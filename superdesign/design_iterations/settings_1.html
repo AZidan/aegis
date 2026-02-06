@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aegis Platform - Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            primary: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            },
+            surface: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    .card-hover {
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+
+    .nav-item {
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .sidebar-overlay {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    .tab-indicator {
+      transition: top 0.25s cubic-bezier(0.4, 0, 0.2, 1), height 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tab-content {
+      animation: fadeInUp 0.3s ease-out;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .progress-bar-fill {
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toast-enter {
+      animation: toastIn 0.35s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+    }
+    .toast-exit {
+      animation: toastOut 0.25s ease-in forwards;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(16px) scale(0.96); }
+    }
+
+    .modal-backdrop {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(6px);
+    }
+    .modal-enter {
+      animation: modalIn 0.3s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .copy-tooltip {
+      animation: tooltipPop 0.2s ease-out forwards;
+    }
+    @keyframes tooltipPop {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body class="h-full bg-surface-50 text-slate-800 antialiased">
+  <div class="flex h-full">
+
+    <!-- ===== LEFT SIDEBAR (Standardized Tenant Admin) ===== -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full z-50 flex flex-col bg-white border-r border-gray-200 transition-all duration-300" style="width: 256px;">
+      <!-- Logo -->
+      <div class="flex items-center gap-2.5 px-5 h-16 border-b border-gray-100">
+        <div class="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="sidebar-label text-sm font-bold text-gray-900 tracking-tight">Acme Corp</span>
+      </div>
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <div class="sidebar-label px-3 pb-2 pt-1 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Workspace</div>
+        <a href="/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-[18px] h-[18px] text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="sidebar-label">Dashboard</span>
+        </a>
+        <a href="/dashboard/agents" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-[18px] h-[18px] text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+          <span class="sidebar-label">Agents</span>
+        </a>
+        <a href="/dashboard/skills" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-[18px] h-[18px] text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 01-.837.276c-.47-.07-.802-.48-.968-.925a2.501 2.501 0 10-3.214 3.214c.446.166.855.497.925.968a.979.979 0 01-.276.837l-1.61 1.61a2.404 2.404 0 01-1.705.707 2.402 2.402 0 01-1.704-.706l-1.568-1.568a1.026 1.026 0 00-.877-.29c-.493.074-.84.504-1.02.968a2.5 2.5 0 11-3.237-3.237c.464-.18.894-.527.967-1.02a1.026 1.026 0 00-.289-.877l-1.568-1.568A2.402 2.402 0 011.998 12c0-.617.236-1.234.706-1.704L4.23 8.77c.24-.24.581-.353.917-.303.515.077.877.528 1.073 1.01a2.5 2.5 0 103.259-3.259c-.482-.196-.933-.558-1.01-1.073-.05-.336.062-.676.303-.917l1.525-1.525A2.402 2.402 0 0112 2c.617 0 1.234.236 1.704.706l1.568 1.568c.23.23.556.338.877.29.493-.074.84-.504 1.02-.969a2.5 2.5 0 113.237 3.237c-.464.18-.894.527-.967 1.02z"/></svg>
+          <span class="sidebar-label">Skill Marketplace</span>
+        </a>
+        <div class="sidebar-label px-3 pb-2 pt-5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Management</div>
+        <a href="/dashboard/team" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-[18px] h-[18px] text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          <span class="sidebar-label">Team Members</span>
+        </a>
+        <a href="/dashboard/audit" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-[18px] h-[18px] text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h12a2 2 0 002-2v-2H10v2a2 2 0 11-4 0V5a2 2 0 10-4 0v3h4"/><path d="M19 17V5a2 2 0 00-2-2H4"/><path d="M15 8h-5"/><path d="M15 12h-5"/></svg>
+          <span class="sidebar-label">Audit Log</span>
+        </a>
+        <a href="/dashboard/settings" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-indigo-50 text-indigo-600 font-semibold">
+          <svg class="w-[18px] h-[18px] text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span class="sidebar-label">Settings</span>
+        </a>
+      </nav>
+      <!-- Footer -->
+      <div class="border-t border-gray-100 px-3 py-3 space-y-2">
+        <button onclick="toggleSidebar()" class="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors">
+          <svg id="collapse-icon" class="w-[18px] h-[18px] transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+          <span class="sidebar-label text-sm">Collapse</span>
+        </button>
+        <div class="flex items-center gap-2.5 px-3 py-2">
+          <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-xs flex-shrink-0">JD</div>
+          <div class="sidebar-label flex-1 min-w-0">
+            <div class="text-sm font-medium text-gray-900 truncate">Jane Doe</div>
+            <div class="text-xs text-gray-500 truncate">Tenant Admin</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main id="main-content" class="flex-1 overflow-y-auto" style="margin-left: 256px;">
+        <div class="mx-auto max-w-[1100px] px-6 py-8 lg:px-8">
+
+          <!-- Page Header -->
+          <div class="mb-8">
+            <h1 class="text-2xl font-bold text-slate-900">Settings</h1>
+            <p class="mt-1 text-sm text-slate-500">Manage your tenant configuration, billing, and API access.</p>
+          </div>
+
+          <!-- Settings Layout: Vertical Tabs + Content -->
+          <div class="flex flex-col md:flex-row gap-6">
+
+            <!-- Vertical Tab Navigation -->
+            <div class="md:w-56 flex-shrink-0">
+              <nav class="flex md:flex-col gap-1 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 md:sticky md:top-8">
+                <button onclick="switchTab('company')" data-tab-btn="company"
+                  class="settings-tab-btn flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 text-sm font-medium whitespace-nowrap transition-all bg-primary-50 text-primary-700 ring-1 ring-primary-200">
+                  <svg class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                  </svg>
+                  Company Profile
+                </button>
+                <button onclick="switchTab('billing')" data-tab-btn="billing"
+                  class="settings-tab-btn flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 text-sm font-medium whitespace-nowrap transition-all text-slate-600 hover:bg-surface-100 hover:text-slate-800">
+                  <svg class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                    <line x1="1" y1="10" x2="23" y2="10"/>
+                  </svg>
+                  Plan & Billing
+                </button>
+                <button onclick="switchTab('apikeys')" data-tab-btn="apikeys"
+                  class="settings-tab-btn flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 text-sm font-medium whitespace-nowrap transition-all text-slate-600 hover:bg-surface-100 hover:text-slate-800">
+                  <svg class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                  </svg>
+                  API Keys
+                </button>
+              </nav>
+            </div>
+
+            <!-- Tab Content Panels -->
+            <div class="flex-1 min-w-0">
+
+              <!-- =============================== -->
+              <!-- TAB: Company Profile             -->
+              <!-- =============================== -->
+              <div id="tab-company" class="tab-content">
+                <div class="rounded-xl border border-surface-200 bg-white shadow-sm">
+                  <div class="px-6 py-5 border-b border-surface-200">
+                    <h2 class="text-lg font-semibold text-slate-900">Company Profile</h2>
+                    <p class="mt-0.5 text-sm text-slate-500">Basic information about your organization on Aegis.</p>
+                  </div>
+                  <div class="px-6 py-6 space-y-6">
+                    <!-- Company Name -->
+                    <div>
+                      <label for="companyName" class="block text-sm font-medium text-slate-700 mb-1.5">Company Name</label>
+                      <input id="companyName" type="text" value="Breadfast"
+                        class="w-full rounded-lg border border-surface-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all" />
+                    </div>
+
+                    <!-- Company Logo -->
+                    <div>
+                      <label class="block text-sm font-medium text-slate-700 mb-1.5">Company Logo</label>
+                      <div id="logoUpload" onclick="document.getElementById('logoInput').click()"
+                        class="group relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-surface-300 bg-surface-50 px-6 py-8 cursor-pointer hover:border-primary-400 hover:bg-primary-50/30 transition-all">
+                        <input id="logoInput" type="file" accept="image/*" class="hidden" onchange="handleLogoUpload(event)" />
+                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-surface-200 group-hover:bg-primary-100 transition-colors">
+                          <svg class="h-5 w-5 text-slate-400 group-hover:text-primary-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                          </svg>
+                        </div>
+                        <div class="text-center">
+                          <p class="text-sm font-medium text-slate-600 group-hover:text-primary-600"><span class="text-primary-600">Click to upload</span> or drag and drop</p>
+                          <p class="mt-1 text-xs text-slate-400">PNG, JPG, SVG up to 2MB. Recommended: 256x256px</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Two column row -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <!-- Industry -->
+                      <div>
+                        <label for="industry" class="block text-sm font-medium text-slate-700 mb-1.5">Industry</label>
+                        <select id="industry"
+                          class="w-full rounded-lg border border-surface-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[right_12px_center] bg-no-repeat pr-10">
+                          <option value="technology" selected>Technology</option>
+                          <option value="ecommerce">E-commerce</option>
+                          <option value="finance">Finance</option>
+                          <option value="healthcare">Healthcare</option>
+                          <option value="education">Education</option>
+                          <option value="retail">Retail</option>
+                          <option value="logistics">Logistics</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+
+                      <!-- Timezone -->
+                      <div>
+                        <label for="timezone" class="block text-sm font-medium text-slate-700 mb-1.5">Timezone</label>
+                        <select id="timezone"
+                          class="w-full rounded-lg border border-surface-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[right_12px_center] bg-no-repeat pr-10">
+                          <option value="Africa/Cairo" selected>Africa/Cairo (UTC+2)</option>
+                          <option value="America/New_York">America/New_York (UTC-5)</option>
+                          <option value="America/Los_Angeles">America/Los_Angeles (UTC-8)</option>
+                          <option value="Europe/London">Europe/London (UTC+0)</option>
+                          <option value="Europe/Berlin">Europe/Berlin (UTC+1)</option>
+                          <option value="Asia/Dubai">Asia/Dubai (UTC+4)</option>
+                          <option value="Asia/Tokyo">Asia/Tokyo (UTC+9)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- Default Agent Model -->
+                    <div>
+                      <label for="agentModel" class="block text-sm font-medium text-slate-700 mb-1.5">Default Agent Model</label>
+                      <select id="agentModel"
+                        class="w-full rounded-lg border border-surface-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[right_12px_center] bg-no-repeat pr-10">
+                        <option value="sonnet-4.5" selected>Sonnet 4.5</option>
+                        <option value="opus-4">Opus 4</option>
+                        <option value="haiku-4">Haiku 4</option>
+                        <option value="gpt-4o">GPT-4o</option>
+                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                        <option value="gemini-2-pro">Gemini 2 Pro</option>
+                      </select>
+                      <p class="mt-1.5 text-xs text-slate-400">This model will be pre-selected when creating new agents.</p>
+                    </div>
+
+                    <!-- Notification Email -->
+                    <div>
+                      <label for="notifEmail" class="block text-sm font-medium text-slate-700 mb-1.5">Notification Email</label>
+                      <input id="notifEmail" type="email" value="admin@breadfast.com" placeholder="alerts@company.com"
+                        class="w-full rounded-lg border border-surface-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all" />
+                      <p class="mt-1.5 text-xs text-slate-400">We will send billing, usage alerts, and system notifications to this address.</p>
+                    </div>
+                  </div>
+
+                  <!-- Footer -->
+                  <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-surface-200 bg-surface-50/60 rounded-b-xl">
+                    <button onclick="resetCompanyForm()" class="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-surface-100 transition-colors">
+                      Reset
+                    </button>
+                    <button onclick="saveCompanyProfile()" id="saveBtn"
+                      class="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 focus:ring-2 focus:ring-primary-200 focus:ring-offset-2 transition-all">
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- =============================== -->
+              <!-- TAB: Plan & Billing              -->
+              <!-- =============================== -->
+              <div id="tab-billing" class="tab-content hidden">
+
+                <!-- Current Plan Card -->
+                <div class="rounded-xl border border-surface-200 bg-white shadow-sm mb-6">
+                  <div class="px-6 py-5 border-b border-surface-200">
+                    <h2 class="text-lg font-semibold text-slate-900">Current Plan</h2>
+                    <p class="mt-0.5 text-sm text-slate-500">Your subscription details and usage overview.</p>
+                  </div>
+                  <div class="px-6 py-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                      <div class="flex items-center gap-4">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-md shadow-primary-200">
+                          <svg class="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <div class="flex items-center gap-2.5">
+                            <h3 class="text-xl font-bold text-slate-900">Enterprise</h3>
+                            <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200">Active</span>
+                          </div>
+                          <p class="text-sm text-slate-500 mt-0.5">Billed monthly. Renews on Mar 1, 2026</p>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-3xl font-bold text-slate-900">$799<span class="text-base font-medium text-slate-400">/mo</span></p>
+                        <p class="text-xs text-slate-400 mt-1">8 of unlimited agents</p>
+                      </div>
+                    </div>
+
+                    <!-- Usage Progress Bars -->
+                    <div class="space-y-5">
+                      <h4 class="text-sm font-semibold text-slate-700">Usage This Month</h4>
+
+                      <!-- Agents -->
+                      <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                          <span class="text-sm text-slate-600">Agents</span>
+                          <span class="text-sm font-medium text-slate-800">8 <span class="text-slate-400 font-normal">/ unlimited</span></span>
+                        </div>
+                        <div class="h-2 rounded-full bg-surface-100 overflow-hidden">
+                          <div class="progress-bar-fill h-full rounded-full bg-primary-500" style="width: 15%"></div>
+                        </div>
+                      </div>
+
+                      <!-- Messages -->
+                      <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                          <span class="text-sm text-slate-600">Messages</span>
+                          <span class="text-sm font-medium text-slate-800">45,231 <span class="text-slate-400 font-normal">/ 100,000</span></span>
+                        </div>
+                        <div class="h-2 rounded-full bg-surface-100 overflow-hidden">
+                          <div class="progress-bar-fill h-full rounded-full bg-amber-500" style="width: 45.2%"></div>
+                        </div>
+                      </div>
+
+                      <!-- Skills -->
+                      <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                          <span class="text-sm text-slate-600">Skills</span>
+                          <span class="text-sm font-medium text-slate-800">15 <span class="text-slate-400 font-normal">/ unlimited</span></span>
+                        </div>
+                        <div class="h-2 rounded-full bg-surface-100 overflow-hidden">
+                          <div class="progress-bar-fill h-full rounded-full bg-emerald-500" style="width: 12%"></div>
+                        </div>
+                      </div>
+
+                      <!-- Storage -->
+                      <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                          <span class="text-sm text-slate-600">Storage</span>
+                          <span class="text-sm font-medium text-slate-800">2.1 GB <span class="text-slate-400 font-normal">/ 10 GB</span></span>
+                        </div>
+                        <div class="h-2 rounded-full bg-surface-100 overflow-hidden">
+                          <div class="progress-bar-fill h-full rounded-full bg-sky-500" style="width: 21%"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-3 px-6 py-4 border-t border-surface-200 bg-surface-50/60 rounded-b-xl">
+                    <button class="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 transition-all">
+                      Upgrade Plan
+                    </button>
+                    <button class="rounded-lg border border-surface-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-surface-50 transition-all">
+                      Contact Sales
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="rounded-xl border border-surface-200 bg-white shadow-sm mb-6">
+                  <div class="px-6 py-5 border-b border-surface-200">
+                    <h2 class="text-lg font-semibold text-slate-900">Payment Method</h2>
+                  </div>
+                  <div class="px-6 py-5">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-4">
+                        <div class="flex h-10 w-16 items-center justify-center rounded-lg bg-slate-800 text-white text-xs font-bold tracking-wider">
+                          VISA
+                        </div>
+                        <div>
+                          <p class="text-sm font-medium text-slate-800">Visa ending in 4242</p>
+                          <p class="text-xs text-slate-400 mt-0.5">Expires 12/2027</p>
+                        </div>
+                      </div>
+                      <button class="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors">
+                        Update
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Billing History -->
+                <div class="rounded-xl border border-surface-200 bg-white shadow-sm">
+                  <div class="px-6 py-5 border-b border-surface-200">
+                    <h2 class="text-lg font-semibold text-slate-900">Billing History</h2>
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="w-full">
+                      <thead>
+                        <tr class="border-b border-surface-200">
+                          <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Invoice</th>
+                          <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
+                          <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Amount</th>
+                          <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                          <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-surface-100">
+                        <tr class="hover:bg-surface-50 transition-colors">
+                          <td class="px-6 py-4 text-sm font-medium text-slate-800">INV-2026-002</td>
+                          <td class="px-6 py-4 text-sm text-slate-600">Feb 1, 2026</td>
+                          <td class="px-6 py-4 text-sm font-medium text-slate-800">$799.00</td>
+                          <td class="px-6 py-4">
+                            <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200">Paid</span>
+                          </td>
+                          <td class="px-6 py-4 text-right">
+                            <button class="text-sm font-medium text-primary-600 hover:text-primary-700 inline-flex items-center gap-1.5 transition-colors">
+                              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                              </svg>
+                              PDF
+                            </button>
+                          </td>
+                        </tr>
+                        <tr class="hover:bg-surface-50 transition-colors">
+                          <td class="px-6 py-4 text-sm font-medium text-slate-800">INV-2026-001</td>
+                          <td class="px-6 py-4 text-sm text-slate-600">Jan 1, 2026</td>
+                          <td class="px-6 py-4 text-sm font-medium text-slate-800">$799.00</td>
+                          <td class="px-6 py-4">
+                            <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200">Paid</span>
+                          </td>
+                          <td class="px-6 py-4 text-right">
+                            <button class="text-sm font-medium text-primary-600 hover:text-primary-700 inline-flex items-center gap-1.5 transition-colors">
+                              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                              </svg>
+                              PDF
+                            </button>
+                          </td>
+                        </tr>
+                        <tr class="hover:bg-surface-50 transition-colors">
+                          <td class="px-6 py-4 text-sm font-medium text-slate-800">INV-2025-012</td>
+                          <td class="px-6 py-4 text-sm text-slate-600">Dec 1, 2025</td>
+                          <td class="px-6 py-4 text-sm font-medium text-slate-800">$799.00</td>
+                          <td class="px-6 py-4">
+                            <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200">Paid</span>
+                          </td>
+                          <td class="px-6 py-4 text-right">
+                            <button class="text-sm font-medium text-primary-600 hover:text-primary-700 inline-flex items-center gap-1.5 transition-colors">
+                              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                              </svg>
+                              PDF
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- =============================== -->
+              <!-- TAB: API Keys                    -->
+              <!-- =============================== -->
+              <div id="tab-apikeys" class="tab-content hidden">
+
+                <!-- Warning Banner -->
+                <div class="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 mb-6">
+                  <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-amber-100">
+                    <svg class="h-4.5 w-4.5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-amber-800">Keep your API keys secure</p>
+                    <p class="mt-0.5 text-sm text-amber-700">API keys provide full access to your tenant. Never expose them in client-side code or public repositories. Rotate keys regularly.</p>
+                  </div>
+                </div>
+
+                <!-- API Keys Table -->
+                <div class="rounded-xl border border-surface-200 bg-white shadow-sm mb-6">
+                  <div class="flex items-center justify-between px-6 py-5 border-b border-surface-200">
+                    <div>
+                      <h2 class="text-lg font-semibold text-slate-900">API Keys</h2>
+                      <p class="mt-0.5 text-sm text-slate-500">Manage keys for programmatic access to the Aegis API.</p>
+                    </div>
+                    <button onclick="openGenerateKeyModal()"
+                      class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 transition-all">
+                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                      </svg>
+                      Generate New Key
+                    </button>
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="w-full">
+                      <thead>
+                        <tr class="border-b border-surface-200">
+                          <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
+                          <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Key</th>
+                          <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Created</th>
+                          <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Last Used</th>
+                          <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-surface-100" id="apiKeysTableBody">
+                        <tr class="hover:bg-surface-50 transition-colors">
+                          <td class="px-6 py-4">
+                            <div class="flex items-center gap-2.5">
+                              <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-50">
+                                <svg class="h-4 w-4 text-primary-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                                </svg>
+                              </div>
+                              <span class="text-sm font-medium text-slate-800">Production API</span>
+                            </div>
+                          </td>
+                          <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                              <code class="font-mono text-sm text-slate-600 bg-surface-100 px-2 py-1 rounded">aegis_sk_...a3f2</code>
+                              <button onclick="copyToClipboard('aegis_sk_prod_7f8e2d1c4b9a6e3f0d5c8b2a1e4f7d9ca3f2', this)"
+                                class="rounded p-1 text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-all" title="Copy full key">
+                                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </td>
+                          <td class="px-6 py-4 text-sm text-slate-600">Jan 15, 2026</td>
+                          <td class="px-6 py-4 text-sm text-slate-600">2 hours ago</td>
+                          <td class="px-6 py-4 text-right">
+                            <button onclick="revokeKey('Production API', this)"
+                              class="text-sm font-medium text-red-600 hover:text-red-700 transition-colors">Revoke</button>
+                          </td>
+                        </tr>
+                        <tr class="hover:bg-surface-50 transition-colors">
+                          <td class="px-6 py-4">
+                            <div class="flex items-center gap-2.5">
+                              <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
+                                <svg class="h-4 w-4 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                                </svg>
+                              </div>
+                              <span class="text-sm font-medium text-slate-800">Staging Environment</span>
+                            </div>
+                          </td>
+                          <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                              <code class="font-mono text-sm text-slate-600 bg-surface-100 px-2 py-1 rounded">aegis_sk_...b7e1</code>
+                              <button onclick="copyToClipboard('aegis_sk_stag_2a4b6c8d0e1f3g5h7i9j0k2l4m6n8o0pb7e1', this)"
+                                class="rounded p-1 text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-all" title="Copy full key">
+                                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </td>
+                          <td class="px-6 py-4 text-sm text-slate-600">Dec 20, 2025</td>
+                          <td class="px-6 py-4 text-sm text-slate-600">5 days ago</td>
+                          <td class="px-6 py-4 text-right">
+                            <button onclick="revokeKey('Staging Environment', this)"
+                              class="text-sm font-medium text-red-600 hover:text-red-700 transition-colors">Revoke</button>
+                          </td>
+                        </tr>
+                        <tr class="hover:bg-surface-50 transition-colors">
+                          <td class="px-6 py-4">
+                            <div class="flex items-center gap-2.5">
+                              <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
+                                <svg class="h-4 w-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                                </svg>
+                              </div>
+                              <span class="text-sm font-medium text-slate-800">CI/CD Pipeline</span>
+                            </div>
+                          </td>
+                          <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                              <code class="font-mono text-sm text-slate-600 bg-surface-100 px-2 py-1 rounded">aegis_sk_...c9d4</code>
+                              <button onclick="copyToClipboard('aegis_sk_cicd_9x8w7v6u5t4s3r2q1p0o9n8m7l6k5j4ic9d4', this)"
+                                class="rounded p-1 text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-all" title="Copy full key">
+                                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </td>
+                          <td class="px-6 py-4 text-sm text-slate-600">Nov 8, 2025</td>
+                          <td class="px-6 py-4 text-sm text-slate-600">12 hours ago</td>
+                          <td class="px-6 py-4 text-right">
+                            <button onclick="revokeKey('CI/CD Pipeline', this)"
+                              class="text-sm font-medium text-red-600 hover:text-red-700 transition-colors">Revoke</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Rate Limits Info -->
+                <div class="rounded-xl border border-surface-200 bg-white shadow-sm">
+                  <div class="px-6 py-5 border-b border-surface-200">
+                    <h2 class="text-lg font-semibold text-slate-900">Rate Limits</h2>
+                  </div>
+                  <div class="px-6 py-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+                      <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-100">
+                          <svg class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <p class="text-sm font-medium text-slate-800">1,000 requests/min</p>
+                          <p class="text-xs text-slate-400">Per API key</p>
+                        </div>
+                      </div>
+                      <div class="hidden sm:block h-8 w-px bg-surface-200"></div>
+                      <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-100">
+                          <svg class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <p class="text-sm font-medium text-slate-800">100,000 requests/day</p>
+                          <p class="text-xs text-slate-400">Tenant-wide limit</p>
+                        </div>
+                      </div>
+                      <div class="hidden sm:block h-8 w-px bg-surface-200"></div>
+                      <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-100">
+                          <svg class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+                            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                            <line x1="6" y1="6" x2="6.01" y2="6"/>
+                            <line x1="6" y1="18" x2="6.01" y2="18"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <p class="text-sm font-medium text-slate-800">10 MB</p>
+                          <p class="text-xs text-slate-400">Max payload size</p>
+                        </div>
+                      </div>
+                    </div>
+                    <p class="mt-4 text-xs text-slate-400">Need higher limits? <a href="#" class="text-primary-600 hover:text-primary-700 font-medium">Contact sales</a> for a custom plan.</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+    </main>
+  </div>
+
+  <!-- =============================== -->
+  <!-- GENERATE KEY MODAL               -->
+  <!-- =============================== -->
+  <div id="generateKeyModal" class="fixed inset-0 z-[100] hidden">
+    <div class="modal-backdrop absolute inset-0" onclick="closeGenerateKeyModal()"></div>
+    <div class="flex items-center justify-center min-h-full p-4">
+      <div class="modal-enter relative w-full max-w-md rounded-2xl bg-white shadow-2xl border border-surface-200">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between px-6 py-5 border-b border-surface-200">
+          <div>
+            <h3 class="text-lg font-semibold text-slate-900">Generate New API Key</h3>
+            <p class="text-sm text-slate-500 mt-0.5">Create a new key for programmatic access.</p>
+          </div>
+          <button onclick="closeGenerateKeyModal()" class="rounded-lg p-2 text-slate-400 hover:text-slate-600 hover:bg-surface-100 transition-all">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Modal Body (Initial State - Form) -->
+        <div id="keyFormState" class="px-6 py-5 space-y-4">
+          <div>
+            <label for="keyName" class="block text-sm font-medium text-slate-700 mb-1.5">Key Name</label>
+            <input id="keyName" type="text" placeholder="e.g., Development Server"
+              class="w-full rounded-lg border border-surface-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all" />
+          </div>
+          <div>
+            <label for="keyExpiry" class="block text-sm font-medium text-slate-700 mb-1.5">Expiration</label>
+            <select id="keyExpiry"
+              class="w-full rounded-lg border border-surface-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[right_12px_center] bg-no-repeat pr-10">
+              <option value="never">Never expires</option>
+              <option value="30">30 days</option>
+              <option value="90" selected>90 days</option>
+              <option value="180">180 days</option>
+              <option value="365">1 year</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Modal Body (Success State - Generated Key) -->
+        <div id="keySuccessState" class="px-6 py-5 hidden">
+          <div class="rounded-xl bg-emerald-50 border border-emerald-200 p-4 mb-4">
+            <div class="flex items-center gap-2 mb-2">
+              <svg class="h-4 w-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              <span class="text-sm font-semibold text-emerald-800">Key generated successfully</span>
+            </div>
+            <p class="text-xs text-emerald-700">Copy your key now. You will not be able to see it again.</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Your API Key</label>
+            <div class="flex items-center gap-2">
+              <input id="generatedKeyValue" type="text" readonly
+                class="font-mono flex-1 rounded-lg border border-surface-200 bg-surface-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none select-all" />
+              <button onclick="copyGeneratedKey()"
+                class="flex-shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-2.5 text-sm font-medium text-white hover:bg-primary-700 transition-all">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copy
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-surface-200 bg-surface-50/60 rounded-b-2xl">
+          <button onclick="closeGenerateKeyModal()" id="modalCancelBtn"
+            class="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-surface-100 transition-colors">
+            Cancel
+          </button>
+          <button onclick="generateKey()" id="modalGenerateBtn"
+            class="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 transition-all">
+            Generate Key
+          </button>
+          <button onclick="closeGenerateKeyModal()" id="modalDoneBtn"
+            class="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 transition-all hidden">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================== -->
+  <!-- REVOKE KEY CONFIRMATION MODAL    -->
+  <!-- =============================== -->
+  <div id="revokeKeyModal" class="fixed inset-0 z-[100] hidden">
+    <div class="modal-backdrop absolute inset-0" onclick="closeRevokeModal()"></div>
+    <div class="flex items-center justify-center min-h-full p-4">
+      <div class="modal-enter relative w-full max-w-sm rounded-2xl bg-white shadow-2xl border border-surface-200">
+        <div class="px-6 py-6 text-center">
+          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-4">
+            <svg class="h-6 w-6 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-1" id="revokeKeyTitle">Revoke API Key?</h3>
+          <p class="text-sm text-slate-500">This action cannot be undone. Any applications using this key will immediately lose access.</p>
+        </div>
+        <div class="flex items-center gap-3 px-6 py-4 border-t border-surface-200 bg-surface-50/60 rounded-b-2xl">
+          <button onclick="closeRevokeModal()" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-surface-100 transition-colors">
+            Cancel
+          </button>
+          <button onclick="confirmRevoke()" class="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-all">
+            Revoke Key
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================== -->
+  <!-- TOAST NOTIFICATIONS              -->
+  <!-- =============================== -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-[200] flex flex-col gap-3 pointer-events-none"></div>
+
+  <!-- =============================== -->
+  <!-- JAVASCRIPT                       -->
+  <!-- =============================== -->
+  <script>
+    // ---- Sidebar Collapse/Expand ----
+    let sidebarCollapsed = false;
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+
+      if (sidebarCollapsed) {
+        sidebar.style.width = '64px';
+        mainContent.style.marginLeft = '64px';
+        labels.forEach(el => el.style.display = 'none');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.style.width = '256px';
+        mainContent.style.marginLeft = '256px';
+        labels.forEach(el => el.style.display = '');
+        collapseIcon.style.transform = '';
+      }
+    }
+
+    // ---- Tab Switching ----
+    function switchTab(tabId) {
+      // Hide all tab content
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.add('hidden');
+        el.style.animation = 'none';
+      });
+
+      // Reset all tab buttons
+      document.querySelectorAll('.settings-tab-btn').forEach(btn => {
+        btn.className = btn.className
+          .replace('bg-primary-50 text-primary-700 ring-1 ring-primary-200', '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        if (!btn.className.includes('text-slate-600')) {
+          btn.classList.add('text-slate-600', 'hover:bg-surface-100', 'hover:text-slate-800');
+        }
+      });
+
+      // Show target tab
+      const target = document.getElementById('tab-' + tabId);
+      target.classList.remove('hidden');
+      // Re-trigger animation
+      void target.offsetWidth;
+      target.style.animation = '';
+
+      // Activate button
+      const activeBtn = document.querySelector('[data-tab-btn="' + tabId + '"]');
+      activeBtn.classList.remove('text-slate-600', 'hover:bg-surface-100', 'hover:text-slate-800');
+      activeBtn.classList.add('bg-primary-50', 'text-primary-700', 'ring-1', 'ring-primary-200');
+    }
+
+    // ---- Save Company Profile ----
+    function saveCompanyProfile() {
+      const btn = document.getElementById('saveBtn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Saving...';
+      btn.disabled = true;
+      btn.classList.add('opacity-70');
+
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        btn.classList.remove('opacity-70');
+        showToast('success', 'Settings saved', 'Your company profile has been updated successfully.');
+      }, 1000);
+    }
+
+    // ---- Reset Company Form ----
+    function resetCompanyForm() {
+      document.getElementById('companyName').value = 'Breadfast';
+      document.getElementById('industry').value = 'technology';
+      document.getElementById('timezone').value = 'Africa/Cairo';
+      document.getElementById('agentModel').value = 'sonnet-4.5';
+      document.getElementById('notifEmail').value = 'admin@breadfast.com';
+      showToast('info', 'Form reset', 'All fields have been restored to their saved values.');
+    }
+
+    // ---- Logo Upload ----
+    function handleLogoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('error', 'File too large', 'Please choose an image under 2MB.');
+        return;
+      }
+      showToast('success', 'Logo uploaded', file.name + ' has been uploaded successfully.');
+    }
+
+    // ---- Copy to Clipboard ----
+    function copyToClipboard(text, btnElement) {
+      navigator.clipboard.writeText(text).then(() => {
+        // Show tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'copy-tooltip absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-slate-800 px-2 py-1 text-xs text-white whitespace-nowrap';
+        tooltip.textContent = 'Copied!';
+        btnElement.style.position = 'relative';
+        btnElement.appendChild(tooltip);
+        setTimeout(() => tooltip.remove(), 1500);
+
+        showToast('success', 'Copied', 'API key copied to clipboard.');
+      }).catch(() => {
+        showToast('error', 'Copy failed', 'Could not copy to clipboard. Please copy manually.');
+      });
+    }
+
+    // ---- Generate Key Modal ----
+    function openGenerateKeyModal() {
+      const modal = document.getElementById('generateKeyModal');
+      modal.classList.remove('hidden');
+      document.getElementById('keyFormState').classList.remove('hidden');
+      document.getElementById('keySuccessState').classList.add('hidden');
+      document.getElementById('modalGenerateBtn').classList.remove('hidden');
+      document.getElementById('modalCancelBtn').classList.remove('hidden');
+      document.getElementById('modalDoneBtn').classList.add('hidden');
+      document.getElementById('keyName').value = '';
+      document.getElementById('keyExpiry').value = '90';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeGenerateKeyModal() {
+      document.getElementById('generateKeyModal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function generateKey() {
+      const name = document.getElementById('keyName').value.trim();
+      if (!name) {
+        document.getElementById('keyName').classList.add('border-red-300', 'ring-2', 'ring-red-100');
+        document.getElementById('keyName').focus();
+        setTimeout(() => {
+          document.getElementById('keyName').classList.remove('border-red-300', 'ring-2', 'ring-red-100');
+        }, 2000);
+        return;
+      }
+
+      const btn = document.getElementById('modalGenerateBtn');
+      btn.textContent = 'Generating...';
+      btn.disabled = true;
+      btn.classList.add('opacity-70');
+
+      setTimeout(() => {
+        // Generate a fake key
+        const chars = 'abcdef0123456789';
+        let key = 'aegis_sk_';
+        for (let i = 0; i < 40; i++) key += chars[Math.floor(Math.random() * chars.length)];
+
+        // Switch to success state
+        document.getElementById('keyFormState').classList.add('hidden');
+        document.getElementById('keySuccessState').classList.remove('hidden');
+        document.getElementById('generatedKeyValue').value = key;
+
+        // Update footer buttons
+        document.getElementById('modalGenerateBtn').classList.add('hidden');
+        document.getElementById('modalCancelBtn').classList.add('hidden');
+        document.getElementById('modalDoneBtn').classList.remove('hidden');
+
+        btn.textContent = 'Generate Key';
+        btn.disabled = false;
+        btn.classList.remove('opacity-70');
+
+        // Add row to table
+        addKeyToTable(name, key);
+
+        showToast('success', 'Key generated', 'Your new API key "' + name + '" is ready.');
+      }, 1200);
+    }
+
+    function copyGeneratedKey() {
+      const keyVal = document.getElementById('generatedKeyValue').value;
+      navigator.clipboard.writeText(keyVal).then(() => {
+        showToast('success', 'Copied', 'New API key copied to clipboard.');
+      });
+    }
+
+    function addKeyToTable(name, fullKey) {
+      const tbody = document.getElementById('apiKeysTableBody');
+      const maskedKey = 'aegis_sk_...' + fullKey.slice(-4);
+      const today = new Date();
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const dateStr = months[today.getMonth()] + ' ' + today.getDate() + ', ' + today.getFullYear();
+
+      const colors = ['primary', 'amber', 'emerald', 'sky', 'violet', 'rose'];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+
+      const row = document.createElement('tr');
+      row.className = 'hover:bg-surface-50 transition-colors';
+      row.style.animation = 'fadeInUp 0.3s ease-out';
+      row.innerHTML = `
+        <td class="px-6 py-4">
+          <div class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-${color}-50">
+              <svg class="h-4 w-4 text-${color}-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+              </svg>
+            </div>
+            <span class="text-sm font-medium text-slate-800">${name}</span>
+          </div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="flex items-center gap-2">
+            <code class="font-mono text-sm text-slate-600 bg-surface-100 px-2 py-1 rounded">${maskedKey}</code>
+            <button onclick="copyToClipboard('${fullKey}', this)"
+              class="rounded p-1 text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-all" title="Copy full key">
+              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+          </div>
+        </td>
+        <td class="px-6 py-4 text-sm text-slate-600">${dateStr}</td>
+        <td class="px-6 py-4 text-sm text-slate-500">Never</td>
+        <td class="px-6 py-4 text-right">
+          <button onclick="revokeKey('${name}', this)"
+            class="text-sm font-medium text-red-600 hover:text-red-700 transition-colors">Revoke</button>
+        </td>
+      `;
+      tbody.insertBefore(row, tbody.firstChild);
+    }
+
+    // ---- Revoke Key ----
+    let revokeTarget = null;
+    function revokeKey(keyName, btnElement) {
+      revokeTarget = btnElement.closest('tr');
+      document.getElementById('revokeKeyTitle').textContent = 'Revoke "' + keyName + '"?';
+      document.getElementById('revokeKeyModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeRevokeModal() {
+      document.getElementById('revokeKeyModal').classList.add('hidden');
+      document.body.style.overflow = '';
+      revokeTarget = null;
+    }
+
+    function confirmRevoke() {
+      if (revokeTarget) {
+        revokeTarget.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        revokeTarget.style.opacity = '0';
+        revokeTarget.style.transform = 'translateX(20px)';
+        setTimeout(() => {
+          revokeTarget.remove();
+          revokeTarget = null;
+        }, 300);
+      }
+      closeRevokeModal();
+      showToast('success', 'Key revoked', 'The API key has been permanently revoked.');
+    }
+
+    // ---- Toast Notifications ----
+    function showToast(type, title, message) {
+      const container = document.getElementById('toastContainer');
+
+      const colors = {
+        success: { bg: 'bg-emerald-50', border: 'border-emerald-200', icon: 'text-emerald-600', title: 'text-emerald-800', msg: 'text-emerald-700' },
+        error:   { bg: 'bg-red-50',     border: 'border-red-200',     icon: 'text-red-600',     title: 'text-red-800',     msg: 'text-red-700' },
+        info:    { bg: 'bg-sky-50',      border: 'border-sky-200',     icon: 'text-sky-600',     title: 'text-sky-800',     msg: 'text-sky-700' },
+      };
+      const c = colors[type] || colors.info;
+
+      const icons = {
+        success: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+        error:   '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+        info:    '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+      };
+
+      const toast = document.createElement('div');
+      toast.className = `toast-enter pointer-events-auto flex items-start gap-3 rounded-xl border ${c.border} ${c.bg} p-4 shadow-lg max-w-sm`;
+      toast.innerHTML = `
+        <svg class="h-5 w-5 flex-shrink-0 ${c.icon}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[type]}</svg>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold ${c.title}">${title}</p>
+          <p class="text-xs ${c.msg} mt-0.5">${message}</p>
+        </div>
+        <button onclick="dismissToast(this.parentElement)" class="flex-shrink-0 rounded p-1 ${c.icon} opacity-60 hover:opacity-100 transition-opacity">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      `;
+      container.appendChild(toast);
+
+      // Auto-dismiss after 4s
+      setTimeout(() => dismissToast(toast), 4000);
+    }
+
+    function dismissToast(toastEl) {
+      if (!toastEl || !toastEl.parentElement) return;
+      toastEl.classList.remove('toast-enter');
+      toastEl.classList.add('toast-exit');
+      setTimeout(() => toastEl.remove(), 250);
+    }
+
+    // ---- Keyboard Shortcut: Escape closes modals ----
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeGenerateKeyModal();
+        closeRevokeModal();
+      }
+    });
+
+    // ---- Animate progress bars on billing tab view ----
+    const observer = new MutationObserver(() => {
+      const billingTab = document.getElementById('tab-billing');
+      if (!billingTab.classList.contains('hidden')) {
+        document.querySelectorAll('#tab-billing .progress-bar-fill').forEach(bar => {
+          const width = bar.style.width;
+          bar.style.width = '0%';
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              bar.style.width = width;
+            });
+          });
+        });
+      }
+    });
+    observer.observe(document.getElementById('tab-billing'), { attributes: true, attributeFilter: ['class'] });
+  </script>
+</body>
+</html>

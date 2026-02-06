@@ -1,0 +1,1799 @@
+# =============================================================================
+# AI Multi-Agent SaaS Platform - Product Roadmap
+# =============================================================================
+# This roadmap covers the SaaS PLATFORM layer (control plane, admin dashboard,
+# tenant management, skill marketplace) -- NOT the agents themselves.
+# Agents run on OpenClaw; we build the management/orchestration layer around them.
+#
+# Last Updated: 2026-02-05
+# Document Owner: Strategy & Product Team
+# =============================================================================
+
+product:
+  name: "AI Multi-Agent SaaS Platform"
+  codename: "Aegis Platform"
+  version: "0.1.0"
+  description: >
+    A multi-tenant SaaS platform enabling enterprises to deploy secure,
+    coordinated AI multi-agent systems. The platform provides hard isolation
+    between company environments, a verified skill marketplace, inter-agent
+    messaging with audit trails, and a management dashboard for provisioning,
+    monitoring, and controlling agent teams. Built on OpenClaw as the agent
+    runtime, the platform adds the enterprise control plane, tenant lifecycle
+    management, billing, and compliance infrastructure.
+  vision: >
+    Make AI multi-agent systems the default way enterprise teams operate --
+    where specialized AI teammates work alongside humans with the same tools,
+    security, and accountability as human employees.
+  pilot_customer: "Breadfast (Egyptian grocery tech)"
+  pilot_agent: "Nadia (PM agent with Tableau/Amplitude/Jira integrations)"
+
+# =============================================================================
+# TECH STACK
+# =============================================================================
+
+tech_stack:
+  frontend:
+    framework: "Next.js 15+"
+    language: "TypeScript"
+    styling: "Tailwind CSS"
+    state_management: "Zustand or React Query"
+    component_library: "Radix UI / shadcn"
+    notes: "Admin dashboard and tenant portal are separate Next.js apps sharing a component library"
+
+  backend:
+    framework: "NestJS"
+    language: "TypeScript"
+    api_style: "REST (primary) + WebSocket (real-time agent status)"
+    validation: "class-validator + class-transformer"
+    orm: "TypeORM"
+    notes: "Modular NestJS architecture with domain-driven modules"
+
+  database:
+    primary: "MySQL 8.0"
+    cache: "Redis 7+"
+    queue: "Redis (via BullMQ)"
+    notes: "MySQL for tenant/agent/skill metadata; Redis for session cache, job queues, real-time status"
+
+  infrastructure:
+    containerization: "Docker"
+    orchestration: "Kubernetes (EKS/GKE)"
+    ci_cd: "GitHub Actions"
+    monitoring: "Prometheus + Grafana"
+    logging: "ELK Stack or Loki"
+    secrets: "HashiCorp Vault or AWS Secrets Manager"
+
+  auth:
+    strategy: "JWT + OAuth2"
+    provider: "Custom (NestJS Passport) with Google/GitHub OAuth"
+    rbac: "Role-based access control (Platform Admin, Tenant Admin, Tenant Member)"
+    api_keys: "HMAC-signed API keys for programmatic access"
+
+  agent_runtime:
+    engine: "OpenClaw"
+    isolation: "Docker container per tenant (OpenClaw-per-Company)"
+    communication: "Messaging-only via sessions_send with allowlists"
+    skills: "Hybrid model -- core shared (read-only) + company custom overlay"
+
+# =============================================================================
+# PERSONAS
+# =============================================================================
+
+personas:
+  - id: vp_product
+    title: "VP of Product (Enterprise SaaS)"
+    context: "Leads 8-15 PMs across product lines. Budget owner for PM tools."
+    key_needs:
+      - "PM agents that know Jira structure, Amplitude events, Tableau dashboards"
+      - "Hard guarantee agents cannot leak data between product lines"
+      - "Audit log of every agent action for compliance"
+    budget: "$200-400/month for 3-5 PM agents"
+
+  - id: dir_engineering
+    title: "Director of Engineering (Tech Startup)"
+    context: "Manages 20-30 engineers. Looking for leverage to avoid hiring overhead."
+    key_needs:
+      - "Engineering agents that triage alerts, update docs, answer architecture questions"
+      - "Each agent isolated to specific repos/systems"
+      - "Skill marketplace for custom internal API tools"
+    budget: "$300-600/month for 5-10 engineering agents"
+
+  - id: coo
+    title: "COO (Mid-Market Company)"
+    context: "Oversees Ops, CS, HR. Drowning in coordination work."
+    key_needs:
+      - "Ops agents that route requests, summarize updates, maintain knowledge base"
+      - "Agents that know company-specific workflows"
+      - "PM + CS + Ops agents working together, not isolated"
+    budget: "$400-800/month for 10-15 ops agents"
+
+  - id: platform_admin
+    title: "Platform Admin (Internal)"
+    context: "Internal team managing the SaaS platform infrastructure."
+    key_needs:
+      - "Provision and deprovision tenant OpenClaw containers"
+      - "Monitor agent health, resource usage, and costs across all tenants"
+      - "Manage skill marketplace catalog and review submissions"
+      - "Handle tenant support escalations and security incidents"
+    budget: "N/A (internal)"
+
+# =============================================================================
+# EPICS & FEATURES -- MVP (Phase 1)
+# =============================================================================
+# Focus: Core platform essentials to go from Breadfast pilot to first 5-10 customers
+# Timeline: Weeks 1-8 (4 sprints of 2 weeks)
+# =============================================================================
+
+epics:
+
+  # ---------------------------------------------------------------------------
+  # EPIC 1: Control Plane & Tenant Provisioning
+  # ---------------------------------------------------------------------------
+  - id: E1
+    title: "Control Plane & Tenant Provisioning"
+    phase: "mvp"
+    priority: "P0"
+    description: >
+      The foundational control plane that manages tenant lifecycle -- from signup
+      to container provisioning to teardown. This is the backbone of the multi-tenant
+      architecture. Each tenant gets an isolated OpenClaw container. The control plane
+      handles provisioning, health checks, configuration management, and resource limits.
+    dependencies: []
+    estimated_effort: "3-4 weeks"
+    success_metrics:
+      - "Tenant provisioned end-to-end in under 5 minutes"
+      - "Zero cross-tenant data leakage in penetration testing"
+      - "Container health check passes within 30 seconds of provisioning"
+
+    features:
+      - id: E1-F1
+        title: "Tenant Registration & Onboarding API"
+        priority: "P0"
+        user_story: >
+          As a Platform Admin, I want to register a new tenant via API so that
+          I can provision their isolated environment without manual server setup.
+        acceptance_criteria:
+          - "POST /api/tenants creates a tenant record in MySQL with unique ID, name, plan, and status"
+          - "Tenant record includes metadata: company name, admin email, plan tier, created_at"
+          - "API validates uniqueness of company name and admin email"
+          - "Returns tenant ID and provisioning status (pending/active/failed)"
+          - "Idempotent -- calling with same email returns existing tenant"
+        screens:
+          - "None (API-only in MVP; admin dashboard in E2)"
+
+      - id: E1-F2
+        title: "OpenClaw Container Provisioning"
+        priority: "P0"
+        user_story: >
+          As a Platform Admin, I want the system to automatically spin up an
+          isolated OpenClaw container for each new tenant so that every company
+          gets hard filesystem and process isolation.
+        acceptance_criteria:
+          - "After tenant creation, a Kubernetes job creates a new OpenClaw container"
+          - "Container has dedicated namespace, persistent volume, and network policy"
+          - "Container is configured with tenant-specific environment variables"
+          - "Provisioning completes within 5 minutes or fails with clear error"
+          - "Container health endpoint returns 200 within 30 seconds of startup"
+          - "Failed provisioning triggers retry (max 3 attempts) and alerts platform admin"
+        screens:
+          - "None (background job; status visible in admin dashboard E2)"
+
+      - id: E1-F3
+        title: "Tenant Configuration Management"
+        priority: "P0"
+        user_story: >
+          As a Platform Admin, I want to manage tenant OpenClaw configurations
+          (model tiers, tool policies, resource limits) from the control plane
+          so that I can enforce platform-wide policies without SSH-ing into containers.
+        acceptance_criteria:
+          - "PUT /api/tenants/:id/config updates the OpenClaw config inside the tenant container"
+          - "Configuration schema validates against allowed fields (model, tools, heartbeat, sandbox)"
+          - "Changes propagate to the running container within 60 seconds (hot reload or restart)"
+          - "Configuration history is versioned -- can rollback to previous config"
+          - "Certain fields are platform-enforced and cannot be overridden by tenant admins"
+        screens:
+          - "Configuration editor in admin dashboard (E2)"
+
+      - id: E1-F4
+        title: "Tenant Suspension & Teardown"
+        priority: "P1"
+        user_story: >
+          As a Platform Admin, I want to suspend or permanently delete a tenant
+          so that I can handle billing failures, policy violations, or customer churn.
+        acceptance_criteria:
+          - "PUT /api/tenants/:id/suspend stops the OpenClaw container but preserves data"
+          - "Suspended tenants cannot use agents but can reactivate within 30 days"
+          - "DELETE /api/tenants/:id initiates permanent teardown (with 7-day grace period)"
+          - "Teardown deletes container, volumes, and database records after grace period"
+          - "Suspension and teardown events are logged in audit trail"
+        screens:
+          - "Tenant management table with suspend/delete actions (E2)"
+
+      - id: E1-F5
+        title: "Container Health Monitoring"
+        priority: "P0"
+        user_story: >
+          As a Platform Admin, I want real-time health status of all tenant
+          containers so that I can detect and respond to outages before customers
+          report them.
+        acceptance_criteria:
+          - "Health check runs every 30 seconds against each tenant container"
+          - "Health status includes: container up/down, memory usage, CPU usage, disk usage"
+          - "Unhealthy containers trigger automatic restart (max 3 per hour)"
+          - "Platform admin receives alert (webhook/email) if container fails 3 consecutive checks"
+          - "GET /api/tenants/:id/health returns current status and last 24h history"
+        screens:
+          - "Health dashboard with green/yellow/red indicators per tenant (E2)"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 2: Platform Admin Dashboard
+  # ---------------------------------------------------------------------------
+  - id: E2
+    title: "Platform Admin Dashboard"
+    phase: "mvp"
+    priority: "P0"
+    description: >
+      Internal web dashboard for the platform team to manage tenants, monitor
+      system health, and operate the platform. This is the primary interface for
+      platform administrators. Not customer-facing in MVP.
+    dependencies:
+      - "E1 (requires control plane APIs)"
+    estimated_effort: "3-4 weeks"
+    success_metrics:
+      - "Platform admin can provision a new tenant entirely from the dashboard"
+      - "Dashboard loads tenant list within 2 seconds for up to 100 tenants"
+      - "All critical actions (provision, suspend, configure) available without CLI"
+
+    features:
+      - id: E2-F1
+        title: "Tenant List & Overview"
+        priority: "P0"
+        user_story: >
+          As a Platform Admin, I want a dashboard view of all tenants with their
+          status, agent count, and health so that I can monitor the platform at a glance.
+        acceptance_criteria:
+          - "Table view showing: tenant name, status (active/suspended/provisioning), agent count, health, plan tier, created date"
+          - "Sortable and filterable by all columns"
+          - "Search by tenant name or admin email"
+          - "Click-through to tenant detail page"
+          - "Real-time status updates via WebSocket (no page refresh needed)"
+        screens:
+          - "Tenant list table with status indicators"
+          - "Search and filter bar"
+          - "Quick action buttons (suspend, configure)"
+
+      - id: E2-F2
+        title: "Tenant Provisioning Wizard"
+        priority: "P0"
+        user_story: >
+          As a Platform Admin, I want a step-by-step wizard to provision new
+          tenants so that I can onboard customers consistently without errors.
+        acceptance_criteria:
+          - "3-step wizard: Company Details -> Plan Selection -> Review & Provision"
+          - "Step 1: Company name, admin email, industry, expected agent count"
+          - "Step 2: Plan tier (starter/growth/enterprise), model defaults, resource limits"
+          - "Step 3: Review summary with estimated monthly cost, confirm to provision"
+          - "Progress indicator shows provisioning status (creating container, configuring, health check)"
+          - "Success state shows tenant ID, admin invite link, and next steps"
+        screens:
+          - "Multi-step form wizard"
+          - "Provisioning progress indicator"
+          - "Success/failure result page"
+
+      - id: E2-F3
+        title: "Tenant Detail & Configuration Panel"
+        priority: "P0"
+        user_story: >
+          As a Platform Admin, I want to view and edit a specific tenant's
+          configuration, agent list, and resource usage so that I can support
+          customer requests and troubleshoot issues.
+        acceptance_criteria:
+          - "Detail page shows: tenant info, configuration, agent list, resource usage, audit log"
+          - "Configuration editor with JSON/form view toggle"
+          - "Agent list shows agent ID, type, model, status, last active timestamp"
+          - "Resource usage charts: CPU, memory, disk, API token consumption (last 7 days)"
+          - "Save configuration triggers validation and hot-reload to container"
+        screens:
+          - "Tenant detail page with tabbed sections"
+          - "Configuration editor (form + raw JSON)"
+          - "Agent list sub-table"
+          - "Resource usage charts"
+
+      - id: E2-F4
+        title: "System Health Dashboard"
+        priority: "P1"
+        user_story: >
+          As a Platform Admin, I want a system-wide health overview showing all
+          tenant containers, platform services, and infrastructure metrics so that
+          I can ensure platform reliability.
+        acceptance_criteria:
+          - "Grid view of all containers with color-coded health (green/yellow/red)"
+          - "Platform service status: API server, database, Redis, Kubernetes cluster"
+          - "Aggregate metrics: total tenants, total agents, total API calls (last 24h)"
+          - "Alert history with severity levels and resolution status"
+          - "Auto-refresh every 30 seconds"
+        screens:
+          - "System overview grid"
+          - "Service status panel"
+          - "Alert history timeline"
+
+      - id: E2-F5
+        title: "Platform Admin Authentication & RBAC"
+        priority: "P0"
+        user_story: >
+          As a Platform Admin, I want secure login with role-based access so that
+          only authorized team members can perform sensitive operations like tenant
+          provisioning and configuration changes.
+        acceptance_criteria:
+          - "Email/password login with MFA (TOTP) for all platform admins"
+          - "Two roles: Super Admin (full access) and Support Admin (read-only + limited actions)"
+          - "Session timeout after 30 minutes of inactivity"
+          - "All admin actions logged with actor, timestamp, and details"
+          - "Password requirements: 12+ chars, mixed case, special characters"
+        screens:
+          - "Login page with MFA step"
+          - "Admin user management page (Super Admin only)"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 3: Agent Management
+  # ---------------------------------------------------------------------------
+  - id: E3
+    title: "Agent Lifecycle Management"
+    phase: "mvp"
+    priority: "P0"
+    description: >
+      CRUD operations for managing agents within a tenant. Covers creating agents
+      with role assignments, configuring model tiers, setting tool policies, and
+      monitoring agent activity. This maps to the OpenClaw agents.list configuration
+      but is managed through the platform API and dashboard.
+    dependencies:
+      - "E1 (requires tenant provisioning)"
+    estimated_effort: "2-3 weeks"
+    success_metrics:
+      - "Tenant admin can create a new agent in under 2 minutes"
+      - "Agent creation propagates to OpenClaw container within 60 seconds"
+      - "Agent activity dashboard shows real-time status"
+
+    features:
+      - id: E3-F1
+        title: "Agent CRUD API"
+        priority: "P0"
+        user_story: >
+          As a Tenant Admin (VP of Product), I want to create, configure, and
+          delete agents within my company's environment so that I can deploy
+          specialized AI teammates for different roles.
+        acceptance_criteria:
+          - "POST /api/tenants/:id/agents creates agent with: name, role type, model tier, workspace config"
+          - "Role types available: PM, Engineering, Operations, Custom"
+          - "Each role type comes with default tool policies and skill suggestions"
+          - "Agent creation updates the tenant OpenClaw config and restarts if needed"
+          - "DELETE /api/tenants/:id/agents/:agentId removes agent config and workspace"
+          - "Agent count enforced against tenant plan limits"
+        screens:
+          - "Agent creation form (in tenant dashboard, E5)"
+
+      - id: E3-F2
+        title: "Agent Configuration & Tool Policies"
+        priority: "P0"
+        user_story: >
+          As a Director of Engineering, I want to configure which tools each agent
+          can access so that my backend engineering agent cannot access mobile
+          repos and vice versa.
+        acceptance_criteria:
+          - "Per-agent tool allow/deny lists configurable via API"
+          - "Tool policy changes propagate to OpenClaw within 60 seconds"
+          - "Default tool policies per role type (PM gets Jira/Amplitude, Eng gets GitHub/Sentry)"
+          - "Tool policy validation prevents conflicting rules"
+          - "Audit log records all tool policy changes with actor and timestamp"
+        screens:
+          - "Tool policy editor with checkboxes per tool category"
+
+      - id: E3-F3
+        title: "Agent Activity & Status Monitoring"
+        priority: "P1"
+        user_story: >
+          As a COO, I want to see which agents are active, what they are working
+          on, and how much they cost so that I can justify the investment and
+          optimize my agent team.
+        acceptance_criteria:
+          - "Agent list shows: name, role, model, status (active/idle/error), last active time"
+          - "Per-agent metrics: messages processed (24h), tool invocations (24h), estimated token cost"
+          - "Status updates in real-time via WebSocket"
+          - "Idle agents (no activity for 7 days) flagged for review"
+          - "Export agent activity report as CSV"
+        screens:
+          - "Agent activity table with sparkline charts"
+          - "Agent detail page with usage history"
+
+      - id: E3-F4
+        title: "Agent Model Tier Management"
+        priority: "P1"
+        user_story: >
+          As a Director of Engineering, I want to assign different AI model tiers
+          to different agents so that I can use Opus for complex reasoning tasks
+          and Haiku for simple automation, controlling costs.
+        acceptance_criteria:
+          - "Model tiers available: Haiku (light), Sonnet (standard), Opus (advanced)"
+          - "Model can be changed per agent without restarting the container"
+          - "Cost estimate displayed when changing model tier"
+          - "Thinking mode (off/low/high) configurable per agent"
+          - "Model tier changes logged in audit trail"
+        screens:
+          - "Model selection dropdown with cost indicators"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 4: Basic Skill Marketplace
+  # ---------------------------------------------------------------------------
+  - id: E4
+    title: "Skill Marketplace (MVP)"
+    phase: "mvp"
+    priority: "P0"
+    description: >
+      Curated catalog of verified skills that tenant admins can browse and install
+      into their agents. MVP scope is a read-only catalog with platform-managed
+      installation. Covers the Layer 1 (Core Tools) and Layer 2 (Role Skills)
+      from the architecture. Custom skills (Layer 3) come in Phase 2.
+    dependencies:
+      - "E3 (requires agent management for skill installation)"
+    estimated_effort: "2-3 weeks"
+    success_metrics:
+      - "10+ verified skills available at launch"
+      - "Skill installation completes within 30 seconds"
+      - "70%+ of tenants install at least 3 skills"
+
+    features:
+      - id: E4-F1
+        title: "Skill Catalog API & Browsing"
+        priority: "P0"
+        user_story: >
+          As a VP of Product, I want to browse a catalog of verified agent skills
+          (Jira, Tableau, Amplitude) so that I can find and install the tools my
+          PM agents need without engineering help.
+        acceptance_criteria:
+          - "GET /api/skills returns paginated list of verified skills"
+          - "Each skill has: name, description, category, compatible roles, version, rating, install count"
+          - "Filter by category (productivity, analytics, engineering, communication)"
+          - "Filter by compatible role (PM, Engineering, Operations)"
+          - "Search by skill name or description"
+          - "Skill detail endpoint shows full documentation, permissions required, and changelog"
+        screens:
+          - "Skill catalog grid with category filters"
+          - "Skill detail page with install button"
+
+      - id: E4-F2
+        title: "Skill Installation & Removal"
+        priority: "P0"
+        user_story: >
+          As a Tenant Admin, I want to install skills from the marketplace into
+          specific agents so that I can extend agent capabilities with verified
+          integrations.
+        acceptance_criteria:
+          - "POST /api/tenants/:id/agents/:agentId/skills installs a skill from the catalog"
+          - "Installation copies skill files to the agent's workspace skill directory"
+          - "Skill becomes available to the agent within 60 seconds (no container restart)"
+          - "DELETE endpoint removes skill from agent"
+          - "Cannot install skills that conflict with the agent's tool policy"
+          - "Installation logged in audit trail"
+        screens:
+          - "Install confirmation modal showing required permissions"
+          - "Installed skills list on agent detail page"
+
+      - id: E4-F3
+        title: "Skill Verification & Review Pipeline (Internal)"
+        priority: "P1"
+        user_story: >
+          As a Platform Admin, I want a workflow for reviewing and publishing
+          skills to the marketplace so that only security-vetted skills are
+          available to tenants.
+        acceptance_criteria:
+          - "Skill submission form: code repository URL, documentation, permission manifest"
+          - "Review workflow: submitted -> in review -> approved/rejected"
+          - "Security checklist: no outbound calls to undeclared domains, no filesystem access outside workspace"
+          - "Approved skills published to catalog with version number"
+          - "Rejection includes feedback for the submitter"
+        screens:
+          - "Skill review queue in platform admin dashboard"
+          - "Review detail page with code viewer and checklist"
+
+      - id: E4-F4
+        title: "Core Skill Bundle (Pre-installed)"
+        priority: "P0"
+        user_story: >
+          As a newly onboarded tenant, I want a set of core skills pre-installed
+          so that my agents can integrate with common tools (Jira, Slack, Google
+          Calendar) from day one without manual configuration.
+        acceptance_criteria:
+          - "Core bundle includes: Jira, Amplitude, Tableau, GitHub, Sentry, Slack, Google Calendar, Linear, Notion, Confluence"
+          - "Core skills installed as read-only shared resources (Layer 1)"
+          - "Core skills cannot be uninstalled or modified by tenants"
+          - "Core skills automatically updated when platform pushes new versions"
+          - "Tenant agents can access core skills based on role-type defaults"
+        screens:
+          - "Core skills section in skill catalog (marked as 'included')"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 5: Tenant Admin Dashboard
+  # ---------------------------------------------------------------------------
+  - id: E5
+    title: "Tenant Admin Dashboard"
+    phase: "mvp"
+    priority: "P0"
+    description: >
+      Customer-facing dashboard for tenant administrators to manage their agents,
+      view activity, install skills, and configure communication allowlists.
+      This is separate from the Platform Admin Dashboard (E2) and scoped to a
+      single tenant's data.
+    dependencies:
+      - "E1 (tenant provisioning)"
+      - "E3 (agent management APIs)"
+      - "E4 (skill marketplace APIs)"
+    estimated_effort: "3-4 weeks"
+    success_metrics:
+      - "Tenant admin can manage all agents without platform admin assistance"
+      - "Dashboard loads within 2 seconds"
+      - "80% of admin actions possible without documentation"
+
+    features:
+      - id: E5-F1
+        title: "Tenant Admin Login & Session Management"
+        priority: "P0"
+        user_story: >
+          As a VP of Product, I want to log in to my company's agent management
+          dashboard with secure authentication so that I can manage my agent team
+          without contacting platform support.
+        acceptance_criteria:
+          - "Email/password login with optional OAuth (Google, GitHub)"
+          - "JWT-based session with 24-hour expiry and refresh token"
+          - "Tenant admin can invite team members with 'Admin' or 'Viewer' roles"
+          - "Login scoped to tenant -- cannot access other tenants' data"
+          - "Password reset via email"
+        screens:
+          - "Login page with OAuth buttons"
+          - "Team member invitation dialog"
+          - "Account settings page"
+
+      - id: E5-F2
+        title: "Agent Overview Dashboard"
+        priority: "P0"
+        user_story: >
+          As a COO, I want a dashboard showing all my company's agents with their
+          status and recent activity so that I can understand how the agent team
+          is performing.
+        acceptance_criteria:
+          - "Card-based view of all agents: name, role, avatar, status, last active"
+          - "Summary metrics: total agents, active today, messages processed today, estimated daily cost"
+          - "Quick actions: create agent, configure agent, view activity log"
+          - "Filter by role type (PM, Engineering, Operations)"
+          - "Activity feed showing recent agent actions across all agents"
+        screens:
+          - "Agent cards grid"
+          - "Summary metrics bar"
+          - "Activity feed sidebar"
+
+      - id: E5-F3
+        title: "Agent Creation & Configuration UI"
+        priority: "P0"
+        user_story: >
+          As a Director of Engineering, I want to create a new engineering agent
+          through a guided form so that I can deploy an agent for my backend team
+          without writing configuration files.
+        acceptance_criteria:
+          - "Step 1: Agent name, role type selection (PM/Eng/Ops/Custom)"
+          - "Step 2: Model tier selection with cost estimate per tier"
+          - "Step 3: Tool policy configuration (pre-populated from role defaults)"
+          - "Step 4: Channel binding (which Telegram/Slack bot connects to this agent)"
+          - "Step 5: Review and create"
+          - "Created agent appears in dashboard within 60 seconds"
+        screens:
+          - "Agent creation wizard (5 steps)"
+          - "Role type selection cards with descriptions"
+          - "Tool policy checkbox grid"
+
+      - id: E5-F4
+        title: "Skill Marketplace Browser (Tenant View)"
+        priority: "P1"
+        user_story: >
+          As a VP of Product, I want to browse and install skills from within
+          my tenant dashboard so that I can extend my agents' capabilities
+          without switching to a separate marketplace site.
+        acceptance_criteria:
+          - "Embedded skill catalog within tenant dashboard"
+          - "Shows only skills compatible with tenant's plan tier"
+          - "One-click install to selected agent"
+          - "Installed skills shown on agent detail page with remove option"
+          - "Skill usage metrics per agent"
+        screens:
+          - "Skill catalog embedded page"
+          - "Agent skill management panel"
+
+      - id: E5-F5
+        title: "Communication Allowlist Configuration"
+        priority: "P1"
+        user_story: >
+          As a COO, I want to configure which agents can communicate with each
+          other so that my PM agent and Engineering agent can coordinate on
+          sprint planning while my HR agent remains isolated.
+        acceptance_criteria:
+          - "Visual graph showing agents as nodes and communication links as edges"
+          - "Click to add/remove communication links between agents"
+          - "Default: all agents can message the main agent (hub); peer-to-peer is opt-in"
+          - "Changes saved to OpenClaw allowlist config within 60 seconds"
+          - "Audit log shows all allowlist changes"
+        screens:
+          - "Agent communication graph (interactive)"
+          - "Allowlist management table (fallback for non-graph view)"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 6: Authentication & Authorization Infrastructure
+  # ---------------------------------------------------------------------------
+  - id: E6
+    title: "Authentication & Authorization Infrastructure"
+    phase: "mvp"
+    priority: "P0"
+    description: >
+      Shared authentication and authorization layer supporting both platform
+      admin and tenant admin flows. JWT issuance, OAuth2 integration, API key
+      management, and RBAC enforcement.
+    dependencies: []
+    estimated_effort: "2 weeks"
+    success_metrics:
+      - "Auth endpoints pass OWASP security checklist"
+      - "Token refresh works without user-visible interruption"
+      - "Role-based access correctly enforced across all API endpoints"
+
+    features:
+      - id: E6-F1
+        title: "JWT Authentication Service"
+        priority: "P0"
+        user_story: >
+          As a developer building the platform, I want a centralized JWT
+          authentication service so that all API endpoints can verify identity
+          and authorize requests consistently.
+        acceptance_criteria:
+          - "POST /api/auth/login issues access token (15min) and refresh token (7 days)"
+          - "POST /api/auth/refresh rotates tokens without requiring re-login"
+          - "Tokens include: userId, tenantId (null for platform admins), role, permissions"
+          - "Token validation middleware available as NestJS guard"
+          - "Revoked tokens rejected within 60 seconds (Redis-backed blacklist)"
+        screens:
+          - "None (backend service)"
+
+      - id: E6-F2
+        title: "OAuth2 Social Login"
+        priority: "P1"
+        user_story: >
+          As a Tenant Admin, I want to log in with my Google or GitHub account
+          so that I can access my dashboard without managing another password.
+        acceptance_criteria:
+          - "Google OAuth2 login flow (PKCE)"
+          - "GitHub OAuth2 login flow (PKCE)"
+          - "Social login creates or links to existing tenant admin account"
+          - "First social login prompts to connect to existing tenant or create new account"
+          - "Social login respects same RBAC as email/password login"
+        screens:
+          - "OAuth consent redirect"
+          - "Account linking prompt (if email matches existing account)"
+
+      - id: E6-F3
+        title: "Role-Based Access Control (RBAC)"
+        priority: "P0"
+        user_story: >
+          As a Platform Admin, I want role-based permissions so that support
+          staff can view tenant details but cannot modify configurations or
+          provision new tenants.
+        acceptance_criteria:
+          - "Platform roles: Super Admin (full), Support Admin (read + limited actions)"
+          - "Tenant roles: Tenant Admin (full within tenant), Tenant Viewer (read-only)"
+          - "Permissions enforced at API middleware level (NestJS guards)"
+          - "Role assignment managed via user management pages"
+          - "Permission denied returns 403 with clear error message"
+        screens:
+          - "User role management table"
+
+      - id: E6-F4
+        title: "API Key Management"
+        priority: "P2"
+        user_story: >
+          As a Director of Engineering, I want to generate API keys for my
+          tenant so that I can integrate the platform with our internal CI/CD
+          pipeline for automated agent provisioning.
+        acceptance_criteria:
+          - "Tenant admin can generate named API keys with expiration dates"
+          - "API keys scoped to tenant with configurable permissions"
+          - "Keys displayed once at creation (not retrievable after)"
+          - "Revoke key immediately invalidates it"
+          - "API key usage logged with IP address and endpoint"
+        screens:
+          - "API key management page with create/revoke actions"
+
+# =============================================================================
+# EPICS & FEATURES -- Phase 2
+# =============================================================================
+# Focus: Multi-agent coordination, security hardening, audit compliance
+# Timeline: Weeks 9-16 (4 sprints)
+# =============================================================================
+
+  # ---------------------------------------------------------------------------
+  # EPIC 7: Inter-Agent Communication & Coordination
+  # ---------------------------------------------------------------------------
+  - id: E7
+    title: "Inter-Agent Communication & Coordination"
+    phase: "phase_2"
+    priority: "P1"
+    description: >
+      Advanced inter-agent messaging features including structured message types,
+      coordination workflows, and visibility into agent-to-agent communication.
+      Builds on the messaging-only architecture (sessions_send) with allowlists.
+    dependencies:
+      - "E3 (agent management)"
+      - "E5-F5 (communication allowlist UI)"
+    estimated_effort: "3 weeks"
+    success_metrics:
+      - "60%+ of multi-agent tenants use peer-to-peer communication"
+      - "Agent-to-agent messages delivered within 2 seconds"
+      - "All inter-agent messages captured in audit trail"
+
+    features:
+      - id: E7-F1
+        title: "Structured Inter-Agent Messaging"
+        priority: "P1"
+        user_story: >
+          As a COO, I want my PM agent and Engineering agent to exchange
+          structured messages (task handoffs, status updates, data requests)
+          so that they can coordinate on cross-functional work like sprint planning.
+        acceptance_criteria:
+          - "Message types: task_handoff, status_update, data_request, data_response, escalation"
+          - "Messages include metadata: sender, recipient, type, timestamp, correlation_id"
+          - "Messages validated against schema before delivery"
+          - "Undeliverable messages (blocked by allowlist) return clear error to sender"
+          - "Message history retrievable per agent pair"
+
+      - id: E7-F2
+        title: "Coordination Workflows"
+        priority: "P2"
+        user_story: >
+          As a VP of Product, I want to define recurring coordination workflows
+          (e.g., weekly standup sync between PM and Eng agents) so that my
+          agent team operates on a predictable cadence.
+        acceptance_criteria:
+          - "Workflow templates: daily_sync, weekly_standup, sprint_handoff"
+          - "Workflow defines: participating agents, trigger (schedule/event), message sequence"
+          - "Workflow execution logged with completion status"
+          - "Failed workflows retry once and escalate to human if still failing"
+          - "Custom workflows creatable from template"
+
+      - id: E7-F3
+        title: "Inter-Agent Message Dashboard"
+        priority: "P1"
+        user_story: >
+          As a Tenant Admin, I want to see all inter-agent messages in a
+          timeline view so that I can understand how my agents are
+          collaborating and identify bottlenecks.
+        acceptance_criteria:
+          - "Timeline view of all inter-agent messages within tenant"
+          - "Filter by agent pair, message type, date range"
+          - "Message detail shows full payload (with sensitive fields masked)"
+          - "Visual flow diagram showing message paths between agents"
+          - "Export message history as JSON or CSV"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 8: Audit Trail & Compliance
+  # ---------------------------------------------------------------------------
+  - id: E8
+    title: "Audit Trail & Compliance"
+    phase: "phase_2"
+    priority: "P0"
+    description: >
+      Comprehensive audit logging for all agent actions, admin operations,
+      inter-agent messages, and system events. Required for enterprise sales
+      and SOC2 preparation. Every action in the platform must be traceable
+      to an actor (human or agent) with timestamp and context.
+    dependencies:
+      - "E1 (control plane)"
+      - "E3 (agent management)"
+    estimated_effort: "3 weeks"
+    success_metrics:
+      - "100% of API calls logged with actor, timestamp, and outcome"
+      - "Audit log query returns results within 5 seconds for last 30 days"
+      - "Audit data retained for 1 year minimum"
+
+    features:
+      - id: E8-F1
+        title: "Agent Action Audit Log"
+        priority: "P0"
+        user_story: >
+          As a VP of Product, I want a detailed log of every action my agents
+          take (tool invocations, file operations, messages sent) so that I
+          can satisfy compliance requirements and investigate incidents.
+        acceptance_criteria:
+          - "Every agent tool invocation logged: agent_id, tool_name, parameters (sanitized), result_status, timestamp"
+          - "Every inter-agent message logged: sender, recipient, message_type, timestamp"
+          - "Logs stored in append-only format (immutable after write)"
+          - "Logs indexed by tenant_id, agent_id, timestamp for fast queries"
+          - "Retention: 90 days hot (MySQL), 1 year cold (S3/object storage)"
+
+      - id: E8-F2
+        title: "Admin Operation Audit Log"
+        priority: "P0"
+        user_story: >
+          As a Platform Admin, I want every administrative action (tenant
+          creation, config changes, skill installations) logged with the
+          admin's identity so that I can investigate unauthorized changes.
+        acceptance_criteria:
+          - "All API mutations logged: endpoint, method, actor_id, actor_role, request_body (sanitized), response_status"
+          - "Login/logout events logged with IP address and user agent"
+          - "Configuration changes logged with before/after diff"
+          - "Logs cannot be deleted by any admin (append-only)"
+          - "Super Admin can export audit logs for external review"
+
+      - id: E8-F3
+        title: "Audit Log Viewer"
+        priority: "P1"
+        user_story: >
+          As a Tenant Admin, I want to search and browse my company's audit
+          logs from the dashboard so that I can quickly investigate what an
+          agent did and when.
+        acceptance_criteria:
+          - "Searchable audit log viewer in tenant dashboard"
+          - "Filter by: agent, action type, date range, severity"
+          - "Log entries expandable to show full details"
+          - "Export filtered logs as CSV or JSON"
+          - "Pagination for large result sets (50 entries per page)"
+        screens:
+          - "Audit log table with filters"
+          - "Log entry detail modal"
+          - "Export dialog"
+
+      - id: E8-F4
+        title: "Security Event Alerting"
+        priority: "P1"
+        user_story: >
+          As a Platform Admin, I want automatic alerts when security-sensitive
+          events occur (failed logins, cross-tenant access attempts, tool
+          policy violations) so that I can respond to threats in real time.
+        acceptance_criteria:
+          - "Alert rules: 5+ failed logins in 5 minutes, cross-tenant API call attempt, tool policy violation"
+          - "Alerts delivered via email and webhook"
+          - "Alert severity levels: info, warning, critical"
+          - "Alert suppression rules to prevent noise"
+          - "Alert history viewable in platform admin dashboard"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 9: Advanced Security & Isolation
+  # ---------------------------------------------------------------------------
+  - id: E9
+    title: "Advanced Security & Isolation"
+    phase: "phase_2"
+    priority: "P1"
+    description: >
+      Security hardening beyond MVP baseline. Includes skill permission manifests
+      (Deno-style), network policy enforcement, secret rotation, and penetration
+      testing infrastructure. Aligns with Phase 2 of the Skill Governance roadmap
+      from architecture decisions.
+    dependencies:
+      - "E4 (skill marketplace)"
+      - "E8 (audit trail for logging violations)"
+    estimated_effort: "3-4 weeks"
+    success_metrics:
+      - "All skills have permission manifests"
+      - "Network policy violations logged and blocked"
+      - "Zero critical findings in penetration test"
+
+    features:
+      - id: E9-F1
+        title: "Skill Permission Manifests"
+        priority: "P1"
+        user_story: >
+          As a Platform Admin, I want every skill to declare its required
+          permissions (network domains, file paths, environment variables)
+          so that I can review and approve only skills with minimal access.
+        acceptance_criteria:
+          - "Skills must include permissions block: network (allowed domains), files (read/write paths), env (required variables)"
+          - "Permission manifest validated on skill submission"
+          - "Runtime logging of permission usage (soft enforcement in Phase 2)"
+          - "Dashboard shows permission summary for each installed skill"
+          - "Skills without manifests rejected from marketplace"
+
+      - id: E9-F2
+        title: "Network Policy Enforcement"
+        priority: "P1"
+        user_story: >
+          As a Director of Engineering, I want network egress from agent
+          containers restricted to declared domains so that a compromised skill
+          cannot exfiltrate data to unauthorized servers.
+        acceptance_criteria:
+          - "Kubernetes NetworkPolicy restricts egress per tenant container"
+          - "Allowed domains derived from installed skills' permission manifests"
+          - "Blocked outbound requests logged with source agent, destination domain, timestamp"
+          - "Platform admin can add tenant-level domain allowlist overrides"
+          - "DNS-level enforcement (not just IP-based)"
+
+      - id: E9-F3
+        title: "Secret Rotation & Management"
+        priority: "P2"
+        user_story: >
+          As a Tenant Admin, I want to manage and rotate API credentials
+          (Jira tokens, Tableau tokens) for my agents from the dashboard
+          so that I can maintain security hygiene without SSH access.
+        acceptance_criteria:
+          - "Credential vault per tenant for storing API tokens, OAuth tokens, API keys"
+          - "Credentials injected into agent container as environment variables"
+          - "Credential rotation: generate new, inject, verify, revoke old"
+          - "Credentials encrypted at rest (AES-256) and in transit (TLS)"
+          - "Credential access logged in audit trail"
+
+      - id: E9-F4
+        title: "Tenant Data Encryption"
+        priority: "P1"
+        user_story: >
+          As a VP of Product, I want all my company's agent data encrypted at
+          rest and in transit so that I can pass my company's security review
+          for deploying AI tools.
+        acceptance_criteria:
+          - "Database encryption at rest (MySQL TDE or application-level encryption)"
+          - "Persistent volumes encrypted (EBS/PD encryption)"
+          - "All API traffic over TLS 1.3"
+          - "Inter-service communication within cluster encrypted (mTLS via service mesh)"
+          - "Encryption configuration documented for customer security reviews"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 10: Custom Skill Development (Layer 3)
+  # ---------------------------------------------------------------------------
+  - id: E10
+    title: "Custom Skill Development"
+    phase: "phase_2"
+    priority: "P1"
+    description: >
+      Enable tenant admins to create and deploy custom skills (Layer 3 from
+      architecture) that integrate with their internal APIs and workflows.
+      Includes a skill development SDK, testing sandbox, and private skill
+      registry per tenant.
+    dependencies:
+      - "E4 (skill marketplace infrastructure)"
+      - "E9-F1 (permission manifests)"
+    estimated_effort: "3 weeks"
+    success_metrics:
+      - "30% of tenants create at least one custom skill within 90 days"
+      - "Custom skill deployment from commit to live in under 10 minutes"
+      - "SDK documentation rated 4+ stars by users"
+
+    features:
+      - id: E10-F1
+        title: "Skill Development SDK"
+        priority: "P1"
+        user_story: >
+          As a Director of Engineering, I want an SDK and documentation for
+          building custom skills so that my team can create integrations with
+          our internal APIs without reverse-engineering the skill format.
+        acceptance_criteria:
+          - "NPM package: @aegis/skill-sdk with TypeScript types"
+          - "Skill scaffold CLI: npx @aegis/skill-sdk init <skill-name>"
+          - "SDK includes: request/response types, authentication helpers, testing utilities"
+          - "Documentation site with tutorials, API reference, and example skills"
+          - "SDK version pinned to platform version for compatibility"
+
+      - id: E10-F2
+        title: "Private Skill Registry"
+        priority: "P1"
+        user_story: >
+          As a Tenant Admin, I want a private registry for my company's custom
+          skills so that they are only available to my agents and not exposed
+          to other tenants.
+        acceptance_criteria:
+          - "Each tenant has a private skill namespace"
+          - "Custom skills stored in tenant-specific storage (not shared catalog)"
+          - "Custom skills can override core skills for the tenant (Layer 3 overlay)"
+          - "Version management: multiple versions, rollback capability"
+          - "Custom skill count limited by plan tier"
+
+      - id: E10-F3
+        title: "Skill Testing Sandbox"
+        priority: "P2"
+        user_story: >
+          As a Director of Engineering, I want to test custom skills in a
+          sandbox before deploying them to production agents so that I can
+          catch errors and security issues early.
+        acceptance_criteria:
+          - "Sandbox environment mimics production agent but with test data"
+          - "Skill tested against permission manifest (network, files, env)"
+          - "Test results include: success/failure, execution time, permissions used"
+          - "Sandbox isolated from production tenant container"
+          - "Test history retained for debugging"
+
+# =============================================================================
+# EPICS & FEATURES -- Phase 3
+# =============================================================================
+# Focus: Self-service, billing, analytics -- scaling from 10 to 100+ tenants
+# Timeline: Weeks 17-24 (4 sprints)
+# =============================================================================
+
+  # ---------------------------------------------------------------------------
+  # EPIC 11: Self-Service Onboarding
+  # ---------------------------------------------------------------------------
+  - id: E11
+    title: "Self-Service Tenant Onboarding"
+    phase: "phase_3"
+    priority: "P1"
+    description: >
+      Public-facing signup flow that allows companies to register, provision
+      their environment, and deploy their first agent without platform admin
+      intervention. Replaces the admin-initiated provisioning from MVP.
+    dependencies:
+      - "E1 (tenant provisioning)"
+      - "E6 (authentication)"
+      - "E12 (billing -- must collect payment before provisioning)"
+    estimated_effort: "3 weeks"
+    success_metrics:
+      - "Signup to first agent interaction in under 10 minutes"
+      - "80% of signups complete onboarding without support ticket"
+      - "Onboarding funnel conversion rate above 60%"
+
+    features:
+      - id: E11-F1
+        title: "Public Signup & Company Registration"
+        priority: "P1"
+        user_story: >
+          As a VP of Product evaluating AI agent platforms, I want to sign up
+          and create my company's account in under 5 minutes so that I can
+          start evaluating the platform without talking to sales.
+        acceptance_criteria:
+          - "Public signup page: email, password, company name, company size, industry"
+          - "Email verification required before proceeding"
+          - "Company name uniqueness validated in real-time"
+          - "Free trial available (14 days, 2 agents, Sonnet model)"
+          - "Terms of service and privacy policy acceptance required"
+        screens:
+          - "Signup page"
+          - "Email verification page"
+          - "Company profile form"
+
+      - id: E11-F2
+        title: "Guided First-Agent Setup"
+        priority: "P1"
+        user_story: >
+          As a newly registered Tenant Admin, I want a guided wizard to create
+          and configure my first agent so that I can experience value within
+          my first session.
+        acceptance_criteria:
+          - "Interactive wizard after first login: 'Let us set up your first AI teammate'"
+          - "Step 1: Choose agent role (PM, Engineering, Operations) with use case descriptions"
+          - "Step 2: Name the agent and set personality basics"
+          - "Step 3: Connect channel (Telegram bot setup walkthrough with screenshots)"
+          - "Step 4: Install recommended skills for the chosen role"
+          - "Step 5: Send first test message to agent and see response"
+          - "Wizard completable in under 10 minutes"
+        screens:
+          - "5-step onboarding wizard"
+          - "Channel connection walkthrough"
+          - "Test message interface"
+
+      - id: E11-F3
+        title: "Onboarding Progress Tracker"
+        priority: "P2"
+        user_story: >
+          As a Tenant Admin, I want to see my onboarding progress and
+          recommended next steps so that I know what to do after initial
+          setup to get the most value.
+        acceptance_criteria:
+          - "Checklist widget on dashboard: Create account, Deploy first agent, Install skills, Connect channel, Invite team member"
+          - "Each step links to relevant page or wizard"
+          - "Progress persisted across sessions"
+          - "Checklist dismissible after completion"
+          - "Recommendations for second agent based on first agent's role"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 12: Billing & Payments
+  # ---------------------------------------------------------------------------
+  - id: E12
+    title: "Billing & Payments"
+    phase: "phase_3"
+    priority: "P0"
+    description: >
+      Subscription billing, usage tracking, and payment processing. Supports
+      multiple pricing models aligned with market research (per-agent fees +
+      usage-based components). Integrates with Stripe for payment processing.
+    dependencies:
+      - "E1 (tenant management)"
+      - "E3 (agent management -- agent count determines billing)"
+    estimated_effort: "4 weeks"
+    success_metrics:
+      - "Payment collection rate above 95%"
+      - "Invoice generation automated with zero manual intervention"
+      - "Usage data accurate to within 1% of actual consumption"
+
+    features:
+      - id: E12-F1
+        title: "Subscription Plan Management"
+        priority: "P0"
+        user_story: >
+          As a COO, I want to choose a subscription plan that matches my
+          company's needs so that I can budget predictably for my agent team.
+        acceptance_criteria:
+          - "Three plan tiers: Starter ($199/mo, 3 agents, Sonnet), Growth ($499/mo, 10 agents, Sonnet+Opus), Enterprise (custom pricing)"
+          - "Plan comparison page showing feature matrix"
+          - "Plan upgrade/downgrade with prorated billing"
+          - "Agent count enforced against plan limits (soft limit with warning, hard limit blocks creation)"
+          - "Annual billing option with 20% discount"
+        screens:
+          - "Plan selection page with feature comparison"
+          - "Plan change confirmation with prorated cost"
+
+      - id: E12-F2
+        title: "Stripe Payment Integration"
+        priority: "P0"
+        user_story: >
+          As a Tenant Admin, I want to pay by credit card with automatic
+          monthly billing so that I do not have to manually process invoices.
+        acceptance_criteria:
+          - "Stripe Checkout for initial payment"
+          - "Stripe Customer Portal for managing payment methods"
+          - "Automatic monthly charging on billing cycle date"
+          - "Failed payments trigger 3 retry attempts over 7 days"
+          - "After 7 days of failed payment, tenant suspended (not deleted)"
+          - "PCI compliance handled entirely by Stripe (no card data stored)"
+        screens:
+          - "Stripe Checkout redirect"
+          - "Payment method management (Stripe Portal)"
+
+      - id: E12-F3
+        title: "Usage Tracking & Metering"
+        priority: "P1"
+        user_story: >
+          As a Director of Engineering, I want to see detailed usage metrics
+          (token consumption, tool invocations, agent hours) so that I can
+          understand costs and optimize my agent configuration.
+        acceptance_criteria:
+          - "Per-agent metrics: input tokens, output tokens, thinking tokens, tool invocations"
+          - "Per-tenant aggregate metrics with daily/weekly/monthly rollups"
+          - "Usage dashboard with charts (bar chart by agent, line chart over time)"
+          - "Usage alerts: notify at 80% and 100% of plan limits"
+          - "Data exported as CSV for internal budgeting"
+        screens:
+          - "Usage dashboard with per-agent breakdown"
+          - "Usage alert configuration"
+
+      - id: E12-F4
+        title: "Invoice Generation & History"
+        priority: "P1"
+        user_story: >
+          As a COO, I want monthly invoices with itemized costs so that I can
+          submit them to finance for approval and track ROI.
+        acceptance_criteria:
+          - "Monthly invoice generated automatically on billing cycle"
+          - "Invoice includes: plan fee, agent count, usage overage (if applicable), taxes"
+          - "Invoice downloadable as PDF"
+          - "Invoice history accessible in billing section"
+          - "Invoice emailed to billing contact on generation"
+        screens:
+          - "Invoice list page"
+          - "Invoice detail/PDF view"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 13: Analytics Dashboard
+  # ---------------------------------------------------------------------------
+  - id: E13
+    title: "Analytics & Insights Dashboard"
+    phase: "phase_3"
+    priority: "P1"
+    description: >
+      Analytics dashboard for tenant admins showing agent performance, team
+      productivity metrics, and ROI indicators. Answers the question: "Are
+      my agents actually helping?"
+    dependencies:
+      - "E8 (audit trail -- analytics derived from audit data)"
+      - "E3 (agent management)"
+    estimated_effort: "3 weeks"
+    success_metrics:
+      - "80% of tenant admins visit analytics weekly"
+      - "Analytics load within 3 seconds"
+      - "NPS improvement attributed to analytics visibility"
+
+    features:
+      - id: E13-F1
+        title: "Agent Performance Metrics"
+        priority: "P1"
+        user_story: >
+          As a VP of Product, I want to see how productive each agent is
+          (messages handled, tasks completed, tools used) so that I can
+          measure ROI and justify continued investment.
+        acceptance_criteria:
+          - "Per-agent metrics: messages/day, tool invocations/day, avg response time, active hours"
+          - "Trend charts: 7-day, 30-day, 90-day views"
+          - "Comparison view: side-by-side agent performance"
+          - "Top tools used per agent (ranked list)"
+          - "Idle time detection: agents with no activity for 48+ hours highlighted"
+        screens:
+          - "Agent performance dashboard with time-series charts"
+          - "Agent comparison view"
+
+      - id: E13-F2
+        title: "Team Productivity Insights"
+        priority: "P2"
+        user_story: >
+          As a COO, I want aggregate insights on how the agent team is
+          impacting overall team productivity so that I can present results
+          to the executive team.
+        acceptance_criteria:
+          - "Aggregate metrics: total tasks handled, estimated hours saved, cost per task"
+          - "Department-level breakdown (PM agents, Eng agents, Ops agents)"
+          - "Month-over-month trends"
+          - "Executive summary exportable as PDF"
+          - "Benchmarks: comparison to platform-wide averages (anonymized)"
+
+      - id: E13-F3
+        title: "Cost Analytics & Optimization Recommendations"
+        priority: "P1"
+        user_story: >
+          As a Director of Engineering, I want cost breakdowns per agent with
+          optimization recommendations so that I can reduce spend without
+          sacrificing capability.
+        acceptance_criteria:
+          - "Cost breakdown: per agent, per model tier, per skill"
+          - "Cost trend chart with budget line overlay"
+          - "Optimization suggestions: 'Agent X uses Opus but only for simple tasks -- switch to Sonnet to save $Y/month'"
+          - "Model tier cost simulator: 'If you switch agents A,B to Haiku, monthly cost drops by Z%'"
+          - "Projected cost based on current usage trajectory"
+        screens:
+          - "Cost analytics dashboard"
+          - "Optimization recommendation cards"
+          - "Cost simulator tool"
+
+# =============================================================================
+# EPICS & FEATURES -- Phase 4
+# =============================================================================
+# Focus: Enterprise readiness -- on-prem, compliance, F500 features
+# Timeline: Weeks 25-36 (6 sprints)
+# =============================================================================
+
+  # ---------------------------------------------------------------------------
+  # EPIC 14: Enterprise SSO & Directory Integration
+  # ---------------------------------------------------------------------------
+  - id: E14
+    title: "Enterprise SSO & Directory Integration"
+    phase: "phase_4"
+    priority: "P1"
+    description: >
+      SAML/OIDC single sign-on and directory sync (SCIM) for enterprise
+      customers. Required for F500 sales where IT mandates centralized
+      identity management.
+    dependencies:
+      - "E6 (authentication infrastructure)"
+    estimated_effort: "3 weeks"
+    success_metrics:
+      - "SSO login works with Okta, Azure AD, and Google Workspace"
+      - "SCIM provisioning syncs users within 5 minutes of directory change"
+
+    features:
+      - id: E14-F1
+        title: "SAML 2.0 SSO"
+        priority: "P1"
+        user_story: >
+          As an Enterprise IT Admin, I want SAML SSO integration so that
+          employees access the platform through our identity provider without
+          separate credentials.
+        acceptance_criteria:
+          - "SAML 2.0 SP-initiated and IdP-initiated flows"
+          - "Tested with Okta, Azure AD, OneLogin"
+          - "Attribute mapping: email, name, department, role"
+          - "JIT (just-in-time) user provisioning from SAML assertion"
+          - "SSO configuration self-service in tenant admin settings"
+
+      - id: E14-F2
+        title: "SCIM Directory Sync"
+        priority: "P2"
+        user_story: >
+          As an Enterprise IT Admin, I want automatic user provisioning and
+          deprovisioning from our identity directory so that employee offboarding
+          immediately revokes platform access.
+        acceptance_criteria:
+          - "SCIM 2.0 endpoint for user provisioning and deprovisioning"
+          - "Supports Okta, Azure AD SCIM connectors"
+          - "User creation/deletion/update synced within 5 minutes"
+          - "Group membership synced to platform roles"
+          - "Sync logs viewable in tenant admin dashboard"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 15: On-Premises & Hybrid Deployment
+  # ---------------------------------------------------------------------------
+  - id: E15
+    title: "On-Premises & Hybrid Deployment"
+    phase: "phase_4"
+    priority: "P2"
+    description: >
+      Self-hosted deployment option for enterprises with data residency
+      requirements. The platform's control plane runs on-premises while
+      optionally connecting to a cloud management layer for updates and
+      skill marketplace access.
+    dependencies:
+      - "E1 (control plane must be deployable independently)"
+      - "E9 (security features required for on-prem)"
+    estimated_effort: "6 weeks"
+    success_metrics:
+      - "On-prem deployment completable in under 4 hours with documentation"
+      - "On-prem instance functionally equivalent to cloud (minus cloud-only features)"
+      - "At least 1 customer deployed on-prem within 6 months of release"
+
+    features:
+      - id: E15-F1
+        title: "Helm Chart & Deployment Package"
+        priority: "P2"
+        user_story: >
+          As an Enterprise DevOps Engineer, I want a Helm chart and deployment
+          guide so that I can deploy the platform in our private Kubernetes
+          cluster within a day.
+        acceptance_criteria:
+          - "Helm chart with configurable values for all services"
+          - "Deployment guide covering: prerequisites, installation, verification, troubleshooting"
+          - "Air-gapped installation support (all images and dependencies bundled)"
+          - "Terraform modules for AWS, GCP, Azure infrastructure provisioning"
+          - "Minimum viable deployment: 3 nodes, 16GB RAM, 100GB storage"
+
+      - id: E15-F2
+        title: "Hybrid Management Plane"
+        priority: "P3"
+        user_story: >
+          As an Enterprise IT Admin, I want my on-prem instance to receive
+          updates and marketplace skills from the cloud without exposing my
+          internal data so that I stay current without manual patching.
+        acceptance_criteria:
+          - "One-way sync: cloud pushes updates and skill catalog to on-prem"
+          - "No tenant data ever leaves the on-prem environment"
+          - "Update channel configurable: automatic, manual approval, air-gapped manual"
+          - "Skill marketplace mirrored locally from cloud catalog"
+          - "Telemetry (anonymized) optionally sent to cloud for support diagnostics"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 16: SOC2 Compliance Tooling
+  # ---------------------------------------------------------------------------
+  - id: E16
+    title: "SOC2 Compliance Tooling"
+    phase: "phase_4"
+    priority: "P1"
+    description: >
+      Tools and processes to achieve and maintain SOC2 Type II certification.
+      Includes automated evidence collection, policy enforcement, and
+      compliance reporting. Required for F500 enterprise sales.
+    dependencies:
+      - "E8 (audit trail -- primary evidence source)"
+      - "E9 (security features)"
+    estimated_effort: "4 weeks"
+    success_metrics:
+      - "SOC2 Type I certification achieved"
+      - "Automated evidence collection covers 80% of SOC2 controls"
+      - "Compliance dashboard passes auditor review"
+
+    features:
+      - id: E16-F1
+        title: "Automated Evidence Collection"
+        priority: "P1"
+        user_story: >
+          As a Platform Security Lead, I want automated collection of SOC2
+          evidence (access logs, configuration changes, security events) so
+          that audit preparation takes days instead of weeks.
+        acceptance_criteria:
+          - "Automated collection for Trust Service Criteria: Security, Availability, Confidentiality"
+          - "Evidence types: access logs, config change history, encryption status, backup records"
+          - "Evidence exportable in auditor-friendly format (CSV, PDF reports)"
+          - "Evidence collection runs daily and stores in tamper-proof archive"
+          - "Gap analysis report identifies missing evidence"
+
+      - id: E16-F2
+        title: "Compliance Dashboard"
+        priority: "P1"
+        user_story: >
+          As a Platform Admin, I want a compliance dashboard showing our
+          current SOC2 posture so that I can identify and address gaps
+          before the auditor arrives.
+        acceptance_criteria:
+          - "Control checklist with status: compliant, partial, non-compliant"
+          - "Per-control evidence linkage (which logs/records prove compliance)"
+          - "Risk register with severity and remediation plan"
+          - "Historical compliance trend (improving/degrading)"
+          - "Auditor access mode: read-only view for external auditors"
+        screens:
+          - "Compliance dashboard with control matrix"
+          - "Evidence viewer"
+          - "Risk register table"
+
+      - id: E16-F3
+        title: "Data Retention & Deletion Policies"
+        priority: "P1"
+        user_story: >
+          As an Enterprise Legal Counsel, I want configurable data retention
+          policies so that agent data is automatically purged after the
+          required retention period, meeting GDPR and internal policies.
+        acceptance_criteria:
+          - "Configurable retention periods per data type: agent messages, audit logs, analytics, backups"
+          - "Automatic purge jobs run on schedule"
+          - "Tenant-level retention overrides (enterprise tenants may need longer retention)"
+          - "Data deletion certificates generated for compliance records"
+          - "Right-to-erasure endpoint for GDPR subject access requests"
+
+  # ---------------------------------------------------------------------------
+  # EPIC 17: Enterprise Admin Features
+  # ---------------------------------------------------------------------------
+  - id: E17
+    title: "Enterprise Admin Features"
+    phase: "phase_4"
+    priority: "P2"
+    description: >
+      Advanced administration features for F500 customers including
+      multi-department support, delegated administration, and enterprise
+      reporting.
+    dependencies:
+      - "E5 (tenant admin dashboard)"
+      - "E14 (SSO for role mapping)"
+    estimated_effort: "3 weeks"
+    success_metrics:
+      - "Enterprise customers can manage 5+ departments independently"
+      - "Delegated admins scoped correctly to their department"
+
+    features:
+      - id: E17-F1
+        title: "Department/Team Hierarchy"
+        priority: "P2"
+        user_story: >
+          As a VP of Product at a large enterprise, I want to organize agents
+          into departments/teams that mirror my org structure so that each
+          team manages their own agents while I see the big picture.
+        acceptance_criteria:
+          - "Tenant can create departments (e.g., Product, Engineering, Operations)"
+          - "Agents assigned to departments"
+          - "Department-level budgets and agent limits"
+          - "Cross-department communication requires explicit approval"
+          - "Aggregate and department-level views in analytics"
+
+      - id: E17-F2
+        title: "Delegated Administration"
+        priority: "P2"
+        user_story: >
+          As a VP of Product, I want to delegate admin access for the Product
+          department to my PM Lead so that they can manage PM agents without
+          seeing Engineering agents.
+        acceptance_criteria:
+          - "Department Admin role: full access within assigned department only"
+          - "Department Admins cannot see agents, configs, or data from other departments"
+          - "Tenant Admin retains override access across all departments"
+          - "Department Admin can create agents, install skills, view analytics within scope"
+          - "Role assignments managed by Tenant Admin"
+
+      - id: E17-F3
+        title: "Enterprise Reporting & SLA Dashboard"
+        priority: "P3"
+        user_story: >
+          As a COO, I want monthly reports showing platform uptime, agent
+          performance, and SLA compliance so that I can present to the board
+          and justify the investment.
+        acceptance_criteria:
+          - "Automated monthly report: uptime %, agent availability, incidents, resolution times"
+          - "SLA tracking against contractual commitments"
+          - "Report delivered via email as PDF with executive summary"
+          - "Custom report builder for ad-hoc queries"
+          - "Year-over-year comparison"
+
+# =============================================================================
+# SPRINT PLAN -- MVP Phase (Weeks 1-8)
+# =============================================================================
+
+sprint_plan:
+  methodology: "2-week sprints with sprint review and retrospective"
+  team_assumption: "2 backend engineers, 1 frontend engineer, 1 full-stack/DevOps"
+  notes: >
+    Sprint plan covers MVP phase only. Phase 2-4 sprint plans will be created
+    during Phase 1 retrospective based on actual velocity.
+
+  sprints:
+    - id: S1
+      name: "Sprint 1: Foundation"
+      duration: "2 weeks"
+      dates: "Weeks 1-2"
+      goal: "Establish core infrastructure, database schema, auth, and CI/CD pipeline"
+      stories:
+        - feature: "E6-F1"
+          description: "JWT authentication service with login, refresh, and middleware"
+          points: 8
+        - feature: "E6-F3"
+          description: "RBAC implementation with platform and tenant role guards"
+          points: 5
+        - feature: "E1-F1"
+          description: "Tenant registration API with MySQL schema and validation"
+          points: 5
+        - feature: "Infrastructure"
+          description: "Set up NestJS project, MySQL, Redis, Docker Compose for local dev, CI/CD pipeline"
+          points: 8
+      total_points: 26
+      deliverables:
+        - "NestJS project with module structure, linting, testing setup"
+        - "MySQL schema: tenants, users, roles, sessions tables"
+        - "Auth endpoints: login, refresh, RBAC guards"
+        - "Tenant registration API (without container provisioning)"
+        - "Docker Compose for local development"
+        - "GitHub Actions CI pipeline (lint + test)"
+
+    - id: S2
+      name: "Sprint 2: Control Plane Core"
+      duration: "2 weeks"
+      dates: "Weeks 3-4"
+      goal: "Container provisioning, health monitoring, and platform admin dashboard skeleton"
+      stories:
+        - feature: "E1-F2"
+          description: "OpenClaw container provisioning via Kubernetes jobs"
+          points: 13
+        - feature: "E1-F5"
+          description: "Container health monitoring with auto-restart"
+          points: 8
+        - feature: "E2-F5"
+          description: "Platform admin login page with MFA"
+          points: 5
+        - feature: "E2-F1"
+          description: "Tenant list view (table with status, search, filters)"
+          points: 5
+      total_points: 31
+      deliverables:
+        - "Container provisioning pipeline (API call -> K8s job -> running OpenClaw)"
+        - "Health check service with 30-second polling"
+        - "Auto-restart for unhealthy containers"
+        - "Platform admin login with MFA"
+        - "Tenant list page with real-time status"
+
+    - id: S3
+      name: "Sprint 3: Agent Management & Tenant Dashboard"
+      duration: "2 weeks"
+      dates: "Weeks 5-6"
+      goal: "Agent CRUD, tenant admin dashboard, and skill marketplace catalog"
+      stories:
+        - feature: "E3-F1"
+          description: "Agent CRUD API with role types and plan limit enforcement"
+          points: 8
+        - feature: "E3-F2"
+          description: "Agent tool policy configuration API"
+          points: 5
+        - feature: "E5-F1"
+          description: "Tenant admin login with OAuth (Google, GitHub)"
+          points: 5
+        - feature: "E5-F2"
+          description: "Agent overview dashboard with cards and activity feed"
+          points: 8
+        - feature: "E4-F1"
+          description: "Skill catalog API and browsing UI"
+          points: 5
+      total_points: 31
+      deliverables:
+        - "Agent CRUD endpoints integrated with OpenClaw config"
+        - "Tool policy editor (API + basic UI)"
+        - "Tenant admin authentication (email + OAuth)"
+        - "Agent dashboard with status cards"
+        - "Skill catalog with filtering and search"
+
+    - id: S4
+      name: "Sprint 4: Integration, Skills & Polish"
+      duration: "2 weeks"
+      dates: "Weeks 7-8"
+      goal: "Skill installation, tenant provisioning wizard, end-to-end testing, MVP launch readiness"
+      stories:
+        - feature: "E4-F2"
+          description: "Skill installation and removal (marketplace to agent)"
+          points: 8
+        - feature: "E4-F4"
+          description: "Core skill bundle pre-installation for new tenants"
+          points: 5
+        - feature: "E2-F2"
+          description: "Tenant provisioning wizard (3-step form)"
+          points: 5
+        - feature: "E5-F3"
+          description: "Agent creation wizard (5-step form)"
+          points: 8
+        - feature: "E1-F3"
+          description: "Tenant configuration management with hot-reload"
+          points: 5
+        - feature: "E2-F3"
+          description: "Tenant detail page with config editor"
+          points: 5
+        - feature: "End-to-end"
+          description: "E2E testing: signup -> provision -> create agent -> install skill -> test message"
+          points: 5
+      total_points: 41
+      deliverables:
+        - "Skill installation flow (catalog -> agent -> working)"
+        - "10 core skills pre-installed (Jira, Amplitude, Tableau, GitHub, Sentry, Slack, Calendar, Linear, Notion, Confluence)"
+        - "Complete provisioning wizard"
+        - "Agent creation wizard with channel binding"
+        - "Configuration hot-reload"
+        - "E2E test suite covering happy path"
+        - "MVP demo-ready"
+
+# =============================================================================
+# PHASE SUMMARY
+# =============================================================================
+
+phases:
+  - id: mvp
+    name: "MVP (Phase 1)"
+    timeline: "Weeks 1-8 (8 weeks)"
+    epics: ["E1", "E2", "E3", "E4", "E5", "E6"]
+    goal: >
+      Deliver a functional multi-tenant platform that can onboard 5-10 early
+      customers. Platform admins can provision tenants, tenant admins can manage
+      agents and install skills. Validates the core value proposition with
+      Breadfast and 2-3 additional pilot customers.
+    exit_criteria:
+      - "Tenant provisioned end-to-end via admin dashboard"
+      - "Agent created and communicating via Telegram"
+      - "Skills installed from marketplace and working"
+      - "Breadfast migrated from manual config to platform-managed"
+      - "Zero cross-tenant data leakage in security review"
+
+  - id: phase_2
+    name: "Phase 2: Coordination & Security"
+    timeline: "Weeks 9-16 (8 weeks)"
+    epics: ["E7", "E8", "E9", "E10"]
+    goal: >
+      Enable multi-agent coordination (the key differentiator), harden security
+      with permission manifests and network policies, and build comprehensive
+      audit trails for compliance. Enables enterprise security review conversations.
+    exit_criteria:
+      - "Inter-agent messaging visible in dashboard"
+      - "All agent actions captured in audit trail"
+      - "Skill permission manifests enforced (soft)"
+      - "Custom skill SDK published and documented"
+      - "Penetration test completed with zero critical findings"
+
+  - id: phase_3
+    name: "Phase 3: Scale & Monetize"
+    timeline: "Weeks 17-24 (8 weeks)"
+    epics: ["E11", "E12", "E13"]
+    goal: >
+      Enable self-service signup, automated billing, and analytics dashboard.
+      Platform can scale from 10 to 100+ tenants without proportional ops
+      effort. Revenue collection automated via Stripe.
+    exit_criteria:
+      - "Self-service signup to first agent in under 10 minutes"
+      - "Stripe billing collecting monthly payments"
+      - "Usage analytics dashboard live for all tenants"
+      - "$10K+ MRR from paying customers"
+
+  - id: phase_4
+    name: "Phase 4: Enterprise Readiness"
+    timeline: "Weeks 25-36 (12 weeks)"
+    epics: ["E14", "E15", "E16", "E17"]
+    goal: >
+      Achieve enterprise sales readiness with SSO, on-prem deployment, SOC2
+      certification, and advanced admin features. Enables F500 sales conversations
+      and regulated industry deployments.
+    exit_criteria:
+      - "SAML SSO working with Okta and Azure AD"
+      - "On-prem Helm chart tested and documented"
+      - "SOC2 Type I certification achieved"
+      - "At least 1 enterprise customer deployed on platform"
+      - "First F500 pilot initiated"
+
+# =============================================================================
+# DEPENDENCY MAP
+# =============================================================================
+
+dependency_map:
+  description: >
+    Key dependencies between epics. Arrows indicate "must be completed before"
+    relationships. Within a phase, epics can be worked on in parallel unless
+    explicitly dependent.
+  dependencies:
+    - from: "E1"
+      to: "E2"
+      reason: "Admin dashboard requires control plane APIs"
+    - from: "E1"
+      to: "E3"
+      reason: "Agent management requires tenant provisioning"
+    - from: "E3"
+      to: "E4"
+      reason: "Skill installation requires agent management"
+    - from: "E1"
+      to: "E5"
+      reason: "Tenant dashboard requires tenant provisioning"
+    - from: "E3"
+      to: "E5"
+      reason: "Tenant dashboard displays agent data"
+    - from: "E4"
+      to: "E5"
+      reason: "Tenant dashboard includes skill browsing"
+    - from: "E5"
+      to: "E7"
+      reason: "Allowlist UI is prerequisite for coordination features"
+    - from: "E3"
+      to: "E8"
+      reason: "Audit logs capture agent actions"
+    - from: "E4"
+      to: "E9"
+      reason: "Permission manifests build on skill marketplace"
+    - from: "E8"
+      to: "E9"
+      reason: "Security features log violations to audit trail"
+    - from: "E4"
+      to: "E10"
+      reason: "Custom skills extend marketplace infrastructure"
+    - from: "E9"
+      to: "E10"
+      reason: "Custom skills require permission manifests"
+    - from: "E6"
+      to: "E11"
+      reason: "Self-service signup uses auth infrastructure"
+    - from: "E12"
+      to: "E11"
+      reason: "Must collect payment before provisioning"
+    - from: "E1"
+      to: "E12"
+      reason: "Billing tied to tenant and agent counts"
+    - from: "E8"
+      to: "E13"
+      reason: "Analytics derived from audit and activity data"
+    - from: "E6"
+      to: "E14"
+      reason: "SSO extends auth infrastructure"
+    - from: "E1"
+      to: "E15"
+      reason: "On-prem requires self-contained control plane"
+    - from: "E8"
+      to: "E16"
+      reason: "SOC2 evidence from audit trail"
+    - from: "E9"
+      to: "E16"
+      reason: "SOC2 requires security controls"
+    - from: "E5"
+      to: "E17"
+      reason: "Enterprise admin extends tenant dashboard"
+    - from: "E14"
+      to: "E17"
+      reason: "Delegated admin relies on SSO role mapping"
+
+# =============================================================================
+# RISK REGISTER
+# =============================================================================
+
+risks:
+  - id: R1
+    category: "Technical"
+    risk: "OpenClaw container provisioning latency exceeds 5-minute target"
+    probability: "Medium"
+    impact: "High"
+    mitigation: "Pre-warm container pool; use pod templates with cached images"
+
+  - id: R2
+    category: "Technical"
+    risk: "Hot-reload of OpenClaw config causes agent downtime"
+    probability: "Medium"
+    impact: "Medium"
+    mitigation: "Implement graceful config reload; test with running sessions"
+
+  - id: R3
+    category: "Market"
+    risk: "Anthropic adds multi-tenant features to Cowork, eroding differentiation"
+    probability: "Medium"
+    impact: "High"
+    mitigation: "Accelerate enterprise features (SOC2, on-prem); focus on OpenClaw ecosystem"
+
+  - id: R4
+    category: "Business"
+    risk: "Pricing too high for mid-market; too low for enterprise value"
+    probability: "Medium"
+    impact: "High"
+    mitigation: "A/B test pricing with early customers; offer custom enterprise quotes"
+
+  - id: R5
+    category: "Technical"
+    risk: "Token costs at scale compress margins below viability"
+    probability: "Low"
+    impact: "High"
+    mitigation: "Usage-based billing component passes cost through; negotiate volume pricing"
+
+  - id: R6
+    category: "Security"
+    risk: "Cross-tenant data leakage due to misconfigured Kubernetes network policies"
+    probability: "Low"
+    impact: "Critical"
+    mitigation: "Automated network policy generation; penetration testing every release"
+
+  - id: R7
+    category: "Operational"
+    risk: "Skill marketplace quality degradation as volume increases"
+    probability: "Medium"
+    impact: "Medium"
+    mitigation: "Automated security scanning in review pipeline; community ratings; revocation process"

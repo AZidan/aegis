@@ -1,0 +1,227 @@
+{
+  "directory": "design-artifacts/prototypes",
+  "files": {
+    "platform-admin-prototype.html": {
+      "hash": "f59441d4fda9",
+      "indexed_at": "2026-02-05T23:56:19.747119+00:00",
+      "language": "html",
+      "lines": 776,
+      "symbols": [
+        {
+          "lines": [
+            422,
+            422
+          ],
+          "name": "#screenName",
+          "signature": "<span id=\"screenName\" class=\"top-bar__screen-name\">",
+          "type": "id"
+        },
+        {
+          "lines": [
+            425,
+            429
+          ],
+          "name": "#prevBtn",
+          "signature": "<button id=\"prevBtn\" class=\"nav-btn\">",
+          "type": "id"
+        },
+        {
+          "lines": [
+            430,
+            430
+          ],
+          "name": "#screenCounter",
+          "signature": "<span id=\"screenCounter\" class=\"screen-counter\">",
+          "type": "id"
+        },
+        {
+          "lines": [
+            431,
+            435
+          ],
+          "name": "#nextBtn",
+          "signature": "<button id=\"nextBtn\" class=\"nav-btn\">",
+          "type": "id"
+        },
+        {
+          "lines": [
+            442,
+            442
+          ],
+          "name": "#screenFrame",
+          "signature": "<iframe id=\"screenFrame\" src=\"../screens/admin-login.html\">",
+          "type": "id"
+        },
+        {
+          "lines": [
+            443,
+            445
+          ],
+          "name": "#iframeOverlay",
+          "signature": "<div id=\"iframeOverlay\" class=\"iframe-overlay\">",
+          "type": "id"
+        },
+        {
+          "lines": [
+            459,
+            461
+          ],
+          "name": "#stepIndicator",
+          "signature": "<div id=\"stepIndicator\" class=\"bottom-bar__center\">",
+          "type": "id"
+        },
+        {
+          "lines": [
+            464,
+            471
+          ],
+          "name": "#openTabLink",
+          "signature": "<a id=\"openTabLink\" class=\"open-tab-link\" href=\"#\">",
+          "type": "id"
+        },
+        {
+          "lines": [
+            476,
+            478
+          ],
+          "name": "#keyboardHint",
+          "signature": "<div id=\"keyboardHint\" class=\"keyboard-hint\">",
+          "type": "id"
+        }
+      ]
+    },
+    "tenant-admin-prototype.html": {
+      "hash": "b26f39a712d1",
+      "indexed_at": "2026-02-05T23:56:19.860104+00:00",
+      "language": "html",
+      "lines": 785,
+      "symbols": [
+        {
+          "children": [
+            {
+              "lines": [
+                434,
+                434
+              ],
+              "name": "#screenName",
+              "signature": "<div id=\"screenName\" class=\"screen-name\">",
+              "type": "id"
+            },
+            {
+              "lines": [
+                435,
+                435
+              ],
+              "name": "#screenGroup",
+              "signature": "<div id=\"screenGroup\" class=\"screen-group-label\">",
+              "type": "id"
+            },
+            {
+              "lines": [
+                438,
+                440
+              ],
+              "name": "#btnPrev",
+              "signature": "<button id=\"btnPrev\" class=\"nav-btn\">",
+              "type": "id"
+            },
+            {
+              "lines": [
+                441,
+                441
+              ],
+              "name": "#screenCounter",
+              "signature": "<span id=\"screenCounter\" class=\"screen-counter\">",
+              "type": "id"
+            },
+            {
+              "lines": [
+                442,
+                444
+              ],
+              "name": "#btnNext",
+              "signature": "<button id=\"btnNext\" class=\"nav-btn\">",
+              "type": "id"
+            }
+          ],
+          "lines": [
+            428,
+            446
+          ],
+          "name": "<header.top-bar>",
+          "signature": "<header class=\"top-bar\">",
+          "type": "element"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                450,
+                452
+              ],
+              "name": "#loadingOverlay",
+              "signature": "<div id=\"loadingOverlay\" class=\"loading-overlay\">",
+              "type": "id"
+            },
+            {
+              "lines": [
+                453,
+                453
+              ],
+              "name": "#screenFrame",
+              "signature": "<iframe id=\"screenFrame\" class=\"screen-iframe\" src=\"../screens/login.html\">",
+              "type": "id"
+            }
+          ],
+          "lines": [
+            449,
+            454
+          ],
+          "name": "<main.main-content>",
+          "signature": "<main class=\"main-content\">",
+          "type": "element"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                458,
+                460
+              ],
+              "name": "#flowContainer",
+              "signature": "<div id=\"flowContainer\" class=\"flow-container\">",
+              "type": "id"
+            },
+            {
+              "lines": [
+                461,
+                464
+              ],
+              "name": "#openTabLink",
+              "signature": "<a id=\"openTabLink\" class=\"open-tab-link\" href=\"../screens/login.html\">",
+              "type": "id"
+            }
+          ],
+          "lines": [
+            457,
+            465
+          ],
+          "name": "<footer.bottom-bar>",
+          "signature": "<footer class=\"bottom-bar\">",
+          "type": "element"
+        },
+        {
+          "lines": [
+            468,
+            471
+          ],
+          "name": "#shortcutHint",
+          "signature": "<div id=\"shortcutHint\" class=\"shortcut-hint\">",
+          "type": "id"
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-02-06T11:35:32.340322+00:00",
+  "version": "1.0"
+}

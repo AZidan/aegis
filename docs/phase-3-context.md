@@ -158,9 +158,16 @@ Phase 3 will generate a large codebase. Reading full files wastes tokens and slo
    # Case-insensitive search
    codemap find "UserService"
 
+   # Fuzzy search (when unsure of exact name)
+   codemap find "usrserv" -f
+   # Matches: UserService, UserServiceImpl, etc.
+
    # Filter by type
    codemap find "create" --type method
    codemap find "User" --type interface
+
+   # Combine fuzzy search with type filter
+   codemap find "auth" -f --type class
    ```
 
 **NEVER:**
@@ -171,6 +178,7 @@ Phase 3 will generate a large codebase. Reading full files wastes tokens and slo
 
 **ALWAYS:**
 - ✅ Check `codemap find` before reading
+- ✅ Use `codemap find "term" -f` for fuzzy search when unsure of exact name
 - ✅ Use `codemap show` to understand file structure
 - ✅ Read specific line ranges only
 - ✅ Validate index freshness with `codemap validate` if uncertain

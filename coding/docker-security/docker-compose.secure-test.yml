@@ -1,0 +1,73 @@
+# OpenClaw Gateway with Secrets Management - TEST ENVIRONMENT
+# Use this for validating the secrets layer before promoting to production
+#
+# Usage:
+#   1. Copy clawdbot-data to clawdbot-data-secure-test
+#   2. Generate age keys: ./secrets/scripts/generate-keys.sh
+#   3. Encrypt configs: ./secrets/scripts/encrypt-configs.sh ./clawdbot-data-secure-test
+#   4. Build and start: docker compose -f docker-compose.secure-test.yml up --build
+#   5. Verify in logs: "[secrets-manager] Decrypted N configs"
+#
+# Port: 18790 (different from production 18789)
+
+services:
+  clawdbot-gateway-secure-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.secrets
+    container_name: clawdbot-gateway-secure-test
+    restart: unless-stopped
+    init: true
+
+    ports:
+      - "18790:18789"
+
+    volumes:
+      # Test data volume (encrypted copy of production)
+      - ./clawdbot-data-secure-test:/home/node/.openclaw
+      # Isolated workspace copy (identical to production)
+      - ./workspace-secure-test:/home/node/.openclaw/workspace
+
+    # tmpfs for decrypted secrets (in-memory only)
+    tmpfs:
+      - /run/secrets/openclaw:size=50M,mode=0700,uid=1000,gid=1000
+
+    environment:
+      - HOME=/home/node
+      - NODE_ENV=production
+      # Age key is mounted as Docker secret
+      - OPENCLAW_AGE_KEY_FILE=/run/secrets/age_key
+      - OPENCLAW_DATA_DIR=/home/node/.openclaw
+      - OPENCLAW_SECRETS_DIR=/run/secrets/openclaw
+      # LM Studio (optional, for local model testing)
+      - CLAWDBOT_MODEL_BASE_URL=http://host.docker.internal:1234/v1
+      - CLAWDBOT_MODEL_API_KEY=lm-studio
+
+    secrets:
+      - age_key
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # Override command if needed
+    command:
+      ["node", "dist/index.js", "gateway", "--bind", "lan", "--port", "18789"]
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# Docker secrets definition
+secrets:
+  age_key:
+    file: ./secrets/keys/age.key
+
+# Network configuration (optional, for isolation)
+networks:
+  default:
+    name: openclaw-secure-test
+    driver: bridge

@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skill Review - Notion Integration v2.1.0 - Aegis Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            aegis: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+
+    /* Code viewer scrollbar (dark variant) */
+    .code-viewer::-webkit-scrollbar-thumb { background: #4338ca; }
+    .code-viewer::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+
+    /* Smooth transitions */
+    .nav-item { transition: all 0.15s ease; }
+
+    /* Pulse animation for notification dot */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.15); }
+    }
+    .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+    /* Sidebar transition for mobile */
+    .sidebar-overlay { transition: opacity 0.3s ease; }
+    .sidebar-panel { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    /* Code tab active indicator */
+    .code-tab {
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .code-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #6366f1;
+      border-radius: 2px 2px 0 0;
+    }
+
+    /* Code line highlight */
+    .code-line:hover {
+      background: rgba(99, 102, 241, 0.08);
+    }
+
+    /* Checkbox custom styling */
+    .security-check input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #d1d5db;
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .security-check input[type="checkbox"]:checked {
+      background: #22c55e;
+      border-color: #22c55e;
+    }
+    .security-check input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 1px;
+      width: 6px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+    .security-check input[type="checkbox"]:focus-visible {
+      outline: 2px solid #6366f1;
+      outline-offset: 2px;
+    }
+
+    /* Toggle fail state */
+    .security-check.failed input[type="checkbox"] {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+    .security-check.failed input[type="checkbox"]:checked {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    /* Modal backdrop */
+    .modal-backdrop {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      transition: opacity 0.2s ease;
+    }
+    .modal-panel {
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+    }
+
+    /* Line number gutter */
+    .line-number {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Syntax highlighting tokens */
+    .token-keyword { color: #c084fc; }
+    .token-string { color: #86efac; }
+    .token-comment { color: #64748b; font-style: italic; }
+    .token-type { color: #67e8f9; }
+    .token-function { color: #fbbf24; }
+    .token-property { color: #93c5fd; }
+    .token-operator { color: #f472b6; }
+    .token-number { color: #fdba74; }
+    .token-punctuation { color: #94a3b8; }
+    .token-variable { color: #e2e8f0; }
+    .token-decorator { color: #a78bfa; }
+
+    /* Approve button glow when enabled */
+    .btn-approve-enabled {
+      box-shadow: 0 0 20px -4px rgba(34, 197, 94, 0.4);
+    }
+
+    /* Action button transitions */
+    .action-btn {
+      transition: all 0.15s ease;
+    }
+    .action-btn:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+<body class="h-full bg-[#f8fafc] font-sans text-gray-900 antialiased">
+
+  <div class="flex h-full">
+
+    <!-- ===== LEFT SIDEBAR (Platform Admin) ===== -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full z-50 flex flex-col bg-white border-r border-gray-200 transition-all duration-300" style="width: 256px;">
+
+      <!-- Logo -->
+      <div class="flex items-center gap-2.5 px-5 h-16 border-b border-gray-100">
+        <div class="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="sidebar-label text-sm font-bold text-gray-900 tracking-tight">Aegis Admin</span>
+      </div>
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <div class="sidebar-label px-3 pb-2 pt-1 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Overview</div>
+        <a href="/admin/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-[18px] h-[18px] text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="sidebar-label">Dashboard</span>
+        </a>
+        <a href="/admin/tenants" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-[18px] h-[18px] text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/></svg>
+          <span class="sidebar-label">Tenants</span>
+        </a>
+        <a href="/admin/health" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-[18px] h-[18px] text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span class="sidebar-label">System Health</span>
+        </a>
+        <div class="sidebar-label px-3 pb-2 pt-5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Marketplace</div>
+        <a href="/admin/skill-review" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-indigo-50 text-indigo-600 font-semibold">
+          <svg class="w-[18px] h-[18px] text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
+          <span class="sidebar-label">Skill Review</span>
+          <span class="sidebar-label ml-auto text-[10px] font-semibold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">3</span>
+        </a>
+      </nav>
+      <!-- Footer -->
+      <div class="border-t border-gray-100 px-3 py-3 space-y-2">
+        <button onclick="toggleSidebar()" class="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors">
+          <svg id="collapse-icon" class="w-[18px] h-[18px] transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+          <span class="sidebar-label text-sm">Collapse</span>
+        </button>
+        <div class="flex items-center gap-2.5 px-3 py-2">
+          <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-xs flex-shrink-0">AZ</div>
+          <div class="sidebar-label flex-1 min-w-0">
+            <div class="text-sm font-medium text-gray-900 truncate">Admin</div>
+            <div class="text-xs text-gray-500 truncate">Platform Owner</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main id="main-content" class="flex-1 overflow-y-auto" style="margin-left: 256px;">
+
+      <!-- Header bar -->
+      <header class="flex items-center justify-between h-16 px-6 lg:px-8 border-b border-gray-200/80 bg-white/70 backdrop-blur-sm shrink-0">
+        <div class="flex items-center gap-4">
+          <!-- Breadcrumb -->
+          <nav class="flex items-center gap-2 text-[13px]">
+            <a href="#" class="text-gray-400 hover:text-aegis-500 transition-colors font-medium">Skills</a>
+            <svg class="w-3.5 h-3.5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+            </svg>
+            <a href="#" class="text-gray-400 hover:text-aegis-500 transition-colors font-medium">Review Queue</a>
+            <svg class="w-3.5 h-3.5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+            </svg>
+            <span class="text-gray-700 font-semibold">Notion Integration v2.1.0</span>
+          </nav>
+        </div>
+        <div class="flex items-center gap-3">
+          <!-- Review queue count -->
+          <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-amber-700 bg-amber-50 rounded-lg border border-amber-200/60">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            2 more in queue
+          </div>
+        </div>
+      </header>
+
+      <!-- Scrollable main area -->
+      <main class="flex-1 overflow-y-auto">
+        <div class="px-6 lg:px-8 py-6 max-w-[1440px]">
+
+          <!-- ==================== SKILL HEADER ==================== -->
+          <div class="bg-white rounded-xl border border-gray-200/60 p-6 mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-start gap-4">
+              <!-- Skill icon -->
+              <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-aegis-500 to-aegis-700 flex items-center justify-center flex-shrink-0 shadow-lg shadow-aegis-500/20">
+                <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                </svg>
+              </div>
+
+              <!-- Skill info -->
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-3 mb-2">
+                  <h1 class="text-xl font-bold text-gray-900 tracking-tight">Notion Integration</h1>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-semibold bg-aegis-100 text-aegis-700 font-mono">v2.1.0</span>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-semibold bg-amber-100 text-amber-700">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                    </svg>
+                    Medium Risk
+                  </span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-gray-500 mb-3">
+                  <span class="flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                    </svg>
+                    Submitted by <span class="font-medium text-gray-700">Notion Labs</span>
+                  </span>
+                  <span class="flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/>
+                    </svg>
+                    <span class="font-mono text-gray-600">Feb 3, 2026</span>
+                  </span>
+                </div>
+
+                <!-- Permission badges -->
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mr-1">Permissions:</span>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[12px] font-medium bg-blue-50 text-blue-700 border border-blue-200/60">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/>
+                    </svg>
+                    <span class="font-mono">network</span>
+                    <span class="text-blue-400">|</span>
+                    <span class="font-mono text-[11px]">notion-api.com</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[12px] font-medium bg-violet-50 text-violet-700 border border-violet-200/60">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/>
+                    </svg>
+                    <span class="font-mono">files</span>
+                    <span class="text-violet-400">|</span>
+                    <span class="font-mono text-[11px]">read:workspace/*</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== TWO COLUMN LAYOUT ==================== -->
+          <div class="flex flex-col lg:flex-row gap-6 pb-24">
+
+            <!-- LEFT COLUMN - CODE VIEWER (60%) -->
+            <div class="w-full lg:w-[60%]">
+              <div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden flex flex-col" style="height: 640px;">
+                <!-- Tab bar -->
+                <div class="flex items-center border-b border-gray-200/80 bg-gray-50/80 px-1">
+                  <button onclick="switchTab('skill-md')" class="code-tab active px-4 py-3 text-[12px] font-semibold text-aegis-600" data-tab="skill-md">
+                    SKILL.md
+                  </button>
+                  <button onclick="switchTab('index-ts')" class="code-tab px-4 py-3 text-[12px] font-medium text-gray-500 hover:text-gray-700" data-tab="index-ts">
+                    index.ts
+                  </button>
+                  <button onclick="switchTab('permissions-yaml')" class="code-tab px-4 py-3 text-[12px] font-medium text-gray-500 hover:text-gray-700" data-tab="permissions-yaml">
+                    permissions.yaml
+                  </button>
+                  <button onclick="switchTab('package-json')" class="code-tab px-4 py-3 text-[12px] font-medium text-gray-500 hover:text-gray-700" data-tab="package-json">
+                    package.json
+                  </button>
+                </div>
+
+                <!-- Code content area -->
+                <div class="flex-1 overflow-auto code-viewer bg-aegis-950">
+                  <!-- SKILL.md content -->
+                  <div id="tab-skill-md" class="tab-content">
+                    <div class="flex text-[13px] font-mono leading-[1.8]">
+                      <div class="flex-shrink-0 py-4 pl-4 pr-3 text-right select-none">
+                        <div class="line-number text-aegis-700/60">1</div>
+                        <div class="line-number text-aegis-700/60">2</div>
+                        <div class="line-number text-aegis-700/60">3</div>
+                        <div class="line-number text-aegis-700/60">4</div>
+                        <div class="line-number text-aegis-700/60">5</div>
+                        <div class="line-number text-aegis-700/60">6</div>
+                        <div class="line-number text-aegis-700/60">7</div>
+                        <div class="line-number text-aegis-700/60">8</div>
+                        <div class="line-number text-aegis-700/60">9</div>
+                        <div class="line-number text-aegis-700/60">10</div>
+                        <div class="line-number text-aegis-700/60">11</div>
+                        <div class="line-number text-aegis-700/60">12</div>
+                        <div class="line-number text-aegis-700/60">13</div>
+                        <div class="line-number text-aegis-700/60">14</div>
+                        <div class="line-number text-aegis-700/60">15</div>
+                        <div class="line-number text-aegis-700/60">16</div>
+                        <div class="line-number text-aegis-700/60">17</div>
+                        <div class="line-number text-aegis-700/60">18</div>
+                        <div class="line-number text-aegis-700/60">19</div>
+                        <div class="line-number text-aegis-700/60">20</div>
+                        <div class="line-number text-aegis-700/60">21</div>
+                        <div class="line-number text-aegis-700/60">22</div>
+                        <div class="line-number text-aegis-700/60">23</div>
+                      </div>
+                      <div class="flex-1 py-4 pr-6 overflow-x-auto">
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-comment"># Notion Integration</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-comment">## Overview</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">Search and retrieve pages from Notion workspaces.</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">Enables AI agents to query Notion databases and</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">access page content for context-aware responses.</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-comment">## Capabilities</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">- Search pages by keyword</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">- Read page content and properties</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">- Query filtered database views</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">- List workspace members</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-comment">## Authentication</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">Requires `NOTION_TOKEN` environment variable.</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">Token is injected by the platform at runtime.</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-comment">## Rate Limits</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">- 3 requests per second per integration</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">- Automatic retry with exponential backoff</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-comment">## Version History</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">- v2.1.0: Added database query support</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-300">- v2.0.0: Complete rewrite with TypeScript</span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- index.ts content -->
+                  <div id="tab-index-ts" class="tab-content hidden">
+                    <div class="flex text-[13px] font-mono leading-[1.8]">
+                      <div class="flex-shrink-0 py-4 pl-4 pr-3 text-right select-none">
+                        <div class="line-number text-aegis-700/60">1</div>
+                        <div class="line-number text-aegis-700/60">2</div>
+                        <div class="line-number text-aegis-700/60">3</div>
+                        <div class="line-number text-aegis-700/60">4</div>
+                        <div class="line-number text-aegis-700/60">5</div>
+                        <div class="line-number text-aegis-700/60">6</div>
+                        <div class="line-number text-aegis-700/60">7</div>
+                        <div class="line-number text-aegis-700/60">8</div>
+                        <div class="line-number text-aegis-700/60">9</div>
+                        <div class="line-number text-aegis-700/60">10</div>
+                        <div class="line-number text-aegis-700/60">11</div>
+                        <div class="line-number text-aegis-700/60">12</div>
+                        <div class="line-number text-aegis-700/60">13</div>
+                        <div class="line-number text-aegis-700/60">14</div>
+                        <div class="line-number text-aegis-700/60">15</div>
+                        <div class="line-number text-aegis-700/60">16</div>
+                        <div class="line-number text-aegis-700/60">17</div>
+                        <div class="line-number text-aegis-700/60">18</div>
+                        <div class="line-number text-aegis-700/60">19</div>
+                        <div class="line-number text-aegis-700/60">20</div>
+                        <div class="line-number text-aegis-700/60">21</div>
+                        <div class="line-number text-aegis-700/60">22</div>
+                        <div class="line-number text-aegis-700/60">23</div>
+                        <div class="line-number text-aegis-700/60">24</div>
+                        <div class="line-number text-aegis-700/60">25</div>
+                        <div class="line-number text-aegis-700/60">26</div>
+                        <div class="line-number text-aegis-700/60">27</div>
+                        <div class="line-number text-aegis-700/60">28</div>
+                        <div class="line-number text-aegis-700/60">29</div>
+                        <div class="line-number text-aegis-700/60">30</div>
+                        <div class="line-number text-aegis-700/60">31</div>
+                        <div class="line-number text-aegis-700/60">32</div>
+                        <div class="line-number text-aegis-700/60">33</div>
+                        <div class="line-number text-aegis-700/60">34</div>
+                        <div class="line-number text-aegis-700/60">35</div>
+                        <div class="line-number text-aegis-700/60">36</div>
+                        <div class="line-number text-aegis-700/60">37</div>
+                        <div class="line-number text-aegis-700/60">38</div>
+                        <div class="line-number text-aegis-700/60">39</div>
+                        <div class="line-number text-aegis-700/60">40</div>
+                        <div class="line-number text-aegis-700/60">41</div>
+                        <div class="line-number text-aegis-700/60">42</div>
+                        <div class="line-number text-aegis-700/60">43</div>
+                        <div class="line-number text-aegis-700/60">44</div>
+                        <div class="line-number text-aegis-700/60">45</div>
+                        <div class="line-number text-aegis-700/60">46</div>
+                        <div class="line-number text-aegis-700/60">47</div>
+                        <div class="line-number text-aegis-700/60">48</div>
+                        <div class="line-number text-aegis-700/60">49</div>
+                        <div class="line-number text-aegis-700/60">50</div>
+                      </div>
+                      <div class="flex-1 py-4 pr-6 overflow-x-auto">
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-comment">// Notion Integration Skill</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-keyword">import</span> <span class="token-punctuation">{</span> <span class="token-type">NotionClient</span> <span class="token-punctuation">}</span> <span class="token-keyword">from</span> <span class="token-string">'@notionhq/client'</span><span class="token-punctuation">;</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-keyword">import</span> <span class="token-punctuation">{</span> <span class="token-type">SearchResult</span><span class="token-punctuation">,</span> <span class="token-type">PageContent</span> <span class="token-punctuation">}</span> <span class="token-keyword">from</span> <span class="token-string">'./types'</span><span class="token-punctuation">;</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-keyword">interface</span> <span class="token-type">NotionPage</span> <span class="token-punctuation">{</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">id</span><span class="token-punctuation">:</span> <span class="token-type">string</span><span class="token-punctuation">;</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">title</span><span class="token-punctuation">:</span> <span class="token-type">string</span> <span class="token-operator">|</span> <span class="token-type">undefined</span><span class="token-punctuation">;</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">url</span><span class="token-punctuation">:</span> <span class="token-type">string</span><span class="token-punctuation">;</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-punctuation">}</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-keyword">export</span> <span class="token-keyword">async</span> <span class="token-keyword">function</span> <span class="token-function">searchPages</span><span class="token-punctuation">(</span><span class="token-variable">query</span><span class="token-punctuation">:</span> <span class="token-type">string</span><span class="token-punctuation">)</span><span class="token-punctuation">:</span> <span class="token-type">Promise</span><span class="token-operator">&lt;</span><span class="token-type">NotionPage</span><span class="token-punctuation">[]</span><span class="token-operator">&gt;</span> <span class="token-punctuation">{</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-keyword">const</span> <span class="token-variable">notion</span> <span class="token-operator">=</span> <span class="token-keyword">new</span> <span class="token-type">NotionClient</span><span class="token-punctuation">({</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">auth</span><span class="token-punctuation">:</span> <span class="token-variable">process</span><span class="token-punctuation">.</span><span class="token-property">env</span><span class="token-punctuation">.</span><span class="token-variable">NOTION_TOKEN</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-punctuation">});</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-keyword">const</span> <span class="token-variable">response</span> <span class="token-operator">=</span> <span class="token-keyword">await</span> <span class="token-variable">notion</span><span class="token-punctuation">.</span><span class="token-function">search</span><span class="token-punctuation">({</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">query</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">filter</span><span class="token-punctuation">:</span> <span class="token-punctuation">{</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">      <span class="token-property">value</span><span class="token-punctuation">:</span> <span class="token-string">'page'</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">      <span class="token-property">property</span><span class="token-punctuation">:</span> <span class="token-string">'object'</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-punctuation">},</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">page_size</span><span class="token-punctuation">:</span> <span class="token-number">20</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-punctuation">});</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-keyword">return</span> <span class="token-variable">response</span><span class="token-punctuation">.</span><span class="token-property">results</span><span class="token-punctuation">.</span><span class="token-function">map</span><span class="token-punctuation">((</span><span class="token-variable">page</span><span class="token-punctuation">)</span> <span class="token-operator">=&gt;</span> <span class="token-punctuation">({</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">id</span><span class="token-punctuation">:</span> <span class="token-variable">page</span><span class="token-punctuation">.</span><span class="token-property">id</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">title</span><span class="token-punctuation">:</span> <span class="token-variable">page</span><span class="token-punctuation">.</span><span class="token-property">properties</span><span class="token-operator">?.</span><span class="token-property">title</span><span class="token-operator">?.</span><span class="token-punctuation">[</span><span class="token-number">0</span><span class="token-punctuation">]</span><span class="token-operator">?.</span><span class="token-property">text</span><span class="token-operator">?.</span><span class="token-property">content</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">url</span><span class="token-punctuation">:</span> <span class="token-variable">page</span><span class="token-punctuation">.</span><span class="token-property">url</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-punctuation">}));</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-punctuation">}</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-keyword">export</span> <span class="token-keyword">async</span> <span class="token-keyword">function</span> <span class="token-function">getPageContent</span><span class="token-punctuation">(</span><span class="token-variable">pageId</span><span class="token-punctuation">:</span> <span class="token-type">string</span><span class="token-punctuation">)</span><span class="token-punctuation">:</span> <span class="token-type">Promise</span><span class="token-operator">&lt;</span><span class="token-type">PageContent</span><span class="token-operator">&gt;</span> <span class="token-punctuation">{</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-keyword">const</span> <span class="token-variable">notion</span> <span class="token-operator">=</span> <span class="token-keyword">new</span> <span class="token-type">NotionClient</span><span class="token-punctuation">({</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">auth</span><span class="token-punctuation">:</span> <span class="token-variable">process</span><span class="token-punctuation">.</span><span class="token-property">env</span><span class="token-punctuation">.</span><span class="token-variable">NOTION_TOKEN</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-punctuation">});</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-keyword">const</span> <span class="token-variable">blocks</span> <span class="token-operator">=</span> <span class="token-keyword">await</span> <span class="token-variable">notion</span><span class="token-punctuation">.</span><span class="token-property">blocks</span><span class="token-punctuation">.</span><span class="token-property">children</span><span class="token-punctuation">.</span><span class="token-function">list</span><span class="token-punctuation">({</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">block_id</span><span class="token-punctuation">:</span> <span class="token-variable">pageId</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-punctuation">});</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-keyword">return</span> <span class="token-punctuation">{</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">pageId</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">blocks</span><span class="token-punctuation">:</span> <span class="token-variable">blocks</span><span class="token-punctuation">.</span><span class="token-property">results</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">hasMore</span><span class="token-punctuation">:</span> <span class="token-variable">blocks</span><span class="token-punctuation">.</span><span class="token-property">has_more</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-punctuation">};</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-punctuation">}</span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- permissions.yaml content -->
+                  <div id="tab-permissions-yaml" class="tab-content hidden">
+                    <div class="flex text-[13px] font-mono leading-[1.8]">
+                      <div class="flex-shrink-0 py-4 pl-4 pr-3 text-right select-none">
+                        <div class="line-number text-aegis-700/60">1</div>
+                        <div class="line-number text-aegis-700/60">2</div>
+                        <div class="line-number text-aegis-700/60">3</div>
+                        <div class="line-number text-aegis-700/60">4</div>
+                        <div class="line-number text-aegis-700/60">5</div>
+                        <div class="line-number text-aegis-700/60">6</div>
+                        <div class="line-number text-aegis-700/60">7</div>
+                        <div class="line-number text-aegis-700/60">8</div>
+                        <div class="line-number text-aegis-700/60">9</div>
+                        <div class="line-number text-aegis-700/60">10</div>
+                        <div class="line-number text-aegis-700/60">11</div>
+                        <div class="line-number text-aegis-700/60">12</div>
+                        <div class="line-number text-aegis-700/60">13</div>
+                        <div class="line-number text-aegis-700/60">14</div>
+                        <div class="line-number text-aegis-700/60">15</div>
+                        <div class="line-number text-aegis-700/60">16</div>
+                        <div class="line-number text-aegis-700/60">17</div>
+                        <div class="line-number text-aegis-700/60">18</div>
+                        <div class="line-number text-aegis-700/60">19</div>
+                        <div class="line-number text-aegis-700/60">20</div>
+                        <div class="line-number text-aegis-700/60">21</div>
+                        <div class="line-number text-aegis-700/60">22</div>
+                        <div class="line-number text-aegis-700/60">23</div>
+                        <div class="line-number text-aegis-700/60">24</div>
+                      </div>
+                      <div class="flex-1 py-4 pr-6 overflow-x-auto">
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-comment"># Skill Permission Manifest</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-property">name</span><span class="token-punctuation">:</span> <span class="token-string">notion-integration</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-property">version</span><span class="token-punctuation">:</span> <span class="token-string">2.1.0</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-property">permissions</span><span class="token-punctuation">:</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">network</span><span class="token-punctuation">:</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-punctuation">-</span> <span class="token-property">domain</span><span class="token-punctuation">:</span> <span class="token-string">notion-api.com</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">      <span class="token-property">protocols</span><span class="token-punctuation">:</span> <span class="token-punctuation">[</span><span class="token-string">https</span><span class="token-punctuation">]</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">      <span class="token-property">ports</span><span class="token-punctuation">:</span> <span class="token-punctuation">[</span><span class="token-number">443</span><span class="token-punctuation">]</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-punctuation">-</span> <span class="token-property">domain</span><span class="token-punctuation">:</span> <span class="token-string">api.notion.com</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">      <span class="token-property">protocols</span><span class="token-punctuation">:</span> <span class="token-punctuation">[</span><span class="token-string">https</span><span class="token-punctuation">]</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">      <span class="token-property">ports</span><span class="token-punctuation">:</span> <span class="token-punctuation">[</span><span class="token-number">443</span><span class="token-punctuation">]</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">filesystem</span><span class="token-punctuation">:</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-punctuation">-</span> <span class="token-property">path</span><span class="token-punctuation">:</span> <span class="token-string">workspace/*</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">      <span class="token-property">access</span><span class="token-punctuation">:</span> <span class="token-string">read</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">environment</span><span class="token-punctuation">:</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-punctuation">-</span> <span class="token-property">variable</span><span class="token-punctuation">:</span> <span class="token-string">NOTION_TOKEN</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">      <span class="token-property">required</span><span class="token-punctuation">:</span> <span class="token-keyword">true</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="text-gray-500"></span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">process</span><span class="token-punctuation">:</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">spawn</span><span class="token-punctuation">:</span> <span class="token-keyword">false</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">shell</span><span class="token-punctuation">:</span> <span class="token-keyword">false</span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- package.json content -->
+                  <div id="tab-package-json" class="tab-content hidden">
+                    <div class="flex text-[13px] font-mono leading-[1.8]">
+                      <div class="flex-shrink-0 py-4 pl-4 pr-3 text-right select-none">
+                        <div class="line-number text-aegis-700/60">1</div>
+                        <div class="line-number text-aegis-700/60">2</div>
+                        <div class="line-number text-aegis-700/60">3</div>
+                        <div class="line-number text-aegis-700/60">4</div>
+                        <div class="line-number text-aegis-700/60">5</div>
+                        <div class="line-number text-aegis-700/60">6</div>
+                        <div class="line-number text-aegis-700/60">7</div>
+                        <div class="line-number text-aegis-700/60">8</div>
+                        <div class="line-number text-aegis-700/60">9</div>
+                        <div class="line-number text-aegis-700/60">10</div>
+                        <div class="line-number text-aegis-700/60">11</div>
+                        <div class="line-number text-aegis-700/60">12</div>
+                        <div class="line-number text-aegis-700/60">13</div>
+                        <div class="line-number text-aegis-700/60">14</div>
+                        <div class="line-number text-aegis-700/60">15</div>
+                        <div class="line-number text-aegis-700/60">16</div>
+                        <div class="line-number text-aegis-700/60">17</div>
+                        <div class="line-number text-aegis-700/60">18</div>
+                        <div class="line-number text-aegis-700/60">19</div>
+                        <div class="line-number text-aegis-700/60">20</div>
+                        <div class="line-number text-aegis-700/60">21</div>
+                        <div class="line-number text-aegis-700/60">22</div>
+                        <div class="line-number text-aegis-700/60">23</div>
+                        <div class="line-number text-aegis-700/60">24</div>
+                        <div class="line-number text-aegis-700/60">25</div>
+                      </div>
+                      <div class="flex-1 py-4 pr-6 overflow-x-auto">
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-punctuation">{</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">"name"</span><span class="token-punctuation">:</span> <span class="token-string">"@aegis/skill-notion-integration"</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">"version"</span><span class="token-punctuation">:</span> <span class="token-string">"2.1.0"</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">"description"</span><span class="token-punctuation">:</span> <span class="token-string">"Notion workspace integration skill"</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">"author"</span><span class="token-punctuation">:</span> <span class="token-string">"Notion Labs"</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">"license"</span><span class="token-punctuation">:</span> <span class="token-string">"MIT"</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">"main"</span><span class="token-punctuation">:</span> <span class="token-string">"dist/index.js"</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">"types"</span><span class="token-punctuation">:</span> <span class="token-string">"dist/index.d.ts"</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">"scripts"</span><span class="token-punctuation">:</span> <span class="token-punctuation">{</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">"build"</span><span class="token-punctuation">:</span> <span class="token-string">"tsc"</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">"test"</span><span class="token-punctuation">:</span> <span class="token-string">"jest"</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">"lint"</span><span class="token-punctuation">:</span> <span class="token-string">"eslint src/"</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-punctuation">}</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">"dependencies"</span><span class="token-punctuation">:</span> <span class="token-punctuation">{</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">"@notionhq/client"</span><span class="token-punctuation">:</span> <span class="token-string">"^2.2.14"</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-punctuation">}</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">"devDependencies"</span><span class="token-punctuation">:</span> <span class="token-punctuation">{</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">"@types/node"</span><span class="token-punctuation">:</span> <span class="token-string">"^20.11.0"</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">"typescript"</span><span class="token-punctuation">:</span> <span class="token-string">"^5.3.3"</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">"jest"</span><span class="token-punctuation">:</span> <span class="token-string">"^29.7.0"</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">"eslint"</span><span class="token-punctuation">:</span> <span class="token-string">"^8.56.0"</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-punctuation">}</span><span class="token-punctuation">,</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-property">"engines"</span><span class="token-punctuation">:</span> <span class="token-punctuation">{</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">    <span class="token-property">"node"</span><span class="token-punctuation">:</span> <span class="token-string">"&gt;=18.0.0"</span></div>
+                        <div class="code-line px-3 -mx-3 rounded">  <span class="token-punctuation">}</span></div>
+                        <div class="code-line px-3 -mx-3 rounded"><span class="token-punctuation">}</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- File info bar -->
+                <div id="fileInfoBar" class="flex items-center justify-between px-4 py-2.5 bg-gray-50/80 border-t border-gray-200/80 text-[11px] font-mono text-gray-500">
+                  <div class="flex items-center gap-3">
+                    <span id="fileInfoName" class="font-semibold text-gray-600">SKILL.md</span>
+                    <span class="text-gray-300">|</span>
+                    <span id="fileInfoLang">Markdown</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span id="fileInfoLines">23 lines</span>
+                    <span class="text-gray-300">|</span>
+                    <span id="fileInfoSize">0.8 KB</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN - SECURITY CHECKLIST (40%) -->
+            <div class="w-full lg:w-[40%]">
+              <div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+                <!-- Heading -->
+                <div class="px-6 py-4 border-b border-gray-200/80">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center">
+                      <svg class="w-4.5 h-4.5 text-rose-500" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 class="text-[15px] font-bold text-gray-900">Security Review Checklist</h2>
+                      <p class="text-[12px] text-gray-400 mt-0.5">Verify each gate before approval</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Checklist items -->
+                <div class="px-6 py-4 space-y-3">
+                  <!-- Check 1: No hardcoded credentials -->
+                  <label class="security-check flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:border-gray-200 hover:bg-gray-50/50 transition-all cursor-pointer group" data-check="0">
+                    <input type="checkbox" class="mt-0.5" onchange="updateChecklist()">
+                    <div class="flex-1 min-w-0">
+                      <div class="text-[13px] font-semibold text-gray-800 group-hover:text-gray-900">No hardcoded credentials or secrets</div>
+                      <p class="text-[12px] text-gray-400 mt-0.5">Code must not contain API keys, tokens, passwords, or other secrets in plain text</p>
+                    </div>
+                    <span class="check-status flex-shrink-0 mt-0.5 px-2 py-0.5 rounded text-[11px] font-bold bg-gray-100 text-gray-400">PENDING</span>
+                  </label>
+
+                  <!-- Check 2: Network access limited -->
+                  <label class="security-check flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:border-gray-200 hover:bg-gray-50/50 transition-all cursor-pointer group" data-check="1">
+                    <input type="checkbox" class="mt-0.5" onchange="updateChecklist()">
+                    <div class="flex-1 min-w-0">
+                      <div class="text-[13px] font-semibold text-gray-800 group-hover:text-gray-900">Network access limited to declared domains</div>
+                      <p class="text-[12px] text-gray-400 mt-0.5">All outbound requests must target only the domains listed in permissions.yaml</p>
+                    </div>
+                    <span class="check-status flex-shrink-0 mt-0.5 px-2 py-0.5 rounded text-[11px] font-bold bg-gray-100 text-gray-400">PENDING</span>
+                  </label>
+
+                  <!-- Check 3: File access scoped -->
+                  <label class="security-check flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:border-gray-200 hover:bg-gray-50/50 transition-all cursor-pointer group" data-check="2">
+                    <input type="checkbox" class="mt-0.5" onchange="updateChecklist()">
+                    <div class="flex-1 min-w-0">
+                      <div class="text-[13px] font-semibold text-gray-800 group-hover:text-gray-900">File access scoped to declared paths</div>
+                      <p class="text-[12px] text-gray-400 mt-0.5">Filesystem access must not exceed the paths declared in the permission manifest</p>
+                    </div>
+                    <span class="check-status flex-shrink-0 mt-0.5 px-2 py-0.5 rounded text-[11px] font-bold bg-gray-100 text-gray-400">PENDING</span>
+                  </label>
+
+                  <!-- Check 4: No process spawning -->
+                  <label class="security-check flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:border-gray-200 hover:bg-gray-50/50 transition-all cursor-pointer group" data-check="3">
+                    <input type="checkbox" class="mt-0.5" onchange="updateChecklist()">
+                    <div class="flex-1 min-w-0">
+                      <div class="text-[13px] font-semibold text-gray-800 group-hover:text-gray-900">No process spawning or shell execution</div>
+                      <p class="text-[12px] text-gray-400 mt-0.5">Skill must not invoke child_process, exec, spawn, or any shell commands</p>
+                    </div>
+                    <span class="check-status flex-shrink-0 mt-0.5 px-2 py-0.5 rounded text-[11px] font-bold bg-gray-100 text-gray-400">PENDING</span>
+                  </label>
+                </div>
+
+                <!-- Reviewer notes -->
+                <div class="px-6 pb-4">
+                  <label class="block text-[12px] font-semibold text-gray-600 mb-2">Reviewer Notes</label>
+                  <textarea
+                    id="reviewerNotes"
+                    rows="4"
+                    class="w-full px-3.5 py-2.5 text-[13px] text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-400 outline-none transition-all resize-none placeholder:text-gray-400"
+                    placeholder="Add review comments, findings, or recommendations..."
+                  ></textarea>
+                </div>
+
+                <!-- Warning bar -->
+                <div id="warningBar" class="mx-6 mb-4 flex items-center gap-2.5 px-4 py-3 rounded-lg bg-amber-50 border border-amber-200/60">
+                  <svg class="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                  </svg>
+                  <span id="warningText" class="text-[12px] font-medium text-amber-700">All 4 checks must pass to approve this skill</span>
+                </div>
+
+                <!-- Progress indicator -->
+                <div class="mx-6 mb-4">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Review Progress</span>
+                    <span id="progressCount" class="text-[12px] font-bold font-mono text-gray-500">0 / 4</span>
+                  </div>
+                  <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div id="progressBar" class="h-full bg-gradient-to-r from-aegis-500 to-aegis-400 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ==================== BOTTOM ACTION BAR ==================== -->
+      <div class="sticky bottom-0 bg-white/80 backdrop-blur-md border-t border-gray-200/80 px-6 lg:px-8 py-4 z-30">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 max-w-[1440px]">
+          <div class="flex items-center gap-2 text-[12px] text-gray-400">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Submitted <span class="font-mono font-medium text-gray-500">2 days ago</span></span>
+          </div>
+          <div class="flex items-center gap-3">
+            <!-- Reject -->
+            <button onclick="openRejectModal()" class="action-btn inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-red-200 text-red-600 text-[13px] font-semibold rounded-lg hover:bg-red-50 hover:border-red-300 transition-all">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+              </svg>
+              Reject
+            </button>
+
+            <!-- Request Changes -->
+            <button onclick="openChangesModal()" class="action-btn inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-amber-200 text-amber-700 text-[13px] font-semibold rounded-lg hover:bg-amber-50 hover:border-amber-300 transition-all">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/>
+              </svg>
+              Request Changes
+            </button>
+
+            <!-- Approve & Publish -->
+            <button id="approveBtn" disabled class="action-btn inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 border border-gray-200 text-gray-400 text-[13px] font-semibold rounded-lg cursor-not-allowed transition-all">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Approve &amp; Publish
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ==================== REJECT MODAL ==================== -->
+  <div id="rejectModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 hidden">
+    <div class="modal-backdrop absolute inset-0" onclick="closeRejectModal()"></div>
+    <div class="modal-panel relative bg-white rounded-2xl shadow-2xl shadow-black/20 w-full max-w-md z-10">
+      <!-- Modal header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+            <svg class="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+            </svg>
+          </div>
+          <h3 class="text-[15px] font-bold text-gray-900">Reject Skill</h3>
+        </div>
+        <button onclick="closeRejectModal()" class="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="px-6 py-4">
+        <p class="text-[13px] text-gray-500 mb-3">Provide a reason for rejecting <span class="font-semibold text-gray-700">Notion Integration v2.1.0</span>. The developer will be notified.</p>
+        <label class="block text-[12px] font-semibold text-gray-600 mb-1.5">Rejection Reason <span class="text-red-400">*</span></label>
+        <textarea
+          id="rejectReason"
+          rows="4"
+          class="w-full px-3.5 py-2.5 text-[13px] text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500/20 focus:border-red-400 outline-none transition-all resize-none placeholder:text-gray-400"
+          placeholder="e.g., Detected unauthorized network calls to external analytics service..."
+        ></textarea>
+        <div class="flex items-center gap-2 mt-3 p-2.5 rounded-lg bg-red-50/60 border border-red-100">
+          <svg class="w-3.5 h-3.5 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+          </svg>
+          <span class="text-[11px] text-red-600 font-medium">This action is permanent. The skill will be removed from the review queue.</span>
+        </div>
+      </div>
+      <!-- Modal footer -->
+      <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+        <button onclick="closeRejectModal()" class="px-4 py-2 text-[13px] font-medium text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100 transition-colors">Cancel</button>
+        <button onclick="confirmReject()" class="px-5 py-2 bg-red-500 hover:bg-red-600 text-white text-[13px] font-semibold rounded-lg shadow-sm shadow-red-500/25 transition-all active:scale-[0.98]">Reject Skill</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== REQUEST CHANGES MODAL ==================== -->
+  <div id="changesModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 hidden">
+    <div class="modal-backdrop absolute inset-0" onclick="closeChangesModal()"></div>
+    <div class="modal-panel relative bg-white rounded-2xl shadow-2xl shadow-black/20 w-full max-w-md z-10">
+      <!-- Modal header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+            <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/>
+            </svg>
+          </div>
+          <h3 class="text-[15px] font-bold text-gray-900">Request Changes</h3>
+        </div>
+        <button onclick="closeChangesModal()" class="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="px-6 py-4">
+        <p class="text-[13px] text-gray-500 mb-3">Describe the changes needed for <span class="font-semibold text-gray-700">Notion Integration v2.1.0</span>. The developer can resubmit after updates.</p>
+        <label class="block text-[12px] font-semibold text-gray-600 mb-1.5">Required Changes <span class="text-amber-500">*</span></label>
+        <textarea
+          id="changesDescription"
+          rows="4"
+          class="w-full px-3.5 py-2.5 text-[13px] text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 outline-none transition-all resize-none placeholder:text-gray-400"
+          placeholder="e.g., Please scope file access to specific subdirectory rather than workspace/*..."
+        ></textarea>
+      </div>
+      <!-- Modal footer -->
+      <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+        <button onclick="closeChangesModal()" class="px-4 py-2 text-[13px] font-medium text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100 transition-colors">Cancel</button>
+        <button onclick="confirmChanges()" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[13px] font-semibold rounded-lg shadow-sm shadow-amber-500/25 transition-all active:scale-[0.98]">Send Request</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SUCCESS TOAST ==================== -->
+  <div id="successToast" class="fixed bottom-24 right-8 z-[70] hidden">
+    <div class="flex items-center gap-3 px-5 py-3.5 bg-gray-900 text-white rounded-xl shadow-xl shadow-black/20">
+      <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <span id="toastMessage" class="text-[13px] font-medium">Action completed successfully</span>
+    </div>
+  </div>
+
+  <script>
+    // ==================== TAB SWITCHING ====================
+    const fileInfoMap = {
+      'skill-md':          { name: 'SKILL.md',          lang: 'Markdown',   lines: '23 lines',  size: '0.8 KB' },
+      'index-ts':          { name: 'index.ts',          lang: 'TypeScript', lines: '50 lines',  size: '1.4 KB' },
+      'permissions-yaml':  { name: 'permissions.yaml',  lang: 'YAML',       lines: '24 lines',  size: '0.5 KB' },
+      'package-json':      { name: 'package.json',      lang: 'JSON',       lines: '25 lines',  size: '0.5 KB' },
+    };
+
+    function switchTab(tabId) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      // Show selected tab content
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+      // Update tab styles
+      document.querySelectorAll('.code-tab').forEach(tab => {
+        tab.classList.remove('active');
+        tab.classList.remove('text-aegis-600');
+        tab.classList.add('text-gray-500');
+        tab.classList.remove('font-semibold');
+        tab.classList.add('font-medium');
+      });
+      const activeTab = document.querySelector(`[data-tab="${tabId}"]`);
+      activeTab.classList.add('active');
+      activeTab.classList.add('text-aegis-600');
+      activeTab.classList.remove('text-gray-500');
+      activeTab.classList.add('font-semibold');
+      activeTab.classList.remove('font-medium');
+
+      // Update file info bar
+      const info = fileInfoMap[tabId];
+      if (info) {
+        document.getElementById('fileInfoName').textContent = info.name;
+        document.getElementById('fileInfoLang').textContent = info.lang;
+        document.getElementById('fileInfoLines').textContent = info.lines;
+        document.getElementById('fileInfoSize').textContent = info.size;
+      }
+    }
+
+    // ==================== SECURITY CHECKLIST ====================
+    function updateChecklist() {
+      const checks = document.querySelectorAll('.security-check input[type="checkbox"]');
+      let passedCount = 0;
+
+      checks.forEach((checkbox, index) => {
+        const label = checkbox.closest('.security-check');
+        const statusBadge = label.querySelector('.check-status');
+
+        if (checkbox.checked) {
+          passedCount++;
+          statusBadge.textContent = 'PASS';
+          statusBadge.className = 'check-status flex-shrink-0 mt-0.5 px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-700';
+          label.classList.remove('border-gray-100');
+          label.classList.add('border-emerald-200', 'bg-emerald-50/30');
+        } else {
+          statusBadge.textContent = 'PENDING';
+          statusBadge.className = 'check-status flex-shrink-0 mt-0.5 px-2 py-0.5 rounded text-[11px] font-bold bg-gray-100 text-gray-400';
+          label.classList.remove('border-emerald-200', 'bg-emerald-50/30');
+          label.classList.add('border-gray-100');
+        }
+      });
+
+      // Update progress
+      document.getElementById('progressCount').textContent = passedCount + ' / 4';
+      document.getElementById('progressBar').style.width = (passedCount / 4 * 100) + '%';
+
+      // Update approve button
+      const approveBtn = document.getElementById('approveBtn');
+      const warningBar = document.getElementById('warningBar');
+      const warningText = document.getElementById('warningText');
+
+      if (passedCount === 4) {
+        approveBtn.disabled = false;
+        approveBtn.className = 'action-btn btn-approve-enabled inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[13px] font-semibold rounded-lg shadow-sm shadow-emerald-500/25 transition-all cursor-pointer';
+        approveBtn.onclick = confirmApprove;
+        warningText.textContent = 'All checks passed. Ready to approve.';
+        warningBar.classList.remove('bg-amber-50', 'border-amber-200/60');
+        warningBar.classList.add('bg-emerald-50', 'border-emerald-200/60');
+        warningBar.querySelector('svg').classList.remove('text-amber-500');
+        warningBar.querySelector('svg').classList.add('text-emerald-500');
+        warningText.classList.remove('text-amber-700');
+        warningText.classList.add('text-emerald-700');
+      } else {
+        approveBtn.disabled = true;
+        approveBtn.className = 'action-btn inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 border border-gray-200 text-gray-400 text-[13px] font-semibold rounded-lg cursor-not-allowed transition-all';
+        approveBtn.onclick = null;
+        warningText.textContent = 'All 4 checks must pass to approve this skill';
+        warningBar.classList.remove('bg-emerald-50', 'border-emerald-200/60');
+        warningBar.classList.add('bg-amber-50', 'border-amber-200/60');
+        warningBar.querySelector('svg').classList.remove('text-emerald-500');
+        warningBar.querySelector('svg').classList.add('text-amber-500');
+        warningText.classList.remove('text-emerald-700');
+        warningText.classList.add('text-amber-700');
+      }
+
+      // Update progress bar color
+      const progressBar = document.getElementById('progressBar');
+      if (passedCount === 4) {
+        progressBar.classList.remove('from-aegis-500', 'to-aegis-400');
+        progressBar.classList.add('from-emerald-500', 'to-emerald-400');
+      } else {
+        progressBar.classList.remove('from-emerald-500', 'to-emerald-400');
+        progressBar.classList.add('from-aegis-500', 'to-aegis-400');
+      }
+    }
+
+    // ==================== MODALS ====================
+    function openRejectModal() {
+      document.getElementById('rejectModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeRejectModal() {
+      document.getElementById('rejectModal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function openChangesModal() {
+      document.getElementById('changesModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeChangesModal() {
+      document.getElementById('changesModal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function confirmReject() {
+      const reason = document.getElementById('rejectReason').value.trim();
+      if (!reason) {
+        document.getElementById('rejectReason').classList.add('border-red-300', 'ring-2', 'ring-red-500/20');
+        document.getElementById('rejectReason').focus();
+        return;
+      }
+      closeRejectModal();
+      showToast('Skill rejected. Notification sent to Notion Labs.');
+    }
+
+    function confirmChanges() {
+      const description = document.getElementById('changesDescription').value.trim();
+      if (!description) {
+        document.getElementById('changesDescription').classList.add('border-amber-300', 'ring-2', 'ring-amber-500/20');
+        document.getElementById('changesDescription').focus();
+        return;
+      }
+      closeChangesModal();
+      showToast('Change request sent to Notion Labs.');
+    }
+
+    function confirmApprove() {
+      showToast('Notion Integration v2.1.0 approved and published to marketplace.');
+    }
+
+    // ==================== TOAST ====================
+    function showToast(message) {
+      const toast = document.getElementById('successToast');
+      document.getElementById('toastMessage').textContent = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 4000);
+    }
+
+    // ==================== SIDEBAR COLLAPSE/EXPAND ====================
+    let sidebarCollapsed = false;
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+
+      if (sidebarCollapsed) {
+        sidebar.style.width = '64px';
+        mainContent.style.marginLeft = '64px';
+        labels.forEach(el => el.style.display = 'none');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.style.width = '256px';
+        mainContent.style.marginLeft = '256px';
+        labels.forEach(el => el.style.display = '');
+        collapseIcon.style.transform = '';
+      }
+    }
+
+    // ==================== KEYBOARD SHORTCUTS ====================
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeRejectModal();
+        closeChangesModal();
+      }
+    });
+
+    // Remove textarea validation styling on input
+    document.getElementById('rejectReason').addEventListener('input', function() {
+      this.classList.remove('border-red-300', 'ring-2', 'ring-red-500/20');
+    });
+    document.getElementById('changesDescription').addEventListener('input', function() {
+      this.classList.remove('border-amber-300', 'ring-2', 'ring-amber-500/20');
+    });
+  </script>
+
+</body>
+</html>

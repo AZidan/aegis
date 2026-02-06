@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provision New Tenant - Aegis Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            aegis: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+
+    /* Smooth transitions */
+    .nav-item { transition: all 0.15s ease; }
+    .card-hover { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04); }
+
+    /* Notification pulse */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.15); }
+    }
+    .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+    /* Sidebar transition for mobile */
+    .sidebar-overlay { transition: opacity 0.3s ease; }
+    .sidebar-panel { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    /* Plan card selection ring */
+    .plan-card {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .plan-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.15), 0 8px 10px -6px rgba(99, 102, 241, 0.08);
+    }
+    .plan-card.selected {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 10px 25px -5px rgba(99, 102, 241, 0.15);
+    }
+
+    /* Slider styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: #e0e7ff;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #6366f1;
+      cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 1px 4px rgba(99, 102, 241, 0.4);
+      transition: transform 0.15s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #6366f1;
+      cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 1px 4px rgba(99, 102, 241, 0.4);
+    }
+
+    /* Spinner animation */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinner {
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* Check mark pop-in */
+    @keyframes check-pop {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .check-pop {
+      animation: check-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    /* Progress pulse */
+    @keyframes progress-pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+    .progress-pulse {
+      animation: progress-pulse 1.5s ease-in-out infinite;
+    }
+
+    /* Fade in for step content */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    /* Toggle switch */
+    .toggle-track {
+      transition: background-color 0.2s ease;
+    }
+    .toggle-knob {
+      transition: transform 0.2s ease;
+    }
+  </style>
+</head>
+<body class="h-full bg-[#f8fafc] font-sans text-gray-900 antialiased">
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside id="sidebar" class="fixed left-0 top-0 h-full bg-white border-r border-gray-200 flex flex-col transition-all duration-300 z-30" style="width: 256px">
+    <!-- Logo -->
+    <div class="flex items-center gap-3 px-5 py-5 border-b border-gray-100">
+      <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center flex-shrink-0">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      </div>
+      <span class="sidebar-label font-bold text-gray-900 text-lg tracking-tight">Aegis Admin</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <!-- OVERVIEW section -->
+      <div>
+        <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Overview</p>
+        <a href="/admin" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="sidebar-label">Dashboard</span>
+        </a>
+        <a href="/admin/tenants" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-600 font-semibold">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18"/><path d="M6 12H4a2 2 0 00-2 2v6a2 2 0 002 2h2"/><path d="M18 9h2a2 2 0 012 2v9a2 2 0 01-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+          <span class="sidebar-label">Tenants</span>
+        </a>
+        <a href="/admin/health" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span class="sidebar-label">System Health</span>
+        </a>
+      </div>
+
+      <!-- MARKETPLACE section -->
+      <div>
+        <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Marketplace</p>
+        <a href="/admin/skills/review" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M16 16l2 2 4-4"/><path d="M21 10V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l2-1.14"/><path d="M16.5 9.4L7.55 4.24"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+          <span class="sidebar-label">Skill Review</span>
+          <span class="sidebar-label ml-auto bg-amber-100 text-amber-700 text-xs font-semibold px-2 py-0.5 rounded-full">5</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Footer: Collapse toggle + User -->
+    <div class="border-t border-gray-100 px-3 py-3 space-y-2">
+      <button onclick="toggleSidebar()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 w-full">
+        <svg id="collapse-icon" class="w-5 h-5 flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+        <span class="sidebar-label">Collapse</span>
+      </button>
+      <div class="flex items-center gap-3 px-3 py-2">
+        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+          <span class="text-sm font-semibold text-indigo-600">SA</span>
+        </div>
+        <div class="sidebar-label">
+          <p class="text-sm font-medium text-gray-900">Super Admin</p>
+          <p class="text-xs text-gray-500">admin@aegis.io</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <div id="main-content" class="flex-1 flex flex-col min-w-0 overflow-hidden" style="margin-left: 256px">
+
+      <!-- Header bar -->
+      <header class="flex items-center justify-between h-16 px-6 lg:px-8 border-b border-gray-200/80 bg-white/70 backdrop-blur-sm shrink-0">
+        <div class="flex items-center gap-4">
+          <!-- Mobile hamburger -->
+          <button onclick="toggleSidebar()" class="lg:hidden -ml-1 p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+            </svg>
+          </button>
+          <div>
+            <!-- Breadcrumb -->
+            <nav class="flex items-center gap-1.5 text-[13px]">
+              <a href="#" class="text-gray-400 hover:text-aegis-600 transition-colors font-medium">Tenants</a>
+              <svg class="w-3.5 h-3.5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+              </svg>
+              <span class="text-gray-700 font-semibold">Provision New Tenant</span>
+            </nav>
+            <p class="text-[11px] text-gray-400 font-medium mt-0.5">Configure and deploy a new tenant environment</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <!-- Help button -->
+          <button class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/>
+            </svg>
+            Help
+          </button>
+          <!-- Notification bell -->
+          <button class="relative p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+            </svg>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable content area -->
+      <main class="flex-1 overflow-y-auto">
+        <div class="max-w-2xl mx-auto px-6 lg:px-8 py-8">
+
+          <!-- ==================== WIZARD STEPPER ==================== -->
+          <div class="mb-8">
+            <div class="flex items-center justify-between relative">
+              <!-- Connector line behind the steps -->
+              <div class="absolute top-5 left-0 right-0 h-[2px] bg-gray-200 z-0"></div>
+              <!-- Active connector segment: step 1 to step 2 -->
+              <div id="connectorProgress" class="absolute top-5 left-0 h-[2px] bg-aegis-500 z-0 transition-all duration-500 ease-out" style="width: 0%"></div>
+
+              <!-- Step 1 -->
+              <div class="relative z-10 flex flex-col items-center flex-1">
+                <button onclick="goToStep(1)" id="stepCircle1" class="w-10 h-10 rounded-full bg-aegis-500 text-white font-semibold text-sm flex items-center justify-center ring-4 ring-white shadow-sm transition-all duration-300">
+                  1
+                </button>
+                <span id="stepLabel1" class="mt-2 text-[12px] font-semibold text-aegis-600 transition-colors duration-300">Company Details</span>
+              </div>
+
+              <!-- Step 2 -->
+              <div class="relative z-10 flex flex-col items-center flex-1">
+                <button onclick="goToStep(2)" id="stepCircle2" class="w-10 h-10 rounded-full bg-gray-200 text-gray-400 font-semibold text-sm flex items-center justify-center ring-4 ring-white shadow-sm transition-all duration-300">
+                  2
+                </button>
+                <span id="stepLabel2" class="mt-2 text-[12px] font-medium text-gray-400 transition-colors duration-300">Plan & Limits</span>
+              </div>
+
+              <!-- Step 3 -->
+              <div class="relative z-10 flex flex-col items-center flex-1">
+                <button onclick="goToStep(3)" id="stepCircle3" class="w-10 h-10 rounded-full bg-gray-200 text-gray-400 font-semibold text-sm flex items-center justify-center ring-4 ring-white shadow-sm transition-all duration-300">
+                  3
+                </button>
+                <span id="stepLabel3" class="mt-2 text-[12px] font-medium text-gray-400 transition-colors duration-300">Provision</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== STEP 1: COMPANY DETAILS ==================== -->
+          <div id="step1" class="fade-in">
+            <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm">
+              <div class="px-6 py-5 border-b border-gray-100">
+                <h2 class="text-[16px] font-semibold text-gray-900">Company Details</h2>
+                <p class="text-[13px] text-gray-500 mt-0.5">Enter the basic information about the new tenant organization.</p>
+              </div>
+              <div class="px-6 py-6 space-y-5">
+                <!-- Company Name -->
+                <div>
+                  <label for="companyName" class="block text-[13px] font-medium text-gray-700 mb-1.5">
+                    Company Name <span class="text-rose-500">*</span>
+                  </label>
+                  <input type="text" id="companyName" placeholder="e.g. Acme Corporation"
+                    class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-[14px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-500 transition-all" />
+                  <p id="companyNameError" class="hidden text-[12px] text-rose-500 mt-1">Company name is required.</p>
+                </div>
+
+                <!-- Admin Email -->
+                <div>
+                  <label for="adminEmail" class="block text-[13px] font-medium text-gray-700 mb-1.5">
+                    Admin Email <span class="text-rose-500">*</span>
+                  </label>
+                  <input type="email" id="adminEmail" placeholder="admin@company.com"
+                    class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-[14px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-500 transition-all" />
+                  <p id="adminEmailError" class="hidden text-[12px] text-rose-500 mt-1">A valid admin email is required.</p>
+                </div>
+
+                <!-- Industry & Company Size row -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <!-- Industry -->
+                  <div>
+                    <label for="industry" class="block text-[13px] font-medium text-gray-700 mb-1.5">Industry</label>
+                    <select id="industry"
+                      class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-[14px] text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-500 transition-all appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%236b7280%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.23%207.21a.75.75%200%20011.06.02L10%2011.168l3.71-3.938a.75.75%200%20111.08%201.04l-4.25%204.5a.75.75%200%2001-1.08%200l-4.25-4.5a.75.75%200%2001.02-1.06z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[right_8px_center] bg-no-repeat pr-10">
+                      <option value="">Select industry</option>
+                      <option value="technology">Technology</option>
+                      <option value="healthcare">Healthcare</option>
+                      <option value="finance">Finance</option>
+                      <option value="retail">Retail</option>
+                      <option value="education">Education</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <!-- Company Size -->
+                  <div>
+                    <label for="companySize" class="block text-[13px] font-medium text-gray-700 mb-1.5">Company Size</label>
+                    <select id="companySize"
+                      class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-[14px] text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-500 transition-all appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%236b7280%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.23%207.21a.75.75%200%20011.06.02L10%2011.168l3.71-3.938a.75.75%200%20111.08%201.04l-4.25%204.5a.75.75%200%2001-1.08%200l-4.25-4.5a.75.75%200%2001.02-1.06z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[right_8px_center] bg-no-repeat pr-10">
+                      <option value="">Select size</option>
+                      <option value="1-50">1-50 employees</option>
+                      <option value="51-200">51-200 employees</option>
+                      <option value="201-1000">201-1,000 employees</option>
+                      <option value="1000+">1,000+ employees</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Region -->
+                <div>
+                  <label for="region" class="block text-[13px] font-medium text-gray-700 mb-1.5">
+                    Deployment Region <span class="text-rose-500">*</span>
+                  </label>
+                  <select id="region"
+                    class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-[14px] text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-500 transition-all appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%236b7280%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.23%207.21a.75.75%200%20011.06.02L10%2011.168l3.71-3.938a.75.75%200%20111.08%201.04l-4.25%204.5a.75.75%200%2001-1.08%200l-4.25-4.5a.75.75%200%2001.02-1.06z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[right_8px_center] bg-no-repeat pr-10">
+                    <option value="">Select region</option>
+                    <option value="us-east">US East (Virginia)</option>
+                    <option value="us-west">US West (Oregon)</option>
+                    <option value="eu-west">EU West (Ireland)</option>
+                    <option value="eu-central">EU Central (Frankfurt)</option>
+                    <option value="ap-southeast">Asia Pacific (Singapore)</option>
+                    <option value="me-south">Middle East (Bahrain)</option>
+                  </select>
+                  <p id="regionError" class="hidden text-[12px] text-rose-500 mt-1">Deployment region is required.</p>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                  <label for="notes" class="block text-[13px] font-medium text-gray-700 mb-1.5">Notes <span class="text-gray-400 font-normal">(optional)</span></label>
+                  <textarea id="notes" rows="3" placeholder="Any additional notes about this tenant..."
+                    class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-[14px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-500 transition-all resize-none"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== STEP 2: PLAN & LIMITS ==================== -->
+          <div id="step2" class="hidden">
+            <!-- Plan Selection -->
+            <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm mb-6">
+              <div class="px-6 py-5 border-b border-gray-100">
+                <h2 class="text-[16px] font-semibold text-gray-900">Select a Plan</h2>
+                <p class="text-[13px] text-gray-500 mt-0.5">Choose the subscription tier for this tenant.</p>
+              </div>
+              <div class="px-6 py-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <!-- Starter Plan -->
+                  <div onclick="selectPlan('starter')" id="plan-starter" class="plan-card relative rounded-xl border-2 border-gray-200 p-5 bg-white">
+                    <div class="flex items-center justify-between mb-3">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Starter</span>
+                      <div id="planCheck-starter" class="hidden w-5 h-5 rounded-full bg-aegis-500 flex items-center justify-center">
+                        <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <span class="text-2xl font-bold text-gray-900">$99</span>
+                      <span class="text-[13px] text-gray-400 font-medium">/mo</span>
+                    </div>
+                    <div class="space-y-2">
+                      <div class="flex items-center gap-2 text-[13px] text-gray-600">
+                        <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                        Up to <span class="font-mono font-medium text-gray-800">3</span> agents
+                      </div>
+                      <div class="flex items-center gap-2 text-[13px] text-gray-600">
+                        <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                        10 GB storage
+                      </div>
+                      <div class="flex items-center gap-2 text-[13px] text-gray-600">
+                        <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                        Email support
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Pro Plan -->
+                  <div onclick="selectPlan('pro')" id="plan-pro" class="plan-card selected relative rounded-xl border-2 border-aegis-500 p-5 bg-aegis-50/30">
+                    <div class="absolute -top-2.5 left-1/2 -translate-x-1/2">
+                      <span class="bg-aegis-500 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full">Popular</span>
+                    </div>
+                    <div class="flex items-center justify-between mb-3">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-aegis-500">Pro</span>
+                      <div id="planCheck-pro" class="w-5 h-5 rounded-full bg-aegis-500 flex items-center justify-center">
+                        <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <span class="text-2xl font-bold text-gray-900">$299</span>
+                      <span class="text-[13px] text-gray-400 font-medium">/mo</span>
+                    </div>
+                    <div class="space-y-2">
+                      <div class="flex items-center gap-2 text-[13px] text-gray-600">
+                        <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                        Up to <span class="font-mono font-medium text-gray-800">10</span> agents
+                      </div>
+                      <div class="flex items-center gap-2 text-[13px] text-gray-600">
+                        <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                        100 GB storage
+                      </div>
+                      <div class="flex items-center gap-2 text-[13px] text-gray-600">
+                        <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                        Priority support
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Enterprise Plan -->
+                  <div onclick="selectPlan('enterprise')" id="plan-enterprise" class="plan-card relative rounded-xl border-2 border-gray-200 p-5 bg-white">
+                    <div class="flex items-center justify-between mb-3">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Enterprise</span>
+                      <div id="planCheck-enterprise" class="hidden w-5 h-5 rounded-full bg-aegis-500 flex items-center justify-center">
+                        <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <span class="text-2xl font-bold text-gray-900">$799</span>
+                      <span class="text-[13px] text-gray-400 font-medium">/mo</span>
+                    </div>
+                    <div class="space-y-2">
+                      <div class="flex items-center gap-2 text-[13px] text-gray-600">
+                        <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                        <span class="font-mono font-medium text-gray-800">Unlimited</span> agents
+                      </div>
+                      <div class="flex items-center gap-2 text-[13px] text-gray-600">
+                        <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                        1 TB storage
+                      </div>
+                      <div class="flex items-center gap-2 text-[13px] text-gray-600">
+                        <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                        24/7 dedicated support
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Resource Limits -->
+            <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm mb-6">
+              <div class="px-6 py-5 border-b border-gray-100">
+                <h2 class="text-[16px] font-semibold text-gray-900">Resource Limits</h2>
+                <p class="text-[13px] text-gray-500 mt-0.5">Fine-tune the resource allocations for this tenant.</p>
+              </div>
+              <div class="px-6 py-6 space-y-6">
+                <!-- Max Agents Slider -->
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <label class="text-[13px] font-medium text-gray-700">Max Agents</label>
+                    <span id="agentSliderValue" class="text-[13px] font-mono font-semibold text-aegis-600 bg-aegis-50 px-2 py-0.5 rounded">10</span>
+                  </div>
+                  <input type="range" id="agentSlider" min="1" max="50" value="10" class="w-full" oninput="updateSliderValue('agent')" />
+                  <div class="flex justify-between mt-1">
+                    <span class="text-[11px] text-gray-400 font-mono">1</span>
+                    <span class="text-[11px] text-gray-400 font-mono">50</span>
+                  </div>
+                </div>
+
+                <!-- Max Skills Slider -->
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <label class="text-[13px] font-medium text-gray-700">Max Skills</label>
+                    <span id="skillSliderValue" class="text-[13px] font-mono font-semibold text-aegis-600 bg-aegis-50 px-2 py-0.5 rounded">25</span>
+                  </div>
+                  <input type="range" id="skillSlider" min="5" max="200" value="25" class="w-full" oninput="updateSliderValue('skill')" />
+                  <div class="flex justify-between mt-1">
+                    <span class="text-[11px] text-gray-400 font-mono">5</span>
+                    <span class="text-[11px] text-gray-400 font-mono">200</span>
+                  </div>
+                </div>
+
+                <!-- Storage Limit Dropdown -->
+                <div>
+                  <label for="storageLimit" class="block text-[13px] font-medium text-gray-700 mb-1.5">Storage Limit</label>
+                  <select id="storageLimit"
+                    class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-[14px] text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-500 transition-all appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%236b7280%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.23%207.21a.75.75%200%20011.06.02L10%2011.168l3.71-3.938a.75.75%200%20111.08%201.04l-4.25%204.5a.75.75%200%2001-1.08%200l-4.25-4.5a.75.75%200%2001.02-1.06z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[right_8px_center] bg-no-repeat pr-10">
+                    <option value="10">10 GB</option>
+                    <option value="50">50 GB</option>
+                    <option value="100" selected>100 GB</option>
+                    <option value="500">500 GB</option>
+                    <option value="1000">1 TB</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Billing Toggle -->
+            <div class="bg-white rounded-xl border border-gray-200/80 shadow-sm">
+              <div class="px-6 py-5 border-b border-gray-100">
+                <h2 class="text-[16px] font-semibold text-gray-900">Billing Cycle</h2>
+                <p class="text-[13px] text-gray-500 mt-0.5">Choose how this tenant will be billed.</p>
+              </div>
+              <div class="px-6 py-6">
+                <div class="flex items-center justify-center gap-4">
+                  <span id="monthlyLabel" class="text-[14px] font-semibold text-aegis-600 transition-colors duration-200">Monthly</span>
+                  <button onclick="toggleBilling()" id="billingToggle" class="relative w-14 h-7 rounded-full toggle-track bg-aegis-500 p-0.5 focus:outline-none focus:ring-2 focus:ring-aegis-500/20">
+                    <div id="billingKnob" class="toggle-knob w-6 h-6 rounded-full bg-white shadow-sm translate-x-0"></div>
+                  </button>
+                  <div class="flex items-center gap-2">
+                    <span id="annualLabel" class="text-[14px] font-medium text-gray-400 transition-colors duration-200">Annual</span>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Save 20%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== STEP 3: PROVISION ==================== -->
+          <div id="step3" class="hidden">
+            <!-- Summary Card -->
+            <div id="summaryCard" class="bg-white rounded-xl border border-gray-200/80 shadow-sm mb-6">
+              <div class="px-6 py-5 border-b border-gray-100">
+                <h2 class="text-[16px] font-semibold text-gray-900">Provisioning Summary</h2>
+                <p class="text-[13px] text-gray-500 mt-0.5">Review the configuration before provisioning.</p>
+              </div>
+              <div class="px-6 py-6">
+                <div class="space-y-4">
+                  <!-- Company Section -->
+                  <div>
+                    <h3 class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Company</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                      <div class="bg-gray-50 rounded-lg px-4 py-3">
+                        <div class="text-[11px] text-gray-400 mb-0.5">Name</div>
+                        <div id="summaryName" class="text-[14px] font-semibold text-gray-900 truncate">--</div>
+                      </div>
+                      <div class="bg-gray-50 rounded-lg px-4 py-3">
+                        <div class="text-[11px] text-gray-400 mb-0.5">Admin Email</div>
+                        <div id="summaryEmail" class="text-[14px] font-mono text-gray-900 truncate">--</div>
+                      </div>
+                      <div class="bg-gray-50 rounded-lg px-4 py-3">
+                        <div class="text-[11px] text-gray-400 mb-0.5">Industry</div>
+                        <div id="summaryIndustry" class="text-[14px] text-gray-900 capitalize">--</div>
+                      </div>
+                      <div class="bg-gray-50 rounded-lg px-4 py-3">
+                        <div class="text-[11px] text-gray-400 mb-0.5">Region</div>
+                        <div id="summaryRegion" class="text-[14px] font-mono text-gray-900">--</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Plan Section -->
+                  <div>
+                    <h3 class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Plan & Resources</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div class="bg-aegis-50/60 rounded-lg px-4 py-3 border border-aegis-100/50">
+                        <div class="text-[11px] text-aegis-400 mb-0.5">Plan</div>
+                        <div id="summaryPlan" class="text-[14px] font-semibold text-aegis-700 capitalize">Pro</div>
+                      </div>
+                      <div class="bg-gray-50 rounded-lg px-4 py-3">
+                        <div class="text-[11px] text-gray-400 mb-0.5">Billing</div>
+                        <div id="summaryBilling" class="text-[14px] text-gray-900">Monthly</div>
+                      </div>
+                      <div class="bg-gray-50 rounded-lg px-4 py-3">
+                        <div class="text-[11px] text-gray-400 mb-0.5">Max Agents</div>
+                        <div id="summaryAgents" class="text-[14px] font-mono font-semibold text-gray-900">10</div>
+                      </div>
+                      <div class="bg-gray-50 rounded-lg px-4 py-3">
+                        <div class="text-[11px] text-gray-400 mb-0.5">Storage</div>
+                        <div id="summaryStorage" class="text-[14px] font-mono text-gray-900">100 GB</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Cost Summary -->
+                  <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div>
+                      <div class="text-[13px] text-gray-500">Estimated Monthly Cost</div>
+                    </div>
+                    <div class="text-right">
+                      <div id="summaryCost" class="text-2xl font-bold text-gray-900">$299</div>
+                      <div id="summaryCostPeriod" class="text-[12px] text-gray-400">per month</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Provisioning Progress -->
+            <div id="provisionProgress" class="hidden bg-white rounded-xl border border-gray-200/80 shadow-sm">
+              <div class="px-6 py-5 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                  <h2 class="text-[16px] font-semibold text-gray-900">Provisioning in Progress</h2>
+                  <span id="provisionPercent" class="text-[13px] font-mono font-semibold text-aegis-600">0%</span>
+                </div>
+                <!-- Overall progress bar -->
+                <div class="mt-3 w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                  <div id="provisionBar" class="h-full bg-gradient-to-r from-aegis-500 to-aegis-400 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                </div>
+              </div>
+              <div class="px-6 py-6">
+                <div class="space-y-4" id="provisionSteps">
+                  <!-- Step: Creating container -->
+                  <div class="provision-step flex items-start gap-3" data-step="0">
+                    <div class="step-icon mt-0.5 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                      <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                    </div>
+                    <div class="flex-1">
+                      <div class="text-[14px] font-medium text-gray-400 step-text">Creating tenant container</div>
+                      <div class="text-[12px] text-gray-300 font-mono step-detail">Allocating isolated environment</div>
+                    </div>
+                    <span class="step-status text-[12px] font-medium text-gray-300 mt-0.5">Waiting</span>
+                  </div>
+
+                  <!-- Step: Configuring network -->
+                  <div class="provision-step flex items-start gap-3" data-step="1">
+                    <div class="step-icon mt-0.5 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                      <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                    </div>
+                    <div class="flex-1">
+                      <div class="text-[14px] font-medium text-gray-400 step-text">Configuring network</div>
+                      <div class="text-[12px] text-gray-300 font-mono step-detail">Setting up VPC and security groups</div>
+                    </div>
+                    <span class="step-status text-[12px] font-medium text-gray-300 mt-0.5">Waiting</span>
+                  </div>
+
+                  <!-- Step: Installing base skills -->
+                  <div class="provision-step flex items-start gap-3" data-step="2">
+                    <div class="step-icon mt-0.5 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                      <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                    </div>
+                    <div class="flex-1">
+                      <div class="text-[14px] font-medium text-gray-400 step-text">Installing base skills</div>
+                      <div class="text-[12px] text-gray-300 font-mono step-detail">Deploying default skill packages</div>
+                    </div>
+                    <span class="step-status text-[12px] font-medium text-gray-300 mt-0.5">Waiting</span>
+                  </div>
+
+                  <!-- Step: Setting up admin account -->
+                  <div class="provision-step flex items-start gap-3" data-step="3">
+                    <div class="step-icon mt-0.5 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                      <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                    </div>
+                    <div class="flex-1">
+                      <div class="text-[14px] font-medium text-gray-400 step-text">Setting up admin account</div>
+                      <div class="text-[12px] text-gray-300 font-mono step-detail">Creating credentials and permissions</div>
+                    </div>
+                    <span class="step-status text-[12px] font-medium text-gray-300 mt-0.5">Waiting</span>
+                  </div>
+
+                  <!-- Step: Health check -->
+                  <div class="provision-step flex items-start gap-3" data-step="4">
+                    <div class="step-icon mt-0.5 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                      <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                    </div>
+                    <div class="flex-1">
+                      <div class="text-[14px] font-medium text-gray-400 step-text">Running health check</div>
+                      <div class="text-[12px] text-gray-300 font-mono step-detail">Verifying all services are operational</div>
+                    </div>
+                    <span class="step-status text-[12px] font-medium text-gray-300 mt-0.5">Waiting</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Provision Success -->
+            <div id="provisionSuccess" class="hidden">
+              <div class="bg-white rounded-xl border border-emerald-200 shadow-sm">
+                <div class="px-6 py-8 text-center">
+                  <div class="w-16 h-16 mx-auto rounded-full bg-emerald-50 flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold text-gray-900 mb-1">Tenant Provisioned Successfully</h3>
+                  <p class="text-[14px] text-gray-500 mb-6">The tenant environment is ready. An invitation email has been sent to the admin.</p>
+                  <div class="inline-flex items-center gap-2 bg-gray-50 rounded-lg px-4 py-2.5 mb-6">
+                    <span class="text-[12px] text-gray-400">Tenant ID</span>
+                    <span id="tenantIdValue" class="text-[14px] font-mono font-semibold text-aegis-600">tnt_a1b2c3d4e5</span>
+                    <button onclick="copyTenantId()" class="ml-1 p-1 rounded hover:bg-gray-200 transition-colors" title="Copy to clipboard">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="flex items-center justify-center gap-3">
+                    <button onclick="window.location.reload()" class="px-4 py-2.5 rounded-lg border border-gray-300 text-[14px] font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                      Provision Another
+                    </button>
+                    <button class="px-4 py-2.5 rounded-lg bg-aegis-500 text-white text-[14px] font-medium hover:bg-aegis-600 transition-colors">
+                      View Tenant
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Spacer for bottom action bar -->
+        <div class="h-20"></div>
+      </main>
+
+      <!-- ==================== BOTTOM ACTION BAR ==================== -->
+      <div id="actionBar" class="shrink-0 border-t border-gray-200/80 bg-white/80 backdrop-blur-sm px-6 lg:px-8 py-3.5">
+        <div class="max-w-2xl mx-auto flex items-center justify-between">
+          <div>
+            <button onclick="prevStep()" id="backBtn" class="hidden px-4 py-2.5 rounded-lg text-[14px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors">
+              <span class="flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
+                </svg>
+                Back
+              </span>
+            </button>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="cancelWizard()" id="cancelBtn" class="px-4 py-2.5 rounded-lg border border-gray-300 text-[14px] font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              Cancel
+            </button>
+            <button onclick="nextStep()" id="nextBtn" class="px-5 py-2.5 rounded-lg bg-aegis-500 text-white text-[14px] font-semibold hover:bg-aegis-600 shadow-sm shadow-aegis-500/20 transition-all hover:shadow-md hover:shadow-aegis-500/25">
+              <span class="flex items-center gap-1.5">
+                Next Step
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    // ============ STATE ============
+    let currentStep = 1;
+    let selectedPlan = 'pro';
+    let billingAnnual = false;
+    let isProvisioning = false;
+
+    const planPrices = {
+      starter: { monthly: 99, annual: 79 },
+      pro: { monthly: 299, annual: 239 },
+      enterprise: { monthly: 799, annual: 639 }
+    };
+    const planAgentLimits = { starter: 3, pro: 10, enterprise: 50 };
+
+    // ============ SIDEBAR COLLAPSE ============
+    let sidebarCollapsed = false;
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+
+      if (sidebarCollapsed) {
+        sidebar.style.width = '64px';
+        mainContent.style.marginLeft = '64px';
+        labels.forEach(el => el.style.display = 'none');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.style.width = '256px';
+        mainContent.style.marginLeft = '256px';
+        labels.forEach(el => el.style.display = '');
+        collapseIcon.style.transform = '';
+      }
+    }
+
+    // ============ STEP NAVIGATION ============
+    function goToStep(step) {
+      if (step > currentStep) return; // Can only go back by clicking stepper
+      if (isProvisioning) return;
+      showStep(step);
+    }
+
+    function nextStep() {
+      if (isProvisioning) return;
+      if (currentStep === 1 && !validateStep1()) return;
+      if (currentStep === 3) {
+        startProvisioning();
+        return;
+      }
+      if (currentStep < 3) {
+        showStep(currentStep + 1);
+      }
+    }
+
+    function prevStep() {
+      if (isProvisioning) return;
+      if (currentStep > 1) {
+        showStep(currentStep - 1);
+      }
+    }
+
+    function showStep(step) {
+      currentStep = step;
+
+      // Hide all steps
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('step2').classList.add('hidden');
+      document.getElementById('step3').classList.add('hidden');
+
+      // Show current step with animation
+      const currentEl = document.getElementById('step' + step);
+      currentEl.classList.remove('hidden');
+      currentEl.classList.remove('fade-in');
+      void currentEl.offsetWidth; // Trigger reflow for animation
+      currentEl.classList.add('fade-in');
+
+      // Update stepper visuals
+      updateStepper();
+
+      // Update bottom bar buttons
+      updateActionBar();
+
+      // Populate summary if step 3
+      if (step === 3) {
+        populateSummary();
+      }
+    }
+
+    function updateStepper() {
+      for (let i = 1; i <= 3; i++) {
+        const circle = document.getElementById('stepCircle' + i);
+        const label = document.getElementById('stepLabel' + i);
+
+        if (i < currentStep) {
+          // Completed step
+          circle.className = 'w-10 h-10 rounded-full bg-aegis-500 text-white font-semibold text-sm flex items-center justify-center ring-4 ring-white shadow-sm transition-all duration-300 cursor-pointer';
+          circle.innerHTML = '<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>';
+          label.className = 'mt-2 text-[12px] font-semibold text-aegis-600 transition-colors duration-300';
+        } else if (i === currentStep) {
+          // Active step
+          circle.className = 'w-10 h-10 rounded-full bg-aegis-500 text-white font-semibold text-sm flex items-center justify-center ring-4 ring-white shadow-sm transition-all duration-300';
+          circle.textContent = i;
+          label.className = 'mt-2 text-[12px] font-semibold text-aegis-600 transition-colors duration-300';
+        } else {
+          // Pending step
+          circle.className = 'w-10 h-10 rounded-full bg-gray-200 text-gray-400 font-semibold text-sm flex items-center justify-center ring-4 ring-white shadow-sm transition-all duration-300';
+          circle.textContent = i;
+          label.className = 'mt-2 text-[12px] font-medium text-gray-400 transition-colors duration-300';
+        }
+      }
+
+      // Update connector line
+      const connector = document.getElementById('connectorProgress');
+      if (currentStep === 1) connector.style.width = '0%';
+      else if (currentStep === 2) connector.style.width = '50%';
+      else connector.style.width = '100%';
+    }
+
+    function updateActionBar() {
+      const backBtn = document.getElementById('backBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const cancelBtn = document.getElementById('cancelBtn');
+
+      // Show/hide back button
+      if (currentStep > 1) {
+        backBtn.classList.remove('hidden');
+      } else {
+        backBtn.classList.add('hidden');
+      }
+
+      // Update next button text
+      if (currentStep === 3) {
+        nextBtn.innerHTML = '<span class="flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z"/></svg>Provision Tenant</span>';
+        nextBtn.className = 'px-5 py-2.5 rounded-lg bg-emerald-500 text-white text-[14px] font-semibold hover:bg-emerald-600 shadow-sm shadow-emerald-500/20 transition-all hover:shadow-md hover:shadow-emerald-500/25';
+      } else {
+        nextBtn.innerHTML = '<span class="flex items-center gap-1.5">Next Step<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>';
+        nextBtn.className = 'px-5 py-2.5 rounded-lg bg-aegis-500 text-white text-[14px] font-semibold hover:bg-aegis-600 shadow-sm shadow-aegis-500/20 transition-all hover:shadow-md hover:shadow-aegis-500/25';
+      }
+    }
+
+    // ============ VALIDATION ============
+    function validateStep1() {
+      let valid = true;
+
+      const name = document.getElementById('companyName');
+      const nameErr = document.getElementById('companyNameError');
+      if (!name.value.trim()) {
+        name.classList.add('border-rose-400', 'ring-2', 'ring-rose-100');
+        nameErr.classList.remove('hidden');
+        valid = false;
+      } else {
+        name.classList.remove('border-rose-400', 'ring-2', 'ring-rose-100');
+        nameErr.classList.add('hidden');
+      }
+
+      const email = document.getElementById('adminEmail');
+      const emailErr = document.getElementById('adminEmailError');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email.value.trim() || !emailRegex.test(email.value)) {
+        email.classList.add('border-rose-400', 'ring-2', 'ring-rose-100');
+        emailErr.classList.remove('hidden');
+        valid = false;
+      } else {
+        email.classList.remove('border-rose-400', 'ring-2', 'ring-rose-100');
+        emailErr.classList.add('hidden');
+      }
+
+      const region = document.getElementById('region');
+      const regionErr = document.getElementById('regionError');
+      if (!region.value) {
+        region.classList.add('border-rose-400', 'ring-2', 'ring-rose-100');
+        regionErr.classList.remove('hidden');
+        valid = false;
+      } else {
+        region.classList.remove('border-rose-400', 'ring-2', 'ring-rose-100');
+        regionErr.classList.add('hidden');
+      }
+
+      return valid;
+    }
+
+    // Clear validation on input
+    document.getElementById('companyName').addEventListener('input', function() {
+      this.classList.remove('border-rose-400', 'ring-2', 'ring-rose-100');
+      document.getElementById('companyNameError').classList.add('hidden');
+    });
+    document.getElementById('adminEmail').addEventListener('input', function() {
+      this.classList.remove('border-rose-400', 'ring-2', 'ring-rose-100');
+      document.getElementById('adminEmailError').classList.add('hidden');
+    });
+    document.getElementById('region').addEventListener('change', function() {
+      this.classList.remove('border-rose-400', 'ring-2', 'ring-rose-100');
+      document.getElementById('regionError').classList.add('hidden');
+    });
+
+    // ============ PLAN SELECTION ============
+    function selectPlan(plan) {
+      selectedPlan = plan;
+      const plans = ['starter', 'pro', 'enterprise'];
+
+      plans.forEach(p => {
+        const card = document.getElementById('plan-' + p);
+        const check = document.getElementById('planCheck-' + p);
+
+        if (p === plan) {
+          card.classList.add('selected');
+          card.classList.remove('border-gray-200', 'bg-white');
+          card.classList.add('border-aegis-500', 'bg-aegis-50/30');
+          check.classList.remove('hidden');
+          check.classList.add('flex');
+        } else {
+          card.classList.remove('selected');
+          card.classList.remove('border-aegis-500', 'bg-aegis-50/30');
+          card.classList.add('border-gray-200', 'bg-white');
+          check.classList.add('hidden');
+          check.classList.remove('flex');
+        }
+      });
+
+      // Update agent slider max based on plan
+      const slider = document.getElementById('agentSlider');
+      slider.max = planAgentLimits[plan];
+      if (parseInt(slider.value) > planAgentLimits[plan]) {
+        slider.value = planAgentLimits[plan];
+      }
+      updateSliderValue('agent');
+    }
+
+    // ============ SLIDERS ============
+    function updateSliderValue(type) {
+      if (type === 'agent') {
+        document.getElementById('agentSliderValue').textContent = document.getElementById('agentSlider').value;
+      } else {
+        document.getElementById('skillSliderValue').textContent = document.getElementById('skillSlider').value;
+      }
+    }
+
+    // ============ BILLING TOGGLE ============
+    function toggleBilling() {
+      billingAnnual = !billingAnnual;
+      const knob = document.getElementById('billingKnob');
+      const track = document.getElementById('billingToggle');
+      const monthlyLabel = document.getElementById('monthlyLabel');
+      const annualLabel = document.getElementById('annualLabel');
+
+      if (billingAnnual) {
+        knob.classList.remove('translate-x-0');
+        knob.classList.add('translate-x-7');
+        track.classList.remove('bg-aegis-500');
+        track.classList.add('bg-emerald-500');
+        monthlyLabel.classList.remove('font-semibold', 'text-aegis-600');
+        monthlyLabel.classList.add('font-medium', 'text-gray-400');
+        annualLabel.classList.remove('font-medium', 'text-gray-400');
+        annualLabel.classList.add('font-semibold', 'text-emerald-600');
+      } else {
+        knob.classList.remove('translate-x-7');
+        knob.classList.add('translate-x-0');
+        track.classList.remove('bg-emerald-500');
+        track.classList.add('bg-aegis-500');
+        monthlyLabel.classList.remove('font-medium', 'text-gray-400');
+        monthlyLabel.classList.add('font-semibold', 'text-aegis-600');
+        annualLabel.classList.remove('font-semibold', 'text-emerald-600');
+        annualLabel.classList.add('font-medium', 'text-gray-400');
+      }
+    }
+
+    // ============ SUMMARY ============
+    function populateSummary() {
+      document.getElementById('summaryName').textContent = document.getElementById('companyName').value || '--';
+      document.getElementById('summaryEmail').textContent = document.getElementById('adminEmail').value || '--';
+
+      const industrySelect = document.getElementById('industry');
+      document.getElementById('summaryIndustry').textContent = industrySelect.options[industrySelect.selectedIndex]?.text || '--';
+
+      const regionSelect = document.getElementById('region');
+      document.getElementById('summaryRegion').textContent = regionSelect.options[regionSelect.selectedIndex]?.text || '--';
+
+      document.getElementById('summaryPlan').textContent = selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1);
+      document.getElementById('summaryBilling').textContent = billingAnnual ? 'Annual' : 'Monthly';
+      document.getElementById('summaryAgents').textContent = document.getElementById('agentSlider').value;
+
+      const storageSelect = document.getElementById('storageLimit');
+      const storageVal = storageSelect.value;
+      document.getElementById('summaryStorage').textContent = storageVal >= 1000 ? (storageVal / 1000) + ' TB' : storageVal + ' GB';
+
+      const price = billingAnnual ? planPrices[selectedPlan].annual : planPrices[selectedPlan].monthly;
+      document.getElementById('summaryCost').textContent = '$' + price;
+      document.getElementById('summaryCostPeriod').textContent = billingAnnual ? 'per month (billed annually)' : 'per month';
+    }
+
+    // ============ PROVISIONING ANIMATION ============
+    function startProvisioning() {
+      isProvisioning = true;
+
+      // Hide summary card and action bar, show progress
+      document.getElementById('summaryCard').classList.add('hidden');
+      document.getElementById('provisionProgress').classList.remove('hidden');
+      document.getElementById('provisionProgress').classList.add('fade-in');
+      document.getElementById('actionBar').classList.add('hidden');
+
+      const steps = document.querySelectorAll('.provision-step');
+      const totalSteps = steps.length;
+      let currentProvStep = 0;
+
+      function processStep(index) {
+        if (index >= totalSteps) {
+          // All done
+          setTimeout(() => {
+            document.getElementById('provisionProgress').classList.add('hidden');
+            document.getElementById('provisionSuccess').classList.remove('hidden');
+            document.getElementById('provisionSuccess').classList.add('fade-in');
+
+            // Generate random tenant ID
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let id = 'tnt_';
+            for (let i = 0; i < 10; i++) id += chars[Math.floor(Math.random() * chars.length)];
+            document.getElementById('tenantIdValue').textContent = id;
+          }, 500);
+          return;
+        }
+
+        const step = steps[index];
+        const icon = step.querySelector('.step-icon');
+        const text = step.querySelector('.step-text');
+        const detail = step.querySelector('.step-detail');
+        const status = step.querySelector('.step-status');
+
+        // Set to "in progress"
+        icon.innerHTML = '<svg class="w-4 h-4 text-aegis-500 spinner" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>';
+        icon.className = 'step-icon mt-0.5 w-6 h-6 rounded-full bg-aegis-50 flex items-center justify-center shrink-0';
+        text.className = 'text-[14px] font-medium text-gray-900 step-text';
+        detail.className = 'text-[12px] text-gray-500 font-mono step-detail progress-pulse';
+        status.textContent = 'Running';
+        status.className = 'step-status text-[12px] font-medium text-aegis-500 mt-0.5';
+
+        // Update progress
+        const percent = Math.round(((index + 0.5) / totalSteps) * 100);
+        document.getElementById('provisionBar').style.width = percent + '%';
+        document.getElementById('provisionPercent').textContent = percent + '%';
+
+        // Simulate completion after random delay
+        const delay = 800 + Math.random() * 1200;
+        setTimeout(() => {
+          // Set to "completed"
+          icon.innerHTML = '<svg class="w-4 h-4 text-white check-pop" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>';
+          icon.className = 'step-icon mt-0.5 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shrink-0';
+          text.className = 'text-[14px] font-medium text-gray-700 step-text';
+          detail.className = 'text-[12px] text-emerald-600 font-mono step-detail';
+          detail.textContent = 'Completed';
+          status.textContent = 'Done';
+          status.className = 'step-status text-[12px] font-medium text-emerald-500 mt-0.5';
+
+          // Update progress
+          const donePercent = Math.round(((index + 1) / totalSteps) * 100);
+          document.getElementById('provisionBar').style.width = donePercent + '%';
+          document.getElementById('provisionPercent').textContent = donePercent + '%';
+
+          // Process next step
+          setTimeout(() => processStep(index + 1), 300);
+        }, delay);
+      }
+
+      // Start the first step after a brief delay
+      setTimeout(() => processStep(0), 400);
+    }
+
+    // ============ HELPERS ============
+    function cancelWizard() {
+      if (confirm('Are you sure you want to cancel? All entered data will be lost.')) {
+        window.location.reload();
+      }
+    }
+
+    function copyTenantId() {
+      const id = document.getElementById('tenantIdValue').textContent;
+      navigator.clipboard.writeText(id).then(() => {
+        // Brief visual feedback
+        const btn = event.currentTarget;
+        const svg = btn.querySelector('svg');
+        svg.style.color = '#10b981';
+        setTimeout(() => { svg.style.color = ''; }, 1500);
+      });
+    }
+  </script>
+</body>
+</html>

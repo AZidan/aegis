@@ -41,9 +41,11 @@ I'm working on **Phase 3 (Implementation)** of the Aegis Platform - a multi-tena
 
 🗺️ **MANDATORY: USE CODEMAP FOR ALL FILE OPERATIONS**
 - **NEVER read full files** - use `codemap find` to locate symbols first
+- **Use fuzzy search** - `codemap find "term" -f` when unsure of exact name
 - **Read specific line ranges only** - saves 60-80% tokens
 - **Before editing** - use `codemap show` to see file structure
 - **Example:** `codemap find "UserService"` → read lines 15-189 only
+- **Fuzzy example:** `codemap find "auth" -f --type class` → finds AuthService, AuthController, etc.
 - **Setup:** `pip install git+https://github.com/AZidan/codemap.git && codemap init . && codemap watch . &`
 - **Target:** <20% of tokens spent on file operations
 
@@ -98,13 +100,19 @@ I'm ready to start Sprint 1. Please help me:
 **CRITICAL INSTRUCTIONS FOR ALL AGENTS:**
 - ✅ **MUST use CodeMap** for ALL file operations (find, read, edit)
 - ✅ **NEVER read full files** - use `codemap find` → read specific line ranges
+- ✅ **Use fuzzy search** - `codemap find "term" -f` when uncertain of exact name
 - ✅ **Before editing** - use `codemap show` to see structure
 - ✅ **Example workflow:**
   ```bash
-  # Find symbol location first
+  # Find symbol location first (exact match)
   codemap find "AuthService"
+
+  # OR use fuzzy search (if unsure)
+  codemap find "auth" -f --type class
+
   # Read ONLY the relevant lines
   Read src/auth/auth.service.ts lines 10-85
+
   # Edit precisely
   Edit src/auth/auth.service.ts (old_string from lines 10-85)
   ```

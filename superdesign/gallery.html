@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegis Platform - Design Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e1b4b; min-height: 100vh; padding: 32px; }
+        .header { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 2rem; font-weight: 700; color: #1e1b4b; }
+        .header p { color: #6b7280; font-size: 0.875rem; margin-top: 4px; }
+        .badge { background: #6366f1; color: white; padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+        .stats { display: flex; gap: 24px; margin-bottom: 32px; }
+        .stat { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px 24px; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: #6366f1; }
+        .stat-label { font-size: 0.75rem; color: #9ca3af; margin-top: 2px; }
+        .section { margin-bottom: 40px; }
+        .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; }
+        .section-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .section-icon.auth { background: #fef3c7; }
+        .section-icon.admin { background: #dbeafe; }
+        .section-icon.tenant { background: #d1fae5; }
+        .section-icon.agents { background: #ede9fe; }
+        .section-icon.skills { background: #fce7f3; }
+        .section-icon.settings { background: #f3e8ff; }
+        .section-title { font-size: 1.25rem; font-weight: 700; color: #1e1b4b; }
+        .section-count { background: #f3f4f6; color: #6b7280; padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 24px; }
+        .design-card { background: white; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .design-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(99,102,241,0.12); border-color: #c7d2fe; }
+        .design-header { padding: 16px 20px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; }
+        .design-title { font-weight: 600; font-size: 0.95rem; color: #1e1b4b; }
+        .design-meta { font-size: 0.75rem; color: #9ca3af; }
+        .design-preview { height: 360px; position: relative; overflow: hidden; background: #f9fafb; }
+        .design-preview iframe { width: 200%; height: 200%; border: none; transform: scale(0.5); transform-origin: top left; pointer-events: none; }
+        .design-actions { padding: 12px 20px; display: flex; gap: 8px; border-top: 1px solid #f3f4f6; }
+        .btn { padding: 8px 16px; border-radius: 8px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s ease; font-family: inherit; }
+        .btn-primary { background: #6366f1; color: white; }
+        .btn-primary:hover { background: #4f46e5; }
+        .btn-outline { background: white; color: #6366f1; border: 1px solid #e0e7ff; }
+        .btn-outline:hover { background: #eef2ff; }
+        @media (max-width: 768px) { .gallery-grid { grid-template-columns: 1fr; } .stats { flex-wrap: wrap; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>Aegis Platform - Screen Designs</h1>
+            <p>18 screens designed for the AI Multi-Agent SaaS Platform</p>
+        </div>
+        <span class="badge">Phase 2.5</span>
+    </div>
+
+    <div class="stats">
+        <div class="stat"><div class="stat-value">18</div><div class="stat-label">Total Screens</div></div>
+        <div class="stat"><div class="stat-value">6</div><div class="stat-label">Categories</div></div>
+        <div class="stat"><div class="stat-value">~1 MB</div><div class="stat-label">Total Size</div></div>
+        <div class="stat"><div class="stat-value">100%</div><div class="stat-label">Coverage</div></div>
+    </div>
+
+    <!-- Authentication -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon auth">&#128274;</div>
+            <span class="section-title">Authentication</span>
+            <span class="section-count">3 screens</span>
+        </div>
+        <div class="gallery-grid">
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Login Page</span><span class="design-meta">17 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/login_page_for__aegi_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/login_page_for__aegi_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/login.html','_blank')">Open Source</button></div>
+            </div>
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Admin Login with MFA</span><span class="design-meta">39 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/admin_login_mfa_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/admin_login_mfa_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/admin-login.html','_blank')">Open Source</button></div>
+            </div>
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Invite Acceptance</span><span class="design-meta">28 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/invite_accept_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/invite_accept_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/invite-accept.html','_blank')">Open Source</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Platform Admin -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon admin">&#128736;</div>
+            <span class="section-title">Platform Admin</span>
+            <span class="section-count">4 screens</span>
+        </div>
+        <div class="gallery-grid">
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Platform Admin Dashboard</span><span class="design-meta">45 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/enterprise_saas_admi_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/enterprise_saas_admi_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/admin-dashboard.html','_blank')">Open Source</button></div>
+            </div>
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Tenant List</span><span class="design-meta">58 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/tenant_list_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/tenant_list_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/tenant-list.html','_blank')">Open Source</button></div>
+            </div>
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Tenant Provisioning Wizard</span><span class="design-meta">70 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/tenant_provisioning_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/tenant_provisioning_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/tenant-provisioning.html','_blank')">Open Source</button></div>
+            </div>
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Tenant Detail</span><span class="design-meta">69 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/tenant_detail_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/tenant_detail_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/tenant-detail.html','_blank')">Open Source</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tenant Dashboard -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon tenant">&#127968;</div>
+            <span class="section-title">Tenant Dashboard</span>
+            <span class="section-count">1 screen</span>
+        </div>
+        <div class="gallery-grid">
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Tenant Dashboard Home</span><span class="design-meta">44 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/tenant_dashboard_hom_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/tenant_dashboard_hom_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/tenant-dashboard.html','_blank')">Open Source</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agents -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon agents">&#129302;</div>
+            <span class="section-title">Agents</span>
+            <span class="section-count">3 screens</span>
+        </div>
+        <div class="gallery-grid">
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Agent List</span><span class="design-meta">61 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/agent_list_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/agent_list_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/agent-list.html','_blank')">Open Source</button></div>
+            </div>
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Agent Creation Wizard</span><span class="design-meta">41 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/agent_creation_wizar_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/agent_creation_wizar_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/agent-wizard.html','_blank')">Open Source</button></div>
+            </div>
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Agent Detail</span><span class="design-meta">71 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/agent_detail_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/agent_detail_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/agent-detail.html','_blank')">Open Source</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon skills">&#128640;</div>
+            <span class="section-title">Skills & Marketplace</span>
+            <span class="section-count">4 screens</span>
+        </div>
+        <div class="gallery-grid">
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Skill Marketplace</span><span class="design-meta">48 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/skill_marketplace_br_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/skill_marketplace_br_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/skill-marketplace.html','_blank')">Open Source</button></div>
+            </div>
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Skill Detail</span><span class="design-meta">51 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/skill_detail_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/skill_detail_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/skill-detail.html','_blank')">Open Source</button></div>
+            </div>
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Skill Review Queue</span><span class="design-meta">72 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/skill_review_queue_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/skill_review_queue_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/skill-review-queue.html','_blank')">Open Source</button></div>
+            </div>
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Skill Review Detail</span><span class="design-meta">84 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/skill_review_detail_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/skill_review_detail_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/skill-review-detail.html','_blank')">Open Source</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings & Team -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon settings">&#9881;</div>
+            <span class="section-title">Settings & Team</span>
+            <span class="section-count">3 screens</span>
+        </div>
+        <div class="gallery-grid">
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Team Members</span><span class="design-meta">61 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/team_members_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/team_members_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/team-members.html','_blank')">Open Source</button></div>
+            </div>
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Settings</span><span class="design-meta">72 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/settings_1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/settings_1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/settings.html','_blank')">Open Source</button></div>
+            </div>
+            <div class="design-card">
+                <div class="design-header"><span class="design-title">Audit Log</span><span class="design-meta">62 KB</span></div>
+                <div class="design-preview"><iframe src="./design_iterations/audit_log_page_for___1.html" loading="lazy"></iframe></div>
+                <div class="design-actions"><button class="btn btn-primary" onclick="window.open('./design_iterations/audit_log_page_for___1.html','_blank')">View Full</button><button class="btn btn-outline" onclick="window.open('../design-artifacts/screens/audit-log.html','_blank')">Open Source</button></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

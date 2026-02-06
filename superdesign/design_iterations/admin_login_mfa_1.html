@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Platform Admin Login - Aegis Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            indigo: {
+              950: '#1e1b4b',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    /* Smooth transitions */
+    input, button, a { transition: all 0.2s ease; }
+
+    /* Grid background pattern */
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(99, 102, 241, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.06) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* Floating geometric shapes */
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-18px) rotate(6deg); }
+    }
+    @keyframes float-medium {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(-5deg); }
+    }
+    @keyframes float-fast {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(10deg); }
+    }
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+    @keyframes shield-pulse {
+      0%, 100% { filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.3)); }
+      50% { filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.6)); }
+    }
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spinner {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes countdown-bar {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+    .float-slow { animation: float-slow 8s ease-in-out infinite; }
+    .float-medium { animation: float-medium 6s ease-in-out infinite; }
+    .float-fast { animation: float-fast 5s ease-in-out infinite; }
+    .pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+    .shield-pulse { animation: shield-pulse 2.5s ease-in-out infinite; }
+    .fade-in-up { animation: fade-in-up 0.4s ease-out forwards; }
+    .spinner { animation: spinner 0.7s linear infinite; }
+
+    /* Input focus ring */
+    .input-field:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+      border-color: #6366f1;
+    }
+
+    /* OTP input focus */
+    .otp-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+      border-color: #6366f1;
+      background-color: #fafafe;
+    }
+
+    /* Remove autofill background flash */
+    input:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 30px white inset !important;
+    }
+
+    /* Scrollbar hide for clean look */
+    html { scrollbar-width: thin; scrollbar-color: #312e81 #1e1b4b; }
+
+    /* Card entry animation */
+    .card-enter {
+      animation: fade-in-up 0.5s ease-out forwards;
+    }
+
+    /* Stagger children animation */
+    .stagger-1 { animation-delay: 0.05s; opacity: 0; }
+    .stagger-2 { animation-delay: 0.1s; opacity: 0; }
+    .stagger-3 { animation-delay: 0.15s; opacity: 0; }
+    .stagger-4 { animation-delay: 0.2s; opacity: 0; }
+    .stagger-5 { animation-delay: 0.25s; opacity: 0; }
+    .stagger-6 { animation-delay: 0.3s; opacity: 0; }
+  </style>
+</head>
+
+<body class="h-full font-sans antialiased" style="background-color: #1e1b4b;">
+
+  <!-- ===================================================================== -->
+  <!-- FULL-PAGE DARK BACKGROUND WITH GRID PATTERN                           -->
+  <!-- ===================================================================== -->
+  <div class="relative min-h-full flex flex-col items-center justify-center px-4 py-8 grid-bg overflow-hidden">
+
+    <!-- ------------------------------------------------------------------- -->
+    <!-- DECORATIVE GEOMETRIC SHAPES                                         -->
+    <!-- ------------------------------------------------------------------- -->
+    <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+      <!-- Large circle top-left -->
+      <div class="absolute -top-24 -left-24 w-80 h-80 rounded-full border border-indigo-400/[0.08] float-slow"></div>
+      <!-- Square top-right -->
+      <div class="absolute top-16 right-20 w-20 h-20 rounded-xl bg-indigo-400/[0.05] float-medium"></div>
+      <!-- Ring mid-left -->
+      <div class="absolute top-1/3 -left-10 w-44 h-44 rounded-full border-2 border-indigo-300/[0.06] float-fast"></div>
+      <!-- Large circle bottom-right -->
+      <div class="absolute -bottom-28 -right-28 w-96 h-96 rounded-full bg-indigo-400/[0.04] float-slow"></div>
+      <!-- Diamond center-right -->
+      <div class="absolute top-1/2 right-32 w-14 h-14 bg-violet-400/[0.06] rotate-45 rounded-md float-medium"></div>
+      <!-- Small square bottom-left -->
+      <div class="absolute bottom-40 left-20 w-16 h-16 rounded-lg border border-indigo-300/[0.07] float-fast"></div>
+      <!-- Dot cluster top-center -->
+      <div class="absolute top-24 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-indigo-400/[0.12] pulse-glow"></div>
+      <div class="absolute top-28 left-1/2 translate-x-6 w-2 h-2 rounded-full bg-violet-400/[0.10] pulse-glow" style="animation-delay: 0.5s;"></div>
+      <div class="absolute top-20 left-1/2 -translate-x-10 w-2.5 h-2.5 rounded-full bg-indigo-300/[0.08] pulse-glow" style="animation-delay: 1s;"></div>
+      <!-- Hexagonal shape bottom-center -->
+      <div class="absolute bottom-16 left-1/2 -translate-x-1/2 w-24 h-24 rounded-2xl bg-indigo-400/[0.03] rotate-12 float-medium"></div>
+    </div>
+
+    <!-- ------------------------------------------------------------------- -->
+    <!-- SESSION TIMEOUT INDICATOR                                           -->
+    <!-- ------------------------------------------------------------------- -->
+    <div class="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
+      <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-900/60 border border-indigo-700/40 backdrop-blur-sm">
+        <svg class="w-3.5 h-3.5 text-indigo-300/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 6v6l4 2" />
+        </svg>
+        <span class="text-xs text-indigo-300/70 font-medium tracking-wide" id="sessionTimer">Session expires in 15:00</span>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------- -->
+    <!-- LOGO                                                                -->
+    <!-- ------------------------------------------------------------------- -->
+    <div class="relative z-10 flex flex-col items-center mb-8 card-enter">
+      <!-- Shield Icon -->
+      <div class="shield-pulse mb-4">
+        <svg class="w-16 h-16" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Shield body -->
+          <path d="M32 4L8 16v16c0 14.4 10.24 27.84 24 32 13.76-4.16 24-17.6 24-32V16L32 4z"
+                fill="url(#shieldGrad)" stroke="url(#shieldStroke)" stroke-width="1.5"/>
+          <!-- Inner keyhole / lock symbol -->
+          <circle cx="32" cy="28" r="5" fill="#c7d2fe" opacity="0.9"/>
+          <rect x="30" y="32" width="4" height="8" rx="2" fill="#c7d2fe" opacity="0.9"/>
+          <!-- Check accent lines -->
+          <path d="M26 28l4 4 8-8" stroke="#1e1b4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+          <defs>
+            <linearGradient id="shieldGrad" x1="8" y1="4" x2="56" y2="52" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#6366f1"/>
+              <stop offset="0.5" stop-color="#4f46e5"/>
+              <stop offset="1" stop-color="#4338ca"/>
+            </linearGradient>
+            <linearGradient id="shieldStroke" x1="8" y1="4" x2="56" y2="52" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#818cf8"/>
+              <stop offset="1" stop-color="#6366f1"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <!-- Brand Text -->
+      <h1 class="text-2xl font-bold text-white tracking-tight">Aegis Platform</h1>
+      <p class="text-indigo-300/60 text-sm font-medium tracking-widest uppercase mt-1">Admin Console</p>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- LOGIN CARD                                                            -->
+    <!-- ===================================================================== -->
+    <div class="relative z-10 w-full max-w-md card-enter" style="animation-delay: 0.1s; opacity: 0;" id="loginCardWrapper">
+      <div class="bg-white rounded-2xl shadow-2xl shadow-black/20 overflow-hidden">
+
+        <!-- ================================================================= -->
+        <!-- STATE 1: LOGIN FORM                                               -->
+        <!-- ================================================================= -->
+        <div id="loginState" class="p-8 sm:p-10">
+          <!-- Heading -->
+          <div class="text-center mb-8">
+            <h2 class="text-xl font-bold text-gray-900 tracking-tight">Platform Admin Login</h2>
+            <div class="flex items-center justify-center gap-2 mt-3 px-4 py-2 bg-amber-50 border border-amber-200/60 rounded-lg">
+              <svg class="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+              <span class="text-xs text-amber-700 font-medium">Restricted access &mdash; authorized personnel only</span>
+            </div>
+          </div>
+
+          <!-- Login Form -->
+          <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off">
+            <!-- Email -->
+            <div class="mb-5">
+              <label for="email" class="block text-sm font-semibold text-gray-700 mb-1.5">Email address</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  placeholder="admin@company.com"
+                  class="input-field w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 bg-gray-50/50 hover:border-gray-300 focus:bg-white"
+                />
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-6">
+              <label for="password" class="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0110 0v4"/>
+                  </svg>
+                </div>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  required
+                  placeholder="Enter your password"
+                  class="input-field w-full pl-11 pr-12 py-3 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 bg-gray-50/50 hover:border-gray-300 focus:bg-white"
+                />
+                <!-- Show/Hide Toggle -->
+                <button
+                  type="button"
+                  onclick="togglePassword()"
+                  class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600"
+                  aria-label="Toggle password visibility"
+                >
+                  <svg id="eyeOpen" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                  <svg id="eyeClosed" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Error Message Area -->
+            <div id="loginError" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="15" y1="9" x2="9" y2="15"/>
+                  <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span class="text-sm text-red-700 font-medium" id="loginErrorText">Invalid credentials. Please try again.</span>
+              </div>
+            </div>
+
+            <!-- Sign In Button -->
+            <button
+              type="submit"
+              id="loginBtn"
+              class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <span id="loginBtnText">Sign in</span>
+              <svg id="loginBtnSpinner" class="hidden w-5 h-5 spinner" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              <svg id="loginBtnArrow" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- STATE 2: MFA / TWO-FACTOR AUTHENTICATION                         -->
+        <!-- ================================================================= -->
+        <div id="mfaState" class="hidden p-8 sm:p-10">
+          <!-- Heading -->
+          <div class="text-center mb-8">
+            <div class="mx-auto w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-900 tracking-tight">Two-Factor Authentication</h2>
+            <p class="text-sm text-gray-500 mt-2 leading-relaxed">Enter the 6-digit code from your<br/>authenticator app</p>
+          </div>
+
+          <!-- OTP Input Group -->
+          <form id="mfaForm" onsubmit="handleVerify(event)" autocomplete="off">
+            <div class="flex items-center justify-center gap-2.5 sm:gap-3 mb-6" id="otpContainer">
+              <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" class="otp-input w-12 h-14 sm:w-[48px] sm:h-[56px] text-center text-xl font-mono font-semibold text-gray-900 border-2 border-gray-200 rounded-xl bg-gray-50/50 hover:border-gray-300" data-otp-index="0" aria-label="Digit 1" />
+              <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" class="otp-input w-12 h-14 sm:w-[48px] sm:h-[56px] text-center text-xl font-mono font-semibold text-gray-900 border-2 border-gray-200 rounded-xl bg-gray-50/50 hover:border-gray-300" data-otp-index="1" aria-label="Digit 2" />
+              <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" class="otp-input w-12 h-14 sm:w-[48px] sm:h-[56px] text-center text-xl font-mono font-semibold text-gray-900 border-2 border-gray-200 rounded-xl bg-gray-50/50 hover:border-gray-300" data-otp-index="2" aria-label="Digit 3" />
+              <!-- Separator dash -->
+              <div class="w-3 h-0.5 bg-gray-300 rounded-full mx-0.5" aria-hidden="true"></div>
+              <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" class="otp-input w-12 h-14 sm:w-[48px] sm:h-[56px] text-center text-xl font-mono font-semibold text-gray-900 border-2 border-gray-200 rounded-xl bg-gray-50/50 hover:border-gray-300" data-otp-index="3" aria-label="Digit 4" />
+              <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" class="otp-input w-12 h-14 sm:w-[48px] sm:h-[56px] text-center text-xl font-mono font-semibold text-gray-900 border-2 border-gray-200 rounded-xl bg-gray-50/50 hover:border-gray-300" data-otp-index="4" aria-label="Digit 5" />
+              <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" class="otp-input w-12 h-14 sm:w-[48px] sm:h-[56px] text-center text-xl font-mono font-semibold text-gray-900 border-2 border-gray-200 rounded-xl bg-gray-50/50 hover:border-gray-300" data-otp-index="5" aria-label="Digit 6" />
+            </div>
+
+            <!-- MFA Error Message Area -->
+            <div id="mfaError" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="15" y1="9" x2="9" y2="15"/>
+                  <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span class="text-sm text-red-700 font-medium" id="mfaErrorText">Invalid code. Please try again.</span>
+              </div>
+            </div>
+
+            <!-- Verify Button -->
+            <button
+              type="submit"
+              id="verifyBtn"
+              disabled
+              class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+            >
+              <span id="verifyBtnText">Verify</span>
+              <svg id="verifyBtnSpinner" class="hidden w-5 h-5 spinner" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              <svg id="verifyBtnCheck" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+              </svg>
+            </button>
+          </form>
+
+          <!-- Secondary Actions -->
+          <div class="mt-5 space-y-3 text-center">
+            <!-- Resend Timer -->
+            <div class="flex items-center justify-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              <span class="text-sm text-gray-400" id="resendTimer">Resend in <span class="font-mono font-medium text-gray-500" id="resendCountdown">28s</span></span>
+              <button
+                type="button"
+                id="resendBtn"
+                onclick="handleResend()"
+                class="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-700 focus:outline-none focus:underline"
+              >
+                Resend code
+              </button>
+            </div>
+
+            <!-- Divider -->
+            <div class="relative">
+              <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                <div class="w-full border-t border-gray-100"></div>
+              </div>
+              <div class="relative flex justify-center">
+                <span class="px-3 bg-white text-xs text-gray-400">or</span>
+              </div>
+            </div>
+
+            <!-- Backup Code -->
+            <button
+              type="button"
+              onclick="toggleBackupCode()"
+              class="text-sm font-medium text-gray-500 hover:text-indigo-600 focus:outline-none focus:underline transition-colors"
+            >
+              Use backup code instead
+            </button>
+
+            <!-- Backup Code Input (hidden by default) -->
+            <div id="backupCodeSection" class="hidden pt-2">
+              <div class="relative">
+                <input
+                  type="text"
+                  id="backupCodeInput"
+                  placeholder="Enter 8-character backup code"
+                  maxlength="10"
+                  class="input-field w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 bg-gray-50/50 hover:border-gray-300 focus:bg-white text-center font-mono font-medium tracking-widest uppercase"
+                />
+              </div>
+            </div>
+
+            <!-- Back to Login -->
+            <button
+              type="button"
+              onclick="backToLogin()"
+              class="flex items-center justify-center gap-1.5 mx-auto text-sm text-gray-400 hover:text-gray-600 focus:outline-none focus:underline transition-colors mt-2"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              Back to login
+            </button>
+          </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- STATE 3: SUCCESS (brief flash before redirect)                    -->
+        <!-- ================================================================= -->
+        <div id="successState" class="hidden p-8 sm:p-10">
+          <div class="text-center">
+            <div class="mx-auto w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4 fade-in-up">
+              <svg class="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-900">Authentication Successful</h2>
+            <p class="text-sm text-gray-500 mt-2">Redirecting to admin dashboard...</p>
+            <div class="mt-4 w-full bg-gray-100 rounded-full h-1 overflow-hidden">
+              <div class="bg-indigo-600 h-1 rounded-full" style="animation: countdown-bar 2s linear forwards; animation-direction: reverse;"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------- -->
+    <!-- SECURITY NOTICE FOOTER                                              -->
+    <!-- ------------------------------------------------------------------- -->
+    <div class="relative z-10 mt-8 text-center card-enter" style="animation-delay: 0.2s; opacity: 0;">
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <svg class="w-3.5 h-3.5 text-red-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <p class="text-xs text-red-300/50 font-medium tracking-wide">
+          This system is monitored. Unauthorized access is prohibited.
+        </p>
+      </div>
+      <p class="text-[11px] text-indigo-400/30 mt-1">Aegis Platform v2.1.0 &middot; Secured by TLS 1.3</p>
+    </div>
+
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- JAVASCRIPT: Interactivity                                             -->
+  <!-- ===================================================================== -->
+  <script>
+    // -----------------------------------------------------------------------
+    // Session Timer
+    // -----------------------------------------------------------------------
+    let sessionSeconds = 15 * 60; // 15 minutes
+    const sessionTimerEl = document.getElementById('sessionTimer');
+
+    function updateSessionTimer() {
+      const mins = Math.floor(sessionSeconds / 60);
+      const secs = sessionSeconds % 60;
+      sessionTimerEl.textContent = `Session expires in ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      if (sessionSeconds > 0) {
+        sessionSeconds--;
+        setTimeout(updateSessionTimer, 1000);
+      } else {
+        sessionTimerEl.textContent = 'Session expired';
+        sessionTimerEl.classList.add('text-red-400');
+      }
+    }
+    updateSessionTimer();
+
+    // -----------------------------------------------------------------------
+    // Password Show/Hide Toggle
+    // -----------------------------------------------------------------------
+    function togglePassword() {
+      const pwInput = document.getElementById('password');
+      const eyeOpen = document.getElementById('eyeOpen');
+      const eyeClosed = document.getElementById('eyeClosed');
+      if (pwInput.type === 'password') {
+        pwInput.type = 'text';
+        eyeOpen.classList.add('hidden');
+        eyeClosed.classList.remove('hidden');
+      } else {
+        pwInput.type = 'password';
+        eyeOpen.classList.remove('hidden');
+        eyeClosed.classList.add('hidden');
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // Login Form Submit
+    // -----------------------------------------------------------------------
+    function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const btnText = document.getElementById('loginBtnText');
+      const btnSpinner = document.getElementById('loginBtnSpinner');
+      const btnArrow = document.getElementById('loginBtnArrow');
+      const errorEl = document.getElementById('loginError');
+
+      // Hide any previous errors
+      errorEl.classList.add('hidden');
+
+      // Show loading state
+      btn.disabled = true;
+      btnText.textContent = 'Authenticating...';
+      btnSpinner.classList.remove('hidden');
+      btnArrow.classList.add('hidden');
+
+      // Simulate API call
+      setTimeout(() => {
+        btn.disabled = false;
+        btnText.textContent = 'Sign in';
+        btnSpinner.classList.add('hidden');
+        btnArrow.classList.remove('hidden');
+
+        // Transition to MFA
+        showMfaState();
+      }, 1500);
+    }
+
+    // -----------------------------------------------------------------------
+    // Show MFA State
+    // -----------------------------------------------------------------------
+    function showMfaState() {
+      const loginState = document.getElementById('loginState');
+      const mfaState = document.getElementById('mfaState');
+
+      // Fade out login
+      loginState.style.opacity = '0';
+      loginState.style.transform = 'translateY(-8px)';
+      loginState.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+
+      setTimeout(() => {
+        loginState.classList.add('hidden');
+        mfaState.classList.remove('hidden');
+
+        // Fade in MFA
+        mfaState.style.opacity = '0';
+        mfaState.style.transform = 'translateY(8px)';
+        requestAnimationFrame(() => {
+          mfaState.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          mfaState.style.opacity = '1';
+          mfaState.style.transform = 'translateY(0)';
+        });
+
+        // Focus first OTP input
+        const firstOtp = document.querySelector('[data-otp-index="0"]');
+        if (firstOtp) firstOtp.focus();
+
+        // Start resend countdown
+        startResendTimer();
+      }, 250);
+    }
+
+    // -----------------------------------------------------------------------
+    // Back to Login
+    // -----------------------------------------------------------------------
+    function backToLogin() {
+      const loginState = document.getElementById('loginState');
+      const mfaState = document.getElementById('mfaState');
+
+      mfaState.style.opacity = '0';
+      mfaState.style.transform = 'translateY(8px)';
+
+      setTimeout(() => {
+        mfaState.classList.add('hidden');
+        loginState.classList.remove('hidden');
+        loginState.style.opacity = '1';
+        loginState.style.transform = 'translateY(0)';
+
+        // Clear OTP inputs
+        clearOtpInputs();
+      }, 250);
+    }
+
+    // -----------------------------------------------------------------------
+    // OTP Input Handling
+    // -----------------------------------------------------------------------
+    const otpInputs = document.querySelectorAll('.otp-input');
+
+    otpInputs.forEach((input, index) => {
+      // Handle input
+      input.addEventListener('input', (e) => {
+        const val = e.target.value;
+
+        // Only allow digits
+        if (!/^\d$/.test(val)) {
+          e.target.value = '';
+          return;
+        }
+
+        // Style filled input
+        input.classList.add('border-indigo-400', 'bg-indigo-50/50');
+        input.classList.remove('border-gray-200');
+
+        // Auto-advance to next input
+        if (val && index < otpInputs.length - 1) {
+          otpInputs[index + 1].focus();
+        }
+
+        // Check if all filled
+        checkOtpComplete();
+      });
+
+      // Handle keydown for backspace navigation
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace') {
+          if (!input.value && index > 0) {
+            otpInputs[index - 1].focus();
+            otpInputs[index - 1].value = '';
+            otpInputs[index - 1].classList.remove('border-indigo-400', 'bg-indigo-50/50');
+            otpInputs[index - 1].classList.add('border-gray-200');
+          } else {
+            input.value = '';
+            input.classList.remove('border-indigo-400', 'bg-indigo-50/50');
+            input.classList.add('border-gray-200');
+          }
+          checkOtpComplete();
+        }
+
+        // Arrow key navigation
+        if (e.key === 'ArrowLeft' && index > 0) {
+          otpInputs[index - 1].focus();
+        }
+        if (e.key === 'ArrowRight' && index < otpInputs.length - 1) {
+          otpInputs[index + 1].focus();
+        }
+      });
+
+      // Handle paste (supports pasting full 6-digit code)
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pastedData = (e.clipboardData || window.clipboardData).getData('text').trim();
+        const digits = pastedData.replace(/\D/g, '').slice(0, 6);
+
+        if (digits.length > 0) {
+          digits.split('').forEach((digit, i) => {
+            if (otpInputs[i]) {
+              otpInputs[i].value = digit;
+              otpInputs[i].classList.add('border-indigo-400', 'bg-indigo-50/50');
+              otpInputs[i].classList.remove('border-gray-200');
+            }
+          });
+
+          // Focus last filled or next empty
+          const focusIndex = Math.min(digits.length, otpInputs.length - 1);
+          otpInputs[focusIndex].focus();
+
+          checkOtpComplete();
+        }
+      });
+
+      // Select all text on focus for easy replacement
+      input.addEventListener('focus', () => {
+        input.select();
+      });
+    });
+
+    function checkOtpComplete() {
+      const verifyBtn = document.getElementById('verifyBtn');
+      const allFilled = Array.from(otpInputs).every(input => /^\d$/.test(input.value));
+      verifyBtn.disabled = !allFilled;
+    }
+
+    function clearOtpInputs() {
+      otpInputs.forEach(input => {
+        input.value = '';
+        input.classList.remove('border-indigo-400', 'bg-indigo-50/50');
+        input.classList.add('border-gray-200');
+      });
+      document.getElementById('verifyBtn').disabled = true;
+      document.getElementById('mfaError').classList.add('hidden');
+    }
+
+    function getOtpCode() {
+      return Array.from(otpInputs).map(input => input.value).join('');
+    }
+
+    // -----------------------------------------------------------------------
+    // MFA Verify
+    // -----------------------------------------------------------------------
+    function handleVerify(e) {
+      e.preventDefault();
+      const btn = document.getElementById('verifyBtn');
+      const btnText = document.getElementById('verifyBtnText');
+      const btnSpinner = document.getElementById('verifyBtnSpinner');
+      const btnCheck = document.getElementById('verifyBtnCheck');
+      const errorEl = document.getElementById('mfaError');
+
+      errorEl.classList.add('hidden');
+
+      // Show loading
+      btn.disabled = true;
+      btnText.textContent = 'Verifying...';
+      btnSpinner.classList.remove('hidden');
+      btnCheck.classList.add('hidden');
+
+      const code = getOtpCode();
+
+      // Simulate verification
+      setTimeout(() => {
+        // Simulate success for code "123456", error for anything else
+        if (code === '000000') {
+          // Show error state demo
+          btn.disabled = false;
+          btnText.textContent = 'Verify';
+          btnSpinner.classList.add('hidden');
+          btnCheck.classList.remove('hidden');
+          errorEl.classList.remove('hidden');
+          document.getElementById('mfaErrorText').textContent = 'Invalid code. 2 attempts remaining.';
+
+          // Shake the OTP inputs
+          const container = document.getElementById('otpContainer');
+          container.style.animation = 'none';
+          container.offsetHeight; // trigger reflow
+          container.style.animation = 'shake 0.4s ease';
+
+          // Clear inputs
+          clearOtpInputs();
+          otpInputs[0].focus();
+        } else {
+          // Success
+          showSuccessState();
+        }
+      }, 1200);
+    }
+
+    // Add shake animation
+    const shakeStyle = document.createElement('style');
+    shakeStyle.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-6px); }
+        40% { transform: translateX(6px); }
+        60% { transform: translateX(-4px); }
+        80% { transform: translateX(4px); }
+      }
+    `;
+    document.head.appendChild(shakeStyle);
+
+    // -----------------------------------------------------------------------
+    // Success State
+    // -----------------------------------------------------------------------
+    function showSuccessState() {
+      const mfaState = document.getElementById('mfaState');
+      const successState = document.getElementById('successState');
+
+      mfaState.style.opacity = '0';
+      mfaState.style.transform = 'translateY(-8px)';
+
+      setTimeout(() => {
+        mfaState.classList.add('hidden');
+        successState.classList.remove('hidden');
+        successState.style.opacity = '0';
+        successState.style.transform = 'translateY(8px)';
+        requestAnimationFrame(() => {
+          successState.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          successState.style.opacity = '1';
+          successState.style.transform = 'translateY(0)';
+        });
+      }, 250);
+    }
+
+    // -----------------------------------------------------------------------
+    // Resend Timer
+    // -----------------------------------------------------------------------
+    let resendInterval = null;
+
+    function startResendTimer() {
+      let seconds = 28;
+      const countdownEl = document.getElementById('resendCountdown');
+      const timerEl = document.getElementById('resendTimer');
+      const resendBtnEl = document.getElementById('resendBtn');
+
+      // Reset state
+      timerEl.classList.remove('hidden');
+      resendBtnEl.classList.add('hidden');
+
+      if (resendInterval) clearInterval(resendInterval);
+
+      resendInterval = setInterval(() => {
+        seconds--;
+        if (seconds <= 0) {
+          clearInterval(resendInterval);
+          timerEl.classList.add('hidden');
+          resendBtnEl.classList.remove('hidden');
+        } else {
+          countdownEl.textContent = `${seconds}s`;
+        }
+      }, 1000);
+    }
+
+    function handleResend() {
+      const resendBtnEl = document.getElementById('resendBtn');
+      resendBtnEl.textContent = 'Sending...';
+      resendBtnEl.disabled = true;
+
+      setTimeout(() => {
+        resendBtnEl.textContent = 'Resend code';
+        resendBtnEl.disabled = false;
+        startResendTimer();
+      }, 1000);
+    }
+
+    // -----------------------------------------------------------------------
+    // Backup Code Toggle
+    // -----------------------------------------------------------------------
+    function toggleBackupCode() {
+      const section = document.getElementById('backupCodeSection');
+      const otpContainer = document.getElementById('otpContainer');
+
+      if (section.classList.contains('hidden')) {
+        section.classList.remove('hidden');
+        otpContainer.style.opacity = '0.3';
+        otpContainer.style.pointerEvents = 'none';
+        document.getElementById('backupCodeInput').focus();
+      } else {
+        section.classList.add('hidden');
+        otpContainer.style.opacity = '1';
+        otpContainer.style.pointerEvents = 'auto';
+        otpInputs[0].focus();
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // Keyboard Shortcut: Enter on last OTP triggers verify
+    // -----------------------------------------------------------------------
+    otpInputs[otpInputs.length - 1].addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const verifyBtn = document.getElementById('verifyBtn');
+        if (!verifyBtn.disabled) {
+          document.getElementById('mfaForm').dispatchEvent(new Event('submit'));
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

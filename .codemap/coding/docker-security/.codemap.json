@@ -1,0 +1,372 @@
+{
+  "directory": "coding/docker-security",
+  "files": {
+    "docker-compose.secure-test.yml": {
+      "hash": "46a1b3b81c78",
+      "indexed_at": "2026-02-05T21:07:47.502069+00:00",
+      "language": "yaml",
+      "lines": 73,
+      "symbols": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "docstring": ".",
+                      "lines": [
+                        16,
+                        16
+                      ],
+                      "name": "context",
+                      "type": "key"
+                    },
+                    {
+                      "docstring": "Dockerfile.secrets",
+                      "lines": [
+                        17,
+                        17
+                      ],
+                      "name": "dockerfile",
+                      "type": "key"
+                    }
+                  ],
+                  "lines": [
+                    15,
+                    17
+                  ],
+                  "name": "build",
+                  "type": "section"
+                },
+                {
+                  "docstring": "clawdbot-gateway-secure-test",
+                  "lines": [
+                    18,
+                    18
+                  ],
+                  "name": "container_name",
+                  "type": "key"
+                },
+                {
+                  "docstring": "unless-stopped",
+                  "lines": [
+                    19,
+                    19
+                  ],
+                  "name": "restart",
+                  "type": "key"
+                },
+                {
+                  "docstring": "true",
+                  "lines": [
+                    20,
+                    21
+                  ],
+                  "name": "init",
+                  "type": "key"
+                },
+                {
+                  "lines": [
+                    22,
+                    24
+                  ],
+                  "name": "ports",
+                  "type": "list"
+                },
+                {
+                  "lines": [
+                    25,
+                    31
+                  ],
+                  "name": "volumes",
+                  "type": "section"
+                },
+                {
+                  "lines": [
+                    32,
+                    34
+                  ],
+                  "name": "tmpfs",
+                  "type": "list"
+                },
+                {
+                  "lines": [
+                    35,
+                    45
+                  ],
+                  "name": "environment",
+                  "type": "list"
+                },
+                {
+                  "lines": [
+                    46,
+                    48
+                  ],
+                  "name": "secrets",
+                  "type": "list"
+                },
+                {
+                  "lines": [
+                    49,
+                    52
+                  ],
+                  "name": "extra_hosts",
+                  "type": "list"
+                },
+                {
+                  "lines": [
+                    53,
+                    56
+                  ],
+                  "name": "command",
+                  "type": "section"
+                },
+                {
+                  "children": [
+                    {
+                      "docstring": "[\"CMD\", \"curl\", \"-f\", \"http://localhost:18789/health\"]",
+                      "lines": [
+                        58,
+                        58
+                      ],
+                      "name": "test",
+                      "type": "collection"
+                    },
+                    {
+                      "docstring": "30s",
+                      "lines": [
+                        59,
+                        59
+                      ],
+                      "name": "interval",
+                      "type": "key"
+                    },
+                    {
+                      "docstring": "10s",
+                      "lines": [
+                        60,
+                        60
+                      ],
+                      "name": "timeout",
+                      "type": "key"
+                    },
+                    {
+                      "docstring": "3",
+                      "lines": [
+                        61,
+                        61
+                      ],
+                      "name": "retries",
+                      "type": "key"
+                    },
+                    {
+                      "docstring": "10s",
+                      "lines": [
+                        62,
+                        64
+                      ],
+                      "name": "start_period",
+                      "type": "key"
+                    }
+                  ],
+                  "lines": [
+                    57,
+                    64
+                  ],
+                  "name": "healthcheck",
+                  "type": "section"
+                }
+              ],
+              "lines": [
+                14,
+                64
+              ],
+              "name": "clawdbot-gateway-secure-test",
+              "type": "section"
+            }
+          ],
+          "lines": [
+            13,
+            64
+          ],
+          "name": "services",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "./secrets/keys/age.key",
+                  "lines": [
+                    67,
+                    69
+                  ],
+                  "name": "file",
+                  "type": "key"
+                }
+              ],
+              "lines": [
+                66,
+                69
+              ],
+              "name": "age_key",
+              "type": "section"
+            }
+          ],
+          "lines": [
+            65,
+            69
+          ],
+          "name": "secrets",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "openclaw-secure-test",
+                  "lines": [
+                    72,
+                    72
+                  ],
+                  "name": "name",
+                  "type": "key"
+                },
+                {
+                  "docstring": "bridge",
+                  "lines": [
+                    73,
+                    74
+                  ],
+                  "name": "driver",
+                  "type": "key"
+                }
+              ],
+              "lines": [
+                71,
+                74
+              ],
+              "name": "default",
+              "type": "section"
+            }
+          ],
+          "lines": [
+            70,
+            74
+          ],
+          "name": "networks",
+          "type": "section"
+        }
+      ]
+    },
+    "docker-compose.yml": {
+      "hash": "f667ecedc540",
+      "indexed_at": "2026-02-05T21:07:47.501397+00:00",
+      "language": "yaml",
+      "lines": 19,
+      "symbols": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "./moltbot",
+                  "lines": [
+                    3,
+                    3
+                  ],
+                  "name": "build",
+                  "type": "key"
+                },
+                {
+                  "docstring": "clawdbot-gateway",
+                  "lines": [
+                    4,
+                    4
+                  ],
+                  "name": "container_name",
+                  "type": "key"
+                },
+                {
+                  "docstring": "unless-stopped",
+                  "lines": [
+                    5,
+                    5
+                  ],
+                  "name": "restart",
+                  "type": "key"
+                },
+                {
+                  "docstring": "true",
+                  "lines": [
+                    6,
+                    6
+                  ],
+                  "name": "init",
+                  "type": "key"
+                },
+                {
+                  "lines": [
+                    7,
+                    8
+                  ],
+                  "name": "ports",
+                  "type": "list"
+                },
+                {
+                  "lines": [
+                    9,
+                    11
+                  ],
+                  "name": "volumes",
+                  "type": "list"
+                },
+                {
+                  "lines": [
+                    12,
+                    15
+                  ],
+                  "name": "environment",
+                  "type": "list"
+                },
+                {
+                  "lines": [
+                    16,
+                    17
+                  ],
+                  "name": "extra_hosts",
+                  "type": "list"
+                },
+                {
+                  "lines": [
+                    18,
+                    20
+                  ],
+                  "name": "command",
+                  "type": "section"
+                }
+              ],
+              "lines": [
+                2,
+                20
+              ],
+              "name": "clawdbot-gateway",
+              "type": "section"
+            }
+          ],
+          "lines": [
+            1,
+            20
+          ],
+          "name": "services",
+          "type": "section"
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-02-06T11:35:32.241790+00:00",
+  "version": "1.0"
+}

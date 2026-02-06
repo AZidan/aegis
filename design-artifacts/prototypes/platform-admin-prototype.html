@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aegis Platform Admin - Interactive Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --indigo-50: #eef2ff;
+      --indigo-100: #e0e7ff;
+      --indigo-200: #c7d2fe;
+      --indigo-300: #a5b4fc;
+      --indigo-400: #818cf8;
+      --indigo-500: #6366f1;
+      --indigo-600: #4f46e5;
+      --indigo-700: #4338ca;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --white: #ffffff;
+      --top-bar-height: 48px;
+      --bottom-bar-height: 44px;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-100);
+      color: var(--gray-800);
+    }
+
+    /* ---- Top Bar ---- */
+    .top-bar {
+      height: var(--top-bar-height);
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      position: relative;
+      z-index: 100;
+      user-select: none;
+    }
+
+    .top-bar__left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 260px;
+    }
+
+    .top-bar__title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-900);
+      letter-spacing: -0.01em;
+    }
+
+    .top-bar__badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--indigo-600);
+      background: var(--indigo-50);
+      border: 1px solid var(--indigo-200);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .top-bar__center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .top-bar__screen-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    .top-bar__right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 260px;
+      justify-content: flex-end;
+    }
+
+    .nav-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 14px;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: var(--gray-50);
+      border-color: var(--gray-300);
+      color: var(--gray-800);
+    }
+
+    .nav-btn:active:not(:disabled) {
+      background: var(--gray-100);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .nav-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .screen-counter {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray-400);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---- Main / Iframe Area ---- */
+    .main-area {
+      height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height));
+      position: relative;
+      background: var(--gray-100);
+    }
+
+    .iframe-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .iframe-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background: var(--white);
+      transition: opacity 0.2s ease;
+    }
+
+    .iframe-container iframe.fading {
+      opacity: 0;
+    }
+
+    .iframe-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      z-index: 10;
+    }
+
+    .iframe-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .loading-spinner {
+      width: 24px;
+      height: 24px;
+      border: 2.5px solid var(--gray-200);
+      border-top-color: var(--indigo-500);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ---- Bottom Bar ---- */
+    .bottom-bar {
+      height: var(--bottom-bar-height);
+      background: var(--white);
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      position: relative;
+      z-index: 100;
+      user-select: none;
+    }
+
+    .bottom-bar__left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 160px;
+    }
+
+    .bottom-bar__label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .bottom-bar__center {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .step-group {
+      display: flex;
+      align-items: center;
+    }
+
+    .step-dot-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .step-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--gray-300);
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .step-dot.completed {
+      background: var(--indigo-500);
+    }
+
+    .step-dot.current {
+      background: var(--indigo-500);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .step-dot.current::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--white);
+    }
+
+    .step-connector {
+      width: 32px;
+      height: 2px;
+      background: var(--gray-200);
+      transition: background 0.25s ease;
+    }
+
+    .step-connector.completed {
+      background: var(--indigo-500);
+    }
+
+    /* Tooltip */
+    .step-dot-wrapper .tooltip {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--gray-800);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      transform: translateX(-50%) translateY(4px);
+      z-index: 200;
+    }
+
+    .step-dot-wrapper .tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid transparent;
+      border-top-color: var(--gray-800);
+    }
+
+    .step-dot-wrapper:hover .tooltip {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .step-number {
+      position: absolute;
+      bottom: calc(100% + 28px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--gray-300);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+
+    .step-dot-wrapper:hover .step-number {
+      opacity: 1;
+    }
+
+    .bottom-bar__right {
+      display: flex;
+      align-items: center;
+      min-width: 160px;
+      justify-content: flex-end;
+    }
+
+    .open-tab-link {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--indigo-500);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s ease;
+    }
+
+    .open-tab-link:hover {
+      color: var(--indigo-700);
+    }
+
+    .open-tab-link svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    /* Keyboard hint toast */
+    .keyboard-hint {
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--gray-800);
+      color: var(--white);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 300;
+      white-space: nowrap;
+    }
+
+    .keyboard-hint.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .keyboard-hint kbd {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      margin: 0 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-bar__left">
+      <span class="top-bar__title">Aegis Platform Admin</span>
+      <span class="top-bar__badge">Prototype</span>
+    </div>
+    <div class="top-bar__center">
+      <span class="top-bar__screen-name" id="screenName">Admin Login</span>
+    </div>
+    <div class="top-bar__right">
+      <button class="nav-btn" id="prevBtn" title="Previous screen (Left arrow)" disabled>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 12L6 8L10 4"/>
+        </svg>
+      </button>
+      <span class="screen-counter" id="screenCounter">1 / 7</span>
+      <button class="nav-btn" id="nextBtn" title="Next screen (Right arrow)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 4L10 8L6 12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Iframe Area -->
+  <div class="main-area">
+    <div class="iframe-container">
+      <iframe id="screenFrame" src="../screens/admin-login.html" title="Screen preview"></iframe>
+      <div class="iframe-overlay" id="iframeOverlay">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <div class="bottom-bar__left">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="12" height="12" rx="2"/>
+        <path d="M5 8h6M8 5v6"/>
+      </svg>
+      <span class="bottom-bar__label">Platform Admin Flow</span>
+    </div>
+
+    <div class="bottom-bar__center" id="stepIndicator">
+      <!-- Dynamically generated -->
+    </div>
+
+    <div class="bottom-bar__right">
+      <a href="#" class="open-tab-link" id="openTabLink" target="_blank" rel="noopener">
+        Open in new tab
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 3H3v10h10V9"/>
+          <path d="M10 2h4v4"/>
+          <path d="M14 2L7 9"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Keyboard hint toast -->
+  <div class="keyboard-hint" id="keyboardHint">
+    Navigate: <kbd>&larr;</kbd> <kbd>&rarr;</kbd> arrows or <kbd>1</kbd>&ndash;<kbd>7</kbd> keys
+  </div>
+
+  <script>
+    // ---- Screen Configuration ----
+    const screens = [
+      { name: 'Admin Login',          shortName: 'Login',       src: '../screens/admin-login.html' },
+      { name: 'Admin Dashboard',      shortName: 'Dashboard',   src: '../screens/admin-dashboard.html' },
+      { name: 'Tenant List',          shortName: 'Tenants',     src: '../screens/tenant-list.html' },
+      { name: 'Tenant Provisioning',  shortName: 'Provision',   src: '../screens/tenant-provisioning.html' },
+      { name: 'Tenant Detail',        shortName: 'Detail',      src: '../screens/tenant-detail.html' },
+      { name: 'Skill Review Queue',   shortName: 'Queue',       src: '../screens/skill-review-queue.html' },
+      { name: 'Skill Review Detail',  shortName: 'Review',      src: '../screens/skill-review-detail.html' }
+    ];
+
+    let currentIndex = 0;
+    let isTransitioning = false;
+
+    // ---- DOM References ----
+    const screenFrame   = document.getElementById('screenFrame');
+    const screenName    = document.getElementById('screenName');
+    const screenCounter = document.getElementById('screenCounter');
+    const prevBtn       = document.getElementById('prevBtn');
+    const nextBtn       = document.getElementById('nextBtn');
+    const stepIndicator = document.getElementById('stepIndicator');
+    const openTabLink   = document.getElementById('openTabLink');
+    const iframeOverlay = document.getElementById('iframeOverlay');
+    const keyboardHint  = document.getElementById('keyboardHint');
+
+    // ---- Build Step Indicator ----
+    function buildStepIndicator() {
+      stepIndicator.innerHTML = '';
+
+      screens.forEach((screen, i) => {
+        // Step dot
+        const wrapper = document.createElement('div');
+        wrapper.className = 'step-dot-wrapper';
+        wrapper.setAttribute('data-index', i);
+        wrapper.addEventListener('click', () => navigateTo(i));
+
+        const dot = document.createElement('div');
+        dot.className = 'step-dot';
+        dot.setAttribute('data-step', i);
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip';
+        tooltip.textContent = screen.name;
+
+        const number = document.createElement('div');
+        number.className = 'step-number';
+        number.textContent = String.fromCharCode(9312 + i); // Circled numbers
+
+        wrapper.appendChild(dot);
+        wrapper.appendChild(tooltip);
+        wrapper.appendChild(number);
+        stepIndicator.appendChild(wrapper);
+
+        // Connector line (except after last)
+        if (i < screens.length - 1) {
+          const connector = document.createElement('div');
+          connector.className = 'step-connector';
+          connector.setAttribute('data-connector', i);
+          stepIndicator.appendChild(connector);
+        }
+      });
+    }
+
+    // ---- Update UI State ----
+    function updateUI() {
+      const screen = screens[currentIndex];
+
+      // Screen name and counter
+      screenName.textContent = screen.name;
+      screenCounter.textContent = `${currentIndex + 1} / ${screens.length}`;
+
+      // Navigation buttons
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === screens.length - 1;
+
+      // Open in new tab link
+      openTabLink.href = screen.src;
+
+      // Step dots
+      document.querySelectorAll('.step-dot').forEach((dot, i) => {
+        dot.classList.remove('current', 'completed');
+        if (i === currentIndex) {
+          dot.classList.add('current');
+        } else if (i < currentIndex) {
+          dot.classList.add('completed');
+        }
+      });
+
+      // Connectors
+      document.querySelectorAll('.step-connector').forEach((conn, i) => {
+        conn.classList.toggle('completed', i < currentIndex);
+      });
+    }
+
+    // ---- Route Mapping (sidebar links to screen indices) ----
+    const routeMap = {
+      '/admin': 1,                          // Admin Dashboard
+      '/admin/dashboard': 1,
+      '/admin/tenants': 2,                  // Tenant List
+      '/admin/tenants/new': 3,              // Tenant Provisioning
+      '/admin/tenants/:id': 4,              // Tenant Detail
+      '/admin/skills/review': 5,            // Skill Review Queue
+      '/admin/skills/review/:id': 6,        // Skill Review Detail
+      '/admin/health': 1,                   // System Health → Dashboard
+      '/admin/settings': 1,                 // Settings → Dashboard (not in prototype)
+    };
+
+    // ---- Intercept Sidebar Navigation ----
+    function setupLinkInterception() {
+      document.addEventListener('click', (e) => {
+        // Check if click is on a link inside the iframe
+        if (e.target.tagName === 'A' && e.target.href) {
+          const href = e.target.href;
+
+          // Try to match against known routes
+          for (const [route, screenIndex] of Object.entries(routeMap)) {
+            // Handle parameterized routes (e.g., /admin/tenants/:id → /admin/tenants/*)
+            const pattern = route.replace(/:(\w+)/g, '[^/]+');
+            const regex = new RegExp(`^.*${pattern}$`);
+
+            if (regex.test(href)) {
+              e.preventDefault();
+              navigateTo(screenIndex);
+              return;
+            }
+          }
+
+          // If no match, check if it's a dashboard/home link
+          if (href.includes('/dashboard') || href.includes('/admin')) {
+            e.preventDefault();
+            const screenIndex = href.includes('/dashboard') ? 1 : 1;
+            navigateTo(screenIndex);
+            return;
+          }
+        }
+      }, true);
+    }
+
+    // ---- Navigation ----
+    function navigateTo(index) {
+      if (index < 0 || index >= screens.length || index === currentIndex || isTransitioning) return;
+
+      isTransitioning = true;
+
+      // Fade out
+      screenFrame.classList.add('fading');
+      iframeOverlay.classList.add('visible');
+
+      setTimeout(() => {
+        currentIndex = index;
+        screenFrame.src = screens[currentIndex].src;
+        updateUI();
+      }, 150);
+    }
+
+    function navigatePrev() {
+      navigateTo(currentIndex - 1);
+    }
+
+    function navigateNext() {
+      navigateTo(currentIndex + 1);
+    }
+
+    // iframe load complete -> fade in
+    screenFrame.addEventListener('load', () => {
+      setTimeout(() => {
+        screenFrame.classList.remove('fading');
+        iframeOverlay.classList.remove('visible');
+        isTransitioning = false;
+      }, 100);
+    });
+
+    // ---- Event Listeners ----
+    prevBtn.addEventListener('click', navigatePrev);
+    nextBtn.addEventListener('click', navigateNext);
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      // Ignore if user is typing in an input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigatePrev();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigateNext();
+      } else if (e.key >= '1' && e.key <= '7') {
+        e.preventDefault();
+        navigateTo(parseInt(e.key) - 1);
+      }
+    });
+
+    // ---- Show keyboard hint on first visit ----
+    function showKeyboardHint() {
+      keyboardHint.classList.add('visible');
+      setTimeout(() => {
+        keyboardHint.classList.remove('visible');
+      }, 4000);
+    }
+
+    // ---- Route Mapping (sidebar links to screen indices) ----
+    const routeMap = {
+      '/admin': 1,                          // Admin Dashboard
+      '/admin/dashboard': 1,
+      '/admin/tenants': 2,                  // Tenant List
+      '/admin/tenants/new': 3,              // Tenant Provisioning
+      '/admin/tenants/:id': 4,              // Tenant Detail
+      '/admin/skills/review': 5,            // Skill Review Queue
+      '/admin/skills/review/:id': 6,        // Skill Review Detail
+      '/admin/health': 1,                   // System Health → Dashboard
+      '/admin/settings': 1,                 // Settings → Dashboard (not in prototype)
+    };
+
+    // ---- Intercept Sidebar Navigation ----
+    function setupLinkInterception() {
+      // Intercept clicks inside the iframe by checking the iframe's document
+      screenFrame.addEventListener('load', () => {
+        try {
+          const iframeDoc = screenFrame.contentDocument;
+          if (!iframeDoc) return;
+
+          iframeDoc.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') {
+              const href = e.target.getAttribute('href') || e.target.href;
+              if (!href) return;
+
+              // Try to match against known routes
+              for (const [route, screenIndex] of Object.entries(routeMap)) {
+                // Handle parameterized routes (e.g., /admin/tenants/:id → /admin/tenants/*)
+                const pattern = route.replace(/:(\w+)/g, '[^/]+');
+                const regex = new RegExp(`^.*${pattern}$`);
+
+                if (regex.test(href)) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigateTo(screenIndex);
+                  return;
+                }
+              }
+
+              // If no match but it's a nav link (contains /admin or /dashboard)
+              if (href.includes('/admin')) {
+                e.preventDefault();
+                e.stopPropagation();
+                navigateTo(1); // Default to dashboard
+              }
+            }
+          }, true);
+        } catch (err) {
+          console.log('Cross-origin iframe - link interception disabled');
+        }
+      });
+    }
+
+    // ---- Initialize ----
+    buildStepIndicator();
+    updateUI();
+    setupLinkInterception();
+
+    // ── Listen for navigation messages from child iframe ──
+    window.addEventListener('message', (e) => {
+      if (e.data.type === 'navigate') {
+        const href = e.data.href;
+
+        // Route mapping
+        const routeMap = {
+          '/admin': 1,
+          '/admin/dashboard': 1,
+          '/admin/tenants': 2,
+          '/admin/tenants/new': 3,
+          '/admin/tenants/:id': 4,
+          '/admin/skills/review': 5,
+          '/admin/skills/review/:id': 6,
+          '/admin/health': 1,
+          '/admin/settings': 1,
+        };
+
+        // Match route to screen index
+        for (const [route, screenIndex] of Object.entries(routeMap)) {
+          const pattern = route.replace(/:(\w+)/g, '[^/]+');
+          const regex = new RegExp(`^${pattern}$`);
+          if (regex.test(href)) {
+            navigateTo(screenIndex);
+            return;
+          }
+        }
+      }
+    });
+
+    // Show hint after a brief delay
+    setTimeout(showKeyboardHint, 1200);
+  </script>
+
+</body>
+</html>

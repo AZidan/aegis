@@ -1,0 +1,1518 @@
+{
+  "directory": "docs",
+  "files": {
+    "gap-analysis-report.md": {
+      "hash": "020b75c7dd66",
+      "indexed_at": "2026-02-06T11:12:56.152849+00:00",
+      "language": "markdown",
+      "lines": 441,
+      "symbols": [
+        {
+          "children": [
+            {
+              "docstring": "**Total Issues Found:** 8 - \ud83d\udd34 **Critical:** 0 - \ud83d\udfe1 **Medium:** 4 - \ud83d\udfe2 **Minor:** 4",
+              "lines": [
+                16,
+                24
+              ],
+              "name": "Overall Status: \u2705 **ALIGNED** with Minor Gaps",
+              "type": "subsection"
+            }
+          ],
+          "docstring": "This report analyzes alignment between three critical Phase 2.5 artifacts: - **API Contract** (docs/api-contract.md) - 67 endpoints, 11 modules - **St",
+          "lines": [
+            9,
+            24
+          ],
+          "name": "Executive Summary",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "| Screen | Route | Primary API | Status | |--------|-------|-------------|--------| | Platform Admin Login | `/admin/login` | `POST /api/auth/login` +",
+              "lines": [
+                27,
+                45
+              ],
+              "name": "\u2705 Fully Aligned Screens (14/18)",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "**Status:** \ud83d\udfe1 Medium Gap **API Endpoint:** `POST /api/dashboard/agents`",
+                  "lines": [
+                    48,
+                    79
+                  ],
+                  "name": "1. Agent Creation Wizard (`/dashboard/agents/new`)",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "**Status:** \ud83d\udfe1 Medium Gap **API Endpoints:** `GET /api/dashboard/settings`, `GET /api/dashboard/settings/usage`",
+                  "lines": [
+                    80,
+                    97
+                  ],
+                  "name": "2. Settings Screen (`/dashboard/settings`)",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "**Status:** \ud83d\udfe2 Minor Gap **API Endpoint:** `GET /api/admin/tenants/:id`",
+                  "lines": [
+                    98,
+                    133
+                  ],
+                  "name": "3. Tenant Detail - Resources Tab (`/admin/tenants/:id`)",
+                  "type": "subsubsection"
+                }
+              ],
+              "lines": [
+                46,
+                133
+              ],
+              "name": "\ud83d\udfe1 Partially Aligned Screens (3/18)",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "**Status:** \u2705 Complete **API Endpoint:** `POST /api/dashboard/team/invite/:token/accept` **Alignment:** Perfect - all fields match",
+                  "lines": [
+                    136,
+                    142
+                  ],
+                  "name": "Invite Acceptance (`/invite/:token`)",
+                  "type": "subsubsection"
+                }
+              ],
+              "lines": [
+                134,
+                142
+              ],
+              "name": "\u2705 Auth Screens (1/18)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            25,
+            142
+          ],
+          "name": "1. Screen-to-API Endpoint Mapping",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**DSL Spec (lines 121-364):**",
+              "lines": [
+                145,
+                167
+              ],
+              "name": "\u2705 Sidebar Specification Compliance",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "**Status:** \ud83d\udfe2 Minor - Cosmetic Only **DSL:** Uses `colors.neutral.*` and `colors.primary.*` **Implementation:** Uses mix of `gray-*`, `indigo-*`, `aeg",
+                  "lines": [
+                    170,
+                    176
+                  ],
+                  "name": "1. Color Palette Naming",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "**Status:** \ud83d\udfe2 Minor - Acceptable Variance **DSL:** References Lucide icon names (e.g., `\"LayoutDashboard\"`, `\"Bot\"`) **Implementation:** Uses inline S",
+                  "lines": [
+                    177,
+                    185
+                  ],
+                  "name": "2. Icon Library",
+                  "type": "subsubsection"
+                }
+              ],
+              "lines": [
+                168,
+                185
+              ],
+              "name": "\ud83d\udfe2 Minor Implementation Variances",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            143,
+            185
+          ],
+          "name": "2. DSL-to-Implementation Gaps",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**Required By:** Settings screen **Missing Endpoints:** - `GET /api/dashboard/settings/api-keys` - `POST /api/dashboard/settings/api-keys` - `DELETE /",
+              "lines": [
+                188,
+                199
+              ],
+              "name": "\ud83d\udfe1 Settings - API Key Management",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Required By:** Agent creation wizard Step 1 **Missing Fields in** `POST /api/dashboard/agents`: - `assistedUserId?: string` - User being assisted by",
+              "lines": [
+                200,
+                212
+              ],
+              "name": "\ud83d\udfe1 Agent Wizard - Person Assignment",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            186,
+            212
+          ],
+          "name": "3. Missing API Endpoints (Screen Requirements)",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "These endpoints exist in the API contract but aren't directly exposed in current UI screens:",
+              "lines": [
+                215,
+                238
+              ],
+              "name": "\ud83d\udfe2 Endpoints Without Direct Screen Representation",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            213,
+            238
+          ],
+          "name": "4. Unused API Endpoints (Not in UI)",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**API Contract Section 11:** Defines 3 event types: - `agent.status.changed` - `container.health.changed` - `provisioning.progress`",
+              "lines": [
+                241,
+                246
+              ],
+              "name": "\u2705 WebSocket Spec Exists",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Current Screens:** Static HTML - no WebSocket code visible **Impact:** Minor - real-time updates will be implemented in React/Next.js version **Reco",
+              "lines": [
+                247,
+                253
+              ],
+              "name": "\ud83d\udfe2 Implementation Status: Not Verified",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            239,
+            253
+          ],
+          "name": "5. WebSocket Events Integration",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**API Contract:**",
+              "lines": [
+                256,
+                273
+              ],
+              "name": "\u2705 Agent Schema - Aligned",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**API Contract:**",
+              "lines": [
+                274,
+                290
+              ],
+              "name": "\u2705 Tenant Schema - Aligned",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**API Contract:**",
+              "lines": [
+                291,
+                307
+              ],
+              "name": "\u2705 Skill Schema - Aligned",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            254,
+            307
+          ],
+          "name": "6. Data Structure Alignment",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "| Screen | Pagination | Filters | Sorting | |--------|-----------|---------|---------| | Tenant List | \u2705 Yes (page, limit) | \u2705 status, plan, health, s",
+              "lines": [
+                310,
+                323
+              ],
+              "name": "\u2705 List Endpoints - Fully Specified",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            308,
+            323
+          ],
+          "name": "7. Pagination & Filtering Alignment",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**API Contract Roles:** - `platform_admin` - Full platform access - `tenant_admin` - Tenant management - `tenant_member` - Read-only tenant access",
+              "lines": [
+                326,
+                339
+              ],
+              "name": "\u2705 Role-Based Access Control - Aligned",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            324,
+            339
+          ],
+          "name": "8. Authentication & Authorization",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**Standard Error Format:**",
+              "lines": [
+                342,
+                365
+              ],
+              "name": "\u2705 API Error Responses - Well Defined",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            340,
+            365
+          ],
+          "name": "9. Error Handling & Validation",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**None identified** - all critical paths are aligned",
+              "lines": [
+                368,
+                373
+              ],
+              "name": "\ud83d\udd34 Must Fix Before Phase 3",
+              "type": "subsection"
+            },
+            {
+              "docstring": "1. **API Keys Management** - Add endpoints: `GET/POST/DELETE /api/dashboard/settings/api-keys` - OR remove \"API Keys\" section from Settings screen",
+              "lines": [
+                374,
+                393
+              ],
+              "name": "\ud83d\udfe1 Should Address Before MVP Launch",
+              "type": "subsection"
+            },
+            {
+              "docstring": "1. **Standardize Color Naming** - Migrate from `gray-*`/`indigo-*` to DSL `colors.neutral.*`/`colors.primary.*`",
+              "lines": [
+                394,
+                414
+              ],
+              "name": "\ud83d\udfe2 Nice to Have (Post-MVP)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            366,
+            414
+          ],
+          "name": "10. Recommendations Summary",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "The API Contract, Styled DSL, and implemented screens are **highly aligned** with only minor gaps that won't block Phase 3 implementation.",
+              "lines": [
+                417,
+                442
+              ],
+              "name": "\u2705 Overall Assessment: **PRODUCTION READY**",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            415,
+            442
+          ],
+          "name": "Conclusion",
+          "type": "section"
+        }
+      ]
+    },
+    "multi-agent-plan.md": {
+      "hash": "3d83ce44069d",
+      "indexed_at": "2026-02-05T21:07:47.498104+00:00",
+      "language": "markdown",
+      "lines": 515,
+      "symbols": [
+        {
+          "docstring": "The agent system follows a 3-layer architecture aligned with the AI Transformation 2027 deck:",
+          "lines": [
+            9,
+            42
+          ],
+          "name": "3-Layer Architecture (AI Transformation 2027)",
+          "type": "section"
+        },
+        {
+          "docstring": "Use a **single shared gateway** with multiple agents routed via `bindings`. Each colleague gets their own Telegram bot, workspace, and session isolati",
+          "lines": [
+            43,
+            48
+          ],
+          "name": "TL;DR",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "One OpenClaw instance running multiple agents via `agents.list[]` + `bindings[]`.",
+              "lines": [
+                51,
+                78
+              ],
+              "name": "Option A: Shared Gateway (Recommended \u2705)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "Each person runs their own OpenClaw gateway.",
+              "lines": [
+                79,
+                93
+              ],
+              "name": "Option B: Isolated Instances (Separate Servers)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Go with Option A.** OpenClaw is designed for multi-agent on a single gateway. The isolation is strong (separate workspaces, separate sessions, confi",
+              "lines": [
+                94,
+                99
+              ],
+              "name": "Verdict",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            49,
+            99
+          ],
+          "name": "1. Architecture Options",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "Each colleague gets their own Telegram bot via BotFather. This is the cleanest approach.",
+              "lines": [
+                102,
+                152
+              ],
+              "name": "Telegram: One Bot Per Person (Recommended \u2705)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "A single bot where different Telegram users get routed to different agents via `bindings[].match.peer`. Technically possible but confusing \u2014 the colle",
+              "lines": [
+                153,
+                156
+              ],
+              "name": "Shared Bot (Not Recommended)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Channel | Effort | Notes | |---------|--------|-------| | **Telegram** | Low | Best for pilot. One BotFather command. | | **Slack** | Medium | Good",
+              "lines": [
+                157,
+                169
+              ],
+              "name": "Other Channels",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            100,
+            169
+          ],
+          "name": "2. Channel Setup",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "| Model | Input | Output | Cache Read | Cache Write | |-------|-------|--------|------------|-------------| | **Haiku 3.5** | $0.80 | $4.00 | $0.08 |",
+              "lines": [
+                172,
+                179
+              ],
+              "name": "Pricing (USD per 1M tokens, Anthropic API as of mid-2025)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- Average message: ~500 tokens input (user msg + context), ~800 tokens output - System prompt + workspace context: ~5,000 tokens (cached after first m",
+              "lines": [
+                180,
+                185
+              ],
+              "name": "Usage Assumptions",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Usage Level | Msgs/Day | Haiku 3.5 | Sonnet 4.5 | Opus 4.5 | |-------------|----------|-----------|------------|----------| | **Light** | ~50 | $3\u20135",
+              "lines": [
+                186,
+                193
+              ],
+              "name": "Monthly Cost Estimates (per agent, no thinking)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "Thinking roughly doubles output costs. Add 50\u2013100% to the output portion:",
+              "lines": [
+                194,
+                203
+              ],
+              "name": "With Thinking Enabled (low level)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Sonnet 4.5 with thinking:low** \u2014 best quality-to-cost ratio.",
+              "lines": [
+                204,
+                219
+              ],
+              "name": "Recommended Tier for Pilot",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            170,
+            219
+          ],
+          "name": "3. Model Tiers & Cost Estimates",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "Each agent gets: - **Separate workspace** (`~/.openclaw/workspace-atlas/`) \u2014 files, memories, SOUL.md are isolated - **Separate session store** (`~/.o",
+              "lines": [
+                222,
+                230
+              ],
+              "name": "Session Isolation (Built-in)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Access | Can See? | Notes | |--------|----------|-------| | Colleague's workspace files | \u2705 Yes | Admin has filesystem access on the server | | Coll",
+              "lines": [
+                231,
+                241
+              ],
+              "name": "What the Admin (Zidan) Can See",
+              "type": "subsection"
+            },
+            {
+              "docstring": "Restrict what the colleague's agent can do:",
+              "lines": [
+                242,
+                264
+              ],
+              "name": "Tool Policy Isolation",
+              "type": "subsection"
+            },
+            {
+              "docstring": "1. **Set `session.dmScope: \"per-account-channel-peer\"`** \u2014 ensures DMs from different Telegram accounts never share sessions 2. **Run `openclaw securi",
+              "lines": [
+                265,
+                273
+              ],
+              "name": "Recommendations",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            220,
+            273
+          ],
+          "name": "4. Security & Privacy",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "- Existing OpenClaw gateway running (Zidan's setup) - Colleague has Telegram installed - ~15 minutes of setup time",
+              "lines": [
+                276,
+                280
+              ],
+              "name": "Prerequisites",
+              "type": "subsection"
+            },
+            {
+              "docstring": "1. Colleague (or Zidan) opens Telegram \u2192 `@BotFather` 2. `/newbot` \u2192 Name: \"Atlas\" (or whatever) \u2192 Username: `breadfast_atlas_bot` 3. Copy the bot tok",
+              "lines": [
+                281,
+                286
+              ],
+              "name": "Step 1: Create a New Telegram Bot",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                287,
+                300
+              ],
+              "name": "Step 2: Create the Colleague's Workspace",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            274,
+            300
+          ],
+          "name": "5. Pilot Recommendation: Step-by-Step",
+          "type": "section"
+        },
+        {
+          "docstring": "- Helpful, direct, and efficient - You work in [colleague's domain \u2014 e.g., product, engineering, ops] - You communicate in English (and Arabic when as",
+          "lines": [
+            301,
+            305
+          ],
+          "name": "About You",
+          "type": "section"
+        },
+        {
+          "docstring": "- [Colleague Name], [Role] at Breadfast - Based in Cairo",
+          "lines": [
+            306,
+            309
+          ],
+          "name": "Your Human",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "Add to `~/.openclaw/openclaw.json`:",
+              "lines": [
+                323,
+                375
+              ],
+              "name": "Step 3: Update OpenClaw Config",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                376,
+                381
+              ],
+              "name": "Step 4: Restart Gateway",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                382,
+                389
+              ],
+              "name": "Step 5: Verify",
+              "type": "subsection"
+            },
+            {
+              "docstring": "1. Send them the bot link: `t.me/breadfast_atlas_bot` 2. They DM the bot \u2192 get a pairing code 3. Zidan approves: `openclaw pairing approve telegram <c",
+              "lines": [
+                390,
+                396
+              ],
+              "name": "Step 6: Onboard the Colleague",
+              "type": "subsection"
+            },
+            {
+              "docstring": "Things to tweak based on feedback: - **SOUL.md** \u2014 refine personality, add domain-specific context - **Skills** \u2014 install relevant skills in `~/.openc",
+              "lines": [
+                397,
+                407
+              ],
+              "name": "Step 7: Customize Over Time",
+              "type": "subsection"
+            }
+          ],
+          "docstring": "- Keep responses concise unless asked for detail - Use bullet points for lists - Ask clarifying questions when the request is ambiguous EOF",
+          "lines": [
+            310,
+            407
+          ],
+          "name": "Guidelines",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "| Concern | Impact | Mitigation | |---------|--------|------------| | Config complexity | Moderate | Use `$include` to split agent configs into separa",
+              "lines": [
+                410,
+                419
+              ],
+              "name": "At 5 Agents",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Concern | Impact | Mitigation | |---------|--------|------------| | Config management | High | **Must** use `$include` per-agent configs | | Concurr",
+              "lines": [
+                420,
+                429
+              ],
+              "name": "At 10 Agents",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Concern | Impact | Mitigation | |---------|--------|------------| | Single gateway | Bottleneck risk | Consider 2 gateways (profiles) for resilience",
+              "lines": [
+                430,
+                439
+              ],
+              "name": "At 20 Agents",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Agents | Server | RAM | CPU | Storage | |--------|--------|-----|-----|---------| | 1-5 | Single VPS | 2GB | 2 vCPU | 20GB | | 5-15 | Single VPS | 4",
+              "lines": [
+                440,
+                449
+              ],
+              "name": "Infrastructure at Scale",
+              "type": "subsection"
+            },
+            {
+              "docstring": "Build a simple script:",
+              "lines": [
+                450,
+                469
+              ],
+              "name": "Management Automation (at 10+)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            408,
+            469
+          ],
+          "name": "6. Scaling Considerations",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "| Command | What it does | |---------|-------------| | `/status` | Check model, token usage, costs | | `/new` | Start a fresh session | | `/model sonn",
+              "lines": [
+                472,
+                481
+              ],
+              "name": "Chat Commands (for colleagues)",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                482,
+                491
+              ],
+              "name": "Cost Monitoring",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                492,
+                504
+              ],
+              "name": "Emergency Controls",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            470,
+            504
+          ],
+          "name": "Appendix: Quick Reference",
+          "type": "section"
+        },
+        {
+          "docstring": "| Decision | Choice | Rationale | |----------|--------|-----------| | Architecture | Shared gateway | Native support, simpler ops | | Channel | Telegr",
+          "lines": [
+            505,
+            516
+          ],
+          "name": "Decision Summary",
+          "type": "section"
+        }
+      ]
+    },
+    "security-whitepaper.md": {
+      "hash": "f5ce9aae6980",
+      "indexed_at": "2026-02-05T21:07:47.499975+00:00",
+      "language": "markdown",
+      "lines": 701,
+      "symbols": [
+        {
+          "docstring": "This document analyzes security vulnerabilities in OpenClaw (the open-source foundation for our platform) and maps them to our mitigation strategy. Op",
+          "lines": [
+            10,
+            15
+          ],
+          "name": "Executive Summary",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "| CVE/Issue | Severity | Description | Status | |-----------|----------|-------------|--------| | CVE-2026-25253 | 8.8 (High) | One-click RCE via toke",
+              "lines": [
+                18,
+                26
+              ],
+              "name": "Recent Security Incidents",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- **Cisco:** \"Personal AI agents like OpenClaw are a security nightmare\" - **ZDNET:** \"5 red flags you shouldn't ignore\" - **SecurityWeek:** \"Vulnerab",
+              "lines": [
+                27,
+                34
+              ],
+              "name": "Media Coverage",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            16,
+            34
+          ],
+          "name": "Part 1: OpenClaw Security Landscape (Feb 2026)",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**Attack Vector:** 1. Victim clicks malicious link 2. JavaScript steals gateway auth token via cross-site WebSocket hijacking 3. Attacker connects to",
+              "lines": [
+                37,
+                62
+              ],
+              "name": "2.1 CVE-2026-25253 \u2014 Token Hijacking / RCE",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Attack Vector:** - Malicious instructions hidden in emails, web pages, documents - Agent reads content \u2192 executes adversarial instructions - Can lea",
+              "lines": [
+                63,
+                89
+              ],
+              "name": "2.2 Prompt Injection Attacks",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Attack Vector:** - Publicly accessible OpenClaw instances without authentication - Plaintext API keys in config files - Conversation histories expos",
+              "lines": [
+                90,
+                123
+              ],
+              "name": "2.3 Exposed Credentials & Misconfiguration",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Attack Vector:** - Skills contain hidden malicious instructions - Data exfiltration via curl/network calls - Command injection via embedded bash - T",
+              "lines": [
+                124,
+                156
+              ],
+              "name": "2.4 Malicious Skills",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Attack Vector:** - OpenClaw can run shell commands, read/write files, execute scripts - Misconfigured or compromised agent = full system access - Da",
+              "lines": [
+                157,
+                185
+              ],
+              "name": "2.5 System-Level Privileges",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Attack Vector:** - Employees install OpenClaw without security review - Agents introduced to corporate environments - No visibility into agent capab",
+              "lines": [
+                186,
+                206
+              ],
+              "name": "2.6 Shadow AI / Supply Chain Risk",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            35,
+            206
+          ],
+          "name": "Part 2: Vulnerability Analysis & Mitigations",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                209,
+                229
+              ],
+              "name": "3.1 Sandboxing",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                230,
+                244
+              ],
+              "name": "3.2 Tool Policy",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                245,
+                261
+              ],
+              "name": "3.3 Gateway Security",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                262,
+                278
+              ],
+              "name": "3.4 DM/Group Policies",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            207,
+            278
+          ],
+          "name": "Part 3: OpenClaw Security Configuration Reference",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                281,
+                305
+              ],
+              "name": "4.1 Multi-Tenant Isolation",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- **Default:** DENY ALL - **Main \u2194 Subagent:** Always allowed - **Subagent \u2194 Subagent:** Explicit allowlist required - **Channel:** Messaging only (`s",
+              "lines": [
+                306,
+                312
+              ],
+              "name": "4.2 Agent Communication Model",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Type | Storage | Access | |------|---------|--------| | LLM API keys | Vault (encrypted) | Injected at runtime | | Channel tokens | Per-company vaul",
+              "lines": [
+                313,
+                323
+              ],
+              "name": "4.3 Credential Management",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            279,
+            323
+          ],
+          "name": "Part 4: SaaS Platform Security Architecture",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "- [x] Container-per-company isolation - [x] Verified skill marketplace - [x] Default sandbox mode - [x] Audit logging - [x] No public gateway endpoint",
+              "lines": [
+                326,
+                332
+              ],
+              "name": "Phase 1: MVP (Current)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- [ ] Skill permission manifest - [ ] Content scanning before ingestion - [ ] Automatic secret rotation - [ ] Runtime behavior monitoring - [ ] SOC2 T",
+              "lines": [
+                333,
+                339
+              ],
+              "name": "Phase 2: Hardening (3-6 months)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- [ ] Hard permission enforcement (Deno-style) - [ ] Container-per-skill execution - [ ] AI-based anomaly detection - [ ] Penetration testing program",
+              "lines": [
+                340,
+                348
+              ],
+              "name": "Phase 3: Zero Trust (6-12 months)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            324,
+            348
+          ],
+          "name": "Part 5: Security Roadmap",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "1. **\"How do you prevent data leakage between customers?\"** - Container-per-company isolation - No shared state, separate filesystems - Network segmen",
+              "lines": [
+                351,
+                380
+              ],
+              "name": "Enterprise Security Review Talking Points",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            349,
+            380
+          ],
+          "name": "Part 6: Compliance Positioning",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                385,
+                430
+              ],
+              "name": "7.1 Architecture Overview",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "Extends base OpenClaw Dockerfile with: - SOPS v3.8.1 + age v1.1.1 encryption tools - jq for JSON manipulation - secrets-entrypoint.sh wrapper - Non-ro",
+                  "lines": [
+                    433,
+                    439
+                  ],
+                  "name": "Dockerfile.secrets",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "Production-ready Docker Compose with: - tmpfs mount at `/run/secrets/openclaw` (50MB, mode=0700, uid=1000) - Docker secret for age private key (never",
+                  "lines": [
+                    440,
+                    446
+                  ],
+                  "name": "docker-compose.secure-test.yml",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "Startup/shutdown wrapper that: 1. Validates age key exists 2. Mounts tmpfs (or relies on Docker Compose mount) 3. Decrypts all `.enc` files to tmpfs 4",
+                  "lines": [
+                    447,
+                    457
+                  ],
+                  "name": "secrets-entrypoint.sh",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "SOPS configuration that encrypts only sensitive JSON keys:",
+                  "lines": [
+                    458,
+                    465
+                  ],
+                  "name": ".sops.yaml",
+                  "type": "subsubsection"
+                }
+              ],
+              "lines": [
+                431,
+                465
+              ],
+              "name": "7.2 Components",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Vulnerability | Coverage | Mechanism | |--------------|----------|-----------| | **Exposed credentials (disk)** | \u2705 FIXED | SOPS+age encryption, onl",
+              "lines": [
+                466,
+                476
+              ],
+              "name": "7.3 Vulnerability Coverage",
+              "type": "subsection"
+            },
+            {
+              "docstring": "The secrets layer integrates with OpenClaw's native security features:",
+              "lines": [
+                477,
+                536
+              ],
+              "name": "7.4 Verified OpenClaw Configuration Integration",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                537,
+                561
+              ],
+              "name": "7.5 Deployment Scripts",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- [ ] `secrets/keys/age.key` is NOT in version control - [ ] `.gitignore` includes `*.key`, `age.key`, `*.enc` backup patterns - [ ] All `.json` confi",
+              "lines": [
+                562,
+                577
+              ],
+              "name": "7.6 Security Audit Checklist",
+              "type": "subsection"
+            }
+          ],
+          "docstring": "We have developed a two-layer secrets defense system using SOPS + age encryption combined with runtime tmpfs isolation.",
+          "lines": [
+            381,
+            577
+          ],
+          "name": "Part 7: Secrets Management Layer (Production Implementation)",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "Replace Docker secrets with HashiCorp Vault or AWS KMS:",
+              "lines": [
+                582,
+                605
+              ],
+              "name": "8.1 Per-Company Key Management",
+              "type": "subsection"
+            },
+            {
+              "docstring": "Cron job for periodic rotation:",
+              "lines": [
+                606,
+                613
+              ],
+              "name": "8.2 Automatic Key Rotation",
+              "type": "subsection"
+            },
+            {
+              "docstring": "All decrypt/encrypt operations should be logged:",
+              "lines": [
+                614,
+                628
+              ],
+              "name": "8.3 Audit Logging",
+              "type": "subsection"
+            }
+          ],
+          "docstring": "For the multi-tenant SaaS platform, the secrets layer requires additional considerations:",
+          "lines": [
+            578,
+            628
+          ],
+          "name": "Part 8: Multi-Tenant SaaS Adaptations",
+          "type": "section"
+        },
+        {
+          "lines": [
+            629,
+            649
+          ],
+          "name": "Appendix A: OpenClaw Security Audit Commands",
+          "type": "section"
+        },
+        {
+          "lines": [
+            650,
+            664
+          ],
+          "name": "Appendix B: Recommended Docker Run (Hardened)",
+          "type": "section"
+        },
+        {
+          "docstring": "- [OpenClaw Security Documentation](https://docs.openclaw.ai/gateway/security) - [OpenClaw Sandboxing Guide](https://docs.openclaw.ai/gateway/sandboxi",
+          "lines": [
+            665,
+            676
+          ],
+          "name": "Appendix C: References",
+          "type": "section"
+        },
+        {
+          "docstring": "Location: `projects/ai-transformation/coding/docker-security/`",
+          "lines": [
+            677,
+            702
+          ],
+          "name": "Appendix D: Secrets Layer File Inventory",
+          "type": "section"
+        }
+      ]
+    },
+    "unused-api-endpoints.md": {
+      "hash": "089cd6106c92",
+      "indexed_at": "2026-02-06T11:25:28.508833+00:00",
+      "language": "markdown",
+      "lines": 365,
+      "symbols": [
+        {
+          "docstring": "This document lists API endpoints that exist in the API contract but are **not directly represented** in the current 18 UI screens. These endpoints ar",
+          "lines": [
+            9,
+            23
+          ],
+          "name": "Overview",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**Endpoint:** `PATCH /api/admin/tenants/:id` **Description:** Update tenant configuration (plan, limits, model defaults)",
+              "lines": [
+                26,
+                40
+              ],
+              "name": "Update Tenant Config",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `DELETE /api/admin/tenants/:id` **Description:** Decommission tenant (soft delete with 7-day grace period)",
+              "lines": [
+                41,
+                55
+              ],
+              "name": "Delete Tenant",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `POST /api/admin/tenants/:id/actions/restart` **Description:** Restart tenant's OpenClaw container",
+              "lines": [
+                56,
+                70
+              ],
+              "name": "Restart Tenant Container",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `GET /api/admin/tenants/:id/health` **Description:** Detailed container health metrics with 24h history",
+              "lines": [
+                71,
+                85
+              ],
+              "name": "Get Tenant Container Health (Historical)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `GET /api/admin/tenants/:id/agents` **Description:** List all agents within a tenant",
+              "lines": [
+                86,
+                99
+              ],
+              "name": "Get Tenant Agents",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            24,
+            99
+          ],
+          "name": "1. Platform Admin - Tenant Management",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**Endpoint:** `POST /api/admin/skills/review/:id/reject` **Description:** Reject skill submission with feedback",
+              "lines": [
+                102,
+                116
+              ],
+              "name": "Reject Skill",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `GET /api/admin/skills` **Description:** All published skills with admin metrics",
+              "lines": [
+                117,
+                131
+              ],
+              "name": "List Published Skills (Admin View)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            100,
+            131
+          ],
+          "name": "2. Platform Admin - Skills",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**Endpoint:** `PATCH /api/dashboard/agents/:id` **Description:** Update agent configuration (model tier, thinking mode, tool policy)",
+              "lines": [
+                134,
+                147
+              ],
+              "name": "Update Agent",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `DELETE /api/dashboard/agents/:id` **Description:** Remove agent",
+              "lines": [
+                148,
+                162
+              ],
+              "name": "Delete Agent",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `POST /api/dashboard/agents/:id/actions/restart` **Description:** Restart agent process",
+              "lines": [
+                163,
+                174
+              ],
+              "name": "Restart Agent",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `POST /api/dashboard/agents/:id/actions/pause` **Description:** Pause agent (stop processing messages)",
+              "lines": [
+                175,
+                189
+              ],
+              "name": "Pause Agent",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `POST /api/dashboard/agents/:id/actions/resume` **Description:** Resume paused agent",
+              "lines": [
+                190,
+                202
+              ],
+              "name": "Resume Agent",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `GET /api/dashboard/agents/:id/activity` **Description:** Paginated activity log for specific agent",
+              "lines": [
+                203,
+                216
+              ],
+              "name": "Get Agent Activity Feed",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `GET /api/dashboard/agents/:id/logs` **Description:** Agent logs with filtering (debug, info, warn, error)",
+              "lines": [
+                217,
+                230
+              ],
+              "name": "Get Agent Logs",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            132,
+            230
+          ],
+          "name": "3. Tenant - Agents",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**Endpoint:** `DELETE /api/dashboard/skills/:id/uninstall?agentId=...` **Description:** Remove skill from agent",
+              "lines": [
+                233,
+                247
+              ],
+              "name": "Uninstall Skill",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `GET /api/dashboard/skills/installed` **Description:** List all skills installed for tenant",
+              "lines": [
+                248,
+                262
+              ],
+              "name": "Get Installed Skills",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            231,
+            262
+          ],
+          "name": "4. Tenant - Skills",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**Endpoint:** `DELETE /api/dashboard/team/:id` **Description:** Remove team member",
+              "lines": [
+                265,
+                278
+              ],
+              "name": "Remove Team Member",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Endpoint:** `PATCH /api/dashboard/team/:id` **Description:** Change member role (tenant_admin \u2194 tenant_member)",
+              "lines": [
+                279,
+                293
+              ],
+              "name": "Update Member Role",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            263,
+            293
+          ],
+          "name": "5. Tenant - Team Management",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**Endpoint:** `GET /api/dashboard/audit/export?format=csv|json` **Description:** Export audit log as CSV or JSON",
+              "lines": [
+                296,
+                310
+              ],
+              "name": "Export Audit Log",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            294,
+            310
+          ],
+          "name": "6. Tenant - Audit",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**Connection:** `wss://api.aegis.ai/ws` **Events:** `agent.status.changed`, `container.health.changed`, `provisioning.progress`",
+              "lines": [
+                313,
+                329
+              ],
+              "name": "Subscribe to Events",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            311,
+            329
+          ],
+          "name": "7. WebSocket Events",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "1. Restart Tenant Container - troubleshooting 2. Reject Skill - core review workflow 3. Update Agent Config - core agent management 4. WebSocket Integ",
+              "lines": [
+                332,
+                337
+              ],
+              "name": "\ud83d\udd34 High Priority (Add to Sprint 1)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "5. Update Tenant Config - plan upgrades 6. Delete Tenant - lifecycle management 7. Delete Agent - lifecycle management 8. Pause/Resume Agent - tempora",
+              "lines": [
+                338,
+                346
+              ],
+              "name": "\ud83d\udfe1 Medium Priority (Add to Backlog)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "12. List Published Skills (Admin) - analytics 13. Get Installed Skills - analytics 14. Various \"partially used\" endpoints - verify implementation",
+              "lines": [
+                347,
+                353
+              ],
+              "name": "\ud83d\udfe2 Low Priority (Future Enhancement)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            330,
+            353
+          ],
+          "name": "Summary by Priority",
+          "type": "section"
+        },
+        {
+          "docstring": "1. **Verify** endpoints marked as \"\u26a0\ufe0f Partially used\" are actually in use 2. **Add UI controls** for high-priority missing endpoints 3. **Implement We",
+          "lines": [
+            354,
+            366
+          ],
+          "name": "Action Items",
+          "type": "section"
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-02-06T11:35:32.330318+00:00",
+  "version": "1.0"
+}

@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tenants - Aegis Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            aegis: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+
+    /* Smooth transitions */
+    .nav-item { transition: all 0.15s ease; }
+
+    /* Pulse animation for notification dot */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.15); }
+    }
+    .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+    /* Health dot glow */
+    .health-green { box-shadow: 0 0 6px 1px rgba(34, 197, 94, 0.4); }
+    .health-yellow { box-shadow: 0 0 6px 1px rgba(234, 179, 8, 0.4); }
+    .health-red { box-shadow: 0 0 6px 1px rgba(239, 68, 68, 0.4); }
+
+    /* Sidebar transition for mobile */
+    .sidebar-overlay { transition: opacity 0.3s ease; }
+    .sidebar-panel { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    /* Spinner animation for provisioning state */
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spin-slow { animation: spin-slow 1.5s linear infinite; }
+
+    /* Table row hover */
+    .table-row-hover { transition: background-color 0.1s ease; }
+    .table-row-hover:hover { background-color: #eef2ff; }
+    .table-row-hover:hover td { cursor: pointer; }
+
+    /* Dropdown animation */
+    .action-menu {
+      transform: translateY(-4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .action-menu.open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Sort header hover */
+    .sort-header:hover { background-color: #f1f5f9; }
+    .sort-header { transition: background-color 0.1s ease; cursor: pointer; user-select: none; }
+
+    /* Filter dropdown */
+    .filter-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.25em 1.25em;
+      padding-right: 2.25rem;
+    }
+
+    /* Table container scroll */
+    .table-scroll::-webkit-scrollbar { height: 6px; }
+    .table-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+    .table-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .table-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="h-full bg-[#f8fafc] font-sans text-gray-900 antialiased">
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside id="sidebar" class="fixed left-0 top-0 h-full bg-white border-r border-gray-200 flex flex-col transition-all duration-300 z-30" style="width: 256px">
+    <!-- Logo -->
+    <div class="flex items-center gap-3 px-5 py-5 border-b border-gray-100">
+      <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center flex-shrink-0">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      </div>
+      <span class="sidebar-label font-bold text-gray-900 text-lg tracking-tight">Aegis Admin</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <!-- OVERVIEW section -->
+      <div>
+        <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Overview</p>
+        <a href="/admin" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="sidebar-label">Dashboard</span>
+        </a>
+        <a href="/admin/tenants" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-indigo-50 text-indigo-600 font-semibold">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18"/><path d="M6 12H4a2 2 0 00-2 2v6a2 2 0 002 2h2"/><path d="M18 9h2a2 2 0 012 2v9a2 2 0 01-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+          <span class="sidebar-label">Tenants</span>
+        </a>
+        <a href="/admin/health" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span class="sidebar-label">System Health</span>
+        </a>
+      </div>
+
+      <!-- MARKETPLACE section -->
+      <div>
+        <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Marketplace</p>
+        <a href="/admin/skills/review" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M16 16l2 2 4-4"/><path d="M21 10V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l2-1.14"/><path d="M16.5 9.4L7.55 4.24"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+          <span class="sidebar-label">Skill Review</span>
+          <span class="sidebar-label ml-auto bg-amber-100 text-amber-700 text-xs font-semibold px-2 py-0.5 rounded-full">5</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Footer: Collapse toggle + User -->
+    <div class="border-t border-gray-100 px-3 py-3 space-y-2">
+      <button onclick="toggleSidebar()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 w-full">
+        <svg id="collapse-icon" class="w-5 h-5 flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+        <span class="sidebar-label">Collapse</span>
+      </button>
+      <div class="flex items-center gap-3 px-3 py-2">
+        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+          <span class="text-sm font-semibold text-indigo-600">SA</span>
+        </div>
+        <div class="sidebar-label">
+          <p class="text-sm font-medium text-gray-900">Super Admin</p>
+          <p class="text-xs text-gray-500">admin@aegis.io</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <div id="main-content" class="flex-1 flex flex-col min-w-0 overflow-hidden" style="margin-left: 256px">
+
+      <!-- Header bar -->
+      <header class="flex items-center justify-between h-16 px-6 lg:px-8 border-b border-gray-200/80 bg-white/70 backdrop-blur-sm shrink-0">
+        <div class="flex items-center gap-4">
+          <!-- Mobile hamburger -->
+          <button onclick="toggleSidebar()" class="lg:hidden -ml-1 p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+            </svg>
+          </button>
+          <div>
+            <div class="flex items-center gap-2.5">
+              <h1 class="text-lg font-semibold text-gray-900 tracking-tight">Tenants</h1>
+              <span class="inline-flex items-center justify-center px-2 py-0.5 text-[11px] font-bold font-mono bg-aegis-50 text-aegis-600 rounded-full border border-aegis-200/60">47</span>
+            </div>
+            <p class="text-[12px] text-gray-400 font-medium mt-0.5">Manage all platform tenants and their containers</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <!-- Refresh button -->
+          <button onclick="refreshTable()" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+            <svg id="refreshIcon" class="w-3.5 h-3.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/>
+            </svg>
+            Refresh
+          </button>
+          <!-- Provision Tenant Button -->
+          <button onclick="showProvisionModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-aegis-500 hover:bg-aegis-600 text-white text-[13px] font-semibold rounded-lg shadow-sm shadow-aegis-500/25 hover:shadow-aegis-600/30 transition-all active:scale-[0.98]">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+            </svg>
+            <span class="hidden sm:inline">Provision Tenant</span>
+            <span class="sm:hidden">New</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable main area -->
+      <main class="flex-1 overflow-y-auto">
+        <div class="px-6 lg:px-8 py-6 max-w-[1440px]">
+
+          <!-- ==================== SEARCH & FILTERS ==================== -->
+          <div class="bg-white rounded-xl border border-gray-200/60 p-4 mb-5">
+            <div class="flex flex-col lg:flex-row lg:items-center gap-3">
+              <!-- Search bar -->
+              <div class="relative flex-1 min-w-[240px]">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                </svg>
+                <input
+                  id="searchInput"
+                  type="text"
+                  placeholder="Search tenants by name, ID, or plan..."
+                  class="w-full pl-10 pr-4 py-2 text-[13px] bg-gray-50 border border-gray-200 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-400 transition-colors"
+                  oninput="filterTable()"
+                />
+              </div>
+
+              <!-- Filter dropdowns -->
+              <div class="flex flex-wrap items-center gap-2">
+                <!-- Status filter -->
+                <select id="filterStatus" onchange="filterTable()" class="filter-select text-[13px] font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-400 transition-colors">
+                  <option value="">Status: All</option>
+                  <option value="active">Active</option>
+                  <option value="provisioning">Provisioning</option>
+                  <option value="suspended">Suspended</option>
+                </select>
+
+                <!-- Plan filter -->
+                <select id="filterPlan" onchange="filterTable()" class="filter-select text-[13px] font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-400 transition-colors">
+                  <option value="">Plan: All</option>
+                  <option value="starter">Starter</option>
+                  <option value="pro">Pro</option>
+                  <option value="enterprise">Enterprise</option>
+                </select>
+
+                <!-- Health filter -->
+                <select id="filterHealth" onchange="filterTable()" class="filter-select text-[13px] font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-400 transition-colors">
+                  <option value="">Health: All</option>
+                  <option value="healthy">Healthy</option>
+                  <option value="degraded">Degraded</option>
+                  <option value="down">Down</option>
+                </select>
+
+                <!-- Clear filters -->
+                <button id="clearFiltersBtn" onclick="clearFilters()" class="hidden items-center gap-1 px-2.5 py-2 text-[12px] font-medium text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                  Clear
+                </button>
+              </div>
+            </div>
+
+            <!-- Active filter pills -->
+            <div id="activeFilters" class="hidden flex-wrap items-center gap-2 mt-3 pt-3 border-t border-gray-100"></div>
+          </div>
+
+          <!-- ==================== DATA TABLE ==================== -->
+          <div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+            <div class="table-scroll overflow-x-auto">
+              <table class="w-full min-w-[960px]">
+                <thead>
+                  <tr class="border-b border-gray-100">
+                    <th class="sort-header text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider" onclick="sortTable('company')" data-sort="company">
+                      <div class="flex items-center gap-1.5">
+                        Company Name
+                        <span class="sort-arrows flex flex-col leading-none" data-col="company">
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-asc" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0L5 0Z"/></svg>
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-desc -mt-0.5" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0H10L5 6Z"/></svg>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="sort-header text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider" onclick="sortTable('tenantId')" data-sort="tenantId">
+                      <div class="flex items-center gap-1.5">
+                        Tenant ID
+                        <span class="sort-arrows flex flex-col leading-none" data-col="tenantId">
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-asc" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0L5 0Z"/></svg>
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-desc -mt-0.5" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0H10L5 6Z"/></svg>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="sort-header text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider" onclick="sortTable('plan')" data-sort="plan">
+                      <div class="flex items-center gap-1.5">
+                        Plan
+                        <span class="sort-arrows flex flex-col leading-none" data-col="plan">
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-asc" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0L5 0Z"/></svg>
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-desc -mt-0.5" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0H10L5 6Z"/></svg>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="sort-header text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider" onclick="sortTable('status')" data-sort="status">
+                      <div class="flex items-center gap-1.5">
+                        Status
+                        <span class="sort-arrows flex flex-col leading-none" data-col="status">
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-asc" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0L5 0Z"/></svg>
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-desc -mt-0.5" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0H10L5 6Z"/></svg>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="sort-header text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider" onclick="sortTable('health')" data-sort="health">
+                      <div class="flex items-center gap-1.5">
+                        Health
+                        <span class="sort-arrows flex flex-col leading-none" data-col="health">
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-asc" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0L5 0Z"/></svg>
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-desc -mt-0.5" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0H10L5 6Z"/></svg>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="sort-header text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider" onclick="sortTable('agents')" data-sort="agents">
+                      <div class="flex items-center gap-1.5">
+                        Agents
+                        <span class="sort-arrows flex flex-col leading-none" data-col="agents">
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-asc" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0L5 0Z"/></svg>
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-desc -mt-0.5" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0H10L5 6Z"/></svg>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="sort-header text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider" onclick="sortTable('created')" data-sort="created">
+                      <div class="flex items-center gap-1.5">
+                        Created
+                        <span class="sort-arrows flex flex-col leading-none" data-col="created">
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-asc" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0L5 0Z"/></svg>
+                          <svg class="w-2.5 h-2.5 text-gray-300 sort-desc -mt-0.5" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0H10L5 6Z"/></svg>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider w-[60px]">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="tenantTableBody">
+                  <!-- Rows rendered by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex flex-col sm:flex-row items-center justify-between px-4 py-3 border-t border-gray-100 gap-3">
+              <p class="text-[13px] text-gray-500">
+                Showing <span id="showingStart" class="font-semibold text-gray-700">1</span>-<span id="showingEnd" class="font-semibold text-gray-700">10</span> of <span id="showingTotal" class="font-semibold text-gray-700">47</span> tenants
+              </p>
+              <div class="flex items-center gap-1">
+                <button id="prevPageBtn" onclick="prevPage()" disabled class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
+                  </svg>
+                </button>
+                <div id="pageButtons" class="flex items-center gap-1">
+                  <!-- Page buttons rendered by JavaScript -->
+                </div>
+                <button id="nextPageBtn" onclick="nextPage()" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+
+  <!-- ==================== PROVISION TENANT MODAL ==================== -->
+  <div id="provisionModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-200" id="provisionModalContent">
+      <div class="flex items-center justify-between px-6 pt-5 pb-0">
+        <h3 class="text-base font-semibold text-gray-900">Provision New Tenant</h3>
+        <button onclick="closeProvisionModal()" class="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="px-6 py-5 space-y-4">
+        <div>
+          <label class="block text-[12px] font-medium text-gray-500 mb-1.5">Company Name</label>
+          <input type="text" placeholder="Enter company name" class="w-full px-3 py-2 text-[13px] border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-400"/>
+        </div>
+        <div>
+          <label class="block text-[12px] font-medium text-gray-500 mb-1.5">Plan</label>
+          <select class="filter-select w-full px-3 py-2 text-[13px] border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-400">
+            <option>Starter</option>
+            <option>Pro</option>
+            <option>Enterprise</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[12px] font-medium text-gray-500 mb-1.5">Admin Email</label>
+          <input type="email" placeholder="admin@company.com" class="w-full px-3 py-2 text-[13px] border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-aegis-500/20 focus:border-aegis-400"/>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2 px-6 pb-5">
+        <button onclick="closeProvisionModal()" class="px-4 py-2 text-[13px] font-medium text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100 transition-colors">Cancel</button>
+        <button onclick="closeProvisionModal()" class="px-4 py-2 bg-aegis-500 hover:bg-aegis-600 text-white text-[13px] font-semibold rounded-lg shadow-sm shadow-aegis-500/25 transition-all active:scale-[0.98]">Provision</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    // ----- Tenant Data -----
+    const allTenants = [
+      { company: 'Breadfast', tenantId: 'TEN-001', plan: 'enterprise', status: 'active', health: 'healthy', agents: 8, created: '2026-01-15', region: 'ME-1' },
+      { company: 'Acme Corp', tenantId: 'TEN-002', plan: 'pro', status: 'active', health: 'healthy', agents: 5, created: '2026-01-12', region: 'US-E1' },
+      { company: 'NexaTech', tenantId: 'TEN-003', plan: 'pro', status: 'active', health: 'degraded', agents: 6, created: '2026-01-10', region: 'EU-W1' },
+      { company: 'Vertex AI Labs', tenantId: 'TEN-004', plan: 'enterprise', status: 'active', health: 'down', agents: 12, created: '2025-12-28', region: 'US-W1' },
+      { company: 'Spark Digital', tenantId: 'TEN-005', plan: 'starter', status: 'active', health: 'healthy', agents: 2, created: '2026-01-22', region: 'AP-1' },
+      { company: 'Orbitron Bio', tenantId: 'TEN-006', plan: 'pro', status: 'suspended', health: 'down', agents: 0, created: '2025-11-30', region: 'EU-C1' },
+      { company: 'CloudLift', tenantId: 'TEN-007', plan: 'starter', status: 'provisioning', health: null, agents: 0, created: '2026-02-04', region: 'US-E1' },
+      { company: 'Helix Dynamics', tenantId: 'TEN-008', plan: 'enterprise', status: 'active', health: 'healthy', agents: 15, created: '2025-10-05', region: 'US-W1' },
+      { company: 'Quantum Retail', tenantId: 'TEN-009', plan: 'pro', status: 'active', health: 'healthy', agents: 4, created: '2026-01-18', region: 'AP-2' },
+      { company: 'Atlas Fintech', tenantId: 'TEN-010', plan: 'enterprise', status: 'active', health: 'degraded', agents: 10, created: '2025-12-15', region: 'EU-W1' },
+      { company: 'Nimbus Health', tenantId: 'TEN-011', plan: 'pro', status: 'active', health: 'healthy', agents: 3, created: '2026-01-25', region: 'US-E1' },
+      { company: 'Pinnacle Media', tenantId: 'TEN-012', plan: 'starter', status: 'active', health: 'healthy', agents: 1, created: '2026-01-30', region: 'EU-W1' },
+      { company: 'Ironclad Security', tenantId: 'TEN-013', plan: 'enterprise', status: 'active', health: 'healthy', agents: 9, created: '2025-11-20', region: 'US-W1' },
+      { company: 'Vortex Logistics', tenantId: 'TEN-014', plan: 'pro', status: 'active', health: 'degraded', agents: 7, created: '2025-12-22', region: 'AP-1' },
+      { company: 'Synapse AI', tenantId: 'TEN-015', plan: 'enterprise', status: 'active', health: 'healthy', agents: 11, created: '2025-11-08', region: 'US-E1' },
+      { company: 'Prism Analytics', tenantId: 'TEN-016', plan: 'pro', status: 'suspended', health: 'down', agents: 0, created: '2025-10-15', region: 'EU-C1' },
+      { company: 'Evergreen Edu', tenantId: 'TEN-017', plan: 'starter', status: 'active', health: 'healthy', agents: 2, created: '2026-02-01', region: 'US-E1' },
+      { company: 'Cobalt Systems', tenantId: 'TEN-018', plan: 'pro', status: 'active', health: 'healthy', agents: 5, created: '2026-01-05', region: 'AP-2' },
+      { company: 'Zenith Pharma', tenantId: 'TEN-019', plan: 'enterprise', status: 'active', health: 'healthy', agents: 13, created: '2025-09-22', region: 'EU-W1' },
+      { company: 'Rubicon Corp', tenantId: 'TEN-020', plan: 'pro', status: 'provisioning', health: null, agents: 0, created: '2026-02-05', region: 'US-W1' },
+      // Extended data for pagination demo
+      { company: 'Meridian Labs', tenantId: 'TEN-021', plan: 'starter', status: 'active', health: 'healthy', agents: 1, created: '2026-01-28', region: 'US-E1' },
+      { company: 'Catalyst Ventures', tenantId: 'TEN-022', plan: 'pro', status: 'active', health: 'healthy', agents: 4, created: '2026-01-08', region: 'EU-W1' },
+      { company: 'Nova Dynamics', tenantId: 'TEN-023', plan: 'enterprise', status: 'active', health: 'healthy', agents: 7, created: '2025-12-10', region: 'AP-1' },
+      { company: 'Stratos Cloud', tenantId: 'TEN-024', plan: 'pro', status: 'active', health: 'degraded', agents: 6, created: '2025-11-15', region: 'US-W1' },
+      { company: 'Ember Tech', tenantId: 'TEN-025', plan: 'starter', status: 'active', health: 'healthy', agents: 2, created: '2026-01-20', region: 'EU-C1' },
+      { company: 'Polaris Group', tenantId: 'TEN-026', plan: 'enterprise', status: 'active', health: 'healthy', agents: 14, created: '2025-10-01', region: 'US-E1' },
+      { company: 'Luminary AI', tenantId: 'TEN-027', plan: 'pro', status: 'active', health: 'healthy', agents: 5, created: '2026-01-03', region: 'AP-2' },
+      { company: 'Apex Robotics', tenantId: 'TEN-028', plan: 'enterprise', status: 'active', health: 'healthy', agents: 9, created: '2025-11-25', region: 'US-W1' },
+      { company: 'Glacier Data', tenantId: 'TEN-029', plan: 'pro', status: 'active', health: 'healthy', agents: 3, created: '2025-12-18', region: 'EU-W1' },
+      { company: 'Solstice Energy', tenantId: 'TEN-030', plan: 'starter', status: 'active', health: 'healthy', agents: 1, created: '2026-02-02', region: 'ME-1' },
+      { company: 'Titan Defense', tenantId: 'TEN-031', plan: 'enterprise', status: 'active', health: 'healthy', agents: 16, created: '2025-09-10', region: 'US-E1' },
+      { company: 'Vivid Media', tenantId: 'TEN-032', plan: 'pro', status: 'active', health: 'healthy', agents: 4, created: '2025-12-05', region: 'AP-1' },
+      { company: 'Oasis Health', tenantId: 'TEN-033', plan: 'pro', status: 'active', health: 'healthy', agents: 6, created: '2025-11-12', region: 'EU-C1' },
+      { company: 'Forge Industries', tenantId: 'TEN-034', plan: 'enterprise', status: 'active', health: 'healthy', agents: 8, created: '2025-10-20', region: 'US-W1' },
+      { company: 'Cirrus Networks', tenantId: 'TEN-035', plan: 'starter', status: 'active', health: 'healthy', agents: 2, created: '2026-01-15', region: 'EU-W1' },
+      { company: 'Horizon Logistics', tenantId: 'TEN-036', plan: 'pro', status: 'active', health: 'healthy', agents: 5, created: '2025-12-28', region: 'AP-2' },
+      { company: 'Radiant Solar', tenantId: 'TEN-037', plan: 'starter', status: 'active', health: 'healthy', agents: 1, created: '2026-01-22', region: 'ME-1' },
+      { company: 'Echo Systems', tenantId: 'TEN-038', plan: 'pro', status: 'active', health: 'healthy', agents: 4, created: '2025-11-28', region: 'US-E1' },
+      { company: 'Summit Finance', tenantId: 'TEN-039', plan: 'enterprise', status: 'active', health: 'healthy', agents: 10, created: '2025-10-12', region: 'EU-W1' },
+      { company: 'Blaze Marketing', tenantId: 'TEN-040', plan: 'pro', status: 'active', health: 'healthy', agents: 3, created: '2025-12-15', region: 'US-W1' },
+      { company: 'Aurora Biotech', tenantId: 'TEN-041', plan: 'enterprise', status: 'active', health: 'healthy', agents: 11, created: '2025-09-18', region: 'AP-1' },
+      { company: 'Pulse Digital', tenantId: 'TEN-042', plan: 'starter', status: 'active', health: 'healthy', agents: 2, created: '2026-01-10', region: 'EU-C1' },
+      { company: 'Nexus Corp', tenantId: 'TEN-043', plan: 'pro', status: 'active', health: 'healthy', agents: 5, created: '2025-11-05', region: 'US-E1' },
+      { company: 'Crest Ventures', tenantId: 'TEN-044', plan: 'pro', status: 'active', health: 'healthy', agents: 4, created: '2025-12-20', region: 'AP-2' },
+      { company: 'Matrix Solutions', tenantId: 'TEN-045', plan: 'enterprise', status: 'active', health: 'healthy', agents: 7, created: '2025-10-25', region: 'EU-W1' },
+      { company: 'Swift Logistics', tenantId: 'TEN-046', plan: 'starter', status: 'active', health: 'healthy', agents: 1, created: '2026-02-03', region: 'US-W1' },
+      { company: 'Onyx Data', tenantId: 'TEN-047', plan: 'pro', status: 'active', health: 'healthy', agents: 6, created: '2025-11-18', region: 'ME-1' },
+    ];
+
+    // ----- State -----
+    let filteredTenants = [...allTenants];
+    let currentPage = 1;
+    const pageSize = 10;
+    let sortCol = null;
+    let sortDir = 'asc';
+    let openMenuId = null;
+
+    // ----- Rendering Helpers -----
+    function formatDate(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function getPlanBadge(plan) {
+      const styles = {
+        enterprise: 'bg-aegis-50 text-aegis-700 border-aegis-200/60',
+        pro: 'bg-violet-50 text-violet-700 border-violet-200/60',
+        starter: 'bg-gray-100 text-gray-600 border-gray-200/60',
+      };
+      return `<span class="inline-flex items-center px-2 py-0.5 text-[11px] font-semibold rounded-md border ${styles[plan]}">${plan.charAt(0).toUpperCase() + plan.slice(1)}</span>`;
+    }
+
+    function getStatusBadge(status) {
+      const styles = {
+        active: 'bg-emerald-50 text-emerald-700 border-emerald-200/60',
+        suspended: 'bg-red-50 text-red-700 border-red-200/60',
+        provisioning: 'bg-blue-50 text-blue-700 border-blue-200/60',
+      };
+      const label = status.charAt(0).toUpperCase() + status.slice(1);
+      if (status === 'provisioning') {
+        return `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-semibold rounded-md border ${styles[status]}">
+          <svg class="w-3 h-3 spin-slow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+          ${label}
+        </span>`;
+      }
+      return `<span class="inline-flex items-center px-2 py-0.5 text-[11px] font-semibold rounded-md border ${styles[status]}">${label}</span>`;
+    }
+
+    function getHealthCell(health) {
+      if (health === null) {
+        return '<span class="text-[12px] text-gray-400 font-medium">N/A</span>';
+      }
+      const dotStyles = {
+        healthy: 'bg-emerald-500 health-green',
+        degraded: 'bg-yellow-500 health-yellow',
+        down: 'bg-red-500 health-red',
+      };
+      const textStyles = {
+        healthy: 'text-emerald-700',
+        degraded: 'text-yellow-700',
+        down: 'text-red-700',
+      };
+      const label = health.charAt(0).toUpperCase() + health.slice(1);
+      return `<div class="flex items-center gap-2">
+        <span class="relative flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full rounded-full ${dotStyles[health]} opacity-60"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 ${dotStyles[health]}"></span>
+        </span>
+        <span class="text-[12px] font-medium ${textStyles[health]}">${label}</span>
+      </div>`;
+    }
+
+    function getAgentCount(agents, status) {
+      if (status === 'provisioning') {
+        return '<span class="text-[12px] text-gray-400 font-mono">--</span>';
+      }
+      if (agents === 0) {
+        return '<span class="text-[12px] text-gray-400 font-mono">0</span>';
+      }
+      return `<span class="text-[13px] font-semibold text-gray-700 font-mono">${agents}</span>`;
+    }
+
+    function getActionsButton(tenantId, status) {
+      return `<div class="relative">
+        <button onclick="event.stopPropagation(); toggleActionMenu('${tenantId}')" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/>
+          </svg>
+        </button>
+        <div id="menu-${tenantId}" class="action-menu absolute right-0 top-full mt-1 w-44 bg-white rounded-lg shadow-lg border border-gray-200/80 py-1 z-30">
+          <button onclick="event.stopPropagation(); actionClick('view', '${tenantId}')" class="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-50 transition-colors">
+            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            View Details
+          </button>
+          <button onclick="event.stopPropagation(); actionClick('edit', '${tenantId}')" class="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-50 transition-colors">
+            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+            Edit Tenant
+          </button>
+          <div class="my-1 border-t border-gray-100"></div>
+          <button onclick="event.stopPropagation(); actionClick('restart', '${tenantId}')" class="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-50 transition-colors">
+            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+            Restart Container
+          </button>
+          ${status === 'suspended'
+            ? `<button onclick="event.stopPropagation(); actionClick('activate', '${tenantId}')" class="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-emerald-700 hover:bg-emerald-50 transition-colors">
+                <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg>
+                Reactivate
+              </button>`
+            : `<button onclick="event.stopPropagation(); actionClick('suspend', '${tenantId}')" class="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-red-600 hover:bg-red-50 transition-colors">
+                <svg class="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                Suspend
+              </button>`
+          }
+        </div>
+      </div>`;
+    }
+
+    // ----- Render Table -----
+    function renderTable() {
+      const tbody = document.getElementById('tenantTableBody');
+      const start = (currentPage - 1) * pageSize;
+      const end = Math.min(start + pageSize, filteredTenants.length);
+      const pageData = filteredTenants.slice(start, end);
+
+      if (pageData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="text-center py-16">
+              <div class="flex flex-col items-center gap-3">
+                <svg class="w-12 h-12 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                </svg>
+                <p class="text-[14px] font-medium text-gray-400">No tenants found</p>
+                <p class="text-[12px] text-gray-400">Try adjusting your search or filter criteria</p>
+              </div>
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = pageData.map((t, i) => `
+          <tr class="table-row-hover border-b border-gray-50 ${i % 2 === 1 ? 'bg-gray-50/30' : ''}" onclick="navigateToTenant('${t.tenantId}')">
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-aegis-100 to-aegis-200 flex items-center justify-center text-[11px] font-bold text-aegis-700 shrink-0">
+                  ${t.company.split(' ').map(w => w[0]).slice(0, 2).join('')}
+                </div>
+                <div>
+                  <p class="text-[13px] font-semibold text-gray-900 leading-tight">${t.company}</p>
+                  <p class="text-[11px] text-gray-400 font-mono mt-0.5">${t.region}</p>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-3">
+              <span class="text-[12px] font-mono font-medium text-gray-600">${t.tenantId}</span>
+            </td>
+            <td class="px-4 py-3">${getPlanBadge(t.plan)}</td>
+            <td class="px-4 py-3">${getStatusBadge(t.status)}</td>
+            <td class="px-4 py-3">${getHealthCell(t.health)}</td>
+            <td class="px-4 py-3">${getAgentCount(t.agents, t.status)}</td>
+            <td class="px-4 py-3">
+              <span class="text-[12px] font-mono text-gray-500">${formatDate(t.created)}</span>
+            </td>
+            <td class="px-4 py-3">${getActionsButton(t.tenantId, t.status)}</td>
+          </tr>
+        `).join('');
+      }
+
+      // Update pagination info
+      document.getElementById('showingStart').textContent = filteredTenants.length === 0 ? 0 : start + 1;
+      document.getElementById('showingEnd').textContent = end;
+      document.getElementById('showingTotal').textContent = filteredTenants.length;
+
+      renderPageButtons();
+    }
+
+    // ----- Pagination -----
+    function renderPageButtons() {
+      const totalPages = Math.ceil(filteredTenants.length / pageSize);
+      const container = document.getElementById('pageButtons');
+      const prevBtn = document.getElementById('prevPageBtn');
+      const nextBtn = document.getElementById('nextPageBtn');
+
+      prevBtn.disabled = currentPage <= 1;
+      nextBtn.disabled = currentPage >= totalPages;
+
+      let buttons = [];
+      const maxVisible = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+      if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+      }
+
+      if (startPage > 1) {
+        buttons.push(pageButton(1));
+        if (startPage > 2) buttons.push('<span class="px-1 text-[12px] text-gray-400">...</span>');
+      }
+      for (let i = startPage; i <= endPage; i++) {
+        buttons.push(pageButton(i));
+      }
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) buttons.push('<span class="px-1 text-[12px] text-gray-400">...</span>');
+        buttons.push(pageButton(totalPages));
+      }
+
+      container.innerHTML = buttons.join('');
+    }
+
+    function pageButton(num) {
+      const active = num === currentPage;
+      return `<button onclick="goToPage(${num})" class="w-8 h-8 flex items-center justify-center text-[13px] font-medium rounded-lg transition-colors ${
+        active
+          ? 'bg-aegis-500 text-white shadow-sm shadow-aegis-500/25'
+          : 'text-gray-600 hover:bg-gray-100'
+      }">${num}</button>`;
+    }
+
+    function goToPage(num) {
+      currentPage = num;
+      closeAllMenus();
+      renderTable();
+      // Scroll table into view on page change
+      document.querySelector('.table-scroll')?.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function prevPage() {
+      if (currentPage > 1) goToPage(currentPage - 1);
+    }
+
+    function nextPage() {
+      const totalPages = Math.ceil(filteredTenants.length / pageSize);
+      if (currentPage < totalPages) goToPage(currentPage + 1);
+    }
+
+    // ----- Sorting -----
+    function sortTable(col) {
+      if (sortCol === col) {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortCol = col;
+        sortDir = 'asc';
+      }
+
+      // Update sort arrow visuals
+      document.querySelectorAll('.sort-arrows').forEach(el => {
+        el.querySelector('.sort-asc').style.color = '#d1d5db';
+        el.querySelector('.sort-desc').style.color = '#d1d5db';
+      });
+      const activeArrows = document.querySelector(`.sort-arrows[data-col="${col}"]`);
+      if (activeArrows) {
+        if (sortDir === 'asc') {
+          activeArrows.querySelector('.sort-asc').style.color = '#6366f1';
+        } else {
+          activeArrows.querySelector('.sort-desc').style.color = '#6366f1';
+        }
+      }
+
+      filteredTenants.sort((a, b) => {
+        let aVal = a[col];
+        let bVal = b[col];
+
+        // Handle null health
+        if (aVal === null) aVal = '';
+        if (bVal === null) bVal = '';
+
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+        }
+        aVal = String(aVal).toLowerCase();
+        bVal = String(bVal).toLowerCase();
+        if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    // ----- Filtering -----
+    function filterTable() {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const statusFilter = document.getElementById('filterStatus').value;
+      const planFilter = document.getElementById('filterPlan').value;
+      const healthFilter = document.getElementById('filterHealth').value;
+
+      filteredTenants = allTenants.filter(t => {
+        // Search match
+        if (search) {
+          const searchFields = [t.company, t.tenantId, t.plan, t.region].join(' ').toLowerCase();
+          if (!searchFields.includes(search)) return false;
+        }
+        // Status match
+        if (statusFilter && t.status !== statusFilter) return false;
+        // Plan match
+        if (planFilter && t.plan !== planFilter) return false;
+        // Health match
+        if (healthFilter) {
+          if (t.health === null) return false;
+          if (t.health !== healthFilter) return false;
+        }
+        return true;
+      });
+
+      // Re-apply sort if active
+      if (sortCol) {
+        filteredTenants.sort((a, b) => {
+          let aVal = a[sortCol];
+          let bVal = b[sortCol];
+          if (aVal === null) aVal = '';
+          if (bVal === null) bVal = '';
+          if (typeof aVal === 'number' && typeof bVal === 'number') {
+            return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+          }
+          aVal = String(aVal).toLowerCase();
+          bVal = String(bVal).toLowerCase();
+          if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+          if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+          return 0;
+        });
+      }
+
+      currentPage = 1;
+      updateClearFiltersBtn();
+      updateActiveFilterPills();
+      renderTable();
+    }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterPlan').value = '';
+      document.getElementById('filterHealth').value = '';
+      filterTable();
+    }
+
+    function updateClearFiltersBtn() {
+      const search = document.getElementById('searchInput').value;
+      const status = document.getElementById('filterStatus').value;
+      const plan = document.getElementById('filterPlan').value;
+      const health = document.getElementById('filterHealth').value;
+      const btn = document.getElementById('clearFiltersBtn');
+      if (search || status || plan || health) {
+        btn.classList.remove('hidden');
+        btn.classList.add('inline-flex');
+      } else {
+        btn.classList.add('hidden');
+        btn.classList.remove('inline-flex');
+      }
+    }
+
+    function updateActiveFilterPills() {
+      const container = document.getElementById('activeFilters');
+      const search = document.getElementById('searchInput').value.trim();
+      const status = document.getElementById('filterStatus').value;
+      const plan = document.getElementById('filterPlan').value;
+      const health = document.getElementById('filterHealth').value;
+
+      const pills = [];
+      if (search) pills.push({ label: `Search: "${search}"`, clear: () => { document.getElementById('searchInput').value = ''; filterTable(); } });
+      if (status) pills.push({ label: `Status: ${status.charAt(0).toUpperCase() + status.slice(1)}`, clear: () => { document.getElementById('filterStatus').value = ''; filterTable(); } });
+      if (plan) pills.push({ label: `Plan: ${plan.charAt(0).toUpperCase() + plan.slice(1)}`, clear: () => { document.getElementById('filterPlan').value = ''; filterTable(); } });
+      if (health) pills.push({ label: `Health: ${health.charAt(0).toUpperCase() + health.slice(1)}`, clear: () => { document.getElementById('filterHealth').value = ''; filterTable(); } });
+
+      if (pills.length === 0) {
+        container.classList.add('hidden');
+        container.classList.remove('flex');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      container.classList.add('flex');
+      container.innerHTML = pills.map((p, i) =>
+        `<span class="inline-flex items-center gap-1 px-2.5 py-1 text-[12px] font-medium text-aegis-700 bg-aegis-50 rounded-full border border-aegis-200/50">
+          ${p.label}
+          <button onclick="event.stopPropagation(); clearPill(${i})" class="ml-0.5 p-0.5 rounded-full hover:bg-aegis-200/50 transition-colors">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </span>`
+      ).join('');
+
+      // Store pill clear functions
+      window._pillClearFns = pills.map(p => p.clear);
+    }
+
+    function clearPill(index) {
+      if (window._pillClearFns && window._pillClearFns[index]) {
+        window._pillClearFns[index]();
+      }
+    }
+
+    // ----- Action Menus -----
+    function toggleActionMenu(tenantId) {
+      const menu = document.getElementById(`menu-${tenantId}`);
+      if (openMenuId === tenantId) {
+        menu.classList.remove('open');
+        openMenuId = null;
+      } else {
+        closeAllMenus();
+        menu.classList.add('open');
+        openMenuId = tenantId;
+      }
+    }
+
+    function closeAllMenus() {
+      document.querySelectorAll('.action-menu.open').forEach(m => m.classList.remove('open'));
+      openMenuId = null;
+    }
+
+    function actionClick(action, tenantId) {
+      closeAllMenus();
+      // Demo: show a subtle notification
+      const actionLabels = {
+        view: `Viewing ${tenantId}...`,
+        edit: `Editing ${tenantId}...`,
+        restart: `Restarting container for ${tenantId}...`,
+        suspend: `Suspending ${tenantId}...`,
+        activate: `Reactivating ${tenantId}...`,
+      };
+      showToast(actionLabels[action] || `${action} on ${tenantId}`);
+    }
+
+    function navigateToTenant(tenantId) {
+      showToast(`Navigating to ${tenantId} details...`);
+    }
+
+    // ----- Toast Notification -----
+    function showToast(message) {
+      const existing = document.getElementById('toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.id = 'toast';
+      toast.className = 'fixed bottom-6 right-6 z-[70] flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-[13px] font-medium rounded-lg shadow-lg transform translate-y-2 opacity-0 transition-all duration-200';
+      toast.innerHTML = `
+        <svg class="w-4 h-4 text-aegis-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        ${message}
+      `;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.style.transform = 'translateY(0)';
+        toast.style.opacity = '1';
+      });
+
+      setTimeout(() => {
+        toast.style.transform = 'translateY(2px)';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 200);
+      }, 2500);
+    }
+
+    // ----- Refresh -----
+    function refreshTable() {
+      const icon = document.getElementById('refreshIcon');
+      icon.style.transform = 'rotate(360deg)';
+      setTimeout(() => { icon.style.transform = ''; }, 500);
+      showToast('Tenant list refreshed');
+    }
+
+    // ----- Provision Modal -----
+    function showProvisionModal() {
+      const modal = document.getElementById('provisionModal');
+      const content = document.getElementById('provisionModalContent');
+      modal.classList.remove('pointer-events-none');
+      modal.style.opacity = '1';
+      content.style.transform = 'scale(1)';
+    }
+
+    function closeProvisionModal() {
+      const modal = document.getElementById('provisionModal');
+      const content = document.getElementById('provisionModalContent');
+      modal.style.opacity = '0';
+      content.style.transform = 'scale(0.95)';
+      setTimeout(() => modal.classList.add('pointer-events-none'), 200);
+    }
+
+    // ----- Sidebar Collapse -----
+    let sidebarCollapsed = false;
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+
+      if (sidebarCollapsed) {
+        sidebar.style.width = '64px';
+        mainContent.style.marginLeft = '64px';
+        labels.forEach(el => el.style.display = 'none');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.style.width = '256px';
+        mainContent.style.marginLeft = '256px';
+        labels.forEach(el => el.style.display = '');
+        collapseIcon.style.transform = '';
+      }
+    }
+
+    // ----- Global Click: close menus -----
+    document.addEventListener('click', (e) => {
+      if (openMenuId && !e.target.closest('.action-menu') && !e.target.closest('button')) {
+        closeAllMenus();
+      }
+    });
+
+    // ----- Keyboard Shortcuts -----
+    document.addEventListener('keydown', (e) => {
+      // Escape to close modal or menu
+      if (e.key === 'Escape') {
+        closeAllMenus();
+        closeProvisionModal();
+      }
+      // Ctrl/Cmd + K to focus search
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById('searchInput').focus();
+      }
+    });
+
+    // ----- Initial Render -----
+    renderTable();
+  </script>
+</body>
+</html>

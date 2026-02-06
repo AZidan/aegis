@@ -1,0 +1,19 @@
+services:
+  clawdbot-gateway:
+    build: ./moltbot
+    container_name: clawdbot-gateway
+    restart: unless-stopped
+    init: true
+    ports:
+      - "18789:18789"
+    volumes:
+      - ./clawdbot-data:/home/node/.openclaw
+      - ./workspace:/home/node/.openclaw/workspace
+    environment:
+      - HOME=/home/node
+      - CLAWDBOT_MODEL_BASE_URL=http://host.docker.internal:1234/v1
+      - CLAWDBOT_MODEL_API_KEY=lm-studio
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command:
+      ["node", "dist/index.js", "gateway", "--bind", "lan", "--port", "18789"]

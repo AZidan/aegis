@@ -1,0 +1,1246 @@
+# =============================================================================
+# Aegis Platform -- Design System & Theme Configuration
+# =============================================================================
+# A comprehensive design token system for the Aegis AI Multi-Agent SaaS Platform.
+#
+# Design Principles:
+#   - Enterprise-grade but modern (Linear/Vercel/Clerk aesthetic)
+#   - Trust-inducing (deep indigo conveys security and reliability)
+#   - Data-dense and clean (optimized for dashboards with agent status)
+#   - Accessible (WCAG 2.1 AA compliant across all color combinations)
+#   - Cross-platform (tokens work in CSS, React Native, SwiftUI, Compose)
+#
+# Last Updated: 2026-02-05
+# Document Owner: UX Design
+# =============================================================================
+
+meta:
+  name: "Aegis Design System"
+  version: "1.0.0"
+  description: >
+    Design tokens for the Aegis AI Multi-Agent SaaS Platform. Covers both the
+    Platform Admin Dashboard and the Tenant Admin Dashboard. Built for
+    Next.js + Tailwind CSS + Radix UI / shadcn component library.
+
+# =============================================================================
+# COLOR SYSTEM
+# =============================================================================
+# HSL-based palette for predictable manipulation.
+# Primary: Deep indigo -- trust, security, enterprise authority.
+# Secondary: Teal/cyan -- complementary accent for AI/technology feel.
+# Accent: Violet -- creative highlight for CTAs and interactive elements.
+#
+# All foreground/background combinations meet WCAG 2.1 AA contrast ratio (4.5:1).
+# =============================================================================
+
+colors:
+
+  # ---------------------------------------------------------------------------
+  # Primary -- Deep Indigo
+  # Core brand color. Used for primary actions, navigation, key UI elements.
+  # Conveys trust, authority, and enterprise reliability.
+  # ---------------------------------------------------------------------------
+  primary:
+    25:  "#f5f5ff"   # hsl(240, 100%, 98%) -- Subtle tint for hover backgrounds
+    50:  "#eef2ff"   # hsl(226, 100%, 97%) -- Light background tint
+    100: "#e0e7ff"   # hsl(226, 100%, 94%) -- Selected state background
+    200: "#c7d2fe"   # hsl(228, 96%, 89%)  -- Borders on focused elements
+    300: "#a5b4fc"   # hsl(230, 94%, 82%)  -- Disabled state or muted accent
+    400: "#818cf8"   # hsl(234, 89%, 74%)  -- Hover state for buttons
+    500: "#6366f1"   # hsl(239, 84%, 67%)  -- DEFAULT -- Primary buttons, links
+    600: "#4f46e5"   # hsl(245, 75%, 59%)  -- Active/pressed state
+    700: "#4338ca"   # hsl(244, 58%, 51%)  -- Dark mode primary
+    800: "#3730a3"   # hsl(242, 47%, 42%)  -- Dark mode pressed
+    900: "#312e81"   # hsl(244, 47%, 35%)  -- Text on light backgrounds
+    950: "#1e1b4b"   # hsl(244, 47%, 20%)  -- Darkest accent text
+
+  # ---------------------------------------------------------------------------
+  # Secondary -- Teal/Cyan
+  # Used for secondary actions, data visualization accents, status indicators.
+  # Complementary to indigo -- adds a technology/innovation feel.
+  # ---------------------------------------------------------------------------
+  secondary:
+    25:  "#f0fdfa"   # hsl(166, 76%, 97%)
+    50:  "#f0fdfa"   # hsl(166, 76%, 97%)
+    100: "#ccfbf1"   # hsl(167, 92%, 89%)
+    200: "#99f6e4"   # hsl(168, 84%, 78%)
+    300: "#5eead4"   # hsl(171, 77%, 64%)
+    400: "#2dd4bf"   # hsl(172, 66%, 50%)
+    500: "#14b8a6"   # hsl(173, 80%, 40%) -- DEFAULT
+    600: "#0d9488"   # hsl(175, 84%, 32%)
+    700: "#0f766e"   # hsl(175, 77%, 26%)
+    800: "#115e59"   # hsl(176, 69%, 22%)
+    900: "#134e4a"   # hsl(176, 61%, 19%)
+    950: "#042f2e"   # hsl(179, 84%, 10%)
+
+  # ---------------------------------------------------------------------------
+  # Accent -- Violet
+  # Used sparingly for CTAs, badges, highlights, promotional elements.
+  # Adds energy without competing with the primary indigo.
+  # ---------------------------------------------------------------------------
+  accent:
+    25:  "#faf5ff"   # hsl(270, 100%, 98%)
+    50:  "#f5f3ff"   # hsl(250, 100%, 98%)
+    100: "#ede9fe"   # hsl(251, 91%, 95%)
+    200: "#ddd6fe"   # hsl(251, 95%, 92%)
+    300: "#c4b5fd"   # hsl(252, 95%, 85%)
+    400: "#a78bfa"   # hsl(255, 92%, 76%)
+    500: "#8b5cf6"   # hsl(258, 90%, 66%) -- DEFAULT
+    600: "#7c3aed"   # hsl(262, 83%, 58%)
+    700: "#6d28d9"   # hsl(263, 70%, 50%)
+    800: "#5b21b6"   # hsl(263, 69%, 42%)
+    900: "#4c1d95"   # hsl(264, 67%, 35%)
+    950: "#2e1065"   # hsl(261, 73%, 23%)
+
+  # ---------------------------------------------------------------------------
+  # Semantic Colors
+  # Used for status indicators, alerts, feedback, and validation.
+  # Each has a main, light (background), and dark (text) variant.
+  # ---------------------------------------------------------------------------
+  semantic:
+    success:
+      light:  "#ecfdf5"   # Background for success banners
+      main:   "#10b981"   # Status badges, success icons
+      dark:   "#065f46"   # Success text on light backgrounds
+      border: "#6ee7b7"   # Success border on cards/alerts
+
+    warning:
+      light:  "#fffbeb"   # Background for warning banners
+      main:   "#f59e0b"   # Warning badges, caution icons
+      dark:   "#92400e"   # Warning text on light backgrounds
+      border: "#fcd34d"   # Warning border on cards/alerts
+
+    error:
+      light:  "#fef2f2"   # Background for error banners
+      main:   "#ef4444"   # Error badges, destructive actions
+      dark:   "#991b1b"   # Error text on light backgrounds
+      border: "#fca5a5"   # Error border on cards/alerts
+
+    info:
+      light:  "#eff6ff"   # Background for info banners
+      main:   "#3b82f6"   # Info badges, informational icons
+      dark:   "#1e40af"   # Info text on light backgrounds
+      border: "#93c5fd"   # Info border on cards/alerts
+
+  # ---------------------------------------------------------------------------
+  # Neutral / Gray Scale
+  # The backbone of the UI. Used for text, borders, backgrounds, dividers.
+  # Slightly cool-toned to harmonize with the indigo primary.
+  # ---------------------------------------------------------------------------
+  neutral:
+    white:  "#ffffff"
+    25:     "#fcfcfd"   # Page backgrounds (subtle off-white)
+    50:     "#f9fafb"   # Card backgrounds, alternating rows
+    100:    "#f3f4f6"   # Sidebar backgrounds, input backgrounds
+    200:    "#e5e7eb"   # Borders, dividers
+    300:    "#d1d5db"   # Disabled text, placeholder borders
+    400:    "#9ca3af"   # Placeholder text, muted icons
+    500:    "#6b7280"   # Secondary text, captions
+    600:    "#4b5563"   # Body text (secondary)
+    700:    "#374151"   # Body text (primary on light)
+    800:    "#1f2937"   # Headings on light backgrounds
+    900:    "#111827"   # Primary text, high-emphasis
+    950:    "#030712"   # Maximum contrast text
+    black:  "#000000"
+
+  # ---------------------------------------------------------------------------
+  # Agent Status Colors
+  # Domain-specific colors for agent health and status indicators.
+  # Used consistently across cards, tables, and status badges.
+  # ---------------------------------------------------------------------------
+  agent_status:
+    active:
+      bg:     "#ecfdf5"
+      text:   "#065f46"
+      dot:    "#10b981"
+    idle:
+      bg:     "#f3f4f6"
+      text:   "#4b5563"
+      dot:    "#9ca3af"
+    error:
+      bg:     "#fef2f2"
+      text:   "#991b1b"
+      dot:    "#ef4444"
+    provisioning:
+      bg:     "#eff6ff"
+      text:   "#1e40af"
+      dot:    "#3b82f6"
+    suspended:
+      bg:     "#fffbeb"
+      text:   "#92400e"
+      dot:    "#f59e0b"
+
+  # ---------------------------------------------------------------------------
+  # Container Health Colors
+  # Used in the platform admin System Health Dashboard grid.
+  # ---------------------------------------------------------------------------
+  container_health:
+    healthy:  "#10b981"   # Green dot/badge
+    degraded: "#f59e0b"   # Yellow dot/badge
+    down:     "#ef4444"   # Red dot/badge
+    unknown:  "#9ca3af"   # Gray dot/badge
+
+# =============================================================================
+# TYPOGRAPHY
+# =============================================================================
+# Inter for UI text -- clean, highly readable at all sizes, excellent for data.
+# JetBrains Mono for code and technical content -- agent configs, logs, IDs.
+# Modular scale based on 1.25 ratio (major third) from 16px base.
+# =============================================================================
+
+typography:
+
+  font_families:
+    primary:
+      family: "Inter"
+      fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"]
+      usage: "All UI text -- headings, body, labels, buttons, navigation"
+      variable_font: true
+      css: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+
+    monospace:
+      family: "JetBrains Mono"
+      fallback: ["SF Mono", "Menlo", "Consolas", "monospace"]
+      usage: "Code blocks, agent IDs, API keys, configuration editors, audit log timestamps"
+      variable_font: true
+      css: "'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace"
+
+  # ---------------------------------------------------------------------------
+  # Type Scale
+  # Major third ratio (1.25x). Base = 16px.
+  # Each step includes: size, line-height, letter-spacing, and typical usage.
+  # ---------------------------------------------------------------------------
+  scale:
+    xs:
+      size: "0.75rem"        # 12px
+      line_height: "1rem"    # 16px -- 1.33 ratio
+      letter_spacing: "0.01em"
+      usage: "Badges, captions, helper text, timestamps"
+
+    sm:
+      size: "0.875rem"       # 14px
+      line_height: "1.25rem" # 20px -- 1.43 ratio
+      letter_spacing: "0em"
+      usage: "Table cells, sidebar items, secondary labels, form hints"
+
+    base:
+      size: "1rem"           # 16px
+      line_height: "1.5rem"  # 24px -- 1.5 ratio
+      letter_spacing: "0em"
+      usage: "Body text, form inputs, buttons, primary UI text"
+
+    lg:
+      size: "1.125rem"       # 18px
+      line_height: "1.75rem" # 28px -- 1.56 ratio
+      letter_spacing: "-0.01em"
+      usage: "Section subtitles, card titles, emphasized body text"
+
+    xl:
+      size: "1.25rem"        # 20px
+      line_height: "1.75rem" # 28px -- 1.4 ratio
+      letter_spacing: "-0.01em"
+      usage: "Page section headings, dialog titles"
+
+    "2xl":
+      size: "1.5rem"         # 24px
+      line_height: "2rem"    # 32px -- 1.33 ratio
+      letter_spacing: "-0.02em"
+      usage: "Page titles, dashboard card large numbers"
+
+    "3xl":
+      size: "1.875rem"       # 30px
+      line_height: "2.25rem" # 36px -- 1.2 ratio
+      letter_spacing: "-0.02em"
+      usage: "Primary page headings"
+
+    "4xl":
+      size: "2.25rem"        # 36px
+      line_height: "2.5rem"  # 40px -- 1.11 ratio
+      letter_spacing: "-0.03em"
+      usage: "Hero headings, landing page titles, large metric numbers"
+
+  # ---------------------------------------------------------------------------
+  # Font Weights
+  # Using variable font weight axis for precise control.
+  # ---------------------------------------------------------------------------
+  weights:
+    light:    300    # Rarely used -- only for very large display text
+    normal:   400    # Body text, descriptions, table cells
+    medium:   500    # Labels, navigation items, form labels
+    semibold: 600    # Subheadings, button text, card titles
+    bold:     700    # Page headings, emphasis, metric numbers
+
+  # ---------------------------------------------------------------------------
+  # Heading Presets
+  # Predefined heading styles combining scale, weight, and tracking.
+  # ---------------------------------------------------------------------------
+  headings:
+    h1:
+      size: "3xl"        # 30px
+      weight: "bold"     # 700
+      tracking: "-0.02em"
+      usage: "Page title -- one per page"
+
+    h2:
+      size: "2xl"        # 24px
+      weight: "semibold" # 600
+      tracking: "-0.02em"
+      usage: "Section headings within a page"
+
+    h3:
+      size: "xl"         # 20px
+      weight: "semibold" # 600
+      tracking: "-0.01em"
+      usage: "Card titles, dialog titles, sub-sections"
+
+    h4:
+      size: "lg"         # 18px
+      weight: "medium"   # 500
+      tracking: "-0.01em"
+      usage: "Small card titles, sidebar section labels"
+
+    h5:
+      size: "base"       # 16px
+      weight: "medium"   # 500
+      tracking: "0em"
+      usage: "Form section labels, table group headers"
+
+    h6:
+      size: "sm"         # 14px
+      weight: "semibold" # 600
+      tracking: "0.01em"
+      usage: "Overline text, small section labels, uppercase labels"
+
+# =============================================================================
+# SPACING
+# =============================================================================
+# 4px base unit grid. All spacing values are multiples of 4.
+# Named semantically from 0 (none) to 24 (96px).
+# Consistent spacing creates visual rhythm and alignment.
+# =============================================================================
+
+spacing:
+  "0":    "0px"       # None
+  "0.5":  "2px"       # Hairline -- icon-to-text gaps in tight layouts
+  "1":    "4px"       # Minimal -- tight padding, inline element gaps
+  "1.5":  "6px"       # Small -- badge padding, compact list items
+  "2":    "8px"       # Default gap -- between icon and label, list items
+  "2.5":  "10px"      # --
+  "3":    "12px"      # Form element padding, small card padding
+  "4":    "16px"      # Standard padding -- card content, section margins
+  "5":    "20px"      # Medium section padding
+  "6":    "24px"      # Large card padding, page section gaps
+  "8":    "32px"      # Section separation, page margins
+  "10":   "40px"      # Large section separation
+  "12":   "48px"      # Page section large gap
+  "16":   "64px"      # Major layout separation
+  "20":   "80px"      # Page-level vertical spacing
+  "24":   "96px"      # Hero section vertical padding
+
+  # Semantic spacing aliases for consistent usage
+  semantic:
+    page_padding_x: "32px"      # Horizontal page content padding
+    page_padding_y: "24px"      # Vertical page content padding
+    card_padding: "24px"        # Default card internal padding
+    card_padding_compact: "16px" # Compact card (e.g., agent status cards)
+    input_padding_x: "12px"     # Horizontal input padding
+    input_padding_y: "8px"      # Vertical input padding
+    button_padding_x: "16px"    # Horizontal button padding
+    button_padding_y: "8px"     # Vertical button padding
+    section_gap: "32px"         # Gap between page sections
+    card_gap: "16px"            # Gap between cards in a grid
+    form_gap: "20px"            # Gap between form fields
+    stack_gap: "8px"            # Gap in vertical stacks (labels, hints)
+    inline_gap: "8px"           # Gap between inline elements
+
+# =============================================================================
+# BORDERS
+# =============================================================================
+
+borders:
+  # ---------------------------------------------------------------------------
+  # Border Radius
+  # From sharp to fully rounded. Used consistently across components.
+  # ---------------------------------------------------------------------------
+  radius:
+    none:   "0px"       # Tables, code blocks
+    xs:     "2px"       # Micro elements, inline badges
+    sm:     "4px"       # Buttons (compact), tags
+    md:     "6px"       # Default -- inputs, cards, dropdowns
+    lg:     "8px"       # Cards, modals, larger containers
+    xl:     "12px"      # Feature cards, hero sections
+    "2xl":  "16px"      # Marketing cards, elevated panels
+    "3xl":  "24px"      # Large promotional banners
+    full:   "9999px"    # Pills, avatars, circular elements
+
+  # ---------------------------------------------------------------------------
+  # Border Width
+  # ---------------------------------------------------------------------------
+  width:
+    none:   "0px"
+    thin:   "1px"       # Default -- inputs, cards, dividers
+    medium: "2px"       # Focus rings, active state borders
+    thick:  "3px"       # Strong emphasis borders (rare)
+
+  # ---------------------------------------------------------------------------
+  # Default Border Color (light mode)
+  # ---------------------------------------------------------------------------
+  color:
+    default:  "#e5e7eb"   # neutral.200
+    muted:    "#f3f4f6"   # neutral.100
+    strong:   "#d1d5db"   # neutral.300
+    focus:    "#6366f1"   # primary.500
+    error:    "#ef4444"   # semantic.error.main
+
+# =============================================================================
+# SHADOWS
+# =============================================================================
+# Elevation system. Higher elevation = further from surface = larger shadow.
+# Shadows use cool-toned transparency to match the indigo-based palette.
+# =============================================================================
+
+shadows:
+  none:   "none"
+  xs:     "0 1px 2px 0 rgba(0, 0, 0, 0.05)"
+  sm:     "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)"
+  md:     "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)"
+  lg:     "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)"
+  xl:     "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)"
+  "2xl":  "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+  inner:  "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)"
+
+  # Focus ring shadow (used alongside border for accessible focus states)
+  focus_ring: "0 0 0 3px rgba(99, 102, 241, 0.3)"       # primary.500 @ 30%
+  focus_ring_error: "0 0 0 3px rgba(239, 68, 68, 0.3)"   # error @ 30%
+  focus_ring_success: "0 0 0 3px rgba(16, 185, 129, 0.3)" # success @ 30%
+
+  # Elevation mapping for semantic use
+  elevation:
+    surface:  "none"                                       # Base page level
+    raised:   "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)"  # Cards
+    overlay:  "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)"  # Dropdowns, tooltips
+    modal:    "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)"  # Modals, dialogs
+    popover:  "0 25px 50px -12px rgba(0, 0, 0, 0.25)"    # Command palettes, popovers
+
+# =============================================================================
+# ANIMATIONS & TRANSITIONS
+# =============================================================================
+# Subtle, purposeful motion. Nothing gratuitous.
+# Follow the principle: fast in, slow out (ease-out for entering elements).
+# =============================================================================
+
+animations:
+  duration:
+    instant:  "50ms"      # State changes (checkbox toggle, color change)
+    fast:     "150ms"     # Hover effects, button feedback
+    normal:   "200ms"     # Dropdown open, tooltip appear, tab switch
+    moderate: "300ms"     # Modal enter, sidebar expand, card transitions
+    slow:     "500ms"     # Page transitions, large element animations
+    slower:   "700ms"     # Complex orchestrated animations (onboarding)
+
+  easing:
+    ease_in:      "cubic-bezier(0.4, 0, 1, 1)"       # Exiting elements
+    ease_out:     "cubic-bezier(0, 0, 0.2, 1)"       # Entering elements (DEFAULT)
+    ease_in_out:  "cubic-bezier(0.4, 0, 0.2, 1)"     # Moving elements, size changes
+    spring:       "cubic-bezier(0.34, 1.56, 0.64, 1)" # Playful bounce (use sparingly)
+    linear:       "linear"                              # Progress bars, loading indicators
+
+  # Common transition presets
+  presets:
+    default:        "all 200ms cubic-bezier(0, 0, 0.2, 1)"
+    colors:         "color 150ms cubic-bezier(0, 0, 0.2, 1), background-color 150ms cubic-bezier(0, 0, 0.2, 1), border-color 150ms cubic-bezier(0, 0, 0.2, 1)"
+    opacity:        "opacity 200ms cubic-bezier(0, 0, 0.2, 1)"
+    transform:      "transform 200ms cubic-bezier(0, 0, 0.2, 1)"
+    modal_enter:    "opacity 200ms cubic-bezier(0, 0, 0.2, 1), transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)"
+    sidebar_expand: "width 300ms cubic-bezier(0.4, 0, 0.2, 1)"
+
+# =============================================================================
+# BREAKPOINTS
+# =============================================================================
+# Mobile-first responsive design.
+# Dashboard is optimized for desktop but remains functional on tablet.
+# Mobile is limited to read-only status views (not full admin).
+# =============================================================================
+
+breakpoints:
+  xs:     "0px"       # Mobile portrait -- agent status cards only
+  sm:     "640px"     # Mobile landscape / small tablet
+  md:     "768px"     # Tablet portrait -- sidebar collapses
+  lg:     "1024px"    # Tablet landscape / small desktop -- sidebar visible
+  xl:     "1280px"    # Desktop -- full dashboard layout
+  "2xl":  "1536px"    # Wide desktop -- expanded data tables, side-by-side panels
+
+  # Container max-widths per breakpoint
+  containers:
+    sm:     "640px"
+    md:     "768px"
+    lg:     "1024px"
+    xl:     "1280px"
+    "2xl":  "1440px"   # Max content width to prevent overly wide layouts
+
+# =============================================================================
+# Z-INDEX SCALE
+# =============================================================================
+# Predictable stacking order. Avoids z-index: 9999 chaos.
+# =============================================================================
+
+z_index:
+  base:       0        # Default page content
+  sticky:     10       # Sticky table headers, toolbar
+  dropdown:   20       # Dropdown menus, select options
+  sidebar:    30       # Sidebar navigation overlay (mobile)
+  overlay:    40       # Background overlay for modals
+  modal:      50       # Modal dialogs, sheets
+  popover:    60       # Popovers, tooltips, command palette
+  toast:      70       # Toast notifications (always on top)
+  splash:     80       # Loading screens, splash overlays
+
+# =============================================================================
+# COMPONENT TOKENS
+# =============================================================================
+# Design tokens mapped to specific UI components.
+# These bridge the gap between raw tokens and component implementation.
+# =============================================================================
+
+components:
+
+  # ---------------------------------------------------------------------------
+  # Buttons
+  # ---------------------------------------------------------------------------
+  button:
+    variants:
+      primary:
+        bg: "#6366f1"               # primary.500
+        bg_hover: "#4f46e5"         # primary.600
+        bg_active: "#4338ca"        # primary.700
+        bg_disabled: "#c7d2fe"      # primary.200
+        text: "#ffffff"
+        text_disabled: "#ffffff"
+        border: "none"
+        shadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)"
+        shadow_hover: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)"
+
+      secondary:
+        bg: "#ffffff"
+        bg_hover: "#f9fafb"         # neutral.50
+        bg_active: "#f3f4f6"        # neutral.100
+        bg_disabled: "#f9fafb"
+        text: "#374151"             # neutral.700
+        text_disabled: "#9ca3af"    # neutral.400
+        border: "1px solid #e5e7eb" # neutral.200
+        shadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)"
+        shadow_hover: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)"
+
+      ghost:
+        bg: "transparent"
+        bg_hover: "#f3f4f6"         # neutral.100
+        bg_active: "#e5e7eb"        # neutral.200
+        bg_disabled: "transparent"
+        text: "#374151"             # neutral.700
+        text_disabled: "#9ca3af"
+        border: "none"
+        shadow: "none"
+        shadow_hover: "none"
+
+      destructive:
+        bg: "#ef4444"               # error.main
+        bg_hover: "#dc2626"
+        bg_active: "#b91c1c"
+        bg_disabled: "#fca5a5"
+        text: "#ffffff"
+        text_disabled: "#ffffff"
+        border: "none"
+        shadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)"
+        shadow_hover: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)"
+
+      outline:
+        bg: "transparent"
+        bg_hover: "#eef2ff"         # primary.50
+        bg_active: "#e0e7ff"        # primary.100
+        bg_disabled: "transparent"
+        text: "#6366f1"             # primary.500
+        text_disabled: "#c7d2fe"    # primary.200
+        border: "1px solid #6366f1"
+        shadow: "none"
+        shadow_hover: "none"
+
+      link:
+        bg: "transparent"
+        bg_hover: "transparent"
+        bg_active: "transparent"
+        bg_disabled: "transparent"
+        text: "#6366f1"             # primary.500
+        text_hover: "#4f46e5"       # primary.600
+        text_disabled: "#c7d2fe"
+        border: "none"
+        shadow: "none"
+        text_decoration: "underline on hover"
+
+    sizes:
+      xs:
+        height: "28px"
+        padding_x: "8px"
+        padding_y: "4px"
+        font_size: "0.75rem"       # 12px
+        border_radius: "4px"
+        icon_size: "14px"
+
+      sm:
+        height: "32px"
+        padding_x: "12px"
+        padding_y: "6px"
+        font_size: "0.875rem"      # 14px
+        border_radius: "6px"
+        icon_size: "16px"
+
+      md:
+        height: "36px"
+        padding_x: "16px"
+        padding_y: "8px"
+        font_size: "0.875rem"      # 14px
+        border_radius: "6px"
+        icon_size: "18px"
+
+      lg:
+        height: "40px"
+        padding_x: "20px"
+        padding_y: "10px"
+        font_size: "1rem"          # 16px
+        border_radius: "8px"
+        icon_size: "20px"
+
+      xl:
+        height: "48px"
+        padding_x: "24px"
+        padding_y: "12px"
+        font_size: "1rem"          # 16px
+        border_radius: "8px"
+        icon_size: "22px"
+
+  # ---------------------------------------------------------------------------
+  # Cards
+  # Used for agent cards, metric cards, skill cards, alert cards.
+  # ---------------------------------------------------------------------------
+  card:
+    variants:
+      default:
+        bg: "#ffffff"
+        border: "1px solid #e5e7eb"  # neutral.200
+        border_radius: "8px"         # lg
+        shadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)"
+        padding: "24px"
+        hover_shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)"
+        hover_border: "1px solid #d1d5db"   # neutral.300
+
+      elevated:
+        bg: "#ffffff"
+        border: "none"
+        border_radius: "12px"        # xl
+        shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)"
+        padding: "24px"
+        hover_shadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)"
+
+      flat:
+        bg: "#f9fafb"               # neutral.50
+        border: "none"
+        border_radius: "8px"
+        shadow: "none"
+        padding: "16px"
+        hover_bg: "#f3f4f6"         # neutral.100
+
+      interactive:
+        bg: "#ffffff"
+        border: "1px solid #e5e7eb"
+        border_radius: "8px"
+        shadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)"
+        padding: "16px"
+        hover_shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)"
+        hover_border: "1px solid #6366f1"   # primary.500
+        cursor: "pointer"
+
+  # ---------------------------------------------------------------------------
+  # Inputs
+  # Text inputs, selects, textareas.
+  # ---------------------------------------------------------------------------
+  input:
+    default:
+      bg: "#ffffff"
+      border: "1px solid #e5e7eb"    # neutral.200
+      border_radius: "6px"           # md
+      text_color: "#111827"          # neutral.900
+      placeholder_color: "#9ca3af"   # neutral.400
+      padding_x: "12px"
+      padding_y: "8px"
+      font_size: "0.875rem"          # 14px
+      height: "36px"
+      transition: "border-color 150ms ease-out, box-shadow 150ms ease-out"
+
+    states:
+      hover:
+        border: "1px solid #d1d5db"  # neutral.300
+      focus:
+        border: "1px solid #6366f1"  # primary.500
+        shadow: "0 0 0 3px rgba(99, 102, 241, 0.15)"
+        outline: "none"
+      error:
+        border: "1px solid #ef4444"  # error.main
+        shadow: "0 0 0 3px rgba(239, 68, 68, 0.15)"
+      disabled:
+        bg: "#f3f4f6"               # neutral.100
+        border: "1px solid #e5e7eb"
+        text_color: "#9ca3af"        # neutral.400
+        cursor: "not-allowed"
+        opacity: "0.6"
+
+    sizes:
+      sm:
+        height: "32px"
+        padding_x: "10px"
+        padding_y: "6px"
+        font_size: "0.875rem"
+      md:
+        height: "36px"
+        padding_x: "12px"
+        padding_y: "8px"
+        font_size: "0.875rem"
+      lg:
+        height: "40px"
+        padding_x: "14px"
+        padding_y: "10px"
+        font_size: "1rem"
+
+  # ---------------------------------------------------------------------------
+  # Badges / Status Indicators
+  # Used for agent status, plan tier, skill category, health status.
+  # ---------------------------------------------------------------------------
+  badge:
+    variants:
+      default:
+        bg: "#f3f4f6"
+        text: "#374151"
+        border: "none"
+
+      primary:
+        bg: "#eef2ff"               # primary.50
+        text: "#4338ca"             # primary.700
+        border: "none"
+
+      success:
+        bg: "#ecfdf5"               # success.light
+        text: "#065f46"             # success.dark
+        border: "none"
+
+      warning:
+        bg: "#fffbeb"               # warning.light
+        text: "#92400e"             # warning.dark
+        border: "none"
+
+      error:
+        bg: "#fef2f2"               # error.light
+        text: "#991b1b"             # error.dark
+        border: "none"
+
+      info:
+        bg: "#eff6ff"               # info.light
+        text: "#1e40af"             # info.dark
+        border: "none"
+
+      outline:
+        bg: "transparent"
+        text: "#6b7280"             # neutral.500
+        border: "1px solid #e5e7eb" # neutral.200
+
+    sizes:
+      sm:
+        padding_x: "6px"
+        padding_y: "2px"
+        font_size: "0.75rem"        # 12px
+        border_radius: "4px"
+        font_weight: 500
+
+      md:
+        padding_x: "8px"
+        padding_y: "2px"
+        font_size: "0.75rem"        # 12px
+        border_radius: "9999px"     # Pill shape
+        font_weight: 500
+
+      lg:
+        padding_x: "10px"
+        padding_y: "4px"
+        font_size: "0.875rem"       # 14px
+        border_radius: "9999px"
+        font_weight: 600
+
+    # Status dot variant (used alongside badge text)
+    dot:
+      size: "8px"
+      border_radius: "9999px"
+      margin_right: "6px"
+      animation_pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
+
+  # ---------------------------------------------------------------------------
+  # Table
+  # Used for tenant list, agent list, audit logs, skill catalog.
+  # ---------------------------------------------------------------------------
+  table:
+    header:
+      bg: "#f9fafb"                 # neutral.50
+      text: "#6b7280"              # neutral.500
+      font_size: "0.75rem"         # 12px
+      font_weight: 600
+      text_transform: "uppercase"
+      letter_spacing: "0.05em"
+      padding: "12px 16px"
+      border_bottom: "1px solid #e5e7eb"
+
+    row:
+      bg: "#ffffff"
+      bg_hover: "#f9fafb"          # neutral.50
+      bg_selected: "#eef2ff"       # primary.50
+      text: "#111827"              # neutral.900
+      font_size: "0.875rem"        # 14px
+      padding: "12px 16px"
+      border_bottom: "1px solid #f3f4f6"  # neutral.100
+      transition: "background-color 150ms ease-out"
+
+    cell:
+      text_primary: "#111827"      # neutral.900
+      text_secondary: "#6b7280"    # neutral.500
+      text_muted: "#9ca3af"        # neutral.400
+
+  # ---------------------------------------------------------------------------
+  # Sidebar Navigation
+  # Platform admin and tenant admin share sidebar pattern.
+  # ---------------------------------------------------------------------------
+  sidebar:
+    width:
+      expanded: "256px"
+      collapsed: "64px"
+    bg: "#ffffff"
+    border_right: "1px solid #e5e7eb"  # neutral.200
+
+    item:
+      padding: "8px 12px"
+      border_radius: "6px"
+      font_size: "0.875rem"        # 14px
+      font_weight: 500
+      text: "#4b5563"              # neutral.600
+      icon_color: "#6b7280"        # neutral.500
+      transition: "all 150ms ease-out"
+
+    item_hover:
+      bg: "#f3f4f6"                # neutral.100
+      text: "#111827"              # neutral.900
+      icon_color: "#374151"        # neutral.700
+
+    item_active:
+      bg: "#eef2ff"                # primary.50
+      text: "#4338ca"              # primary.700
+      icon_color: "#6366f1"        # primary.500
+      font_weight: 600
+
+    section_label:
+      font_size: "0.75rem"
+      font_weight: 600
+      text_transform: "uppercase"
+      letter_spacing: "0.05em"
+      text: "#9ca3af"              # neutral.400
+      padding: "16px 12px 4px 12px"
+
+  # ---------------------------------------------------------------------------
+  # Modal / Dialog
+  # ---------------------------------------------------------------------------
+  modal:
+    overlay:
+      bg: "rgba(0, 0, 0, 0.5)"
+      backdrop_filter: "blur(4px)"
+    container:
+      bg: "#ffffff"
+      border_radius: "12px"       # xl
+      shadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)"
+      padding: "24px"
+      max_width: "500px"
+      width: "100%"
+    header:
+      font_size: "1.25rem"        # xl
+      font_weight: 600
+      margin_bottom: "16px"
+    footer:
+      padding_top: "16px"
+      border_top: "1px solid #f3f4f6"  # neutral.100
+      gap: "8px"
+      justify: "flex-end"
+
+  # ---------------------------------------------------------------------------
+  # Toast / Notification
+  # ---------------------------------------------------------------------------
+  toast:
+    container:
+      padding: "12px 16px"
+      border_radius: "8px"
+      shadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)"
+      max_width: "400px"
+      font_size: "0.875rem"
+    variants:
+      success:
+        bg: "#ecfdf5"
+        border: "1px solid #6ee7b7"
+        text: "#065f46"
+        icon_color: "#10b981"
+      error:
+        bg: "#fef2f2"
+        border: "1px solid #fca5a5"
+        text: "#991b1b"
+        icon_color: "#ef4444"
+      warning:
+        bg: "#fffbeb"
+        border: "1px solid #fcd34d"
+        text: "#92400e"
+        icon_color: "#f59e0b"
+      info:
+        bg: "#eff6ff"
+        border: "1px solid #93c5fd"
+        text: "#1e40af"
+        icon_color: "#3b82f6"
+
+  # ---------------------------------------------------------------------------
+  # Metric Card
+  # Used on dashboard summary bars for key numbers.
+  # ---------------------------------------------------------------------------
+  metric_card:
+    bg: "#ffffff"
+    border: "1px solid #e5e7eb"
+    border_radius: "8px"
+    padding: "16px 20px"
+    label:
+      font_size: "0.75rem"        # 12px
+      font_weight: 500
+      color: "#6b7280"            # neutral.500
+      text_transform: "uppercase"
+      letter_spacing: "0.05em"
+    value:
+      font_size: "1.5rem"         # 24px -- 2xl
+      font_weight: 700
+      color: "#111827"            # neutral.900
+    trend:
+      positive: "#10b981"         # success
+      negative: "#ef4444"         # error
+      neutral: "#6b7280"          # neutral.500
+      font_size: "0.75rem"
+      font_weight: 500
+
+  # ---------------------------------------------------------------------------
+  # Wizard / Stepper
+  # Used for provisioning wizard and agent creation wizard.
+  # ---------------------------------------------------------------------------
+  wizard:
+    step_indicator:
+      size: "32px"
+      font_size: "0.875rem"
+      font_weight: 600
+      border_radius: "9999px"
+      completed:
+        bg: "#6366f1"             # primary.500
+        text: "#ffffff"
+        icon: "check"
+      active:
+        bg: "#6366f1"             # primary.500
+        text: "#ffffff"
+        border: "2px solid #6366f1"
+      upcoming:
+        bg: "#f3f4f6"             # neutral.100
+        text: "#9ca3af"            # neutral.400
+        border: "2px solid #e5e7eb"
+    connector:
+      color_completed: "#6366f1"   # primary.500
+      color_upcoming: "#e5e7eb"    # neutral.200
+      height: "2px"
+    step_label:
+      font_size: "0.875rem"
+      font_weight: 500
+      active_color: "#111827"      # neutral.900
+      inactive_color: "#9ca3af"    # neutral.400
+
+# =============================================================================
+# DARK MODE
+# =============================================================================
+# Full dark palette variant. Applied via class="dark" on <html> element.
+# Dark mode follows the same token structure but with inverted luminance.
+# Background: deep blue-gray (not pure black) for reduced eye strain.
+# =============================================================================
+
+dark_mode:
+
+  colors:
+    # Background hierarchy (from deepest to raised)
+    bg:
+      base:     "#09090b"       # Deepest background
+      raised:   "#0f0f12"       # Cards, panels
+      overlay:  "#18181b"       # Dropdowns, modals
+      muted:    "#27272a"       # Subtle backgrounds (hover states)
+      subtle:   "#3f3f46"       # Borders, dividers
+
+    # Text hierarchy
+    text:
+      primary:   "#fafafa"       # High emphasis -- headings, primary content
+      secondary: "#a1a1aa"       # Body text, descriptions
+      muted:     "#71717a"       # Captions, timestamps, placeholder
+      disabled:  "#52525b"       # Disabled labels
+
+    # Primary in dark mode
+    primary:
+      50:  "#1a1a2e"
+      100: "#1e1b4b"
+      200: "#312e81"
+      300: "#4338ca"
+      400: "#6366f1"            # Primary interactive color in dark mode
+      500: "#818cf8"            # Brighter for visibility on dark backgrounds
+      600: "#a5b4fc"
+      700: "#c7d2fe"
+
+    # Borders in dark mode
+    border:
+      default: "#27272a"
+      muted:   "#1f1f23"
+      strong:  "#3f3f46"
+      focus:   "#818cf8"        # primary.500 dark
+
+    # Semantic colors adjusted for dark backgrounds
+    semantic:
+      success:
+        light:  "#052e16"       # Background
+        main:   "#22c55e"       # Badge/icon
+        dark:   "#86efac"       # Text
+        border: "#166534"
+      warning:
+        light:  "#422006"
+        main:   "#f59e0b"
+        dark:   "#fcd34d"
+        border: "#854d0e"
+      error:
+        light:  "#450a0a"
+        main:   "#f87171"
+        dark:   "#fca5a5"
+        border: "#991b1b"
+      info:
+        light:  "#172554"
+        main:   "#60a5fa"
+        dark:   "#93c5fd"
+        border: "#1e40af"
+
+    # Agent status in dark mode
+    agent_status:
+      active:
+        bg:   "#052e16"
+        text: "#86efac"
+        dot:  "#22c55e"
+      idle:
+        bg:   "#18181b"
+        text: "#a1a1aa"
+        dot:  "#71717a"
+      error:
+        bg:   "#450a0a"
+        text: "#fca5a5"
+        dot:  "#f87171"
+      provisioning:
+        bg:   "#172554"
+        text: "#93c5fd"
+        dot:  "#60a5fa"
+      suspended:
+        bg:   "#422006"
+        text: "#fcd34d"
+        dot:  "#f59e0b"
+
+  # Shadows in dark mode -- subtler, use opacity and lighter color
+  shadows:
+    xs:     "0 1px 2px 0 rgba(0, 0, 0, 0.3)"
+    sm:     "0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.3)"
+    md:     "0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3)"
+    lg:     "0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3)"
+    xl:     "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4)"
+    focus_ring: "0 0 0 3px rgba(129, 140, 248, 0.3)"   # primary.500 dark @ 30%
+
+  # Dark mode component overrides
+  components:
+
+    card:
+      bg: "#0f0f12"
+      border: "1px solid #27272a"
+      hover_border: "1px solid #3f3f46"
+
+    input:
+      bg: "#18181b"
+      border: "1px solid #27272a"
+      text_color: "#fafafa"
+      placeholder_color: "#71717a"
+      focus_border: "#818cf8"
+      disabled_bg: "#0f0f12"
+
+    sidebar:
+      bg: "#0f0f12"
+      border_right: "1px solid #1f1f23"
+      item_text: "#a1a1aa"
+      item_hover_bg: "#18181b"
+      item_hover_text: "#fafafa"
+      item_active_bg: "#1a1a2e"
+      item_active_text: "#a5b4fc"
+
+    table:
+      header_bg: "#0f0f12"
+      header_text: "#71717a"
+      row_bg: "#09090b"
+      row_hover_bg: "#0f0f12"
+      row_selected_bg: "#1a1a2e"
+      border: "#1f1f23"
+
+    modal:
+      overlay_bg: "rgba(0, 0, 0, 0.7)"
+      container_bg: "#18181b"
+      container_border: "1px solid #27272a"
+
+    button:
+      secondary_bg: "#18181b"
+      secondary_border: "1px solid #27272a"
+      secondary_text: "#a1a1aa"
+      secondary_hover_bg: "#27272a"
+      ghost_hover_bg: "#27272a"
+      ghost_text: "#a1a1aa"
+
+    toast:
+      success_bg: "#052e16"
+      success_border: "1px solid #166534"
+      error_bg: "#450a0a"
+      error_border: "1px solid #991b1b"
+      warning_bg: "#422006"
+      warning_border: "1px solid #854d0e"
+      info_bg: "#172554"
+      info_border: "1px solid #1e40af"
+
+# =============================================================================
+# ACCESSIBILITY
+# =============================================================================
+# WCAG 2.1 AA compliance checklist for all color combinations.
+# Minimum contrast ratios: 4.5:1 for normal text, 3:1 for large text/UI.
+# =============================================================================
+
+accessibility:
+
+  contrast_ratios:
+    # Light mode text on backgrounds
+    - pair: "neutral.900 on white"
+      ratio: "17.4:1"
+      passes: "AAA"
+    - pair: "neutral.700 on white"
+      ratio: "9.8:1"
+      passes: "AAA"
+    - pair: "neutral.500 on white"
+      ratio: "4.6:1"
+      passes: "AA"
+    - pair: "primary.500 on white"
+      ratio: "4.5:1"
+      passes: "AA"
+    - pair: "primary.700 on primary.50"
+      ratio: "7.2:1"
+      passes: "AAA"
+    - pair: "white on primary.500"
+      ratio: "4.5:1"
+      passes: "AA"
+    - pair: "white on primary.600"
+      ratio: "6.3:1"
+      passes: "AA"
+    - pair: "error.dark on error.light"
+      ratio: "8.1:1"
+      passes: "AAA"
+    - pair: "success.dark on success.light"
+      ratio: "7.3:1"
+      passes: "AAA"
+    - pair: "warning.dark on warning.light"
+      ratio: "6.8:1"
+      passes: "AA"
+
+    # Dark mode text on backgrounds
+    - pair: "dark text.primary on dark bg.base"
+      ratio: "18.2:1"
+      passes: "AAA"
+    - pair: "dark text.secondary on dark bg.base"
+      ratio: "7.5:1"
+      passes: "AAA"
+    - pair: "dark text.muted on dark bg.base"
+      ratio: "4.8:1"
+      passes: "AA"
+    - pair: "dark primary.500 on dark bg.base"
+      ratio: "7.9:1"
+      passes: "AAA"
+
+  focus_states:
+    description: >
+      All interactive elements have visible focus indicators using a
+      combination of border color change and focus ring shadow.
+    keyboard_visible: true
+    indicator_style: "2px solid primary.500 + 3px box-shadow ring"
+    minimum_area: "44x44px touch targets on mobile"
+
+  motion:
+    reduced_motion: >
+      Respect prefers-reduced-motion media query. When active, all
+      transitions set to 0ms duration. Animations replaced with
+      instant state changes. Loading spinners remain animated.
+    css: "@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }"
+
+  text_scaling:
+    description: >
+      All text uses rem units for browser zoom support. Layout does not
+      break at 200% text scaling. No horizontal scrolling required at
+      any zoom level up to 400% on 1280px viewport.
+    unit: "rem"
+    max_zoom_tested: "400%"
+    min_viewport_tested: "320px"
+
+# =============================================================================
+# DESIGN SYSTEM USAGE NOTES
+# =============================================================================
+# Implementation guidance for engineering teams.
+# =============================================================================
+
+usage_notes:
+
+  tailwind_integration: >
+    This theme maps directly to a Tailwind CSS configuration file.
+    Primary colors become bg-primary-500, text-primary-700, etc.
+    Custom colors (agent_status, semantic) are added via theme.extend.
+    Font families are registered under fontFamily config.
+
+  shadcn_mapping: >
+    shadcn/ui components use CSS custom properties. Map theme tokens to:
+    --background: neutral.white (light) / dark.bg.base (dark)
+    --foreground: neutral.900 (light) / dark.text.primary (dark)
+    --primary: primary.500 / dark.primary.400
+    --primary-foreground: white / white
+    --destructive: semantic.error.main
+    --muted: neutral.100 / dark.bg.muted
+    --accent: primary.50 / dark.primary.50
+    --border: neutral.200 / dark.border.default
+    --ring: primary.500 / dark.primary.500
+
+  icon_system: >
+    Use Lucide React icons (included with shadcn). Icon sizes should match
+    the typography scale: 14px for sm text, 16px for base, 18px for lg,
+    20px for xl. Icons use currentColor to inherit text color.
+
+  data_visualization: >
+    Charts use a color sequence drawn from the primary and secondary
+    palettes: primary.500, secondary.500, accent.500, primary.300,
+    secondary.300, accent.300. This ensures sufficient contrast between
+    data series on both light and dark backgrounds.
+
+  chart_colors:
+    sequence:
+      - "#6366f1"   # primary.500
+      - "#14b8a6"   # secondary.500
+      - "#8b5cf6"   # accent.500
+      - "#f59e0b"   # warning.main
+      - "#3b82f6"   # info.main
+      - "#ef4444"   # error.main
+      - "#a5b4fc"   # primary.300
+      - "#5eead4"   # secondary.300
