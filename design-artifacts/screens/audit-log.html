@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audit Log - Aegis Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            primary: {
+              50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc',
+              400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
+              800: '#3730a3', 900: '#312e81', 950: '#1e1b4b',
+            },
+            neutral: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              700: '#334155',
+              800: '#1e293b',
+              900: '#0f172a',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    * { font-family: 'Inter', system-ui, sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace !important; }
+    .row-details { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.2s ease-out; opacity: 0; }
+    .row-details.expanded { max-height: 400px; opacity: 1; transition: max-height 0.4s ease-in, opacity 0.3s ease-in; }
+    .chevron-icon { transition: transform 0.25s ease; }
+    .chevron-icon.rotated { transform: rotate(90deg); }
+    .sort-arrow-active { color: #6366f1; }
+    .dropdown-menu { transform: translateY(-4px); opacity: 0; pointer-events: none; transition: transform 0.15s ease, opacity 0.15s ease; }
+    .dropdown-menu.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .table-wrapper::-webkit-scrollbar { height: 6px; }
+    .table-wrapper::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+    .table-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .table-wrapper::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .severity-pill { transition: all 0.15s ease; }
+    .severity-pill.active { background-color: #6366f1; color: white; box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3); }
+    tbody tr.data-row:hover td { background-color: #eef2ff !important; }
+    .nav-item { transition: background-color 0.15s ease, color 0.15s ease; }
+    .sidebar-collapsed { width: 64px !important; }
+    .sidebar-collapsed .nav-label,
+    .sidebar-collapsed .nav-badge,
+    .sidebar-collapsed .sidebar-section-label,
+    .sidebar-collapsed .sidebar-logo-text,
+    .sidebar-collapsed .sidebar-user-info,
+    .sidebar-collapsed .sidebar-promo { display: none !important; }
+    .sidebar-collapsed .nav-item-link { justify-content: center; padding-left: 0; padding-right: 0; }
+    .sidebar-collapsed .sidebar-logo-link { justify-content: center; padding-left: 0; padding-right: 0; }
+    .sidebar-collapsed .sidebar-user-row { justify-content: center; }
+    .sidebar-collapsed .sidebar-user-avatar { margin: 0; }
+    .sidebar-collapsed .sidebar-user-btn { display: none; }
+  </style>
+</head>
+<body class="h-full bg-surface-50 text-slate-800 antialiased">
+  <div class="h-full min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full bg-white border-r border-neutral-200 flex flex-col z-30 transition-all duration-300" style="width: 256px">
+      <!-- Logo -->
+      <div class="flex items-center gap-3 px-5 py-5 border-b border-neutral-100">
+        <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-violet-500 rounded-lg flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <span class="sidebar-label font-bold text-neutral-900 text-lg tracking-tight">Acme Corp</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+        <div>
+          <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Workspace</p>
+          <!-- Dashboard -->
+          <a href="/dashboard" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="sidebar-label">Dashboard</span>
+          </a>
+          <!-- Agents -->
+          <a href="/dashboard/agents" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+            <span class="sidebar-label">Agents</span>
+          </a>
+          <!-- Skill Marketplace -->
+          <a href="/dashboard/skills" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span class="sidebar-label">Skill Marketplace</span>
+          </a>
+        </div>
+        <div>
+          <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Management</p>
+          <!-- Team Members -->
+          <a href="/dashboard/team" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            <span class="sidebar-label">Team Members</span>
+          </a>
+          <!-- Audit Log -->
+          <a href="/dashboard/audit" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-primary-50 text-primary-600 font-semibold">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span class="sidebar-label">Audit Log</span>
+          </a>
+          <!-- Settings -->
+          <a href="/dashboard/settings" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            <span class="sidebar-label">Settings</span>
+          </a>
+        </div>
+      </nav>
+
+      <!-- Footer -->
+      <div class="border-t border-neutral-100 px-3 py-3 space-y-2">
+        <button onclick="toggleSidebar()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 w-full">
+          <svg id="collapse-icon" class="w-5 h-5 flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+          <span class="sidebar-label">Collapse</span>
+        </button>
+        <div class="flex items-center gap-3 px-3 py-2">
+          <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-sm font-semibold text-primary-600">JD</span>
+          </div>
+          <div class="sidebar-label">
+            <p class="text-sm font-medium text-neutral-900">Jane Doe</p>
+            <p class="text-xs text-neutral-500">Tenant Admin</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main id="main-content" class="flex flex-col min-w-0 overflow-hidden min-h-screen" style="margin-left: 256px">
+
+      <!-- Top bar (mobile sidebar toggle) -->
+      <div class="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-surface-200">
+        <button onclick="document.querySelector('aside').classList.toggle('hidden')" class="p-1.5 rounded-lg hover:bg-surface-100">
+          <svg class="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+        </button>
+        <span class="text-sm font-semibold text-slate-800">Aegis Platform</span>
+      </div>
+
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8 pt-6 lg:pt-8 pb-4">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Audit Log</h1>
+          <p class="text-sm text-slate-500 mt-1">Track agent actions, system events, and security activity</p>
+        </div>
+        <div class="relative">
+          <button id="exportBtn" onclick="toggleDropdown('exportMenu')" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-surface-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-surface-50 shadow-sm transition-colors">
+            <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Export
+            <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+          <div id="exportMenu" class="dropdown-menu absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-surface-200 z-50 py-1">
+            <button class="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">Export CSV</button>
+            <button class="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">Export JSON</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="px-6 lg:px-8 pb-4">
+        <div class="bg-white rounded-xl border border-surface-200 shadow-sm p-4">
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- Date range -->
+            <div class="relative">
+              <button onclick="toggleDropdown('dateMenu')" class="inline-flex items-center gap-2 px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg text-sm text-slate-700 hover:bg-surface-100 transition-colors">
+                <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                </svg>
+                Last 7 days
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+              </button>
+              <div id="dateMenu" class="dropdown-menu absolute left-0 mt-2 w-44 bg-white rounded-lg shadow-lg border border-surface-200 z-50 py-1">
+                <button class="w-full px-4 py-2 text-sm text-left text-primary-600 font-medium bg-primary-50">Last 7 days</button>
+                <button class="w-full px-4 py-2 text-sm text-left text-slate-700 hover:bg-surface-50">Last 24 hours</button>
+                <button class="w-full px-4 py-2 text-sm text-left text-slate-700 hover:bg-surface-50">Last 30 days</button>
+                <button class="w-full px-4 py-2 text-sm text-left text-slate-700 hover:bg-surface-50">Last 90 days</button>
+              </div>
+            </div>
+
+            <!-- Event category filter -->
+            <div class="relative">
+              <button onclick="toggleDropdown('actionMenu')" class="inline-flex items-center gap-2 px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg text-sm text-slate-700 hover:bg-surface-100 transition-colors">
+                <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+                </svg>
+                All Events
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+              </button>
+              <div id="actionMenu" class="dropdown-menu absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-surface-200 z-50 py-1">
+                <button class="w-full px-4 py-2 text-sm text-left text-primary-600 font-medium bg-primary-50">All Events</button>
+                <button class="w-full px-4 py-2 text-sm text-left text-slate-700 hover:bg-surface-50">Agent Actions</button>
+                <button class="w-full px-4 py-2 text-sm text-left text-slate-700 hover:bg-surface-50">System Events</button>
+                <button class="w-full px-4 py-2 text-sm text-left text-slate-700 hover:bg-surface-50">User Actions</button>
+                <button class="w-full px-4 py-2 text-sm text-left text-slate-700 hover:bg-surface-50">Security Events</button>
+              </div>
+            </div>
+
+            <div class="hidden sm:block w-px h-6 bg-surface-200"></div>
+
+            <!-- Severity pill toggles -->
+            <div class="flex items-center gap-1.5">
+              <button onclick="setSeverity(this)" class="severity-pill active px-3 py-1.5 rounded-full text-xs font-medium border border-surface-200 transition-colors">All</button>
+              <button onclick="setSeverity(this)" class="severity-pill px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-surface-50 border border-surface-200 hover:bg-surface-100 transition-colors">Info</button>
+              <button onclick="setSeverity(this)" class="severity-pill px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-surface-50 border border-surface-200 hover:bg-surface-100 transition-colors">Warning</button>
+              <button onclick="setSeverity(this)" class="severity-pill px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-surface-50 border border-surface-200 hover:bg-surface-100 transition-colors">Error</button>
+            </div>
+
+            <div class="flex-1"></div>
+            <button class="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors hover:underline underline-offset-2">Clear Filters</button>
+            <div class="hidden sm:block w-px h-6 bg-surface-200"></div>
+            <span class="text-sm text-slate-500 font-medium font-mono tabular-nums">1,847 events</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="flex-1 px-6 lg:px-8 pb-4 overflow-hidden flex flex-col">
+        <div class="bg-white rounded-xl border border-surface-200 shadow-sm flex-1 flex flex-col overflow-hidden">
+          <div class="table-wrapper overflow-x-auto flex-1">
+            <table class="w-full min-w-[900px]">
+              <thead>
+                <tr class="border-b border-surface-200 bg-surface-50/80">
+                  <th class="w-8 px-3 py-3"></th>
+                  <th class="px-4 py-3 text-left"><span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Timestamp</span></th>
+                  <th class="px-4 py-3 text-left"><span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Actor</span></th>
+                  <th class="px-4 py-3 text-left"><span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Event Type</span></th>
+                  <th class="px-4 py-3 text-left"><span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Details</span></th>
+                  <th class="px-4 py-3 text-left"><span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Severity</span></th>
+                  <th class="px-4 py-3 text-right"><span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Duration</span></th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-surface-100">
+
+                <!-- ROW 1: Agent Action - Tool Execution (Expanded) -->
+                <tr class="data-row cursor-pointer" onclick="toggleRow(this)">
+                  <td class="px-3 py-3"><svg class="chevron-icon w-4 h-4 text-slate-400 rotated" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></td>
+                  <td class="px-4 py-3"><span class="font-mono text-sm text-slate-700 tabular-nums">2026-02-05 14:32:18</span></td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center text-[10px] font-bold text-violet-700">N</div>
+                      <span class="text-sm font-medium text-slate-900">Nadia</span>
+                      <span class="text-xs text-slate-400">(Agent)</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary-50 text-primary-700 text-xs font-medium">Tool Execution</span></td>
+                  <td class="px-4 py-3 max-w-xs"><p class="text-sm text-slate-600 truncate font-mono text-xs">GET /rest/api/3/search?jql=project=PM&status=In+Progress</p></td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Info</span></td>
+                  <td class="px-4 py-3 text-right"><span class="font-mono text-sm text-slate-600 tabular-nums">1.2s</span></td>
+                </tr>
+                <tr><td colspan="7" class="p-0">
+                  <div class="row-details expanded" id="details-row-1">
+                    <div class="px-12 py-4 bg-surface-50/70 border-t border-surface-100">
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Action Metadata</span>
+                        <span class="font-mono text-[10px] text-slate-400">event_id: evt_8f3a2b1c</span>
+                      </div>
+                      <pre class="font-mono text-xs leading-relaxed bg-primary-950 text-primary-200 rounded-lg p-4 overflow-x-auto"><code>{
+  "event_type": "agent.tool_execution",
+  "agent_id": "agent_nadia_01",
+  "agent_name": "Nadia",
+  "tool": "jira.search",
+  "method": "GET",
+  "endpoint": "/rest/api/3/search",
+  "params": {
+    "jql": "project = PM AND status = 'In Progress'"
+  },
+  "response_code": 200,
+  "results_count": 14,
+  "tokens_consumed": 1247,
+  "duration_ms": 1203,
+  "ip_address": "10.0.1.42"
+}</code></pre>
+                    </div>
+                  </div>
+                </td></tr>
+
+                <!-- ROW 2: System Event - Agent Started -->
+                <tr class="data-row bg-surface-50/40 cursor-pointer" onclick="toggleRow(this)">
+                  <td class="px-3 py-3"><svg class="chevron-icon w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></td>
+                  <td class="px-4 py-3"><span class="font-mono text-sm text-slate-700 tabular-nums">2026-02-05 14:31:45</span></td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-700">S</div>
+                      <span class="text-sm font-medium text-slate-900">System</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-medium">Agent Started</span></td>
+                  <td class="px-4 py-3 max-w-xs"><p class="text-sm text-slate-600 truncate">Agent Atlas (Eng) restarted after config update</p></td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Info</span></td>
+                  <td class="px-4 py-3 text-right"><span class="font-mono text-sm text-slate-600 tabular-nums">0.3s</span></td>
+                </tr>
+                <tr><td colspan="7" class="p-0"><div class="row-details"></div></td></tr>
+
+                <!-- ROW 3: Agent Action - API Call Error -->
+                <tr class="data-row cursor-pointer" onclick="toggleRow(this)">
+                  <td class="px-3 py-3"><svg class="chevron-icon w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></td>
+                  <td class="px-4 py-3"><span class="font-mono text-sm text-slate-700 tabular-nums">2026-02-05 14:28:02</span></td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-[10px] font-bold text-amber-700">H</div>
+                      <span class="text-sm font-medium text-slate-900">Hermes</span>
+                      <span class="text-xs text-slate-400">(Agent)</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-red-50 text-red-700 text-xs font-medium">API Call Failed</span></td>
+                  <td class="px-4 py-3 max-w-xs"><p class="text-sm text-red-600 truncate font-medium">Google Sheets API: 429 Too Many Requests</p></td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">Error</span></td>
+                  <td class="px-4 py-3 text-right"><span class="font-mono text-sm text-red-600 tabular-nums">8.5s</span></td>
+                </tr>
+                <tr><td colspan="7" class="p-0"><div class="row-details"></div></td></tr>
+
+                <!-- ROW 4: User Action - Settings Change -->
+                <tr class="data-row bg-surface-50/40 cursor-pointer" onclick="toggleRow(this)">
+                  <td class="px-3 py-3"><svg class="chevron-icon w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></td>
+                  <td class="px-4 py-3"><span class="font-mono text-sm text-slate-700 tabular-nums">2026-02-05 14:25:11</span></td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center text-[10px] font-bold text-primary-700">AZ</div>
+                      <span class="text-sm font-medium text-slate-900">Ahmed Zidan</span>
+                      <span class="text-xs text-slate-400">(Admin)</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-yellow-50 text-yellow-700 text-xs font-medium">Config Change</span></td>
+                  <td class="px-4 py-3 max-w-xs"><p class="text-sm text-slate-600 truncate">Updated Iris model: haiku-3.5 to sonnet-4.5</p></td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Warning</span></td>
+                  <td class="px-4 py-3 text-right"><span class="font-mono text-sm text-slate-600 tabular-nums">0.1s</span></td>
+                </tr>
+                <tr><td colspan="7" class="p-0"><div class="row-details"></div></td></tr>
+
+                <!-- ROW 5: System Event - Skill Installed -->
+                <tr class="data-row cursor-pointer" onclick="toggleRow(this)">
+                  <td class="px-3 py-3"><svg class="chevron-icon w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></td>
+                  <td class="px-4 py-3"><span class="font-mono text-sm text-slate-700 tabular-nums">2026-02-05 14:20:33</span></td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-sky-100 flex items-center justify-center text-[10px] font-bold text-sky-700">A</div>
+                      <span class="text-sm font-medium text-slate-900">Atlas</span>
+                      <span class="text-xs text-slate-400">(Agent)</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-cyan-50 text-cyan-700 text-xs font-medium">Skill Installed</span></td>
+                  <td class="px-4 py-3 max-w-xs"><p class="text-sm text-slate-600 truncate">Installed skill: github-pr-reviewer v2.4.1</p></td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Info</span></td>
+                  <td class="px-4 py-3 text-right"><span class="font-mono text-sm text-slate-600 tabular-nums">0.8s</span></td>
+                </tr>
+                <tr><td colspan="7" class="p-0"><div class="row-details"></div></td></tr>
+
+                <!-- ROW 6: Security Event - Failed Login -->
+                <tr class="data-row bg-surface-50/40 cursor-pointer" onclick="toggleRow(this)">
+                  <td class="px-3 py-3"><svg class="chevron-icon w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></td>
+                  <td class="px-4 py-3"><span class="font-mono text-sm text-slate-700 tabular-nums">2026-02-05 14:15:47</span></td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-[10px] font-bold text-red-700">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                      </div>
+                      <span class="text-sm font-medium text-slate-900">unknown@ext.co</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-red-50 text-red-700 text-xs font-medium">Failed Login</span></td>
+                  <td class="px-4 py-3 max-w-xs"><p class="text-sm text-red-600 truncate font-medium">3 failed login attempts from 185.42.103.12</p></td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">Error</span></td>
+                  <td class="px-4 py-3 text-right"><span class="font-mono text-sm text-slate-400 tabular-nums">--</span></td>
+                </tr>
+                <tr><td colspan="7" class="p-0"><div class="row-details"></div></td></tr>
+
+                <!-- ROW 7: User Action - Team Member Invite -->
+                <tr class="data-row cursor-pointer" onclick="toggleRow(this)">
+                  <td class="px-3 py-3"><svg class="chevron-icon w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></td>
+                  <td class="px-4 py-3"><span class="font-mono text-sm text-slate-700 tabular-nums">2026-02-05 14:12:09</span></td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center text-[10px] font-bold text-primary-700">AZ</div>
+                      <span class="text-sm font-medium text-slate-900">Ahmed Zidan</span>
+                      <span class="text-xs text-slate-400">(Admin)</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary-50 text-primary-700 text-xs font-medium">Team Invite</span></td>
+                  <td class="px-4 py-3 max-w-xs"><p class="text-sm text-slate-600 truncate">Invited sara.m@breadfast.com as Member</p></td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Info</span></td>
+                  <td class="px-4 py-3 text-right"><span class="font-mono text-sm text-slate-600 tabular-nums">0.2s</span></td>
+                </tr>
+                <tr><td colspan="7" class="p-0"><div class="row-details"></div></td></tr>
+
+                <!-- ROW 8: Security Event - API Key Created -->
+                <tr class="data-row bg-surface-50/40 cursor-pointer" onclick="toggleRow(this)">
+                  <td class="px-3 py-3"><svg class="chevron-icon w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></td>
+                  <td class="px-4 py-3"><span class="font-mono text-sm text-slate-700 tabular-nums">2026-02-05 14:08:55</span></td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center text-[10px] font-bold text-primary-700">AZ</div>
+                      <span class="text-sm font-medium text-slate-900">Ahmed Zidan</span>
+                      <span class="text-xs text-slate-400">(Admin)</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-yellow-50 text-yellow-700 text-xs font-medium">API Key Created</span></td>
+                  <td class="px-4 py-3 max-w-xs"><p class="text-sm text-slate-600 truncate">Created API key "prod-webhook" (read-only, expires 2026-08-05)</p></td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Warning</span></td>
+                  <td class="px-4 py-3 text-right"><span class="font-mono text-sm text-slate-600 tabular-nums">0.1s</span></td>
+                </tr>
+                <tr><td colspan="7" class="p-0"><div class="row-details"></div></td></tr>
+
+                <!-- ROW 9: Agent Action - Skill Invocation -->
+                <tr class="data-row cursor-pointer" onclick="toggleRow(this)">
+                  <td class="px-3 py-3"><svg class="chevron-icon w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></td>
+                  <td class="px-4 py-3"><span class="font-mono text-sm text-slate-700 tabular-nums">2026-02-05 14:03:22</span></td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center text-[10px] font-bold text-teal-700">I</div>
+                      <span class="text-sm font-medium text-slate-900">Iris</span>
+                      <span class="text-xs text-slate-400">(Agent)</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-violet-50 text-violet-700 text-xs font-medium">Skill Invocation</span></td>
+                  <td class="px-4 py-3 max-w-xs"><p class="text-sm text-slate-600 truncate">slack.send_message -> #ops-monitoring (daily health report)</p></td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Info</span></td>
+                  <td class="px-4 py-3 text-right"><span class="font-mono text-sm text-slate-600 tabular-nums">0.5s</span></td>
+                </tr>
+                <tr><td colspan="7" class="p-0"><div class="row-details"></div></td></tr>
+
+                <!-- ROW 10: Security Event - Permission Change -->
+                <tr class="data-row bg-surface-50/40 cursor-pointer" onclick="toggleRow(this)">
+                  <td class="px-3 py-3"><svg class="chevron-icon w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></td>
+                  <td class="px-4 py-3"><span class="font-mono text-sm text-slate-700 tabular-nums">2026-02-05 13:58:41</span></td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center text-[10px] font-bold text-primary-700">AZ</div>
+                      <span class="text-sm font-medium text-slate-900">Ahmed Zidan</span>
+                      <span class="text-xs text-slate-400">(Admin)</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-yellow-50 text-yellow-700 text-xs font-medium">Permission Change</span></td>
+                  <td class="px-4 py-3 max-w-xs"><p class="text-sm text-slate-600 truncate">Elevated sara.m@breadfast.com from Member to Admin</p></td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Warning</span></td>
+                  <td class="px-4 py-3 text-right"><span class="font-mono text-sm text-slate-600 tabular-nums">0.1s</span></td>
+                </tr>
+                <tr><td colspan="7" class="p-0"><div class="row-details"></div></td></tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-surface-200 bg-surface-50/50">
+            <p class="text-sm text-slate-500">
+              Showing <span class="font-medium text-slate-700">1-25</span> of <span class="font-medium text-slate-700">1,847</span> events
+            </p>
+            <div class="flex items-center gap-2">
+              <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-surface-200 bg-white text-slate-400 cursor-not-allowed" disabled>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+              </button>
+              <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-primary-300 bg-primary-50 text-primary-700 text-sm font-semibold shadow-sm">1</button>
+              <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-surface-200 bg-white text-slate-700 text-sm font-medium hover:bg-surface-50 transition-colors">2</button>
+              <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-surface-200 bg-white text-slate-700 text-sm font-medium hover:bg-surface-50 transition-colors">3</button>
+              <span class="text-slate-400 text-sm px-1">...</span>
+              <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-surface-200 bg-white text-slate-700 text-sm font-medium hover:bg-surface-50 transition-colors">74</button>
+              <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-surface-200 bg-white text-slate-700 text-sm font-medium hover:bg-surface-50 transition-colors">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+              </button>
+              <div class="w-px h-6 bg-surface-200 mx-1"></div>
+              <div class="relative">
+                <button onclick="toggleDropdown('perPageMenu')" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-surface-200 rounded-lg text-sm text-slate-600 hover:bg-surface-50 transition-colors">
+                  25 per page
+                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                </button>
+                <div id="perPageMenu" class="dropdown-menu absolute right-0 bottom-full mb-2 w-32 bg-white rounded-lg shadow-lg border border-surface-200 z-50 py-1">
+                  <button class="w-full px-4 py-2 text-sm text-left text-slate-700 hover:bg-surface-50">10 per page</button>
+                  <button class="w-full px-4 py-2 text-sm text-left text-primary-600 font-medium bg-primary-50">25 per page</button>
+                  <button class="w-full px-4 py-2 text-sm text-left text-slate-700 hover:bg-surface-50">50 per page</button>
+                  <button class="w-full px-4 py-2 text-sm text-left text-slate-700 hover:bg-surface-50">100 per page</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    let sidebarCollapsed = false;
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+      if (sidebarCollapsed) {
+        sidebar.style.width = '64px';
+        mainContent.style.marginLeft = '64px';
+        labels.forEach(el => el.style.display = 'none');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.style.width = '256px';
+        mainContent.style.marginLeft = '256px';
+        labels.forEach(el => el.style.display = '');
+        collapseIcon.style.transform = '';
+      }
+    }
+
+    // Dropdown toggle
+    function toggleDropdown(menuId) {
+      document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        if (menu.id !== menuId) menu.classList.remove('open');
+      });
+      document.getElementById(menuId).classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.relative') && !e.target.closest('.sidebar-user-row')) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('open'));
+      }
+    });
+
+    // Severity pill toggle
+    function setSeverity(el) {
+      document.querySelectorAll('.severity-pill').forEach(pill => {
+        pill.classList.remove('active');
+        pill.classList.add('text-slate-600', 'bg-surface-50');
+      });
+      el.classList.add('active');
+      el.classList.remove('text-slate-600', 'bg-surface-50');
+    }
+
+    // Row expand/collapse
+    function toggleRow(row) {
+      const chevron = row.querySelector('.chevron-icon');
+      const detailsRow = row.nextElementSibling;
+      const detailsDiv = detailsRow ? detailsRow.querySelector('.row-details') : null;
+      if (!detailsDiv) return;
+
+      const isExpanded = detailsDiv.classList.contains('expanded');
+      if (isExpanded) {
+        detailsDiv.classList.remove('expanded');
+        chevron.classList.remove('rotated');
+      } else {
+        if (!detailsDiv.innerHTML.trim()) {
+          const cells = row.querySelectorAll('td');
+          const timestamp = cells[1]?.textContent.trim() || '';
+          const actor = cells[2]?.querySelector('.text-sm.font-medium')?.textContent.trim() || 'unknown';
+          const eventType = cells[3]?.textContent.trim().toLowerCase().replace(/\s+/g, '_') || 'unknown';
+          const detail = cells[4]?.textContent.trim() || '';
+          const severity = cells[5]?.textContent.trim().toLowerCase() || 'info';
+          const duration = cells[6]?.textContent.trim().replace('s', '').replace('--', '0') || '0';
+
+          const payload = {
+            event_type: eventType,
+            actor: actor,
+            timestamp: timestamp,
+            description: detail.substring(0, 120),
+            severity: severity,
+            response_code: eventType.includes('error') || eventType.includes('failed') ? 500 : 200,
+            duration_ms: duration !== '0' ? Math.round(parseFloat(duration) * 1000) : null,
+            ip_address: "10.0.1." + Math.floor(Math.random() * 255),
+            session_id: "sess_" + Math.random().toString(36).substr(2, 12)
+          };
+
+          detailsDiv.innerHTML = `
+            <div class="px-12 py-4 bg-surface-50/70 border-t border-surface-100">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Action Metadata</span>
+                <span class="font-mono text-[10px] text-slate-400">event_id: evt_${Math.random().toString(36).substr(2, 8)}</span>
+              </div>
+              <pre class="font-mono text-xs leading-relaxed bg-primary-950 text-primary-200 rounded-lg p-4 overflow-x-auto"><code>${JSON.stringify(payload, null, 2)}</code></pre>
+            </div>
+          `;
+        }
+        detailsDiv.classList.add('expanded');
+        chevron.classList.add('rotated');
+      }
+    }
+
+    // ── Prototype Navigation Bridge ──
+    // If loaded in a prototype frame, communicate navigation requests to parent
+    if (window.parent !== window) {
+      // Intercept all sidebar link clicks
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href^="/"]');
+        if (link) {
+          const href = link.getAttribute('href');
+
+          // Send navigation request to parent frame
+          window.parent.postMessage({
+            type: 'navigate',
+            href: href
+          }, '*');
+
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+    }
+  </script>
+</body>
+</html>

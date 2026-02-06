@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Members - Aegis Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            primary: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            },
+            neutral: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              700: '#334155',
+              800: '#1e293b',
+              900: '#0f172a',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Card hover */
+    .card-hover {
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-hover:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -2px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Nav hover */
+    .nav-item {
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    /* Sidebar mobile overlay */
+    .sidebar-overlay {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    /* Status pulse animation */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .status-pulse { animation: pulse-dot 2s ease-in-out infinite; }
+
+    /* Modal animation */
+    .modal-backdrop {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      transition: opacity 0.2s ease;
+    }
+    .modal-panel {
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+    }
+    .modal-backdrop.hidden { opacity: 0; pointer-events: none; }
+    .modal-backdrop.hidden .modal-panel { transform: scale(0.95) translateY(10px); opacity: 0; }
+    .modal-backdrop:not(.hidden) .modal-panel { transform: scale(1) translateY(0); opacity: 1; }
+
+    /* Dropdown animation - z-index 50 fix */
+    .dropdown-menu {
+      position: absolute;
+      z-index: 50;
+      transform: translateY(-4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .dropdown-menu.open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Dropdown container must be relative */
+    [data-dropdown] {
+      position: relative;
+    }
+
+    /* Confirmation toast */
+    .toast {
+      transform: translateY(100%);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Sidebar collapse transitions */
+    #sidebar {
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #sidebar .sidebar-label {
+      transition: opacity 0.2s ease, width 0.2s ease;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    #sidebar.collapsed .sidebar-label {
+      opacity: 0;
+      width: 0;
+      margin: 0;
+      padding: 0;
+    }
+    #sidebar.collapsed .sidebar-section-label {
+      opacity: 0;
+      height: 0;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #sidebar .sidebar-section-label {
+      transition: opacity 0.2s ease, height 0.2s ease;
+    }
+    #sidebar.collapsed .sidebar-badge {
+      display: none;
+    }
+    #sidebar.collapsed .sidebar-cta {
+      display: none;
+    }
+    #sidebar.collapsed .sidebar-user-info {
+      display: none;
+    }
+    #sidebar.collapsed .sidebar-user-action {
+      display: none;
+    }
+    /* User footer dropdown in sidebar */
+    .sidebar-footer-dropdown {
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      transform: translateY(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .sidebar-footer-dropdown.open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+
+<body class="h-full bg-surface-50 text-slate-800 antialiased">
+  <div class="flex h-full">
+
+    <!-- ======================= -->
+    <!-- LEFT SIDEBAR (TENANT ADMIN) -->
+    <!-- ======================= -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full bg-white border-r border-neutral-200 flex flex-col z-30 transition-all duration-300" style="width: 256px">
+      <!-- Logo -->
+      <div class="flex items-center gap-3 px-5 py-5 border-b border-neutral-100">
+        <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-violet-500 rounded-lg flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <span class="sidebar-label font-bold text-neutral-900 text-lg tracking-tight">Acme Corp</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+        <div>
+          <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Workspace</p>
+          <!-- Dashboard -->
+          <a href="/dashboard" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="sidebar-label">Dashboard</span>
+          </a>
+          <!-- Agents -->
+          <a href="/dashboard/agents" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+            <span class="sidebar-label">Agents</span>
+          </a>
+          <!-- Skill Marketplace -->
+          <a href="/dashboard/skills" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span class="sidebar-label">Skill Marketplace</span>
+          </a>
+        </div>
+        <div>
+          <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Management</p>
+          <!-- Team Members -->
+          <a href="/dashboard/team" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-primary-50 text-primary-600 font-semibold">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            <span class="sidebar-label">Team Members</span>
+          </a>
+          <!-- Audit Log -->
+          <a href="/dashboard/audit" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span class="sidebar-label">Audit Log</span>
+          </a>
+          <!-- Settings -->
+          <a href="/dashboard/settings" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            <span class="sidebar-label">Settings</span>
+          </a>
+        </div>
+      </nav>
+
+      <!-- Footer -->
+      <div class="border-t border-neutral-100 px-3 py-3 space-y-2">
+        <button onclick="toggleSidebar()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 w-full">
+          <svg id="collapse-icon" class="w-5 h-5 flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+          <span class="sidebar-label">Collapse</span>
+        </button>
+        <div class="flex items-center gap-3 px-3 py-2">
+          <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-sm font-semibold text-primary-600">JD</span>
+          </div>
+          <div class="sidebar-label">
+            <p class="text-sm font-medium text-neutral-900">Jane Doe</p>
+            <p class="text-xs text-neutral-500">Tenant Admin</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ======================= -->
+    <!-- MAIN CONTENT AREA       -->
+    <!-- ======================= -->
+    <div id="main-content" class="flex flex-col min-w-0 overflow-hidden min-h-screen" style="margin-left: 256px">
+      <!-- Top bar (mobile) -->
+      <header class="flex h-14 items-center justify-between border-b border-surface-200 bg-white px-4 lg:hidden">
+        <button onclick="toggleSidebar()" class="rounded-lg p-2 hover:bg-surface-100 transition-colors">
+          <svg class="h-5 w-5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <div class="flex items-center gap-2">
+          <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-500">
+            <svg class="h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <span class="text-sm font-semibold text-slate-800">Breadfast</span>
+        </div>
+        <div class="w-9"></div>
+      </header>
+
+      <!-- Scrollable content -->
+      <div class="flex-1 overflow-y-auto">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+
+          <!-- ======================= -->
+          <!-- PAGE HEADER             -->
+          <!-- ======================= -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div>
+              <div class="flex items-center gap-3">
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Team Members</h1>
+                <span class="inline-flex items-center rounded-full bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700 ring-1 ring-inset ring-primary-200">(6)</span>
+              </div>
+              <p class="text-sm text-slate-500 mt-1">Manage your team members and their roles within the platform</p>
+            </div>
+            <button onclick="openInviteModal()" class="inline-flex items-center gap-2 rounded-lg bg-primary-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="8.5" cy="7" r="4"/>
+                <line x1="20" y1="8" x2="20" y2="14"/>
+                <line x1="23" y1="11" x2="17" y2="11"/>
+              </svg>
+              Invite Member
+            </button>
+          </div>
+
+          <!-- ======================= -->
+          <!-- MEMBER CARDS LIST       -->
+          <!-- ======================= -->
+          <div class="space-y-3" id="membersList">
+
+            <!-- Member 1: Ahmed Zidan (Admin - current user, cannot be removed as last admin) -->
+            <div class="card-hover bg-white rounded-xl border border-surface-200 shadow-sm overflow-visible">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5">
+                <!-- Avatar + Info -->
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                  <div class="relative flex-shrink-0">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-sm font-semibold text-white">AZ</div>
+                    <div class="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-400 ring-2 ring-white status-pulse" title="Active now"></div>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="text-sm font-semibold text-slate-900 truncate">Ahmed Zidan</h3>
+                      <span class="inline-flex items-center rounded-md bg-primary-50 px-2 py-0.5 text-[11px] font-semibold text-primary-700 ring-1 ring-inset ring-primary-200">Admin</span>
+                      <span class="text-[10px] font-medium text-slate-400 bg-slate-50 rounded px-1.5 py-0.5">You</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5 truncate">ahmed@breadfast.com</p>
+                  </div>
+                </div>
+
+                <!-- Meta + Actions -->
+                <div class="flex items-center gap-6 sm:gap-8 pl-15 sm:pl-0">
+                  <div class="hidden md:block text-right">
+                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Joined</p>
+                    <p class="text-xs text-slate-600 mt-0.5">Jan 15, 2025</p>
+                  </div>
+                  <div class="hidden md:block text-right">
+                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Last active</p>
+                    <p class="text-xs text-slate-600 mt-0.5 flex items-center justify-end gap-1.5">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 status-pulse"></span>
+                      Active now
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <!-- Role dropdown (disabled for self) -->
+                    <div class="relative">
+                      <button disabled class="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-surface-50 px-3 py-1.5 text-xs font-medium text-slate-400 cursor-not-allowed" title="Cannot change your own role">
+                        Admin
+                        <svg class="h-3 w-3 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Member 2: Sarah Mahmoud (Admin) -->
+            <div class="card-hover bg-white rounded-xl border border-surface-200 shadow-sm overflow-visible">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5">
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                  <div class="relative flex-shrink-0">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-rose-400 to-pink-600 text-sm font-semibold text-white">SM</div>
+                    <div class="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-400 ring-2 ring-white status-pulse" title="Active recently"></div>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="text-sm font-semibold text-slate-900 truncate">Sarah Mahmoud</h3>
+                      <span class="inline-flex items-center rounded-md bg-primary-50 px-2 py-0.5 text-[11px] font-semibold text-primary-700 ring-1 ring-inset ring-primary-200">Admin</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5 truncate">sarah@breadfast.com</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-6 sm:gap-8 pl-15 sm:pl-0">
+                  <div class="hidden md:block text-right">
+                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Joined</p>
+                    <p class="text-xs text-slate-600 mt-0.5">Jan 15, 2025</p>
+                  </div>
+                  <div class="hidden md:block text-right">
+                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Last active</p>
+                    <p class="text-xs text-slate-600 mt-0.5">2h ago</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="relative" data-dropdown="role-sarah">
+                      <button onclick="toggleRoleDropdown('role-sarah')" class="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-surface-50 transition-colors">
+                        Admin
+                        <svg class="h-3 w-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                      </button>
+                      <div id="role-sarah" class="dropdown-menu right-0 top-full mt-1 w-32 rounded-lg bg-white border border-surface-200 shadow-lg py-1">
+                        <button onclick="changeRole('sarah', 'Admin', this)" class="w-full text-left px-3 py-1.5 text-xs font-medium text-primary-600 bg-primary-50 flex items-center gap-2">
+                          <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          Admin
+                        </button>
+                        <button onclick="changeRole('sarah', 'Member', this)" class="w-full text-left px-3 py-1.5 text-xs text-slate-600 hover:bg-surface-50 flex items-center gap-2">
+                          <span class="w-3"></span>
+                          Member
+                        </button>
+                      </div>
+                    </div>
+                    <button onclick="confirmRemove('Sarah Mahmoud', 'sarah')" class="rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Remove member">
+                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <line x1="18" y1="11" x2="23" y2="11"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Member 3: Karim Reda (Member) -->
+            <div class="card-hover bg-white rounded-xl border border-surface-200 shadow-sm overflow-visible">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5">
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                  <div class="relative flex-shrink-0">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-600 text-sm font-semibold text-white">KR</div>
+                    <div class="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-slate-300 ring-2 ring-white" title="Inactive"></div>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="text-sm font-semibold text-slate-900 truncate">Karim Reda</h3>
+                      <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-inset ring-slate-200">Member</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5 truncate">karim@breadfast.com</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-6 sm:gap-8 pl-15 sm:pl-0">
+                  <div class="hidden md:block text-right">
+                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Joined</p>
+                    <p class="text-xs text-slate-600 mt-0.5">Jan 20, 2025</p>
+                  </div>
+                  <div class="hidden md:block text-right">
+                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Last active</p>
+                    <p class="text-xs text-slate-600 mt-0.5">1d ago</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="relative" data-dropdown="role-karim">
+                      <button onclick="toggleRoleDropdown('role-karim')" class="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-surface-50 transition-colors">
+                        Member
+                        <svg class="h-3 w-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                      </button>
+                      <div id="role-karim" class="dropdown-menu right-0 top-full mt-1 w-32 rounded-lg bg-white border border-surface-200 shadow-lg py-1">
+                        <button onclick="changeRole('karim', 'Admin', this)" class="w-full text-left px-3 py-1.5 text-xs text-slate-600 hover:bg-surface-50 flex items-center gap-2">
+                          <span class="w-3"></span>
+                          Admin
+                        </button>
+                        <button onclick="changeRole('karim', 'Member', this)" class="w-full text-left px-3 py-1.5 text-xs font-medium text-primary-600 bg-primary-50 flex items-center gap-2">
+                          <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          Member
+                        </button>
+                      </div>
+                    </div>
+                    <button onclick="confirmRemove('Karim Reda', 'karim')" class="rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Remove member">
+                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <line x1="18" y1="11" x2="23" y2="11"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Member 4: Layla Hassan (Member) -->
+            <div class="card-hover bg-white rounded-xl border border-surface-200 shadow-sm overflow-visible">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5">
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                  <div class="relative flex-shrink-0">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-emerald-600 text-sm font-semibold text-white">LH</div>
+                    <div class="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-400 ring-2 ring-white status-pulse" title="Active recently"></div>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="text-sm font-semibold text-slate-900 truncate">Layla Hassan</h3>
+                      <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-inset ring-slate-200">Member</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5 truncate">layla@breadfast.com</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-6 sm:gap-8 pl-15 sm:pl-0">
+                  <div class="hidden md:block text-right">
+                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Joined</p>
+                    <p class="text-xs text-slate-600 mt-0.5">Feb 1, 2025</p>
+                  </div>
+                  <div class="hidden md:block text-right">
+                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Last active</p>
+                    <p class="text-xs text-slate-600 mt-0.5">3h ago</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="relative" data-dropdown="role-layla">
+                      <button onclick="toggleRoleDropdown('role-layla')" class="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-surface-50 transition-colors">
+                        Member
+                        <svg class="h-3 w-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                      </button>
+                      <div id="role-layla" class="dropdown-menu right-0 top-full mt-1 w-32 rounded-lg bg-white border border-surface-200 shadow-lg py-1">
+                        <button onclick="changeRole('layla', 'Admin', this)" class="w-full text-left px-3 py-1.5 text-xs text-slate-600 hover:bg-surface-50 flex items-center gap-2">
+                          <span class="w-3"></span>
+                          Admin
+                        </button>
+                        <button onclick="changeRole('layla', 'Member', this)" class="w-full text-left px-3 py-1.5 text-xs font-medium text-primary-600 bg-primary-50 flex items-center gap-2">
+                          <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          Member
+                        </button>
+                      </div>
+                    </div>
+                    <button onclick="confirmRemove('Layla Hassan', 'layla')" class="rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Remove member">
+                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <line x1="18" y1="11" x2="23" y2="11"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Member 5: Omar Farid (Member) -->
+            <div class="card-hover bg-white rounded-xl border border-surface-200 shadow-sm overflow-visible">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5">
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                  <div class="relative flex-shrink-0">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-400 to-purple-700 text-sm font-semibold text-white">OF</div>
+                    <div class="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-slate-300 ring-2 ring-white" title="Inactive"></div>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="text-sm font-semibold text-slate-900 truncate">Omar Farid</h3>
+                      <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-inset ring-slate-200">Member</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5 truncate">omar@breadfast.com</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-6 sm:gap-8 pl-15 sm:pl-0">
+                  <div class="hidden md:block text-right">
+                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Joined</p>
+                    <p class="text-xs text-slate-600 mt-0.5">Feb 3, 2025</p>
+                  </div>
+                  <div class="hidden md:block text-right">
+                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Last active</p>
+                    <p class="text-xs text-slate-600 mt-0.5">5d ago</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="relative" data-dropdown="role-omar">
+                      <button onclick="toggleRoleDropdown('role-omar')" class="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-surface-50 transition-colors">
+                        Member
+                        <svg class="h-3 w-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                      </button>
+                      <div id="role-omar" class="dropdown-menu right-0 top-full mt-1 w-32 rounded-lg bg-white border border-surface-200 shadow-lg py-1">
+                        <button onclick="changeRole('omar', 'Admin', this)" class="w-full text-left px-3 py-1.5 text-xs text-slate-600 hover:bg-surface-50 flex items-center gap-2">
+                          <span class="w-3"></span>
+                          Admin
+                        </button>
+                        <button onclick="changeRole('omar', 'Member', this)" class="w-full text-left px-3 py-1.5 text-xs font-medium text-primary-600 bg-primary-50 flex items-center gap-2">
+                          <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          Member
+                        </button>
+                      </div>
+                    </div>
+                    <button onclick="confirmRemove('Omar Farid', 'omar')" class="rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Remove member">
+                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <line x1="18" y1="11" x2="23" y2="11"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Member 6: Nour Ali (Member) -->
+            <div class="card-hover bg-white rounded-xl border border-surface-200 shadow-sm overflow-visible">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5">
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                  <div class="relative flex-shrink-0">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-600 text-sm font-semibold text-white">NA</div>
+                    <div class="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-400 ring-2 ring-white status-pulse" title="Active now"></div>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="text-sm font-semibold text-slate-900 truncate">Nour Ali</h3>
+                      <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-inset ring-slate-200">Member</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5 truncate">nour@breadfast.com</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-6 sm:gap-8 pl-15 sm:pl-0">
+                  <div class="hidden md:block text-right">
+                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Joined</p>
+                    <p class="text-xs text-slate-600 mt-0.5">Feb 4, 2025</p>
+                  </div>
+                  <div class="hidden md:block text-right">
+                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Last active</p>
+                    <p class="text-xs text-slate-600 mt-0.5 flex items-center justify-end gap-1.5">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 status-pulse"></span>
+                      Just now
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="relative" data-dropdown="role-nour">
+                      <button onclick="toggleRoleDropdown('role-nour')" class="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-surface-50 transition-colors">
+                        Member
+                        <svg class="h-3 w-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                      </button>
+                      <div id="role-nour" class="dropdown-menu right-0 top-full mt-1 w-32 rounded-lg bg-white border border-surface-200 shadow-lg py-1">
+                        <button onclick="changeRole('nour', 'Admin', this)" class="w-full text-left px-3 py-1.5 text-xs text-slate-600 hover:bg-surface-50 flex items-center gap-2">
+                          <span class="w-3"></span>
+                          Admin
+                        </button>
+                        <button onclick="changeRole('nour', 'Member', this)" class="w-full text-left px-3 py-1.5 text-xs font-medium text-primary-600 bg-primary-50 flex items-center gap-2">
+                          <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          Member
+                        </button>
+                      </div>
+                    </div>
+                    <button onclick="confirmRemove('Nour Ali', 'nour')" class="rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Remove member">
+                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <line x1="18" y1="11" x2="23" y2="11"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ======================= -->
+          <!-- PENDING INVITES         -->
+          <!-- ======================= -->
+          <div class="mt-10">
+            <div class="flex items-center gap-3 mb-4">
+              <h2 class="text-lg font-semibold text-slate-900">Pending Invites</h2>
+              <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 ring-1 ring-inset ring-amber-200">(2)</span>
+            </div>
+
+            <div class="space-y-3">
+
+              <!-- Pending Invite 1 -->
+              <div class="bg-white rounded-xl border border-dashed border-surface-300 shadow-sm overflow-hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5">
+                  <div class="flex items-center gap-4 flex-1 min-w-0">
+                    <div class="flex-shrink-0">
+                      <div class="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 border-2 border-dashed border-slate-300">
+                        <svg class="h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                          <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <p class="text-sm font-medium text-slate-700 truncate">pending1@breadfast.com</p>
+                        <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-inset ring-slate-200">Member</span>
+                      </div>
+                      <div class="flex items-center gap-3 mt-1">
+                        <p class="text-xs text-slate-400">Sent Feb 3, 2025</p>
+                        <span class="text-xs text-slate-300">|</span>
+                        <p class="text-xs text-amber-600 font-medium flex items-center gap-1">
+                          <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                          </svg>
+                          Expires in 5 days
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2 pl-15 sm:pl-0">
+                    <button onclick="resendInvite('pending1@breadfast.com')" class="inline-flex items-center gap-1.5 rounded-lg border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-medium text-primary-700 hover:bg-primary-100 transition-colors">
+                      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                      </svg>
+                      Resend
+                    </button>
+                    <button onclick="cancelInvite('pending1@breadfast.com')" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pending Invite 2 -->
+              <div class="bg-white rounded-xl border border-dashed border-surface-300 shadow-sm overflow-hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5">
+                  <div class="flex items-center gap-4 flex-1 min-w-0">
+                    <div class="flex-shrink-0">
+                      <div class="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 border-2 border-dashed border-slate-300">
+                        <svg class="h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                          <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <p class="text-sm font-medium text-slate-700 truncate">pending2@breadfast.com</p>
+                        <span class="inline-flex items-center rounded-md bg-primary-50 px-2 py-0.5 text-[11px] font-semibold text-primary-700 ring-1 ring-inset ring-primary-200">Admin</span>
+                      </div>
+                      <div class="flex items-center gap-3 mt-1">
+                        <p class="text-xs text-slate-400">Sent Feb 4, 2025</p>
+                        <span class="text-xs text-slate-300">|</span>
+                        <p class="text-xs text-amber-600 font-medium flex items-center gap-1">
+                          <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                          </svg>
+                          Expires in 5 days
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2 pl-15 sm:pl-0">
+                    <button onclick="resendInvite('pending2@breadfast.com')" class="inline-flex items-center gap-1.5 rounded-lg border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-medium text-primary-700 hover:bg-primary-100 transition-colors">
+                      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                      </svg>
+                      Resend
+                    </button>
+                    <button onclick="cancelInvite('pending2@breadfast.com')" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Bottom spacer -->
+          <div class="h-8"></div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ======================= -->
+  <!-- INVITE MODAL            -->
+  <!-- ======================= -->
+  <div id="inviteModal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
+    <div class="modal-panel w-full max-w-md bg-white rounded-2xl shadow-2xl border border-surface-200 overflow-hidden">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-6 py-5 border-b border-surface-200">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50">
+            <svg class="h-5 w-5 text-primary-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="8.5" cy="7" r="4"/>
+              <line x1="20" y1="8" x2="20" y2="14"/>
+              <line x1="23" y1="11" x2="17" y2="11"/>
+            </svg>
+          </div>
+          <h2 class="text-lg font-semibold text-slate-900">Invite Team Member</h2>
+        </div>
+        <button onclick="closeInviteModal()" class="rounded-lg p-2 text-slate-400 hover:text-slate-600 hover:bg-surface-100 transition-colors">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="px-6 py-5 space-y-5">
+        <!-- Email Input -->
+        <div>
+          <label for="inviteEmail" class="block text-sm font-medium text-slate-700 mb-1.5">Email address</label>
+          <div class="relative">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+              <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <input
+              type="email"
+              id="inviteEmail"
+              placeholder="colleague@breadfast.com"
+              class="block w-full rounded-lg border border-surface-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-colors"
+            />
+          </div>
+        </div>
+
+        <!-- Role Selector -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-3">Select role</label>
+          <div class="space-y-3">
+            <!-- Admin Option -->
+            <label id="roleAdmin" class="role-option flex items-start gap-3 rounded-xl border-2 border-surface-200 p-4 cursor-pointer hover:border-primary-200 hover:bg-primary-50/30 transition-all" onclick="selectRole('admin')">
+              <div class="flex-shrink-0 mt-0.5">
+                <div id="radioAdmin" class="h-4.5 w-4.5 rounded-full border-2 border-slate-300 flex items-center justify-center transition-colors" style="width: 18px; height: 18px;">
+                  <div class="h-2 w-2 rounded-full bg-transparent transition-colors" style="width: 8px; height: 8px;"></div>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-900">Admin</span>
+                  <span class="inline-flex items-center rounded-md bg-primary-50 px-1.5 py-0.5 text-[10px] font-semibold text-primary-600 ring-1 ring-inset ring-primary-200">Full access</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">Full access to dashboard, can manage agents and team</p>
+              </div>
+            </label>
+
+            <!-- Member Option -->
+            <label id="roleMember" class="role-option flex items-start gap-3 rounded-xl border-2 border-primary-500 bg-primary-50/40 p-4 cursor-pointer transition-all" onclick="selectRole('member')">
+              <div class="flex-shrink-0 mt-0.5">
+                <div id="radioMember" class="rounded-full border-2 border-primary-500 flex items-center justify-center transition-colors" style="width: 18px; height: 18px;">
+                  <div class="rounded-full bg-primary-500 transition-colors" style="width: 8px; height: 8px;"></div>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-900">Member</span>
+                  <span class="inline-flex items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 ring-1 ring-inset ring-slate-200">View only</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">View-only access to agent activity and audit logs</p>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-surface-200 bg-surface-50">
+        <button onclick="closeInviteModal()" class="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-surface-200 transition-colors">
+          Cancel
+        </button>
+        <button onclick="sendInvite()" class="inline-flex items-center gap-2 rounded-lg bg-primary-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          Send Invite
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= -->
+  <!-- REMOVE CONFIRMATION     -->
+  <!-- ======================= -->
+  <div id="removeModal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
+    <div class="modal-panel w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-surface-200 overflow-hidden">
+      <div class="px-6 py-6 text-center">
+        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 mb-4">
+          <svg class="h-6 w-6 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-900 mb-1">Remove Team Member</h3>
+        <p class="text-sm text-slate-500" id="removeMessage">Are you sure you want to remove this member? They will lose access immediately.</p>
+      </div>
+      <div class="flex items-center gap-3 px-6 py-4 border-t border-surface-200 bg-surface-50">
+        <button onclick="closeRemoveModal()" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 border border-surface-200 bg-white hover:bg-surface-100 transition-colors">
+          Cancel
+        </button>
+        <button onclick="executeRemove()" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 shadow-sm transition-colors">
+          Remove
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= -->
+  <!-- TOAST NOTIFICATION      -->
+  <!-- ======================= -->
+  <div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] flex items-center gap-3 rounded-xl bg-slate-900 px-5 py-3 shadow-lg">
+    <svg id="toastIcon" class="h-5 w-5 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+      <polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+    <p id="toastMessage" class="text-sm font-medium text-white">Action completed</p>
+  </div>
+
+  <!-- ======================= -->
+  <!-- JAVASCRIPT              -->
+  <!-- ======================= -->
+  <script>
+    let sidebarCollapsed = false;
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+      if (sidebarCollapsed) {
+        sidebar.style.width = '64px';
+        mainContent.style.marginLeft = '64px';
+        labels.forEach(el => el.style.display = 'none');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.style.width = '256px';
+        mainContent.style.marginLeft = '256px';
+        labels.forEach(el => el.style.display = '');
+        collapseIcon.style.transform = '';
+      }
+    }
+
+    // ---- User footer dropdown ----
+    function toggleUserDropdown() {
+      const dropdown = document.getElementById('userFooterDropdown');
+      dropdown.classList.toggle('open');
+    }
+
+    // Close user dropdown on outside click
+    document.addEventListener('click', function(e) {
+      const userSection = document.querySelector('#sidebar .relative');
+      const dropdown = document.getElementById('userFooterDropdown');
+      if (dropdown && !userSection.contains(e.target)) {
+        dropdown.classList.remove('open');
+      }
+    });
+
+    // ---- Invite Modal ----
+    let selectedRole = 'member';
+
+    function openInviteModal() {
+      const modal = document.getElementById('inviteModal');
+      modal.classList.remove('hidden');
+      document.getElementById('inviteEmail').value = '';
+      selectRole('member');
+      setTimeout(() => document.getElementById('inviteEmail').focus(), 200);
+    }
+
+    function closeInviteModal() {
+      document.getElementById('inviteModal').classList.add('hidden');
+    }
+
+    function selectRole(role) {
+      selectedRole = role;
+      const adminOption = document.getElementById('roleAdmin');
+      const memberOption = document.getElementById('roleMember');
+      const radioAdmin = document.getElementById('radioAdmin');
+      const radioMember = document.getElementById('radioMember');
+
+      if (role === 'admin') {
+        adminOption.className = 'role-option flex items-start gap-3 rounded-xl border-2 border-primary-500 bg-primary-50/40 p-4 cursor-pointer transition-all';
+        memberOption.className = 'role-option flex items-start gap-3 rounded-xl border-2 border-surface-200 p-4 cursor-pointer hover:border-primary-200 hover:bg-primary-50/30 transition-all';
+        radioAdmin.className = 'rounded-full border-2 border-primary-500 flex items-center justify-center transition-colors';
+        radioAdmin.querySelector('div').className = 'rounded-full bg-primary-500 transition-colors';
+        radioMember.className = 'rounded-full border-2 border-slate-300 flex items-center justify-center transition-colors';
+        radioMember.querySelector('div').className = 'rounded-full bg-transparent transition-colors';
+      } else {
+        memberOption.className = 'role-option flex items-start gap-3 rounded-xl border-2 border-primary-500 bg-primary-50/40 p-4 cursor-pointer transition-all';
+        adminOption.className = 'role-option flex items-start gap-3 rounded-xl border-2 border-surface-200 p-4 cursor-pointer hover:border-primary-200 hover:bg-primary-50/30 transition-all';
+        radioMember.className = 'rounded-full border-2 border-primary-500 flex items-center justify-center transition-colors';
+        radioMember.querySelector('div').className = 'rounded-full bg-primary-500 transition-colors';
+        radioAdmin.className = 'rounded-full border-2 border-slate-300 flex items-center justify-center transition-colors';
+        radioAdmin.querySelector('div').className = 'rounded-full bg-transparent transition-colors';
+      }
+    }
+
+    function sendInvite() {
+      const email = document.getElementById('inviteEmail').value.trim();
+      if (!email) {
+        document.getElementById('inviteEmail').classList.add('ring-2', 'ring-red-300', 'border-red-300');
+        document.getElementById('inviteEmail').focus();
+        setTimeout(() => {
+          document.getElementById('inviteEmail').classList.remove('ring-2', 'ring-red-300', 'border-red-300');
+        }, 2000);
+        return;
+      }
+      closeInviteModal();
+      showToast(`Invite sent to ${email} as ${selectedRole === 'admin' ? 'Admin' : 'Member'}`);
+    }
+
+    // ---- Escape key closes modals ----
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeInviteModal();
+        closeRemoveModal();
+        closeAllDropdowns();
+        document.getElementById('userFooterDropdown').classList.remove('open');
+      }
+    });
+
+    // ---- Click outside closes modals ----
+    document.getElementById('inviteModal').addEventListener('click', function(e) {
+      if (e.target === this) closeInviteModal();
+    });
+    document.getElementById('removeModal').addEventListener('click', function(e) {
+      if (e.target === this) closeRemoveModal();
+    });
+
+    // ---- Role Change Dropdown ----
+    function toggleRoleDropdown(id) {
+      const dropdown = document.getElementById(id);
+      const isOpen = dropdown.classList.contains('open');
+      closeAllDropdowns();
+      if (!isOpen) {
+        dropdown.classList.add('open');
+      }
+    }
+
+    function closeAllDropdowns() {
+      document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('open'));
+    }
+
+    // Close dropdowns on outside click
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('[data-dropdown]')) {
+        closeAllDropdowns();
+      }
+    });
+
+    function changeRole(memberId, newRole, btn) {
+      closeAllDropdowns();
+      // Update the role button text
+      const container = document.querySelector(`[data-dropdown="role-${memberId}"]`);
+      if (container) {
+        const triggerBtn = container.querySelector('button:first-child');
+        triggerBtn.innerHTML = `${newRole} <svg class="h-3 w-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>`;
+
+        // Update dropdown active states
+        const dropdownBtns = container.querySelectorAll('.dropdown-menu button');
+        dropdownBtns.forEach(b => {
+          const isActive = b.textContent.trim() === newRole;
+          if (isActive) {
+            b.className = 'w-full text-left px-3 py-1.5 text-xs font-medium text-primary-600 bg-primary-50 flex items-center gap-2';
+            b.innerHTML = `<svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>${newRole}`;
+          } else {
+            b.className = 'w-full text-left px-3 py-1.5 text-xs text-slate-600 hover:bg-surface-50 flex items-center gap-2';
+            b.innerHTML = `<span class="w-3"></span>${b.textContent.trim()}`;
+          }
+        });
+      }
+
+      // Update the role badge on the card
+      const card = container.closest('.card-hover');
+      if (card) {
+        const badge = card.querySelector('h3').nextElementSibling;
+        if (newRole === 'Admin') {
+          badge.className = 'inline-flex items-center rounded-md bg-primary-50 px-2 py-0.5 text-[11px] font-semibold text-primary-700 ring-1 ring-inset ring-primary-200';
+          badge.textContent = 'Admin';
+        } else {
+          badge.className = 'inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-inset ring-slate-200';
+          badge.textContent = 'Member';
+        }
+      }
+
+      showToast(`Role changed to ${newRole}`);
+    }
+
+    // ---- Remove Member ----
+    let pendingRemoveName = '';
+    let pendingRemoveId = '';
+
+    function confirmRemove(name, id) {
+      pendingRemoveName = name;
+      pendingRemoveId = id;
+      document.getElementById('removeMessage').textContent = `Are you sure you want to remove ${name}? They will lose access to the platform immediately.`;
+      document.getElementById('removeModal').classList.remove('hidden');
+    }
+
+    function closeRemoveModal() {
+      document.getElementById('removeModal').classList.add('hidden');
+      pendingRemoveName = '';
+      pendingRemoveId = '';
+    }
+
+    function executeRemove() {
+      closeRemoveModal();
+      showToast(`${pendingRemoveName} has been removed from the team`);
+    }
+
+    // ---- Resend / Cancel Invite ----
+    function resendInvite(email) {
+      showToast(`Invite resent to ${email}`);
+    }
+
+    function cancelInvite(email) {
+      showToast(`Invite to ${email} has been cancelled`);
+    }
+
+    // ---- Toast Notification ----
+    let toastTimeout;
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMessage');
+      toastMsg.textContent = message;
+      clearTimeout(toastTimeout);
+      toast.classList.add('show');
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    // ── Prototype Navigation Bridge ──
+    // If loaded in a prototype frame, communicate navigation requests to parent
+    if (window.parent !== window) {
+      // Intercept all sidebar link clicks
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href^="/"]');
+        if (link) {
+          const href = link.getAttribute('href');
+
+          // Send navigation request to parent frame
+          window.parent.postMessage({
+            type: 'navigate',
+            href: href
+          }, '*');
+
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+    }
+  </script>
+
+</body>
+</html>

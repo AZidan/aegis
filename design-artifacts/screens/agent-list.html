@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aegis Platform - Agents</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            primary: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            },
+            neutral: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              700: '#334155',
+              800: '#1e293b',
+              900: '#0f172a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+
+    /* Smooth transitions */
+    .nav-item { transition: all 0.15s ease; }
+    .card-hover {
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                  box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.1), 0 6px 12px -6px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Quick actions appear on card hover */
+    .agent-card .quick-actions {
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .agent-card:hover .quick-actions {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Status pulse animation */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+    .status-pulse { animation: pulse-dot 2s ease-in-out infinite; }
+
+    /* Error glow */
+    .error-glow {
+      box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.3), 0 0 20px -4px rgba(239, 68, 68, 0.2);
+    }
+
+    /* Suspended dimming */
+    .suspended-card {
+      opacity: 0.55;
+      filter: saturate(0.4);
+    }
+    .suspended-card:hover {
+      opacity: 0.75;
+      filter: saturate(0.6);
+    }
+
+    /* Empty slot card hover */
+    .empty-slot {
+      transition: all 0.2s ease;
+    }
+    .empty-slot:hover {
+      border-color: #818cf8;
+      background: #eef2ff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -5px rgba(99, 102, 241, 0.12);
+    }
+    .empty-slot:hover .empty-icon {
+      color: #6366f1;
+      transform: scale(1.1);
+    }
+    .empty-slot .empty-icon {
+      transition: all 0.2s ease;
+    }
+
+    /* Sidebar overlay for mobile */
+    .sidebar-overlay {
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-panel {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* View toggle active indicator */
+    .view-btn.active {
+      background: #6366f1;
+      color: white;
+      box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
+    }
+
+    /* List view styles */
+    .list-view .agent-card {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    /* Agent card layout fixes */
+    .agent-card .card-inner {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .agent-card .skills-row {
+      flex-wrap: wrap;
+      max-height: 68px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .agent-card .skills-row::-webkit-scrollbar {
+      width: 3px;
+    }
+    .agent-card .skills-row::-webkit-scrollbar-thumb {
+      background: #e2e8f0;
+      border-radius: 2px;
+    }
+    .agent-card .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+      min-width: 0;
+    }
+    .agent-card .meta-row .last-active {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+  </style>
+</head>
+
+<body class="h-full bg-[#f8fafc] font-sans text-neutral-900 antialiased">
+
+  <div class="h-full">
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full bg-white border-r border-neutral-200 flex flex-col z-30 transition-all duration-300" style="width: 256px">
+      <!-- Logo -->
+      <div class="flex items-center gap-3 px-5 py-5 border-b border-neutral-100">
+        <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-violet-500 rounded-lg flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <span class="sidebar-label font-bold text-neutral-900 text-lg tracking-tight">Acme Corp</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+        <div>
+          <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Workspace</p>
+          <!-- Dashboard -->
+          <a href="/dashboard" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="sidebar-label">Dashboard</span>
+          </a>
+          <!-- Agents -->
+          <a href="/dashboard/agents" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-primary-50 text-primary-600 font-semibold">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+            <span class="sidebar-label">Agents</span>
+          </a>
+          <!-- Skill Marketplace -->
+          <a href="/dashboard/skills" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span class="sidebar-label">Skill Marketplace</span>
+          </a>
+        </div>
+        <div>
+          <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Management</p>
+          <!-- Team Members -->
+          <a href="/dashboard/team" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            <span class="sidebar-label">Team Members</span>
+          </a>
+          <!-- Audit Log -->
+          <a href="/dashboard/audit" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span class="sidebar-label">Audit Log</span>
+          </a>
+          <!-- Settings -->
+          <a href="/dashboard/settings" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            <span class="sidebar-label">Settings</span>
+          </a>
+        </div>
+      </nav>
+
+      <!-- Footer -->
+      <div class="border-t border-neutral-100 px-3 py-3 space-y-2">
+        <button onclick="toggleSidebar()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 w-full">
+          <svg id="collapse-icon" class="w-5 h-5 flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+          <span class="sidebar-label">Collapse</span>
+        </button>
+        <div class="flex items-center gap-3 px-3 py-2">
+          <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-sm font-semibold text-primary-600">JD</span>
+          </div>
+          <div class="sidebar-label">
+            <p class="text-sm font-medium text-neutral-900">Jane Doe</p>
+            <p class="text-xs text-neutral-500">Tenant Admin</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <div id="main-content" class="flex flex-col min-w-0 overflow-hidden min-h-screen" style="margin-left: 256px">
+
+      <!-- Header bar -->
+      <header class="flex items-center justify-between h-16 px-6 lg:px-8 border-b border-neutral-200/80 bg-white/70 backdrop-blur-sm shrink-0">
+        <div class="flex items-center gap-4">
+          <!-- Mobile hamburger -->
+          <button onclick="toggleSidebar()" class="lg:hidden -ml-1 p-1.5 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 transition-colors">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+            </svg>
+          </button>
+          <div>
+            <h1 class="text-lg font-semibold text-neutral-900 tracking-tight">Agents</h1>
+            <p class="text-[12px] text-neutral-400 font-medium mt-0.5">
+              <span class="text-neutral-500 font-semibold">5 of 8</span> slots used
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <!-- Search (hidden on small) -->
+          <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-100 border border-neutral-200/60 w-56 focus-within:ring-2 focus-within:ring-primary-500/30 focus-within:border-primary-300 transition-all">
+            <svg class="w-3.5 h-3.5 text-neutral-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+            </svg>
+            <input type="text" placeholder="Search agents..." class="bg-transparent text-[13px] text-neutral-700 placeholder-neutral-400 outline-none w-full" />
+          </div>
+          <!-- Notification bell -->
+          <button class="relative p-2 rounded-lg text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+            </svg>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable main area -->
+      <main class="flex-1 overflow-y-auto">
+        <div class="max-w-[1400px] mx-auto px-6 lg:px-8 py-6">
+
+          <!-- ==================== PAGE HEADER ROW ==================== -->
+          <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+            <!-- Left: Usage bar -->
+            <div class="flex-1 max-w-md">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[13px] font-medium text-neutral-500">Agent Slots</span>
+                <span class="text-[13px] font-mono font-medium text-neutral-700">5 / 8</span>
+              </div>
+              <div class="w-full h-2.5 bg-neutral-200 rounded-full overflow-hidden">
+                <div class="h-full rounded-full bg-gradient-to-r from-primary-500 to-primary-400 transition-all duration-700" style="width: 62.5%"></div>
+              </div>
+              <p class="text-[11px] text-neutral-400 mt-1.5">3 slots remaining on your current plan</p>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="flex items-center gap-3">
+              <!-- View toggle -->
+              <div class="flex items-center bg-neutral-100 rounded-lg p-0.5 border border-neutral-200/60">
+                <button id="gridViewBtn" onclick="setView('grid')" class="view-btn active p-1.5 rounded-md transition-all" title="Grid view">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/>
+                  </svg>
+                </button>
+                <button id="listViewBtn" onclick="setView('list')" class="view-btn p-1.5 rounded-md text-neutral-400 transition-all" title="List view">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Create Agent button -->
+              <button class="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-[13px] font-semibold rounded-lg shadow-sm shadow-primary-500/25 hover:shadow-primary-600/30 transition-all active:scale-[0.98]">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+                Create Agent
+              </button>
+            </div>
+          </div>
+
+          <!-- ==================== AGENT CARDS GRID ==================== -->
+          <div id="agentGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+
+            <!-- ========== AGENT 1: Nadia - PM - Active ========== -->
+            <div class="agent-card card-hover bg-white rounded-xl border border-neutral-200/80 overflow-hidden relative group">
+              <!-- Top accent bar -->
+              <div class="h-1 bg-gradient-to-r from-emerald-400 to-emerald-500"></div>
+              <div class="p-5 card-inner">
+                <!-- Row 1: Avatar + Name + Role badge -->
+                <div class="flex items-start gap-4 mb-3">
+                  <div class="relative shrink-0">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-rose-400 to-pink-600 flex items-center justify-center text-lg font-bold text-white shadow-lg shadow-rose-500/20">
+                      NA
+                    </div>
+                    <!-- Status indicator -->
+                    <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 rounded-full ring-[2.5px] ring-white">
+                      <div class="status-pulse w-full h-full bg-emerald-500 rounded-full"></div>
+                    </div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1.5">
+                      <h3 class="text-[15px] font-semibold text-neutral-900 truncate">Nadia</h3>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider bg-violet-100 text-violet-700 shrink-0">PM</span>
+                    </div>
+                    <!-- Row 2: Model badge + status dot + last active -->
+                    <div class="meta-row">
+                      <span class="font-mono text-[11px] text-neutral-500 bg-neutral-100 rounded px-1.5 py-0.5 shrink-0">Sonnet 4.5</span>
+                      <span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 shrink-0">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                        Active
+                      </span>
+                      <span class="text-neutral-300 shrink-0">&middot;</span>
+                      <span class="last-active text-[11px] text-neutral-400">2 min ago</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stats row -->
+                <div class="grid grid-cols-3 gap-3 mb-3 py-3 px-3 bg-neutral-50/80 rounded-lg border border-neutral-100">
+                  <div class="text-center">
+                    <div class="text-[15px] font-semibold text-neutral-900">143</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Messages</div>
+                  </div>
+                  <div class="text-center border-x border-neutral-200/60">
+                    <div class="text-[15px] font-semibold text-neutral-900">4</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Skills</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-[15px] font-semibold text-emerald-600">99.8%</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Uptime</div>
+                  </div>
+                </div>
+
+                <!-- Row 3: Skill badges (constrained) -->
+                <div class="skills-row flex gap-1.5 mb-3">
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-blue-50 text-blue-700 border border-blue-100 shrink-0">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z"/></svg>
+                    Jira
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-orange-50 text-orange-700 border border-orange-100 shrink-0">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+                    Tableau
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-purple-50 text-purple-700 border border-purple-100 shrink-0">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z"/></svg>
+                    Amplitude
+                  </span>
+                </div>
+
+                <!-- Footer: quick actions -->
+                <div class="flex items-center justify-end pt-3 border-t border-neutral-100 mt-auto">
+                  <div class="quick-actions flex items-center gap-1">
+                    <button title="Pause" class="p-1.5 rounded-md text-neutral-400 hover:text-amber-600 hover:bg-amber-50 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5"/>
+                      </svg>
+                    </button>
+                    <button title="Restart" class="p-1.5 rounded-md text-neutral-400 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/>
+                      </svg>
+                    </button>
+                    <button title="Configure" class="p-1.5 rounded-md text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.204-.107-.397.165-.71.505-.78.929l-.15.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== AGENT 2: Atlas - Engineering - Idle ========== -->
+            <div class="agent-card card-hover bg-white rounded-xl border border-neutral-200/80 overflow-hidden relative group">
+              <div class="h-1 bg-gradient-to-r from-amber-300 to-yellow-400"></div>
+              <div class="p-5 card-inner">
+                <div class="flex items-start gap-4 mb-3">
+                  <div class="relative shrink-0">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-lg font-bold text-white shadow-lg shadow-blue-500/20">
+                      AT
+                    </div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-amber-400 rounded-full ring-[2.5px] ring-white"></div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1.5">
+                      <h3 class="text-[15px] font-semibold text-neutral-900 truncate">Atlas</h3>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider bg-blue-100 text-blue-700 shrink-0">Engineering</span>
+                    </div>
+                    <div class="meta-row">
+                      <span class="font-mono text-[11px] text-neutral-500 bg-neutral-100 rounded px-1.5 py-0.5 shrink-0">Sonnet 4.5</span>
+                      <span class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600 shrink-0">
+                        <span class="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>
+                        Idle
+                      </span>
+                      <span class="text-neutral-300 shrink-0">&middot;</span>
+                      <span class="last-active text-[11px] text-neutral-400">18 min ago</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 mb-3 py-3 px-3 bg-neutral-50/80 rounded-lg border border-neutral-100">
+                  <div class="text-center">
+                    <div class="text-[15px] font-semibold text-neutral-900">87</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Messages</div>
+                  </div>
+                  <div class="text-center border-x border-neutral-200/60">
+                    <div class="text-[15px] font-semibold text-neutral-900">3</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Skills</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-[15px] font-semibold text-emerald-600">99.9%</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Uptime</div>
+                  </div>
+                </div>
+
+                <div class="skills-row flex gap-1.5 mb-3">
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-neutral-800 text-neutral-100 border border-neutral-700 shrink-0">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/></svg>
+                    GitHub
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-red-50 text-red-700 border border-red-100 shrink-0">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                    Sentry
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-primary-50 text-primary-700 border border-primary-100 shrink-0">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+                    Linear
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-end pt-3 border-t border-neutral-100 mt-auto">
+                  <div class="quick-actions flex items-center gap-1">
+                    <button title="Resume" class="p-1.5 rounded-md text-neutral-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>
+                      </svg>
+                    </button>
+                    <button title="Restart" class="p-1.5 rounded-md text-neutral-400 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/>
+                      </svg>
+                    </button>
+                    <button title="Configure" class="p-1.5 rounded-md text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.204-.107-.397.165-.71.505-.78.929l-.15.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== AGENT 3: Iris - Operations - Active ========== -->
+            <div class="agent-card card-hover bg-white rounded-xl border border-neutral-200/80 overflow-hidden relative group">
+              <div class="h-1 bg-gradient-to-r from-emerald-400 to-emerald-500"></div>
+              <div class="p-5 card-inner">
+                <div class="flex items-start gap-4 mb-3">
+                  <div class="relative shrink-0">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-lg font-bold text-white shadow-lg shadow-teal-500/20">
+                      IR
+                    </div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 rounded-full ring-[2.5px] ring-white">
+                      <div class="status-pulse w-full h-full bg-emerald-500 rounded-full"></div>
+                    </div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1.5">
+                      <h3 class="text-[15px] font-semibold text-neutral-900 truncate">Iris</h3>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider bg-teal-100 text-teal-700 shrink-0">Ops</span>
+                    </div>
+                    <div class="meta-row">
+                      <span class="font-mono text-[11px] text-neutral-500 bg-neutral-100 rounded px-1.5 py-0.5 shrink-0">Haiku 3.5</span>
+                      <span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 shrink-0">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                        Active
+                      </span>
+                      <span class="text-neutral-300 shrink-0">&middot;</span>
+                      <span class="last-active text-[11px] text-neutral-400">Just now</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 mb-3 py-3 px-3 bg-neutral-50/80 rounded-lg border border-neutral-100">
+                  <div class="text-center">
+                    <div class="text-[15px] font-semibold text-neutral-900">312</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Messages</div>
+                  </div>
+                  <div class="text-center border-x border-neutral-200/60">
+                    <div class="text-[15px] font-semibold text-neutral-900">3</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Skills</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-[15px] font-semibold text-emerald-600">99.5%</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Uptime</div>
+                  </div>
+                </div>
+
+                <div class="skills-row flex gap-1.5 mb-3">
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-100 shrink-0">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/></svg>
+                    Slack
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-sky-50 text-sky-700 border border-sky-100 shrink-0">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                    Calendar
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-neutral-100 text-neutral-700 border border-neutral-200 shrink-0">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    Notion
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-end pt-3 border-t border-neutral-100 mt-auto">
+                  <div class="quick-actions flex items-center gap-1">
+                    <button title="Pause" class="p-1.5 rounded-md text-neutral-400 hover:text-amber-600 hover:bg-amber-50 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5"/>
+                      </svg>
+                    </button>
+                    <button title="Restart" class="p-1.5 rounded-md text-neutral-400 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/>
+                      </svg>
+                    </button>
+                    <button title="Configure" class="p-1.5 rounded-md text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.204-.107-.397.165-.71.505-.78.929l-.15.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== AGENT 4: Hermes - HR - Error ========== -->
+            <div class="agent-card card-hover bg-white rounded-xl border border-red-200 error-glow overflow-hidden relative group">
+              <div class="h-1 bg-gradient-to-r from-red-400 to-red-500"></div>
+              <div class="p-5 card-inner">
+                <div class="flex items-start gap-4 mb-3">
+                  <div class="relative shrink-0">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center text-lg font-bold text-white shadow-lg shadow-orange-500/20">
+                      HE
+                    </div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full ring-[2.5px] ring-white">
+                      <div class="status-pulse w-full h-full bg-red-500 rounded-full"></div>
+                    </div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1.5">
+                      <h3 class="text-[15px] font-semibold text-neutral-900 truncate">Hermes</h3>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider bg-amber-100 text-amber-700 shrink-0">HR</span>
+                    </div>
+                    <div class="meta-row">
+                      <span class="font-mono text-[11px] text-neutral-500 bg-neutral-100 rounded px-1.5 py-0.5 shrink-0">Haiku 3.5</span>
+                      <span class="inline-flex items-center gap-1 text-[11px] font-medium text-red-600 shrink-0">
+                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+                        Error
+                      </span>
+                      <span class="text-neutral-300 shrink-0">&middot;</span>
+                      <span class="last-active text-[11px] text-red-500">34 min ago</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Error banner -->
+                <div class="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg bg-red-50 border border-red-100">
+                  <svg class="w-4 h-4 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                  </svg>
+                  <span class="text-[11px] font-medium text-red-700">Google Sheets API auth token expired</span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 mb-3 py-3 px-3 bg-neutral-50/80 rounded-lg border border-neutral-100">
+                  <div class="text-center">
+                    <div class="text-[15px] font-semibold text-neutral-900">28</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Messages</div>
+                  </div>
+                  <div class="text-center border-x border-neutral-200/60">
+                    <div class="text-[15px] font-semibold text-neutral-900">1</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Skills</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-[15px] font-semibold text-red-500">87.2%</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Uptime</div>
+                  </div>
+                </div>
+
+                <div class="skills-row flex gap-1.5 mb-3">
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-green-50 text-green-700 border border-green-100 shrink-0">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M12 12h.008v.008H12V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                    Google Sheets
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-end pt-3 border-t border-neutral-100 mt-auto">
+                  <div class="quick-actions flex items-center gap-1">
+                    <button title="Restart" class="p-1.5 rounded-md text-neutral-400 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/>
+                      </svg>
+                    </button>
+                    <button title="Configure" class="p-1.5 rounded-md text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.204-.107-.397.165-.71.505-.78.929l-.15.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== AGENT 5: Thoth - Data - Suspended ========== -->
+            <div class="agent-card card-hover suspended-card bg-white rounded-xl border border-neutral-200/80 overflow-hidden relative group">
+              <div class="h-1 bg-gradient-to-r from-neutral-300 to-neutral-400"></div>
+              <div class="p-5 card-inner">
+                <div class="flex items-start gap-4 mb-3">
+                  <div class="relative shrink-0">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-violet-400 to-primary-600 flex items-center justify-center text-lg font-bold text-white shadow-lg shadow-primary-500/20">
+                      TH
+                    </div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-neutral-400 rounded-full ring-[2.5px] ring-white"></div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1.5">
+                      <h3 class="text-[15px] font-semibold text-neutral-900 truncate">Thoth</h3>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider bg-primary-100 text-primary-700 shrink-0">Data</span>
+                    </div>
+                    <div class="meta-row">
+                      <span class="font-mono text-[11px] text-neutral-500 bg-neutral-100 rounded px-1.5 py-0.5 shrink-0">Sonnet 4.5</span>
+                      <span class="inline-flex items-center gap-1 text-[11px] font-medium text-neutral-500 shrink-0">
+                        <span class="w-1.5 h-1.5 bg-neutral-400 rounded-full"></span>
+                        Suspended
+                      </span>
+                      <span class="text-neutral-300 shrink-0">&middot;</span>
+                      <span class="last-active text-[11px] text-neutral-400">3 days ago</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 mb-3 py-3 px-3 bg-neutral-50/80 rounded-lg border border-neutral-100">
+                  <div class="text-center">
+                    <div class="text-[15px] font-semibold text-neutral-900">0</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Messages</div>
+                  </div>
+                  <div class="text-center border-x border-neutral-200/60">
+                    <div class="text-[15px] font-semibold text-neutral-900">2</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Skills</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-[15px] font-semibold text-neutral-400">--</div>
+                    <div class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">Uptime</div>
+                  </div>
+                </div>
+
+                <div class="skills-row flex gap-1.5 mb-3">
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-orange-50 text-orange-700 border border-orange-100 shrink-0">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+                    Tableau
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-purple-50 text-purple-700 border border-purple-100 shrink-0">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z"/></svg>
+                    Amplitude
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-end pt-3 border-t border-neutral-100 mt-auto">
+                  <div class="quick-actions flex items-center gap-1">
+                    <button title="Resume" class="p-1.5 rounded-md text-neutral-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>
+                      </svg>
+                    </button>
+                    <button title="Configure" class="p-1.5 rounded-md text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.204-.107-.397.165-.71.505-.78.929l-.15.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== EMPTY SLOT 1 ========== -->
+            <div class="empty-slot flex flex-col items-center justify-center min-h-[280px] rounded-xl border-2 border-dashed border-neutral-300 bg-white/50 cursor-pointer group" onclick="window.location.href='#create'">
+              <div class="empty-icon w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center mb-3 text-neutral-400">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+              </div>
+              <span class="text-[13px] font-medium text-neutral-400 group-hover:text-primary-600 transition-colors">Create Agent</span>
+              <span class="text-[11px] text-neutral-300 mt-1">Slot 6 of 8</span>
+            </div>
+
+            <!-- ========== EMPTY SLOT 2 ========== -->
+            <div class="empty-slot flex flex-col items-center justify-center min-h-[280px] rounded-xl border-2 border-dashed border-neutral-300 bg-white/50 cursor-pointer group" onclick="window.location.href='#create'">
+              <div class="empty-icon w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center mb-3 text-neutral-400">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+              </div>
+              <span class="text-[13px] font-medium text-neutral-400 group-hover:text-primary-600 transition-colors">Create Agent</span>
+              <span class="text-[11px] text-neutral-300 mt-1">Slot 7 of 8</span>
+            </div>
+
+            <!-- ========== EMPTY SLOT 3 ========== -->
+            <div class="empty-slot flex flex-col items-center justify-center min-h-[280px] rounded-xl border-2 border-dashed border-neutral-300 bg-white/50 cursor-pointer group" onclick="window.location.href='#create'">
+              <div class="empty-icon w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center mb-3 text-neutral-400">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+              </div>
+              <span class="text-[13px] font-medium text-neutral-400 group-hover:text-primary-600 transition-colors">Create Agent</span>
+              <span class="text-[11px] text-neutral-300 mt-1">Slot 8 of 8</span>
+            </div>
+
+          </div><!-- end #agentGrid -->
+
+        </div>
+      </main>
+
+    </div><!-- end main content -->
+
+  </div><!-- end flex container -->
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    let sidebarCollapsed = false;
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+      if (sidebarCollapsed) {
+        sidebar.style.width = '64px';
+        mainContent.style.marginLeft = '64px';
+        labels.forEach(el => el.style.display = 'none');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.style.width = '256px';
+        mainContent.style.marginLeft = '256px';
+        labels.forEach(el => el.style.display = '');
+        collapseIcon.style.transform = '';
+      }
+    }
+
+    // View toggle: Grid vs List
+    function setView(mode) {
+      const grid = document.getElementById('agentGrid');
+      const gridBtn = document.getElementById('gridViewBtn');
+      const listBtn = document.getElementById('listViewBtn');
+
+      if (mode === 'grid') {
+        grid.classList.remove('grid-cols-1', 'gap-3');
+        grid.classList.add('grid-cols-1', 'md:grid-cols-2', 'xl:grid-cols-3', 'gap-5');
+        gridBtn.classList.add('active');
+        gridBtn.classList.remove('text-neutral-400');
+        listBtn.classList.remove('active');
+        listBtn.classList.add('text-neutral-400');
+
+        // Restore agent cards to block layout
+        document.querySelectorAll('.agent-card').forEach(card => {
+          card.classList.remove('flex', 'flex-row', 'items-stretch');
+          const inner = card.querySelector('.p-5');
+          if (inner) {
+            inner.classList.remove('flex', 'flex-row', 'items-center', 'gap-6', 'flex-1');
+          }
+        });
+
+        // Restore empty slots
+        document.querySelectorAll('.empty-slot').forEach(slot => {
+          slot.classList.remove('flex-row', 'min-h-0', 'py-4', 'px-6', 'gap-3');
+          slot.classList.add('min-h-[280px]');
+        });
+      } else {
+        grid.classList.remove('md:grid-cols-2', 'xl:grid-cols-3', 'gap-5');
+        grid.classList.add('grid-cols-1', 'gap-3');
+        gridBtn.classList.remove('active');
+        gridBtn.classList.add('text-neutral-400');
+        listBtn.classList.add('active');
+        listBtn.classList.remove('text-neutral-400');
+
+        // Make empty slots horizontal
+        document.querySelectorAll('.empty-slot').forEach(slot => {
+          slot.classList.add('flex-row', 'min-h-0', 'py-4', 'px-6', 'gap-3');
+          slot.classList.remove('min-h-[280px]');
+        });
+      }
+    }
+
+    // ── Prototype Navigation Bridge ──
+    // If loaded in a prototype frame, communicate navigation requests to parent
+    if (window.parent !== window) {
+      // Intercept all sidebar link clicks
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href^="/"]');
+        if (link) {
+          const href = link.getAttribute('href');
+
+          // Send navigation request to parent frame
+          window.parent.postMessage({
+            type: 'navigate',
+            href: href
+          }, '*');
+
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+    }
+  </script>
+
+</body>
+</html>

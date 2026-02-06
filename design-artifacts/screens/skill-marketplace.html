@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skill Marketplace - Aegis Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            primary: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            },
+            neutral: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              700: '#334155',
+              800: '#1e293b',
+              900: '#0f172a',
+            }
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+
+    /* Category pills horizontal scroll */
+    .pills-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+    .pills-scroll::-webkit-scrollbar { display: none; }
+
+    /* Card hover lift */
+    .skill-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .skill-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px -5px rgba(99, 102, 241, 0.15), 0 4px 10px -6px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Featured card hover */
+    .featured-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .featured-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 30px -8px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Install button transitions */
+    .btn-install {
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+    .btn-install:hover {
+      transform: scale(1.02);
+    }
+    .btn-install:active {
+      transform: scale(0.98);
+    }
+
+    /* Category pill transitions */
+    .cat-pill {
+      transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    /* Sidebar link hover */
+    .sidebar-link {
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    /* Gradient icon circles */
+    .icon-gradient-1 { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+    .icon-gradient-2 { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+    .icon-gradient-3 { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
+    .icon-gradient-4 { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+    .icon-gradient-5 { background: linear-gradient(135deg, #10b981, #14b8a6); }
+    .icon-gradient-6 { background: linear-gradient(135deg, #f59e0b, #f97316); }
+    .icon-gradient-7 { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
+    .icon-gradient-8 { background: linear-gradient(135deg, #6366f1, #ec4899); }
+    .icon-gradient-9 { background: linear-gradient(135deg, #64748b, #475569); }
+
+    /* Star rating */
+    .star-filled { color: #f59e0b; }
+    .star-empty { color: #d1d5db; }
+  </style>
+</head>
+<body class="h-full bg-neutral-50 text-neutral-900 antialiased">
+  <div class="flex h-full min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR (Standardized Tenant Admin) ===== -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full z-50 flex flex-col bg-white border-r border-neutral-200 transition-all duration-300" style="width: 256px;">
+      <!-- Logo -->
+      <div class="flex items-center gap-2.5 px-5 h-16 border-b border-neutral-100">
+        <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="sidebar-label text-sm font-bold text-neutral-900 tracking-tight">Acme Corp</span>
+      </div>
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <div class="sidebar-label px-3 pb-2 pt-1 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">Workspace</div>
+        <a href="/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="sidebar-label">Dashboard</span>
+        </a>
+        <a href="/dashboard/agents" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+          <span class="sidebar-label">Agents</span>
+        </a>
+        <a href="/dashboard/skills" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-primary-50 text-primary-600 font-semibold">
+          <svg class="w-[18px] h-[18px] text-primary-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 01-.837.276c-.47-.07-.802-.48-.968-.925a2.501 2.501 0 10-3.214 3.214c.446.166.855.497.925.968a.979.979 0 01-.276.837l-1.61 1.61a2.404 2.404 0 01-1.705.707 2.402 2.402 0 01-1.704-.706l-1.568-1.568a1.026 1.026 0 00-.877-.29c-.493.074-.84.504-1.02.968a2.5 2.5 0 11-3.237-3.237c.464-.18.894-.527.967-1.02a1.026 1.026 0 00-.289-.877l-1.568-1.568A2.402 2.402 0 011.998 12c0-.617.236-1.234.706-1.704L4.23 8.77c.24-.24.581-.353.917-.303.515.077.877.528 1.073 1.01a2.5 2.5 0 103.259-3.259c-.482-.196-.933-.558-1.01-1.073-.05-.336.062-.676.303-.917l1.525-1.525A2.402 2.402 0 0112 2c.617 0 1.234.236 1.704.706l1.568 1.568c.23.23.556.338.877.29.493-.074.84-.504 1.02-.969a2.5 2.5 0 113.237 3.237c-.464.18-.894.527-.967 1.02z"/></svg>
+          <span class="sidebar-label">Skill Marketplace</span>
+        </a>
+        <div class="sidebar-label px-3 pb-2 pt-5 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">Management</div>
+        <a href="/dashboard/team" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          <span class="sidebar-label">Team Members</span>
+        </a>
+        <a href="/dashboard/audit" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h12a2 2 0 002-2v-2H10v2a2 2 0 11-4 0V5a2 2 0 10-4 0v3h4"/><path d="M19 17V5a2 2 0 00-2-2H4"/><path d="M15 8h-5"/><path d="M15 12h-5"/></svg>
+          <span class="sidebar-label">Audit Log</span>
+        </a>
+        <a href="/dashboard/settings" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span class="sidebar-label">Settings</span>
+        </a>
+      </nav>
+      <!-- Footer -->
+      <div class="border-t border-neutral-100 px-3 py-3 space-y-2">
+        <button onclick="toggleSidebar()" class="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 transition-colors">
+          <svg id="collapse-icon" class="w-[18px] h-[18px] transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+          <span class="sidebar-label text-sm">Collapse</span>
+        </button>
+        <div class="flex items-center gap-2.5 px-3 py-2">
+          <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-semibold text-xs flex-shrink-0">JD</div>
+          <div class="sidebar-label flex-1 min-w-0">
+            <div class="text-sm font-medium text-neutral-900 truncate">Jane Doe</div>
+            <div class="text-xs text-neutral-500 truncate">Tenant Admin</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main id="main-content" class="flex-1 overflow-y-auto" style="margin-left: 256px;">
+      <div class="max-w-6xl mx-auto px-6 py-8">
+
+        <!-- Page Header -->
+        <div class="mb-8">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <h1 class="text-2xl font-bold text-neutral-900 tracking-tight">Skill Marketplace</h1>
+              <p class="mt-1 text-sm text-neutral-500">Extend your agents with powerful integrations and capabilities</p>
+            </div>
+          </div>
+
+          <!-- Search bar + Tabs row -->
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <!-- Search -->
+            <div class="relative flex-1 max-w-md">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input
+                type="text"
+                placeholder="Search skills..."
+                class="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 placeholder-neutral-400 transition-all"
+              />
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex items-center gap-1 bg-neutral-100 rounded-lg p-1">
+              <button id="tab-installed" onclick="switchTab('installed')" class="tab-btn px-4 py-2 text-sm font-medium rounded-md bg-white text-neutral-900 shadow-sm transition-all">
+                Installed
+                <span class="ml-1 text-xs text-primary-600 font-semibold">(12)</span>
+              </button>
+              <button id="tab-browse" onclick="switchTab('browse')" class="tab-btn px-4 py-2 text-sm font-medium rounded-md text-neutral-500 hover:text-neutral-700 transition-all">
+                Browse All
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Filter Pills -->
+        <div class="mb-8 -mx-1">
+          <div class="pills-scroll flex items-center gap-2 overflow-x-auto px-1 pb-1">
+            <button onclick="setCategory(this)" class="cat-pill active-pill flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-medium bg-primary-500 text-white shadow-sm shadow-primary-200">All</button>
+            <button onclick="setCategory(this)" class="cat-pill flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-medium bg-white text-neutral-600 border border-neutral-200 hover:border-primary-300 hover:text-primary-600">Communication</button>
+            <button onclick="setCategory(this)" class="cat-pill flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-medium bg-white text-neutral-600 border border-neutral-200 hover:border-primary-300 hover:text-primary-600">Analytics</button>
+            <button onclick="setCategory(this)" class="cat-pill flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-medium bg-white text-neutral-600 border border-neutral-200 hover:border-primary-300 hover:text-primary-600">Development</button>
+            <button onclick="setCategory(this)" class="cat-pill flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-medium bg-white text-neutral-600 border border-neutral-200 hover:border-primary-300 hover:text-primary-600">Project Management</button>
+            <button onclick="setCategory(this)" class="cat-pill flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-medium bg-white text-neutral-600 border border-neutral-200 hover:border-primary-300 hover:text-primary-600">Custom</button>
+          </div>
+        </div>
+
+        <!-- Featured Section -->
+        <div class="mb-10">
+          <div class="flex items-center gap-2 mb-4">
+            <svg class="w-5 h-5 text-amber-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <h2 class="text-lg font-semibold text-neutral-900">Featured & Verified</h2>
+            <span class="text-xs text-neutral-400 ml-1">Curated by the Aegis team</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Featured: Jira Integration -->
+            <div class="featured-card bg-white rounded-2xl border border-neutral-200 p-5 flex gap-4">
+              <div class="flex-shrink-0 w-14 h-14 rounded-xl icon-gradient-2 flex items-center justify-center">
+                <span class="text-white font-bold text-lg">J</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="font-semibold text-neutral-900 truncate">Jira Integration</h3>
+                  <!-- Verified badge -->
+                  <svg class="w-4 h-4 text-primary-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <p class="text-sm text-neutral-500 mb-3">Full Jira read/write access for agents</p>
+                <div class="flex items-center gap-3 text-xs text-neutral-400 mb-3">
+                  <span class="text-neutral-500">by Aegis Team</span>
+                  <span class="flex items-center gap-0.5">
+                    <svg class="w-3.5 h-3.5 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    4.8
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    234 installs
+                  </span>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  Installed
+                </span>
+              </div>
+            </div>
+
+            <!-- Featured: Tableau Connector -->
+            <div class="featured-card bg-white rounded-2xl border border-neutral-200 p-5 flex gap-4">
+              <div class="flex-shrink-0 w-14 h-14 rounded-xl icon-gradient-3 flex items-center justify-center">
+                <span class="text-white font-bold text-lg">T</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="font-semibold text-neutral-900 truncate">Tableau Connector</h3>
+                  <svg class="w-4 h-4 text-primary-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <p class="text-sm text-neutral-500 mb-3">Query Tableau dashboards and extract insights</p>
+                <div class="flex items-center gap-3 text-xs text-neutral-400 mb-3">
+                  <span class="text-neutral-500">by Aegis Team</span>
+                  <span class="flex items-center gap-0.5">
+                    <svg class="w-3.5 h-3.5 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    4.6
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    189 installs
+                  </span>
+                </div>
+                <button class="btn-install px-4 py-1.5 rounded-full text-xs font-medium bg-primary-500 text-white hover:bg-primary-600 shadow-sm shadow-primary-200">
+                  Install
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills Grid -->
+        <div class="mb-6">
+          <h2 class="text-lg font-semibold text-neutral-900 mb-4">All Skills</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+            <!-- Card 1: Slack -->
+            <div class="skill-card bg-white rounded-2xl border border-neutral-200 p-5">
+              <div class="flex items-start gap-3 mb-3">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl icon-gradient-4 flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">S</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <h3 class="font-semibold text-sm text-neutral-900 truncate">Slack</h3>
+                    <svg class="w-3.5 h-3.5 text-primary-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  </div>
+                  <p class="text-xs text-neutral-400">by Aegis Team</p>
+                </div>
+              </div>
+              <p class="text-sm text-neutral-500 mb-3 line-clamp-1">Send messages, manage channels, and read threads</p>
+              <!-- Permissions -->
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">network</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">env</span>
+              </div>
+              <!-- Bottom row -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 text-xs text-neutral-400">
+                  <span class="flex items-center gap-0.5">
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    4.9
+                  </span>
+                  <span>312</span>
+                  <span class="font-mono text-[10px]">v2.1.0</span>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  Installed
+                </span>
+              </div>
+            </div>
+
+            <!-- Card 2: GitHub -->
+            <div class="skill-card bg-white rounded-2xl border border-neutral-200 p-5">
+              <div class="flex items-start gap-3 mb-3">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl icon-gradient-9 flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">G</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <h3 class="font-semibold text-sm text-neutral-900 truncate">GitHub</h3>
+                    <svg class="w-3.5 h-3.5 text-primary-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  </div>
+                  <p class="text-xs text-neutral-400">by Aegis Team</p>
+                </div>
+              </div>
+              <p class="text-sm text-neutral-500 mb-3 line-clamp-1">Manage repos, PRs, issues, and code reviews</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">network</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">files</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">env</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 text-xs text-neutral-400">
+                  <span class="flex items-center gap-0.5">
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-empty" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    4.7
+                  </span>
+                  <span>287</span>
+                  <span class="font-mono text-[10px]">v3.0.2</span>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  Installed
+                </span>
+              </div>
+            </div>
+
+            <!-- Card 3: Amplitude -->
+            <div class="skill-card bg-white rounded-2xl border border-neutral-200 p-5">
+              <div class="flex items-start gap-3 mb-3">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl icon-gradient-3 flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">A</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <h3 class="font-semibold text-sm text-neutral-900 truncate">Amplitude</h3>
+                  </div>
+                  <p class="text-xs text-neutral-400">by Amplitude Inc.</p>
+                </div>
+              </div>
+              <p class="text-sm text-neutral-500 mb-3 line-clamp-1">Query product analytics and user behavior data</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">network</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 text-xs text-neutral-400">
+                  <span class="flex items-center gap-0.5">
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-empty" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    4.3
+                  </span>
+                  <span>156</span>
+                  <span class="font-mono text-[10px]">v1.4.1</span>
+                </div>
+                <button class="btn-install px-3.5 py-1 rounded-full text-[11px] font-medium bg-primary-500 text-white hover:bg-primary-600 shadow-sm shadow-primary-200">Install</button>
+              </div>
+            </div>
+
+            <!-- Card 4: Sentry -->
+            <div class="skill-card bg-white rounded-2xl border border-neutral-200 p-5">
+              <div class="flex items-start gap-3 mb-3">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl icon-gradient-4 flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">S</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <h3 class="font-semibold text-sm text-neutral-900 truncate">Sentry</h3>
+                  </div>
+                  <p class="text-xs text-neutral-400">by Sentry.io</p>
+                </div>
+              </div>
+              <p class="text-sm text-neutral-500 mb-3 line-clamp-1">Monitor errors and performance issues in real-time</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">network</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">env</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 text-xs text-neutral-400">
+                  <span class="flex items-center gap-0.5">
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-empty" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    4.5
+                  </span>
+                  <span>201</span>
+                  <span class="font-mono text-[10px]">v2.0.0</span>
+                </div>
+                <button class="btn-install px-3.5 py-1 rounded-full text-[11px] font-medium bg-primary-500 text-white hover:bg-primary-600 shadow-sm shadow-primary-200">Install</button>
+              </div>
+            </div>
+
+            <!-- Card 5: Google Calendar -->
+            <div class="skill-card bg-white rounded-2xl border border-neutral-200 p-5">
+              <div class="flex items-start gap-3 mb-3">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl icon-gradient-5 flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">G</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <h3 class="font-semibold text-sm text-neutral-900 truncate">Google Calendar</h3>
+                    <svg class="w-3.5 h-3.5 text-primary-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  </div>
+                  <p class="text-xs text-neutral-400">by Aegis Team</p>
+                </div>
+              </div>
+              <p class="text-sm text-neutral-500 mb-3 line-clamp-1">Schedule meetings, check availability, manage events</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">network</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">env</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 text-xs text-neutral-400">
+                  <span class="flex items-center gap-0.5">
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    4.9
+                  </span>
+                  <span>278</span>
+                  <span class="font-mono text-[10px]">v1.8.3</span>
+                </div>
+                <button class="btn-install px-3.5 py-1 rounded-full text-[11px] font-medium bg-primary-500 text-white hover:bg-primary-600 shadow-sm shadow-primary-200">Install</button>
+              </div>
+            </div>
+
+            <!-- Card 6: Linear -->
+            <div class="skill-card bg-white rounded-2xl border border-neutral-200 p-5">
+              <div class="flex items-start gap-3 mb-3">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl icon-gradient-7 flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">L</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <h3 class="font-semibold text-sm text-neutral-900 truncate">Linear</h3>
+                  </div>
+                  <p class="text-xs text-neutral-400">by Linear Inc.</p>
+                </div>
+              </div>
+              <p class="text-sm text-neutral-500 mb-3 line-clamp-1">Create issues, manage sprints, track project progress</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">network</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 text-xs text-neutral-400">
+                  <span class="flex items-center gap-0.5">
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-empty" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    4.4
+                  </span>
+                  <span>143</span>
+                  <span class="font-mono text-[10px]">v2.2.1</span>
+                </div>
+                <button class="btn-install px-3.5 py-1 rounded-full text-[11px] font-medium bg-primary-500 text-white hover:bg-primary-600 shadow-sm shadow-primary-200">Install</button>
+              </div>
+            </div>
+
+            <!-- Card 7: Notion -->
+            <div class="skill-card bg-white rounded-2xl border border-neutral-200 p-5">
+              <div class="flex items-start gap-3 mb-3">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl icon-gradient-9 flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">N</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <h3 class="font-semibold text-sm text-neutral-900 truncate">Notion</h3>
+                  </div>
+                  <p class="text-xs text-neutral-400">by Notion Labs</p>
+                </div>
+              </div>
+              <p class="text-sm text-neutral-500 mb-3 line-clamp-1">Read and write Notion pages, databases, and wikis</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">network</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">files</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 text-xs text-neutral-400">
+                  <span class="flex items-center gap-0.5">
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-empty" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    4.2
+                  </span>
+                  <span>198</span>
+                  <span class="font-mono text-[10px]">v1.6.0</span>
+                </div>
+                <button class="btn-install px-3.5 py-1 rounded-full text-[11px] font-medium bg-primary-500 text-white hover:bg-primary-600 shadow-sm shadow-primary-200">Install</button>
+              </div>
+            </div>
+
+            <!-- Card 8: Confluence -->
+            <div class="skill-card bg-white rounded-2xl border border-neutral-200 p-5">
+              <div class="flex items-start gap-3 mb-3">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl icon-gradient-2 flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">C</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <h3 class="font-semibold text-sm text-neutral-900 truncate">Confluence</h3>
+                    <svg class="w-3.5 h-3.5 text-primary-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  </div>
+                  <p class="text-xs text-neutral-400">by Aegis Team</p>
+                </div>
+              </div>
+              <p class="text-sm text-neutral-500 mb-3 line-clamp-1">Search and create Confluence pages and spaces</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">network</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">files</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 text-xs text-neutral-400">
+                  <span class="flex items-center gap-0.5">
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-empty" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    4.1
+                  </span>
+                  <span>167</span>
+                  <span class="font-mono text-[10px]">v1.3.5</span>
+                </div>
+                <button class="btn-install px-3.5 py-1 rounded-full text-[11px] font-medium bg-primary-500 text-white hover:bg-primary-600 shadow-sm shadow-primary-200">Install</button>
+              </div>
+            </div>
+
+            <!-- Card 9: Custom API Builder -->
+            <div class="skill-card bg-white rounded-2xl border border-neutral-200 p-5">
+              <div class="flex items-start gap-3 mb-3">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl icon-gradient-8 flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">{}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <h3 class="font-semibold text-sm text-neutral-900 truncate">Custom API Builder</h3>
+                    <svg class="w-3.5 h-3.5 text-primary-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  </div>
+                  <p class="text-xs text-neutral-400">by Aegis Team</p>
+                </div>
+              </div>
+              <p class="text-sm text-neutral-500 mb-3 line-clamp-1">Build custom REST/GraphQL skill connectors visually</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">network</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">files</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">env</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 text-xs text-neutral-400">
+                  <span class="flex items-center gap-0.5">
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    4.8
+                  </span>
+                  <span>312</span>
+                  <span class="font-mono text-[10px]">v3.1.0</span>
+                </div>
+                <button class="btn-install px-3.5 py-1 rounded-full text-[11px] font-medium bg-primary-500 text-white hover:bg-primary-600 shadow-sm shadow-primary-200">Install</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 pb-8">
+          <p class="text-sm text-neutral-500">Showing <span class="font-medium text-neutral-700">9</span> of <span class="font-medium text-neutral-700">24</span> skills</p>
+          <button class="btn-install px-6 py-2.5 rounded-xl text-sm font-medium bg-white border border-neutral-200 text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300 transition-all">
+            Load More
+          </button>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Sidebar collapse/expand
+    let sidebarCollapsed = false;
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+
+      if (sidebarCollapsed) {
+        sidebar.style.width = '64px';
+        mainContent.style.marginLeft = '64px';
+        labels.forEach(el => el.style.display = 'none');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.style.width = '256px';
+        mainContent.style.marginLeft = '256px';
+        labels.forEach(el => el.style.display = '');
+        collapseIcon.style.transform = '';
+      }
+    }
+
+    // Tab switching
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-neutral-900', 'shadow-sm');
+        btn.classList.add('text-neutral-500');
+      });
+      const activeBtn = document.getElementById('tab-' + tab);
+      activeBtn.classList.add('bg-white', 'text-neutral-900', 'shadow-sm');
+      activeBtn.classList.remove('text-neutral-500');
+    }
+
+    // Category pill selection
+    function setCategory(el) {
+      document.querySelectorAll('.cat-pill').forEach(pill => {
+        pill.classList.remove('bg-primary-500', 'text-white', 'shadow-sm', 'shadow-primary-200', 'active-pill');
+        pill.classList.add('bg-white', 'text-neutral-600', 'border', 'border-neutral-200');
+      });
+      el.classList.remove('bg-white', 'text-neutral-600', 'border', 'border-neutral-200');
+      el.classList.add('bg-primary-500', 'text-white', 'shadow-sm', 'shadow-primary-200', 'active-pill');
+    }
+
+    // Install button click simulation
+    document.querySelectorAll('.btn-install').forEach(btn => {
+      if (btn.textContent.trim() === 'Install') {
+        btn.addEventListener('click', function() {
+          const original = this;
+          original.disabled = true;
+          original.textContent = 'Installing...';
+          original.classList.remove('bg-primary-500', 'hover:bg-primary-600');
+          original.classList.add('bg-primary-400', 'cursor-wait');
+
+          setTimeout(() => {
+            original.outerHTML = `
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Installed
+              </span>`;
+          }, 1200);
+        });
+      }
+    });
+
+    // ── Prototype Navigation Bridge ──
+    // If loaded in a prototype frame, communicate navigation requests to parent
+    if (window.parent !== window) {
+      // Intercept all sidebar link clicks
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href^="/"]');
+        if (link) {
+          const href = link.getAttribute('href');
+
+          // Send navigation request to parent frame
+          window.parent.postMessage({
+            type: 'navigate',
+            href: href
+          }, '*');
+
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+    }
+  </script>
+</body>
+</html>

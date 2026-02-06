@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aegis Platform - Agent Detail: Nadia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            primary: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            },
+            neutral: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              700: '#334155',
+              800: '#1e293b',
+              900: '#0f172a',
+            }
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .card-hover { transition: transform 0.2s cubic-bezier(0.4,0,0.2,1), box-shadow 0.2s cubic-bezier(0.4,0,0.2,1); }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0,0,0,0.08), 0 4px 10px -6px rgba(0,0,0,0.04); }
+    .nav-item { transition: background-color 0.15s ease, color 0.15s ease; }
+    .sidebar-overlay { background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .status-pulse { animation: pulse-dot 2s ease-in-out infinite; }
+    .log-line { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.7; }
+    .toggle-track { transition: background-color 0.2s ease; }
+    .toggle-thumb { transition: transform 0.2s ease; }
+    .sidebar-collapsed { width: 64px !important; }
+    .sidebar-collapsed .nav-label,
+    .sidebar-collapsed .nav-badge,
+    .sidebar-collapsed .sidebar-section-label,
+    .sidebar-collapsed .sidebar-logo-text,
+    .sidebar-collapsed .sidebar-user-info,
+    .sidebar-collapsed .sidebar-promo { display: none !important; }
+    .sidebar-collapsed .nav-item-link { justify-content: center; padding-left: 0; padding-right: 0; }
+    .sidebar-collapsed .sidebar-logo-link { justify-content: center; padding-left: 0; padding-right: 0; }
+    .sidebar-collapsed .sidebar-user-row { justify-content: center; }
+    .sidebar-collapsed .sidebar-user-avatar { margin: 0; }
+    .sidebar-collapsed .sidebar-user-btn { display: none; }
+    .dropdown-menu {
+      transform: translateY(-4px); opacity: 0; pointer-events: none;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .dropdown-menu.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  </style>
+</head>
+<body class="h-full bg-surface-50 text-slate-800 antialiased">
+  <div class="h-full">
+
+    <!-- LEFT SIDEBAR -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full bg-white border-r border-neutral-200 flex flex-col z-30 transition-all duration-300" style="width: 256px">
+      <!-- Logo -->
+      <div class="flex items-center gap-3 px-5 py-5 border-b border-neutral-100">
+        <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-violet-500 rounded-lg flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <span class="sidebar-label font-bold text-neutral-900 text-lg tracking-tight">Acme Corp</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+        <div>
+          <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Workspace</p>
+          <!-- Dashboard -->
+          <a href="/dashboard" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="sidebar-label">Dashboard</span>
+          </a>
+          <!-- Agents -->
+          <a href="/dashboard/agents" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-primary-50 text-primary-600 font-semibold">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+            <span class="sidebar-label">Agents</span>
+          </a>
+          <!-- Skill Marketplace -->
+          <a href="/dashboard/skills" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span class="sidebar-label">Skill Marketplace</span>
+          </a>
+        </div>
+        <div>
+          <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Management</p>
+          <!-- Team Members -->
+          <a href="/dashboard/team" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            <span class="sidebar-label">Team Members</span>
+          </a>
+          <!-- Audit Log -->
+          <a href="/dashboard/audit" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span class="sidebar-label">Audit Log</span>
+          </a>
+          <!-- Settings -->
+          <a href="/dashboard/settings" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            <span class="sidebar-label">Settings</span>
+          </a>
+        </div>
+      </nav>
+
+      <!-- Footer -->
+      <div class="border-t border-neutral-100 px-3 py-3 space-y-2">
+        <button onclick="toggleSidebar()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 w-full">
+          <svg id="collapse-icon" class="w-5 h-5 flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+          <span class="sidebar-label">Collapse</span>
+        </button>
+        <div class="flex items-center gap-3 px-3 py-2">
+          <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-sm font-semibold text-primary-600">JD</span>
+          </div>
+          <div class="sidebar-label">
+            <p class="text-sm font-medium text-neutral-900">Jane Doe</p>
+            <p class="text-xs text-neutral-500">Tenant Admin</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content" class="flex flex-col min-w-0 overflow-hidden min-h-screen" style="margin-left: 256px">
+      <!-- Mobile top bar -->
+      <header class="flex h-14 items-center justify-between border-b border-surface-200 bg-white px-4 lg:hidden">
+        <button onclick="toggleSidebar()" class="rounded-lg p-2 hover:bg-surface-100 transition-colors">
+          <svg class="h-5 w-5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="flex items-center gap-2">
+          <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-500">
+            <svg class="h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <span class="text-sm font-semibold text-slate-800">Breadfast</span>
+        </div>
+        <div class="w-9"></div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto">
+        <div class="mx-auto max-w-[1100px] px-6 py-8 lg:px-8">
+
+          <!-- Breadcrumb -->
+          <nav class="flex items-center gap-2 text-sm mb-6">
+            <a href="/dashboard/agents" class="text-slate-400 hover:text-primary-500 transition-colors">Agents</a>
+            <svg class="h-3.5 w-3.5 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            <span class="font-medium text-slate-700">Nadia</span>
+          </nav>
+
+          <!-- Agent Header -->
+          <div class="rounded-xl border border-surface-200 bg-white p-6 shadow-sm mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-5">
+              <div class="relative flex-shrink-0">
+                <div class="flex h-16 w-16 items-center justify-center rounded-full text-2xl font-bold text-white" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)">N</div>
+                <span class="absolute -bottom-0.5 -right-0.5 flex h-4.5 w-4.5 items-center justify-center rounded-full border-[2.5px] border-white bg-emerald-400 status-pulse" style="width:18px;height:18px"></span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-3 mb-1.5">
+                  <h1 class="text-xl font-bold text-slate-900">Nadia</h1>
+                  <span class="rounded-md bg-violet-50 border border-violet-100 px-2 py-0.5 text-xs font-medium text-violet-600">PM Agent</span>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>
+                    Active
+                  </span>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                  <span>Model: <span class="font-mono text-xs bg-surface-100 rounded px-1.5 py-0.5 text-slate-600">Sonnet 4.5</span></span>
+                  <span class="text-surface-300">|</span>
+                  <span>Created: Jan 15, 2026</span>
+                  <span class="text-surface-300">|</span>
+                  <span>Last active: <span class="text-slate-700 font-medium">2 min ago</span></span>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-100 transition-colors">
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+                  Pause
+                </button>
+                <button class="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-surface-50 transition-colors">
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                  Restart
+                </button>
+                <button onclick="confirmDelete()" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-100 transition-colors">
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabs -->
+          <div class="border-b border-surface-200 mb-6">
+            <nav class="flex gap-0 -mb-px" id="tabNav">
+              <button onclick="switchTab('overview')" data-tab="overview" class="tab-btn relative px-5 py-3 text-sm font-semibold text-primary-600 border-b-2 border-primary-500 transition-colors">Overview</button>
+              <button onclick="switchTab('activity')" data-tab="activity" class="tab-btn relative px-5 py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition-colors">Activity</button>
+              <button onclick="switchTab('configuration')" data-tab="configuration" class="tab-btn relative px-5 py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition-colors">Configuration</button>
+              <button onclick="switchTab('logs')" data-tab="logs" class="tab-btn relative px-5 py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition-colors">Logs</button>
+            </nav>
+          </div>
+
+          <!-- ============================================ -->
+          <!-- TAB: Overview -->
+          <!-- ============================================ -->
+          <div id="tab-overview" class="tab-content">
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div class="card-hover rounded-xl border border-surface-200 bg-white p-5 shadow-sm">
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Tasks Completed Today</p>
+                <p class="mt-2 text-2xl font-bold text-slate-900">37</p>
+                <p class="mt-1 flex items-center gap-1 text-[11px]">
+                  <span class="inline-flex items-center gap-0.5 text-emerald-600 font-semibold"><svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>12%</span>
+                  <span class="text-slate-400">vs yesterday</span>
+                </p>
+              </div>
+              <div class="card-hover rounded-xl border border-surface-200 bg-white p-5 shadow-sm">
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Avg Response Time</p>
+                <p class="mt-2 text-2xl font-bold text-slate-900">2.3<span class="text-base font-medium text-slate-400">s</span></p>
+                <p class="mt-1 flex items-center gap-1 text-[11px]">
+                  <span class="inline-flex items-center gap-0.5 text-emerald-600 font-semibold"><svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>0.4s</span>
+                  <span class="text-slate-400">faster than avg</span>
+                </p>
+              </div>
+              <div class="card-hover rounded-xl border border-surface-200 bg-white p-5 shadow-sm">
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Success Rate</p>
+                <p class="mt-2 text-2xl font-bold text-emerald-600">96.2<span class="text-base font-medium">%</span></p>
+                <p class="mt-1 text-[11px] text-slate-400">Last 7 days</p>
+              </div>
+              <div class="card-hover rounded-xl border border-surface-200 bg-white p-5 shadow-sm">
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Uptime</p>
+                <p class="mt-2 text-2xl font-bold text-emerald-600">99.8<span class="text-base font-medium">%</span></p>
+                <p class="mt-1 text-[11px] text-slate-400">Last 30 days</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <!-- Connected Channels -->
+              <div class="rounded-xl border border-surface-200 bg-white shadow-sm">
+                <div class="flex items-center justify-between px-5 py-4 border-b border-surface-200">
+                  <h3 class="text-sm font-semibold text-slate-900">Connected Channels</h3>
+                  <button class="text-xs font-medium text-primary-500 hover:text-primary-700 transition-colors">+ Bind Channel</button>
+                </div>
+                <div class="divide-y divide-surface-100">
+                  <div class="flex items-center justify-between px-5 py-4">
+                    <div class="flex items-center gap-3">
+                      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-50">
+                        <svg class="h-5 w-5 text-sky-500" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-slate-800">Telegram Bot</p>
+                        <p class="text-[11px] text-slate-500 font-mono">@breadfast_nadia_bot</p>
+                      </div>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-100 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Connected
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between px-5 py-4">
+                    <div class="flex items-center gap-3">
+                      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-50">
+                        <svg class="h-5 w-5 text-[#E01E5A]" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z"/></svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-slate-800">Slack Channel</p>
+                        <p class="text-[11px] text-slate-500 font-mono">#pm-nadia</p>
+                      </div>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-100 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Connected
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Installed Skills with Hot-Swap Toggles -->
+              <div class="rounded-xl border border-surface-200 bg-white shadow-sm">
+                <div class="flex items-center justify-between px-5 py-4 border-b border-surface-200">
+                  <h3 class="text-sm font-semibold text-slate-900">Installed Skills</h3>
+                  <button class="text-xs font-medium text-primary-500 hover:text-primary-700 transition-colors">+ Add Skill</button>
+                </div>
+                <div class="divide-y divide-surface-100">
+                  <div class="flex items-center justify-between px-5 py-3.5">
+                    <div class="flex items-center gap-3">
+                      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50">
+                        <svg class="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M11.53 2c0 2.4 1.97 4.35 4.35 4.35h1.78v1.7c0 2.4 1.94 4.34 4.34 4.35V2.84a.84.84 0 0 0-.84-.84H11.53zM6.77 6.8a4.36 4.36 0 0 0 4.34 4.34h1.8v1.72a4.36 4.36 0 0 0 4.34 4.34V7.63a.84.84 0 0 0-.83-.83H6.77zM2 11.6a4.35 4.35 0 0 0 4.34 4.34h1.8v1.72A4.35 4.35 0 0 0 12.48 22v-9.57a.84.84 0 0 0-.84-.84H2z"/></svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-slate-800">Jira</p>
+                        <p class="text-[11px] text-slate-400 font-mono">v2.4.1</p>
+                      </div>
+                    </div>
+                    <button onclick="togglePolicy(this)" class="toggle-track relative inline-flex h-5 w-9 items-center rounded-full bg-primary-500 cursor-pointer" data-enabled="true"><span class="toggle-thumb inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform translate-x-4"></span></button>
+                  </div>
+                  <div class="flex items-center justify-between px-5 py-3.5">
+                    <div class="flex items-center gap-3">
+                      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50">
+                        <svg class="h-5 w-5 text-orange-500" viewBox="0 0 24 24" fill="currentColor"><path d="M11 2h2v4h-2V2zm0 16h2v4h-2v-4zM4 11h4v2H4v-2zm12 0h4v2h-4v-2z"/></svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-slate-800">Tableau</p>
+                        <p class="text-[11px] text-slate-400 font-mono">v1.8.0</p>
+                      </div>
+                    </div>
+                    <button onclick="togglePolicy(this)" class="toggle-track relative inline-flex h-5 w-9 items-center rounded-full bg-primary-500 cursor-pointer" data-enabled="true"><span class="toggle-thumb inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform translate-x-4"></span></button>
+                  </div>
+                  <div class="flex items-center justify-between px-5 py-3.5">
+                    <div class="flex items-center gap-3">
+                      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-pink-50">
+                        <svg class="h-5 w-5 text-pink-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-slate-800">Amplitude</p>
+                        <p class="text-[11px] text-slate-400 font-mono">v3.1.2</p>
+                      </div>
+                    </div>
+                    <button onclick="togglePolicy(this)" class="toggle-track relative inline-flex h-5 w-9 items-center rounded-full bg-primary-500 cursor-pointer" data-enabled="true"><span class="toggle-thumb inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform translate-x-4"></span></button>
+                  </div>
+                  <div class="flex items-center justify-between px-5 py-3.5">
+                    <div class="flex items-center gap-3">
+                      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-50">
+                        <svg class="h-5 w-5 text-[#E01E5A]" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z"/></svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-slate-800">Slack</p>
+                        <p class="text-[11px] text-slate-400 font-mono">v4.0.3</p>
+                      </div>
+                    </div>
+                    <button onclick="togglePolicy(this)" class="toggle-track relative inline-flex h-5 w-9 items-center rounded-full bg-primary-500 cursor-pointer" data-enabled="true"><span class="toggle-thumb inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform translate-x-4"></span></button>
+                  </div>
+                </div>
+                <div class="px-5 py-3 border-t border-surface-100 bg-surface-50/50 rounded-b-xl">
+                  <p class="text-[11px] text-slate-400 flex items-center gap-1.5">
+                    <svg class="h-3.5 w-3.5 text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    Changes apply instantly -- no downtime required
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============================================ -->
+          <!-- TAB: Activity (Action Log) -->
+          <!-- ============================================ -->
+          <div id="tab-activity" class="tab-content hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <button onclick="setActivityFilter(this, 'today')" class="activity-filter rounded-lg bg-primary-50 border border-primary-200 px-3 py-1.5 text-xs font-semibold text-primary-600" data-filter="today">Today</button>
+                <button onclick="setActivityFilter(this, 'week')" class="activity-filter rounded-lg bg-white border border-surface-200 px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-surface-50" data-filter="week">This Week</button>
+                <button onclick="setActivityFilter(this, 'month')" class="activity-filter rounded-lg bg-white border border-surface-200 px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-surface-50" data-filter="month">This Month</button>
+              </div>
+              <span class="text-xs text-slate-400 font-mono">37 actions today</span>
+            </div>
+
+            <div class="rounded-xl border border-surface-200 bg-white shadow-sm overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full min-w-[700px]">
+                  <thead>
+                    <tr class="border-b border-surface-200 bg-surface-50/80">
+                      <th class="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Time</th>
+                      <th class="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Action Type</th>
+                      <th class="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Target</th>
+                      <th class="px-5 py-3 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Duration</th>
+                      <th class="px-5 py-3 text-center text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-surface-100">
+                    <tr class="hover:bg-primary-50/30 transition-colors">
+                      <td class="px-5 py-3"><span class="font-mono text-xs text-slate-600">10:42:18</span></td>
+                      <td class="px-5 py-3"><span class="rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-600">Tool Execution</span></td>
+                      <td class="px-5 py-3"><span class="text-sm text-slate-700">jira.create_ticket</span> <span class="text-xs text-slate-400">-- PM-1247</span></td>
+                      <td class="px-5 py-3 text-right"><span class="font-mono text-xs text-slate-600">1.2s</span></td>
+                      <td class="px-5 py-3 text-center"><span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100"><svg class="h-3 w-3 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                    </tr>
+                    <tr class="hover:bg-primary-50/30 transition-colors">
+                      <td class="px-5 py-3"><span class="font-mono text-xs text-slate-600">10:38:19</span></td>
+                      <td class="px-5 py-3"><span class="rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-600">Tool Execution</span></td>
+                      <td class="px-5 py-3"><span class="text-sm text-slate-700">amplitude.query_events</span> <span class="text-xs text-slate-400">-- 7d DAU data</span></td>
+                      <td class="px-5 py-3 text-right"><span class="font-mono text-xs text-slate-600">0.8s</span></td>
+                      <td class="px-5 py-3 text-center"><span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100"><svg class="h-3 w-3 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                    </tr>
+                    <tr class="hover:bg-primary-50/30 transition-colors">
+                      <td class="px-5 py-3"><span class="font-mono text-xs text-slate-600">10:15:03</span></td>
+                      <td class="px-5 py-3"><span class="rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-600">Rate Limit Warning</span></td>
+                      <td class="px-5 py-3"><span class="text-sm text-slate-700">Jira API</span> <span class="text-xs text-slate-400">-- 85% hourly quota</span></td>
+                      <td class="px-5 py-3 text-right"><span class="font-mono text-xs text-slate-400">--</span></td>
+                      <td class="px-5 py-3 text-center"><span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-100"><svg class="h-3 w-3 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span></td>
+                    </tr>
+                    <tr class="hover:bg-primary-50/30 transition-colors">
+                      <td class="px-5 py-3"><span class="font-mono text-xs text-slate-600">10:02:45</span></td>
+                      <td class="px-5 py-3"><span class="rounded-md bg-violet-50 px-2 py-0.5 text-[11px] font-semibold text-violet-600">Skill Invocation</span></td>
+                      <td class="px-5 py-3"><span class="text-sm text-slate-700">slack.send_message</span> <span class="text-xs text-slate-400">-- daily standup to #pm-nadia</span></td>
+                      <td class="px-5 py-3 text-right"><span class="font-mono text-xs text-slate-600">1.8s</span></td>
+                      <td class="px-5 py-3 text-center"><span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100"><svg class="h-3 w-3 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                    </tr>
+                    <tr class="hover:bg-primary-50/30 transition-colors">
+                      <td class="px-5 py-3"><span class="font-mono text-xs text-slate-600">09:47:33</span></td>
+                      <td class="px-5 py-3"><span class="rounded-md bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-600">Error</span></td>
+                      <td class="px-5 py-3"><span class="text-sm text-slate-700">tableau.read_dashboard</span> <span class="text-xs text-red-500">-- HTTP 503 Service Unavailable</span></td>
+                      <td class="px-5 py-3 text-right"><span class="font-mono text-xs text-red-600">8.2s</span></td>
+                      <td class="px-5 py-3 text-center"><span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-100"><svg class="h-3 w-3 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
+                    </tr>
+                    <tr class="hover:bg-primary-50/30 transition-colors">
+                      <td class="px-5 py-3"><span class="font-mono text-xs text-slate-600">09:48:04</span></td>
+                      <td class="px-5 py-3"><span class="rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-600">Tool Execution</span></td>
+                      <td class="px-5 py-3"><span class="text-sm text-slate-700">tableau.read_dashboard</span> <span class="text-xs text-slate-400">-- retry #1 success</span></td>
+                      <td class="px-5 py-3 text-right"><span class="font-mono text-xs text-slate-600">0.9s</span></td>
+                      <td class="px-5 py-3 text-center"><span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100"><svg class="h-3 w-3 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                    </tr>
+                    <tr class="hover:bg-primary-50/30 transition-colors">
+                      <td class="px-5 py-3"><span class="font-mono text-xs text-slate-600">09:30:09</span></td>
+                      <td class="px-5 py-3"><span class="rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-600">Tool Execution</span></td>
+                      <td class="px-5 py-3"><span class="text-sm text-slate-700">tableau.read_dashboard</span> <span class="text-xs text-slate-400">-- weekly revenue data</span></td>
+                      <td class="px-5 py-3 text-right"><span class="font-mono text-xs text-slate-600">3.1s</span></td>
+                      <td class="px-5 py-3 text-center"><span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100"><svg class="h-3 w-3 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============================================ -->
+          <!-- TAB: Configuration -->
+          <!-- ============================================ -->
+          <div id="tab-configuration" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Model Settings -->
+              <div class="rounded-xl border border-surface-200 bg-white shadow-sm">
+                <div class="px-5 py-4 border-b border-surface-200">
+                  <h3 class="text-sm font-semibold text-slate-900">Model Settings</h3>
+                </div>
+                <div class="p-5 space-y-4">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1.5">Agent Name</label>
+                    <input type="text" value="Nadia" class="w-full rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-primary-300 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1.5">Role</label>
+                    <select class="w-full rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-primary-300 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all">
+                      <option selected>PM Agent</option>
+                      <option>Eng Agent</option>
+                      <option>Ops Agent</option>
+                      <option>HR Agent</option>
+                      <option>Data Agent</option>
+                      <option>Custom</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1.5">Model</label>
+                    <select class="w-full rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm font-mono text-slate-800 focus:border-primary-300 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all">
+                      <option selected>Sonnet 4.5</option>
+                      <option>Opus 4</option>
+                      <option>Haiku 3.5</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1.5">Thinking Mode</label>
+                    <select class="w-full rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-primary-300 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all">
+                      <option selected>Extended Thinking</option>
+                      <option>Standard</option>
+                      <option>Fast</option>
+                    </select>
+                  </div>
+                  <div>
+                    <div class="flex justify-between mb-1.5">
+                      <label class="text-xs font-medium text-slate-600">Temperature</label>
+                      <span class="text-xs font-mono text-slate-500" id="tempValue">0.7</span>
+                    </div>
+                    <input type="range" min="0" max="100" value="70" oninput="document.getElementById('tempValue').textContent=(this.value/100).toFixed(1)" class="w-full h-1.5 bg-surface-200 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary-500 [&::-webkit-slider-thumb]:cursor-pointer" />
+                    <div class="flex justify-between mt-1">
+                      <span class="text-[10px] text-slate-400">Precise (0.0)</span>
+                      <span class="text-[10px] text-slate-400">Creative (1.0)</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="px-5 py-3 border-t border-surface-100 flex justify-end">
+                  <button class="rounded-lg bg-primary-500 px-4 py-2 text-xs font-semibold text-white hover:bg-primary-600 transition-colors shadow-sm">Save Changes</button>
+                </div>
+              </div>
+
+              <!-- Channel Bindings -->
+              <div class="rounded-xl border border-surface-200 bg-white shadow-sm">
+                <div class="px-5 py-4 border-b border-surface-200">
+                  <h3 class="text-sm font-semibold text-slate-900">Channel Bindings</h3>
+                </div>
+                <div class="p-5 space-y-4">
+                  <div class="flex items-center justify-between p-3 rounded-lg border border-surface-200 bg-surface-50">
+                    <div class="flex items-center gap-3">
+                      <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50">
+                        <svg class="h-4 w-4 text-sky-500" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-slate-700">Telegram</p>
+                        <p class="text-[11px] text-slate-400 font-mono">@breadfast_nadia_bot</p>
+                      </div>
+                    </div>
+                    <button onclick="togglePolicy(this)" class="toggle-track relative inline-flex h-5 w-9 items-center rounded-full bg-primary-500 cursor-pointer" data-enabled="true"><span class="toggle-thumb inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform translate-x-4"></span></button>
+                  </div>
+                  <div class="flex items-center justify-between p-3 rounded-lg border border-surface-200 bg-surface-50">
+                    <div class="flex items-center gap-3">
+                      <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-50">
+                        <svg class="h-4 w-4 text-[#E01E5A]" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z"/></svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-slate-700">Slack</p>
+                        <p class="text-[11px] text-slate-400 font-mono">#pm-nadia</p>
+                      </div>
+                    </div>
+                    <button onclick="togglePolicy(this)" class="toggle-track relative inline-flex h-5 w-9 items-center rounded-full bg-primary-500 cursor-pointer" data-enabled="true"><span class="toggle-thumb inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform translate-x-4"></span></button>
+                  </div>
+                  <button class="w-full rounded-lg border border-dashed border-surface-300 px-4 py-3 text-xs font-medium text-slate-500 hover:bg-surface-50 hover:border-primary-300 hover:text-primary-600 transition-colors">+ Add Channel Binding</button>
+                </div>
+                <div class="px-5 py-3 border-t border-surface-100 flex justify-end">
+                  <button class="rounded-lg bg-primary-500 px-4 py-2 text-xs font-semibold text-white hover:bg-primary-600 transition-colors shadow-sm">Save Changes</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tool Policy Grid -->
+            <div class="rounded-xl border border-surface-200 bg-white shadow-sm mt-6">
+              <div class="flex items-center justify-between px-5 py-4 border-b border-surface-200">
+                <h3 class="text-sm font-semibold text-slate-900">Tool Policy</h3>
+                <span class="text-[11px] text-slate-400">Manage which tools this agent can access</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead>
+                    <tr class="border-b border-surface-100">
+                      <th class="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Tool</th>
+                      <th class="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Category</th>
+                      <th class="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Risk Level</th>
+                      <th class="px-5 py-3 text-center text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-surface-100">
+                    <tr><td class="px-5 py-3.5"><span class="text-sm font-medium text-slate-800">jira.create_ticket</span></td><td class="px-5 py-3.5"><span class="rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-600">Project Management</span></td><td class="px-5 py-3.5"><span class="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-600">Low</span></td><td class="px-5 py-3.5 text-center"><button onclick="togglePolicy(this)" class="toggle-track relative inline-flex h-5 w-9 items-center rounded-full bg-primary-500 cursor-pointer" data-enabled="true"><span class="toggle-thumb inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform translate-x-4"></span></button></td></tr>
+                    <tr><td class="px-5 py-3.5"><span class="text-sm font-medium text-slate-800">jira.delete_ticket</span></td><td class="px-5 py-3.5"><span class="rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-600">Project Management</span></td><td class="px-5 py-3.5"><span class="rounded-md bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-600">High</span></td><td class="px-5 py-3.5 text-center"><button onclick="togglePolicy(this)" class="toggle-track relative inline-flex h-5 w-9 items-center rounded-full bg-slate-200 cursor-pointer" data-enabled="false"><span class="toggle-thumb inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform translate-x-0.5"></span></button></td></tr>
+                    <tr><td class="px-5 py-3.5"><span class="text-sm font-medium text-slate-800">tableau.read_dashboard</span></td><td class="px-5 py-3.5"><span class="rounded-md bg-orange-50 px-2 py-0.5 text-[11px] font-medium text-orange-600">Analytics</span></td><td class="px-5 py-3.5"><span class="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-600">Low</span></td><td class="px-5 py-3.5 text-center"><button onclick="togglePolicy(this)" class="toggle-track relative inline-flex h-5 w-9 items-center rounded-full bg-primary-500 cursor-pointer" data-enabled="true"><span class="toggle-thumb inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform translate-x-4"></span></button></td></tr>
+                    <tr><td class="px-5 py-3.5"><span class="text-sm font-medium text-slate-800">amplitude.query_events</span></td><td class="px-5 py-3.5"><span class="rounded-md bg-pink-50 px-2 py-0.5 text-[11px] font-medium text-pink-600">Analytics</span></td><td class="px-5 py-3.5"><span class="rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-600">Medium</span></td><td class="px-5 py-3.5 text-center"><button onclick="togglePolicy(this)" class="toggle-track relative inline-flex h-5 w-9 items-center rounded-full bg-primary-500 cursor-pointer" data-enabled="true"><span class="toggle-thumb inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform translate-x-4"></span></button></td></tr>
+                    <tr><td class="px-5 py-3.5"><span class="text-sm font-medium text-slate-800">slack.send_message</span></td><td class="px-5 py-3.5"><span class="rounded-md bg-purple-50 px-2 py-0.5 text-[11px] font-medium text-purple-600">Communication</span></td><td class="px-5 py-3.5"><span class="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-600">Low</span></td><td class="px-5 py-3.5 text-center"><button onclick="togglePolicy(this)" class="toggle-track relative inline-flex h-5 w-9 items-center rounded-full bg-primary-500 cursor-pointer" data-enabled="true"><span class="toggle-thumb inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform translate-x-4"></span></button></td></tr>
+                    <tr><td class="px-5 py-3.5"><span class="text-sm font-medium text-slate-800">slack.delete_message</span></td><td class="px-5 py-3.5"><span class="rounded-md bg-purple-50 px-2 py-0.5 text-[11px] font-medium text-purple-600">Communication</span></td><td class="px-5 py-3.5"><span class="rounded-md bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-600">High</span></td><td class="px-5 py-3.5 text-center"><button onclick="togglePolicy(this)" class="toggle-track relative inline-flex h-5 w-9 items-center rounded-full bg-slate-200 cursor-pointer" data-enabled="false"><span class="toggle-thumb inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform translate-x-0.5"></span></button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="px-5 py-3 border-t border-surface-100 flex justify-end">
+                <button class="rounded-lg bg-primary-500 px-4 py-2 text-xs font-semibold text-white hover:bg-primary-600 transition-colors shadow-sm">Save Changes</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============================================ -->
+          <!-- TAB: Logs (System/Debug) -->
+          <!-- ============================================ -->
+          <div id="tab-logs" class="tab-content hidden">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div class="flex items-center gap-2">
+                <button onclick="setLogLevel(this, 'all')" class="log-level-btn rounded-lg bg-primary-50 border border-primary-200 px-2.5 py-1 text-[11px] font-semibold text-primary-700">ALL</button>
+                <button onclick="setLogLevel(this, 'info')" class="log-level-btn rounded-lg bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">INFO</button>
+                <button onclick="setLogLevel(this, 'warn')" class="log-level-btn rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-1 text-[11px] font-semibold text-amber-700">WARN</button>
+                <button onclick="setLogLevel(this, 'error')" class="log-level-btn rounded-lg bg-red-50 border border-red-200 px-2.5 py-1 text-[11px] font-semibold text-red-700">ERROR</button>
+              </div>
+              <div class="flex items-center gap-2">
+                <label class="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                  <input type="checkbox" checked id="autoScroll" class="rounded border-surface-300 text-primary-500 focus:ring-primary-200" />
+                  Auto-scroll
+                </label>
+                <button class="rounded-lg border border-surface-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-surface-50 transition-colors">Clear</button>
+                <button class="rounded-lg border border-surface-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-surface-50 transition-colors">Export</button>
+              </div>
+            </div>
+            <div id="logViewer" class="rounded-xl border border-slate-700 shadow-sm overflow-hidden" style="background:#0f172a">
+              <div class="overflow-y-auto p-5 space-y-0.5" style="max-height:580px" id="logContent">
+                <p class="log-line text-slate-500">2026-02-05 10:42:18.234 <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">Tool call completed: jira.create_ticket -> PM-1247 (1247ms)</span></p>
+                <p class="log-line text-slate-500">2026-02-05 10:42:16.012 <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">Initiating tool call: jira.create_ticket {project: "PM", type: "story", summary: "Checkout Flow Redesign"}</span></p>
+                <p class="log-line text-slate-500">2026-02-05 10:38:22.567 <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">Tool call completed: amplitude.query_events -> 7d DAU data (823ms)</span></p>
+                <p class="log-line text-slate-500">2026-02-05 10:38:18.280 <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">Initiating tool call: amplitude.query_events {metric: "DAU", period: "7d"}</span></p>
+                <p class="log-line text-slate-500">2026-02-05 10:15:03.891 <span class="text-amber-400">[WARN]</span> <span class="text-amber-200">Rate limit approaching: Jira API at 85% of hourly quota (170/200 requests)</span></p>
+                <p class="log-line text-slate-500">2026-02-05 10:02:45.223 <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">Scheduled task executed: daily_standup_summary -> sent to Slack #pm-nadia (1823ms)</span></p>
+                <p class="log-line text-slate-500">2026-02-05 09:47:33.001 <span class="text-red-400">[ERROR]</span> <span class="text-red-200">Tableau API returned HTTP 503 for dashboard "Weekly Revenue" - Service Unavailable</span></p>
+                <p class="log-line text-slate-500">2026-02-05 09:47:33.890 <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">Auto-retry initiated for tableau.read_dashboard (attempt 1/3, backoff: 30s)</span></p>
+                <p class="log-line text-slate-500">2026-02-05 09:48:04.112 <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">Retry successful: tableau.read_dashboard -> dashboard data retrieved (892ms)</span></p>
+                <p class="log-line text-slate-500">2026-02-05 09:30:12.445 <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">Tool call completed: tableau.read_dashboard -> weekly revenue data (3102ms)</span></p>
+                <p class="log-line text-slate-500">2026-02-05 09:30:09.343 <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">Initiating tool call: tableau.read_dashboard {dashboard: "Weekly Revenue"}</span></p>
+                <p class="log-line text-slate-500">2026-02-05 09:15:00.001 <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">Health check passed: all 4 skills operational, memory: 124MB, latency: 89ms</span></p>
+                <p class="log-line text-slate-500">2026-02-05 09:00:00.003 <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">Agent heartbeat: uptime 14d 6h 23m, total tasks today: 0, total tool calls today: 0</span></p>
+                <p class="log-line text-slate-500">2026-02-05 08:59:58.112 <span class="text-amber-400">[WARN]</span> <span class="text-amber-200">Memory usage approaching threshold: 124MB / 256MB (48.4%)</span></p>
+                <p class="log-line text-slate-500">2026-02-05 08:45:00.001 <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">Health check passed: all 4 skills operational, memory: 118MB, latency: 92ms</span></p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeDeleteModal()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+          <svg class="h-5 w-5 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div>
+          <h3 class="text-base font-semibold text-slate-900">Delete Agent</h3>
+          <p class="text-sm text-slate-500">This action cannot be undone</p>
+        </div>
+      </div>
+      <p class="text-sm text-slate-600 mb-6">Are you sure you want to permanently delete <strong>Nadia</strong>? All configuration, channel bindings, and action history will be removed.</p>
+      <div class="flex justify-end gap-3">
+        <button onclick="closeDeleteModal()" class="rounded-lg border border-surface-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-surface-50 transition-colors">Cancel</button>
+        <button class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition-colors">Delete Agent</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let sidebarCollapsed = false;
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+      if (sidebarCollapsed) {
+        sidebar.style.width = '64px';
+        mainContent.style.marginLeft = '64px';
+        labels.forEach(el => el.style.display = 'none');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.style.width = '256px';
+        mainContent.style.marginLeft = '256px';
+        labels.forEach(el => el.style.display = '');
+        collapseIcon.style.transform = '';
+      }
+    }
+
+    // Tab switching
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('text-primary-600', 'font-semibold', 'border-primary-500');
+        btn.classList.add('text-slate-400', 'font-medium', 'border-transparent');
+      });
+      document.getElementById('tab-' + tabName).classList.remove('hidden');
+      const activeBtn = document.querySelector('[data-tab="' + tabName + '"]');
+      activeBtn.classList.add('text-primary-600', 'font-semibold', 'border-primary-500');
+      activeBtn.classList.remove('text-slate-400', 'font-medium', 'border-transparent');
+      if (tabName === 'logs') { scrollLogsToBottom(); }
+    }
+
+    // Toggle switches
+    function togglePolicy(btn) {
+      const enabled = btn.dataset.enabled === 'true';
+      const thumb = btn.querySelector('.toggle-thumb');
+      if (enabled) {
+        btn.dataset.enabled = 'false';
+        btn.classList.remove('bg-primary-500');
+        btn.classList.add('bg-slate-200');
+        thumb.classList.remove('translate-x-4');
+        thumb.classList.add('translate-x-0.5');
+      } else {
+        btn.dataset.enabled = 'true';
+        btn.classList.remove('bg-slate-200');
+        btn.classList.add('bg-primary-500');
+        thumb.classList.remove('translate-x-0.5');
+        thumb.classList.add('translate-x-4');
+      }
+    }
+
+    // Delete modal
+    function confirmDelete() { document.getElementById('deleteModal').classList.remove('hidden'); }
+    function closeDeleteModal() { document.getElementById('deleteModal').classList.add('hidden'); }
+
+    // Activity filter
+    function setActivityFilter(btn, filter) {
+      document.querySelectorAll('.activity-filter').forEach(b => {
+        b.classList.remove('bg-primary-50', 'border-primary-200', 'text-primary-600', 'font-semibold');
+        b.classList.add('bg-white', 'border-surface-200', 'text-slate-500', 'font-medium');
+      });
+      btn.classList.remove('bg-white', 'border-surface-200', 'text-slate-500', 'font-medium');
+      btn.classList.add('bg-primary-50', 'border-primary-200', 'text-primary-600', 'font-semibold');
+    }
+
+    // Log level filter
+    function setLogLevel(btn, level) {
+      document.querySelectorAll('.log-level-btn').forEach(b => {
+        b.classList.remove('ring-2', 'ring-primary-300', 'ring-offset-1');
+      });
+      btn.classList.add('ring-2', 'ring-primary-300', 'ring-offset-1');
+      const lines = document.querySelectorAll('.log-line');
+      lines.forEach(line => {
+        if (level === 'all') { line.style.display = ''; return; }
+        const text = line.innerHTML.toLowerCase();
+        if (level === 'info' && text.includes('[info]')) line.style.display = '';
+        else if (level === 'warn' && text.includes('[warn]')) line.style.display = '';
+        else if (level === 'error' && text.includes('[error]')) line.style.display = '';
+        else if (level !== 'all') line.style.display = 'none';
+      });
+    }
+
+    // Log auto-scroll
+    function scrollLogsToBottom() {
+      const logContent = document.getElementById('logContent');
+      if (logContent && document.getElementById('autoScroll').checked) {
+        logContent.scrollTop = logContent.scrollHeight;
+      }
+    }
+
+    // Dropdown toggle
+    function toggleDropdown(menuId) {
+      document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        if (menu.id !== menuId) menu.classList.remove('open');
+      });
+      document.getElementById(menuId).classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.sidebar-user-row') && !e.target.closest('.dropdown-menu')) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('open'));
+      }
+    });
+
+    // Simulate new log entry every 8s
+    setInterval(() => {
+      const logContent = document.getElementById('logContent');
+      if (!logContent) return;
+      const now = new Date();
+      const ts = now.getFullYear() + '-' +
+        String(now.getMonth()+1).padStart(2,'0') + '-' +
+        String(now.getDate()).padStart(2,'0') + ' ' +
+        String(now.getHours()).padStart(2,'0') + ':' +
+        String(now.getMinutes()).padStart(2,'0') + ':' +
+        String(now.getSeconds()).padStart(2,'0') + '.' +
+        String(now.getMilliseconds()).padStart(3,'0');
+      const msgs = [
+        'Health check passed: all 4 skills operational',
+        'Heartbeat: connection stable, latency 91ms',
+        'Memory GC completed: freed 12MB, current usage 112MB',
+        'Token usage: 23,451 / 100,000 daily limit (23.5%)',
+        'Skill jira responding normally, avg latency 340ms',
+      ];
+      const msg = msgs[Math.floor(Math.random() * msgs.length)];
+      const p = document.createElement('p');
+      p.className = 'log-line text-slate-500';
+      p.innerHTML = ts + ' <span class="text-emerald-400">[INFO]</span> <span class="text-slate-300">' + msg + '</span>';
+      logContent.appendChild(p);
+      if (document.getElementById('autoScroll').checked) {
+        logContent.scrollTop = logContent.scrollHeight;
+      }
+    }, 8000);
+
+    // Close modals on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { closeDeleteModal(); }
+    });
+
+    // ── Prototype Navigation Bridge ──
+    // If loaded in a prototype frame, communicate navigation requests to parent
+    if (window.parent !== window) {
+      // Intercept all sidebar link clicks
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href^="/"]');
+        if (link) {
+          const href = link.getAttribute('href');
+
+          // Send navigation request to parent frame
+          window.parent.postMessage({
+            type: 'navigate',
+            href: href
+          }, '*');
+
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+    }
+  </script>
+</body>
+</html>
