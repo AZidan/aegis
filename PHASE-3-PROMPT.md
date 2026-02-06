@@ -1,8 +1,4 @@
-# Phase 3 Implementation - Fresh Context Prompt
-
-Copy and paste this prompt when starting a fresh conversation for Phase 3:
-
----
+# Phase 3 Implementation - Context Prompt
 
 I'm working on **Phase 3 (Implementation)** of the Aegis Platform - a multi-tenant AI Multi-Agent SaaS.
 
