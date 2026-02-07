@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { HealthModule } from './health/health.module';
 import { ProvisioningModule } from './provisioning/provisioning.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import configuration from './config/configuration';
 import { validateEnv } from './config/validation';
 
@@ -52,6 +53,7 @@ import { validateEnv } from './config/validation';
     // Feature modules
     AuthModule,
     AdminModule,
+    DashboardModule,
     HealthModule,
     ProvisioningModule,
   ],
