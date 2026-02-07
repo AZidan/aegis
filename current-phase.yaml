@@ -92,3 +92,33 @@ phase_3:
         status: completed
         points: 13
         notes: "BullMQ provisioning processor, 5 mock steps, retry logic, 3-step wizard, 168 tests"
+
+  # Sprint 3 - Agent Management & Tenant Dashboard (IN PROGRESS)
+  sprint_3:
+    status: in_progress
+    stories:
+      - id: E3-F1
+        name: "Agent CRUD API"
+        status: completed
+        points: 8
+        notes: "8 endpoints, TenantGuard, plan limit enforcement, seed data, 169 tests"
+      - id: E3-F2
+        name: "Agent Tool Policy Configuration"
+        status: completed
+        points: 5
+        notes: "8 tool categories, role defaults, per-agent policy CRUD, 65 tests"
+      - id: E5-F2
+        name: "Agent Dashboard + Activity Feed"
+        status: pending
+        points: 8
+        notes: "Tenant sidebar, dashboard stats, agent cards, detail page, creation wizard"
+      - id: E5-F1
+        name: "Tenant Login OAuth"
+        status: pending
+        points: 5
+        notes: "Google + GitHub OAuth via Passport"
+      - id: E4-F1
+        name: "Skill Catalog & Browsing UI"
+        status: pending
+        points: 5
+        notes: "Skill marketplace, browse, detail, install/uninstall"

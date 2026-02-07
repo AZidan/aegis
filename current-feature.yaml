@@ -2,50 +2,28 @@
 # Tracks active development scope and requirements per CLAUDE.md
 
 feature:
-  name: "Agent Tool Policy Configuration"
-  epic: "E3-F2"
+  name: "Agent Dashboard + Activity Feed"
+  epic: "E5-F2"
   sprint: "Sprint 3 - Agent Management & Tenant Dashboard"
   priority: P0
-  points: 5
-  started_at: "2026-02-07"
-  status: in_progress
-  branch: agent-tool-policy
+  points: 8
+  started_at: null
+  status: pending
+  branch: agent-dashboard
 
-requirements:
-  - "Define tool categories with metadata (name, description, risk level)"
-  - "Default tool policies per role type (PM, Engineering, Operations, Custom)"
-  - "GET /api/dashboard/tools/categories - list available tool categories"
-  - "GET /api/dashboard/agents/:id/tool-policy - get agent's current policy"
-  - "PUT /api/dashboard/agents/:id/tool-policy - update agent's policy"
-  - "Tool policy changes propagate to OpenClaw within 60s (mock for MVP)"
+previous_completed:
+  - epic: E3-F1
+    name: "Agent CRUD API"
+    points: 8
+    tests: 169
+  - epic: E3-F2
+    name: "Agent Tool Policy Configuration"
+    points: 5
+    tests: 65
 
-design_decisions:
-  tool_categories: "Static config (not DB) - categories are platform-defined"
-  role_defaults: "PM: analytics+project_mgmt, Eng: code+devops, Ops: communication+monitoring"
-  propagation: "Mock - log 'propagating to OpenClaw' (real integration later)"
-
-tasks:
-  - name: "Backend Tool Policy Module"
-    agent: api-engineer
-    subtasks:
-      - "1.1 Define tool categories constant with metadata"
-      - "1.2 Define role-based default policies"
-      - "1.3 GET /api/dashboard/tools/categories endpoint"
-      - "1.4 GET /api/dashboard/agents/:id/tool-policy"
-      - "1.5 PUT /api/dashboard/agents/:id/tool-policy"
-      - "1.6 Auto-apply defaults on agent creation based on role"
-
-  - name: "Backend Tests"
-    agent: qa-engineer
-    subtasks:
-      - "2.1 Tool categories endpoint tests"
-      - "2.2 Tool policy CRUD tests"
-      - "2.3 Role default application tests"
-
-acceptance_criteria:
-  - "Tool categories endpoint returns structured list with risk levels"
-  - "Each role type has sensible default tool policies"
-  - "Tool policy can be read and updated per agent"
-  - "Creating an agent auto-populates tool policy from role defaults"
-  - "npm run build passes"
-  - "All tests pass"
+notes: |
+  Backend APIs for agents are complete (234 tests).
+  This feature is frontend-heavy: tenant sidebar, dashboard stats,
+  agent list/detail pages, agent creation wizard.
+  Also needs GET /api/dashboard/stats backend endpoint.
+  Design screens: tenant-dashboard.html, agent-list.html, agent-detail.html, agent-wizard.html
