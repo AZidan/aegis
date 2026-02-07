@@ -112,6 +112,74 @@ async function main() {
   console.log(`  Tenant member: ${member.email} (${member.id})`);
 
   // ---------------------------------------------------------------------------
+  // Demo Agents (for Acme Corp tenant)
+  // ---------------------------------------------------------------------------
+  console.log('\n  Seeding agents for Acme Corp...');
+
+  // Delete existing agents for this tenant to avoid duplicates on re-seed
+  await prisma.agent.deleteMany({ where: { tenantId: tenant.id } });
+
+  const agent1 = await prisma.agent.create({
+    data: {
+      name: 'Sprint Planner',
+      description: 'Manages sprint planning, backlog grooming, and story point estimation.',
+      role: 'pm',
+      status: 'active',
+      modelTier: 'sonnet',
+      thinkingMode: 'low',
+      toolPolicy: { allow: ['jira', 'confluence', 'slack'], deny: [] },
+      tenantId: tenant.id,
+      lastActive: new Date(),
+    },
+  });
+  console.log(`  Agent: ${agent1.name} (${agent1.id}) - role: pm, status: active`);
+
+  const agent2 = await prisma.agent.create({
+    data: {
+      name: 'Code Reviewer',
+      description: 'Performs automated code reviews, checks for security issues, and suggests improvements.',
+      role: 'engineering',
+      status: 'idle',
+      modelTier: 'opus',
+      thinkingMode: 'high',
+      toolPolicy: { allow: ['github', 'sonarqube', 'eslint'], deny: ['deploy'] },
+      tenantId: tenant.id,
+      lastActive: new Date(Date.now() - 72 * 60 * 60 * 1000), // 3 days ago
+    },
+  });
+  console.log(`  Agent: ${agent2.name} (${agent2.id}) - role: engineering, status: idle`);
+
+  const agent3 = await prisma.agent.create({
+    data: {
+      name: 'Infra Monitor',
+      description: 'Monitors infrastructure health, alerts on anomalies, and runs incident response playbooks.',
+      role: 'operations',
+      status: 'error',
+      modelTier: 'haiku',
+      thinkingMode: 'off',
+      toolPolicy: { allow: ['datadog', 'pagerduty', 'aws'], deny: [] },
+      tenantId: tenant.id,
+      lastActive: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
+    },
+  });
+  console.log(`  Agent: ${agent3.name} (${agent3.id}) - role: operations, status: error`);
+
+  const agent4 = await prisma.agent.create({
+    data: {
+      name: 'Customer Insights',
+      description: 'Analyzes customer feedback, generates reports, and tracks NPS trends.',
+      role: 'custom',
+      status: 'active',
+      modelTier: 'sonnet',
+      thinkingMode: 'low',
+      toolPolicy: { allow: ['intercom', 'google-analytics', 'notion'], deny: [] },
+      tenantId: tenant.id,
+      lastActive: new Date(Date.now() - 30 * 60 * 1000), // 30 mins ago
+    },
+  });
+  console.log(`  Agent: ${agent4.name} (${agent4.id}) - role: custom, status: active`);
+
+  // ---------------------------------------------------------------------------
   // Done
   // ---------------------------------------------------------------------------
   console.log('\nSeed complete. Test credentials:');

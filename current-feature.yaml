@@ -2,82 +2,72 @@
 # Tracks active development scope and requirements per CLAUDE.md
 
 feature:
-  name: "Container Provisioning"
-  epic: "E1-F2"
-  sprint: "Sprint 2 - Control Plane Core"
+  name: "Agent CRUD API"
+  epic: "E3-F1"
+  sprint: "Sprint 3 - Agent Management & Tenant Dashboard"
   priority: P0
-  points: 13
+  points: 8
   started_at: "2026-02-07"
   status: in_progress
-  branch: container-provisioning
+  branch: agent-crud-api
 
 requirements:
-  - "After tenant creation, provisioning job creates isolated container"
-  - "5 provisioning steps: create namespace, spin container, configure, install skills, health check"
-  - "Provisioning completes within 5 minutes or fails with clear error"
-  - "Failed provisioning triggers retry (max 3 attempts) and alerts platform admin"
-  - "3-step wizard UI: Company Details → Plan & Limits → Provision"
-  - "Live provisioning progress with polling"
+  - "Full CRUD for agents scoped to tenant (create, list, detail, update, delete)"
+  - "Agent actions: restart, pause, resume"
+  - "Plan limit enforcement on agent creation (starter=3, growth=10, enterprise=50)"
+  - "Filter by status/role, sort by name/last_active/created_at"
+  - "Tenant auth guard extracting tenantId from JWT for all /dashboard/* routes"
+  - "Agent detail includes metrics and installed skills"
 
 design_decisions:
-  design_source: "design-artifacts/screens/tenant-provisioning.html"
-  provisioning_engine: "BullMQ job processor (mock steps, replaceable with K8s later)"
-  progress_tracking: "Poll GET /api/admin/tenants/:id every 2s during provisioning"
-  websocket: "Deferred - use polling for MVP"
+  api_contract: "docs/api-contract.md Section 6: Tenant Agents"
+  base_path: "/api/dashboard/agents"
+  auth: "JWT with X-Tenant-Id extracted from token claims"
+  prisma_models: "Agent, AgentChannel, AgentActivity, AgentMetrics already in schema"
 
 tasks:
-  - name: "API Contract Update"
-    status: in_progress
+  - name: "Prisma Migration"
+    status: pending
     subtasks:
-      - "1.1 Add missing request fields (companySize, deploymentRegion, notes, billingCycle, maxSkills)"
-      - "1.2 Add provisioning progress fields to tenant detail response"
-      - "1.3 Bump version to v1.3.0"
+      - "1.1 Verify Agent-related tables exist in DB"
+      - "1.2 Run migration if needed"
 
-  - name: "Backend Provisioning Module"
-    branch: "container-provisioning/backend-provisioning"
+  - name: "Tenant Auth Guard"
+    status: pending
+    subtasks:
+      - "2.1 Create TenantGuard extracting tenantId from JWT"
+      - "2.2 Apply to /dashboard/* routes"
+
+  - name: "Agent CRUD Module"
+    branch: "agent-crud-api/backend"
     status: pending
     agent: api-engineer
     subtasks:
-      - "2.1 Create ProvisioningModule (service + BullMQ processor)"
-      - "2.2 Implement 5 mock provisioning steps with simulated delays"
-      - "2.3 Track provisioning progress in DB"
-      - "2.4 Add retry logic (max 3, exponential backoff) + Alert on failure"
-      - "2.5 Wire createTenant() to enqueue provisioning job"
-      - "2.6 Extend tenant detail response with provisioning step/progress"
-      - "2.7 Prisma migration for new fields"
-      - "2.8 Backend unit tests"
+      - "3.1 Create AgentsModule (controller + service)"
+      - "3.2 Zod DTOs for create/update agent"
+      - "3.3 POST /api/dashboard/agents (create with plan limits)"
+      - "3.4 GET /api/dashboard/agents (list with filters/sort)"
+      - "3.5 GET /api/dashboard/agents/:id (detail with metrics)"
+      - "3.6 PATCH /api/dashboard/agents/:id (update)"
+      - "3.7 DELETE /api/dashboard/agents/:id (remove)"
+      - "3.8 POST restart/pause/resume actions"
+      - "3.9 Seed data for dev testing"
 
-  - name: "Frontend Provisioning Wizard"
-    branch: "container-provisioning/frontend-wizard"
-    status: pending
-    agent: ui-engineer
-    subtasks:
-      - "3.1 Wizard layout with 3-step stepper"
-      - "3.2 Step 1: Company Details form"
-      - "3.3 Step 2: Plan & Limits (plan cards, sliders, billing toggle)"
-      - "3.4 Step 3: Summary + provisioning progress + success state"
-      - "3.5 Bottom action bar"
-      - "3.6 Wire to API"
-      - "3.7 Frontend component tests"
-
-  - name: "Integration Tests"
-    branch: "container-provisioning/tests"
+  - name: "Backend Tests"
     status: pending
     agent: qa-engineer
     subtasks:
-      - "4.1 E2E provisioning flow tests"
-      - "4.2 Retry/failure scenarios"
-      - "4.3 Build verification"
+      - "4.1 DTO validation tests"
+      - "4.2 Service unit tests"
+      - "4.3 Controller integration tests"
+      - "4.4 Plan limit enforcement tests"
 
 acceptance_criteria:
-  - "POST /api/admin/tenants accepts all fields from design screen"
-  - "Provisioning job runs 5 steps with progress tracking"
-  - "Retry max 3 times on failure, creates Alert"
-  - "Tenant detail returns provisioning step + progress %"
-  - "3-step wizard matches tenant-provisioning.html design"
-  - "Plan cards show Starter $99, Pro $299, Enterprise $799"
-  - "Resource sliders for agents (1-50) and skills (5-200)"
-  - "Live progress polling at 2s during provisioning"
-  - "Success state shows tenant ID with copy button"
-  - "npm run build passes for both frontend and backend"
+  - "All 8 endpoints match API contract Section 6 exactly"
+  - "Plan limits enforced: starter=3, growth=10, enterprise=50"
+  - "Tenant isolation: agents only visible to their own tenant"
+  - "Filter by status (active/idle/error) and role (pm/engineering/operations/custom)"
+  - "Sort by name, last_active, created_at (asc/desc)"
+  - "Agent detail returns metrics and installed skills"
+  - "npm run build passes"
   - "All tests pass"
