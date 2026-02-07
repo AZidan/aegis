@@ -55,8 +55,7 @@ function PlanCard({ plan, selected, billingCycle, onSelect }: PlanCardProps) {
       onClick={onSelect}
       data-testid={`plan-card-${plan.value}`}
       className={cn(
-        'plan-card relative rounded-xl border-2 p-5 text-left transition-all duration-200 cursor-pointer',
-        'hover:-translate-y-0.5 hover:shadow-[0_10px_25px_-5px_rgba(99,102,241,0.15),0_8px_10px_-6px_rgba(99,102,241,0.08)]',
+        'plan-card-hover relative rounded-xl border-2 p-5 text-left',
         selected
           ? 'border-primary-500 bg-primary-50/30 shadow-[0_0_0_3px_rgba(99,102,241,0.15),0_10px_25px_-5px_rgba(99,102,241,0.15)]'
           : 'border-neutral-200 bg-white'
@@ -141,46 +140,6 @@ function FeatureRow({ text }: { text: React.ReactNode }) {
 }
 
 // ---------------------------------------------------------------------------
-// Slider styling
-// ---------------------------------------------------------------------------
-
-const sliderCss = `
-  .provisioning-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 6px;
-    border-radius: 3px;
-    background: #e0e7ff;
-    outline: none;
-    width: 100%;
-  }
-  .provisioning-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #6366f1;
-    cursor: pointer;
-    border: 3px solid white;
-    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.4);
-    transition: transform 0.15s ease;
-  }
-  .provisioning-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
-  }
-  .provisioning-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #6366f1;
-    cursor: pointer;
-    border: 3px solid white;
-    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.4);
-  }
-`;
-
-// ---------------------------------------------------------------------------
 // Select arrow background
 // ---------------------------------------------------------------------------
 
@@ -203,9 +162,6 @@ export function StepPlanLimits({ data, onChange }: StepPlanLimitsProps) {
 
   return (
     <>
-      {/* Inject slider styles */}
-      <style dangerouslySetInnerHTML={{ __html: sliderCss }} />
-
       {/* Plan Selection */}
       <div className="bg-white rounded-xl border border-neutral-200/80 shadow-sm mb-6">
         <div className="px-6 py-5 border-b border-neutral-100">

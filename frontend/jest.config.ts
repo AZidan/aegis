@@ -4,7 +4,8 @@ const config: Config = {
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
   testMatch: [
-    '**/__tests__/**/*.{ts,tsx}',
+    '**/__tests__/**/*.test.{ts,tsx}',
+    '**/__tests__/**/*.spec.{ts,tsx}',
     '**/*.{spec,test}.{ts,tsx}',
   ],
   transform: {

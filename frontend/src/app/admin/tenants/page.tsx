@@ -2,16 +2,16 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { Plus, Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 import type {
   TenantStatus,
   TenantPlan,
+  HealthStatus,
   SortField,
   SortDirection,
 } from '@/lib/api/tenants';
 import { useTenantsQuery } from '@/lib/api/tenants';
-import { ROUTES, DEFAULT_PAGE_SIZE } from '@/lib/constants';
-import { Button } from '@/components/ui/button';
+import { DEFAULT_PAGE_SIZE } from '@/lib/constants';
 import { TenantFilters } from '@/components/admin/tenants/tenant-filters';
 import { TenantTable } from '@/components/admin/tenants/tenant-table';
 import { TenantPagination } from '@/components/admin/tenants/pagination';
@@ -22,9 +22,11 @@ export default function TenantsPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [status, setStatus] = useState<TenantStatus | undefined>(undefined);
   const [plan, setPlan] = useState<TenantPlan | undefined>(undefined);
+  const [health, setHealth] = useState<HealthStatus | undefined>(undefined);
   const [page, setPage] = useState(1);
   const [sortField, setSortField] = useState<SortField | undefined>(undefined);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Debounce the search value for API calls
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -62,6 +64,11 @@ export default function TenantsPage() {
     setPage(1);
   }, []);
 
+  const handleHealthChange = useCallback((value: HealthStatus | undefined) => {
+    setHealth(value);
+    setPage(1);
+  }, []);
+
   const handleSortChange = useCallback(
     (field: SortField) => {
       if (sortField === field) {
@@ -75,11 +82,12 @@ export default function TenantsPage() {
   );
 
   // Query with all params
-  const { data, isLoading, isError, error } = useTenantsQuery({
+  const { data, isLoading, isError, error, refetch } = useTenantsQuery({
     page,
     limit: DEFAULT_PAGE_SIZE,
     status,
     plan,
+    health,
     search: debouncedSearch || undefined,
     sortField,
     sortDirection,
@@ -89,51 +97,74 @@ export default function TenantsPage() {
   const tenants = data?.data ?? [];
   const meta = data?.meta;
 
-  return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div className="flex items-start justify-between">
-        <div>
-          {/* Breadcrumbs */}
-          <nav className="mb-2 flex items-center gap-1 text-sm text-neutral-500">
-            <Link
-              href={ROUTES.ADMIN_HOME}
-              className="hover:text-neutral-700 transition-colors"
-            >
-              Admin
-            </Link>
-            <span>/</span>
-            <span className="text-neutral-900">Tenants</span>
-          </nav>
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    refetch().finally(() => {
+      setTimeout(() => setIsRefreshing(false), 500);
+    });
+  }, [refetch]);
 
-          <h1 className="text-2xl font-semibold text-neutral-900">Tenants</h1>
-          <p className="mt-1 text-sm text-neutral-500">
-            Manage all tenant environments and their configurations.
+  return (
+    <div className="space-y-5">
+      {/* Page header - matches design: title with count badge, subtitle, provision button */}
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-lg font-semibold text-neutral-900 tracking-tight">
+              Tenants
+            </h1>
+            {meta && (
+              <span className="inline-flex items-center justify-center px-2 py-0.5 text-[11px] font-bold font-mono bg-primary-50 text-primary-600 rounded-full border border-primary-200/60">
+                {meta.total}
+              </span>
+            )}
+          </div>
+          <p className="text-[12px] text-neutral-400 font-medium mt-0.5">
+            Manage all platform tenants and their containers
           </p>
         </div>
-
-        <Button asChild>
-          <Link href="/admin/tenants/new">
-            <Plus className="h-4 w-4" />
-            Provision Tenant
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/tenants/new"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-[13px] font-semibold rounded-lg shadow-sm shadow-primary-500/25 hover:shadow-primary-600/30 transition-all active:scale-[0.98]"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              />
+            </svg>
+            <span className="hidden sm:inline">Provision Tenant</span>
+            <span className="sm:hidden">New</span>
           </Link>
-        </Button>
+        </div>
       </div>
 
-      {/* Card wrapper */}
-      <div className="bg-white rounded-lg border border-neutral-200 shadow-xs">
-        {/* Filters toolbar */}
-        <div className="p-4 border-b border-neutral-200">
-          <TenantFilters
-            search={search}
-            onSearchChange={handleSearchChange}
-            status={status}
-            onStatusChange={handleStatusChange}
-            plan={plan}
-            onPlanChange={handlePlanChange}
-          />
-        </div>
+      {/* Filters card - matching design: white card with rounded corners */}
+      <div className="bg-white rounded-xl border border-neutral-200/60 p-4">
+        <TenantFilters
+          search={search}
+          onSearchChange={handleSearchChange}
+          status={status}
+          onStatusChange={handleStatusChange}
+          plan={plan}
+          onPlanChange={handlePlanChange}
+          health={health}
+          onHealthChange={handleHealthChange}
+          isRefreshing={isRefreshing}
+          onRefresh={handleRefresh}
+        />
+      </div>
 
+      {/* Data table card */}
+      <div className="bg-white rounded-xl border border-neutral-200/60 overflow-hidden">
         {/* Loading state */}
         {isLoading && (
           <div className="flex items-center justify-center py-16">
@@ -147,7 +178,7 @@ export default function TenantsPage() {
         {/* Error state */}
         {isError && !isLoading && (
           <div className="flex items-center justify-center py-16">
-            <AlertCircle className="h-8 w-8 text-error-main" />
+            <AlertCircle className="h-8 w-8 text-red-500" />
             <div className="ml-3">
               <p className="text-sm font-medium text-neutral-900">
                 Failed to load tenants
@@ -173,15 +204,13 @@ export default function TenantsPage() {
 
             {/* Pagination */}
             {meta && (
-              <div className="border-t border-neutral-200">
-                <TenantPagination
-                  page={meta.page}
-                  totalPages={meta.totalPages}
-                  total={meta.total}
-                  limit={meta.limit}
-                  onPageChange={setPage}
-                />
-              </div>
+              <TenantPagination
+                page={meta.page}
+                totalPages={meta.totalPages}
+                total={meta.total}
+                limit={meta.limit}
+                onPageChange={setPage}
+              />
             )}
           </>
         )}

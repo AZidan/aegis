@@ -1,29 +1,26 @@
 import type { HealthStatus } from '@/lib/api/tenants';
-import { cn } from '@/lib/utils/cn';
 
 const HEALTH_CONFIG: Record<
   string,
-  { dotClass: string; label: string; animate: boolean }
+  { dotBg: string; glowClass: string; textClass: string; label: string }
 > = {
   healthy: {
-    dotClass: 'bg-container-healthy',
+    dotBg: 'bg-emerald-500',
+    glowClass: 'health-green',
+    textClass: 'text-emerald-700',
     label: 'Healthy',
-    animate: true,
   },
   degraded: {
-    dotClass: 'bg-container-degraded',
+    dotBg: 'bg-yellow-500',
+    glowClass: 'health-yellow',
+    textClass: 'text-yellow-700',
     label: 'Degraded',
-    animate: false,
   },
   down: {
-    dotClass: 'bg-container-down',
+    dotBg: 'bg-red-500',
+    glowClass: 'health-red',
+    textClass: 'text-red-700',
     label: 'Down',
-    animate: true,
-  },
-  unknown: {
-    dotClass: 'bg-container-unknown',
-    label: 'Unknown',
-    animate: false,
   },
 };
 
@@ -32,24 +29,30 @@ interface HealthDotProps {
 }
 
 export function HealthDot({ status }: HealthDotProps) {
-  const key = status ?? 'unknown';
-  const config = HEALTH_CONFIG[key] ?? {
-    dotClass: 'bg-container-unknown',
-    label: 'Unknown',
-    animate: false,
-  };
+  if (!status) {
+    return <span className="text-[12px] text-neutral-400 font-medium">N/A</span>;
+  }
+
+  const config = HEALTH_CONFIG[status];
+  if (!config) {
+    return <span className="text-[12px] text-neutral-400 font-medium">Unknown</span>;
+  }
 
   return (
     <div className="flex items-center gap-2">
-      <span
-        className={cn(
-          'inline-block h-2 w-2 rounded-full',
-          config.dotClass,
-          config.animate && 'animate-pulse-dot'
-        )}
-        aria-hidden="true"
-      />
-      <span className="text-sm text-neutral-600">{config.label}</span>
+      <span className="relative flex h-2 w-2">
+        <span
+          className={`absolute inline-flex h-full w-full rounded-full ${config.dotBg} ${config.glowClass} opacity-60`}
+          aria-hidden="true"
+        />
+        <span
+          className={`relative inline-flex rounded-full h-2 w-2 ${config.dotBg} ${config.glowClass}`}
+          aria-hidden="true"
+        />
+      </span>
+      <span className={`text-[12px] font-medium ${config.textClass}`}>
+        {config.label}
+      </span>
     </div>
   );
 }

@@ -33,10 +33,10 @@ describe('StatusBadge', () => {
     expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
-  it('should render with success variant class for active status', () => {
+  it('should render with emerald background class for active status', () => {
     render(<StatusBadge status="active" />);
     const badge = screen.getByText('Active');
-    expect(badge.className).toContain('bg-success');
+    expect(badge.className).toContain('bg-emerald-50');
   });
 
   it('should render "Provisioning" label for provisioning status', () => {
@@ -44,10 +44,10 @@ describe('StatusBadge', () => {
     expect(screen.getByText('Provisioning')).toBeInTheDocument();
   });
 
-  it('should render with info variant class for provisioning status', () => {
+  it('should render with blue background class for provisioning status', () => {
     render(<StatusBadge status="provisioning" />);
     const badge = screen.getByText('Provisioning');
-    expect(badge.className).toContain('bg-info');
+    expect(badge.className).toContain('bg-blue-50');
   });
 
   it('should render "Suspended" label for suspended status', () => {
@@ -55,10 +55,10 @@ describe('StatusBadge', () => {
     expect(screen.getByText('Suspended')).toBeInTheDocument();
   });
 
-  it('should render with warning variant class for suspended status', () => {
+  it('should render with red background class for suspended status', () => {
     render(<StatusBadge status="suspended" />);
     const badge = screen.getByText('Suspended');
-    expect(badge.className).toContain('bg-warning');
+    expect(badge.className).toContain('bg-red-50');
   });
 
   it('should render "Failed" label for failed status', () => {
@@ -66,10 +66,10 @@ describe('StatusBadge', () => {
     expect(screen.getByText('Failed')).toBeInTheDocument();
   });
 
-  it('should render with destructive variant class for failed status', () => {
+  it('should render with rose background class for failed status', () => {
     render(<StatusBadge status="failed" />);
     const badge = screen.getByText('Failed');
-    expect(badge.className).toContain('bg-destructive');
+    expect(badge.className).toContain('bg-rose-50');
   });
 });
 
@@ -85,7 +85,7 @@ describe('HealthDot', () => {
   it('should render a green dot for healthy status', () => {
     const { container } = render(<HealthDot status="healthy" />);
     const dot = container.querySelector('[aria-hidden="true"]');
-    expect(dot?.className).toContain('bg-container-healthy');
+    expect(dot?.className).toContain('bg-emerald-500');
   });
 
   it('should render "Degraded" text for degraded status', () => {
@@ -93,10 +93,10 @@ describe('HealthDot', () => {
     expect(screen.getByText('Degraded')).toBeInTheDocument();
   });
 
-  it('should render an amber dot for degraded status', () => {
+  it('should render a yellow dot for degraded status', () => {
     const { container } = render(<HealthDot status="degraded" />);
     const dot = container.querySelector('[aria-hidden="true"]');
-    expect(dot?.className).toContain('bg-container-degraded');
+    expect(dot?.className).toContain('bg-yellow-500');
   });
 
   it('should render "Down" text for down status', () => {
@@ -107,18 +107,18 @@ describe('HealthDot', () => {
   it('should render a red dot for down status', () => {
     const { container } = render(<HealthDot status="down" />);
     const dot = container.querySelector('[aria-hidden="true"]');
-    expect(dot?.className).toContain('bg-container-down');
+    expect(dot?.className).toContain('bg-red-500');
   });
 
-  it('should render "Unknown" text when status is undefined', () => {
+  it('should render "N/A" text when status is undefined', () => {
     render(<HealthDot />);
-    expect(screen.getByText('Unknown')).toBeInTheDocument();
+    expect(screen.getByText('N/A')).toBeInTheDocument();
   });
 
-  it('should render a gray dot when status is undefined', () => {
+  it('should not render a dot element when status is undefined', () => {
     const { container } = render(<HealthDot />);
     const dot = container.querySelector('[aria-hidden="true"]');
-    expect(dot?.className).toContain('bg-container-unknown');
+    expect(dot).toBeNull();
   });
 });
 
@@ -160,25 +160,30 @@ describe('TenantPagination', () => {
 
   it('should disable Previous button on first page', () => {
     render(<TenantPagination {...defaultProps} page={1} />);
-    const prevButton = screen.getByRole('button', { name: /previous/i });
+    // Previous button is the first button (has a left chevron SVG)
+    const buttons = screen.getAllByRole('button');
+    const prevButton = buttons[0]; // First button is Previous
     expect(prevButton).toBeDisabled();
   });
 
   it('should enable Previous button on pages after first', () => {
     render(<TenantPagination {...defaultProps} page={2} />);
-    const prevButton = screen.getByRole('button', { name: /previous/i });
+    const buttons = screen.getAllByRole('button');
+    const prevButton = buttons[0]; // First button is Previous
     expect(prevButton).not.toBeDisabled();
   });
 
   it('should disable Next button on last page', () => {
     render(<TenantPagination {...defaultProps} page={5} />);
-    const nextButton = screen.getByRole('button', { name: /next/i });
+    const buttons = screen.getAllByRole('button');
+    const nextButton = buttons[buttons.length - 1]; // Last button is Next
     expect(nextButton).toBeDisabled();
   });
 
   it('should enable Next button on pages before last', () => {
     render(<TenantPagination {...defaultProps} page={3} />);
-    const nextButton = screen.getByRole('button', { name: /next/i });
+    const buttons = screen.getAllByRole('button');
+    const nextButton = buttons[buttons.length - 1]; // Last button is Next
     expect(nextButton).not.toBeDisabled();
   });
 
@@ -187,7 +192,9 @@ describe('TenantPagination', () => {
     const onPageChange = jest.fn();
     render(<TenantPagination {...defaultProps} page={3} onPageChange={onPageChange} />);
 
-    await user.click(screen.getByRole('button', { name: /previous/i }));
+    const buttons = screen.getAllByRole('button');
+    const prevButton = buttons[0]; // First button is Previous
+    await user.click(prevButton);
     expect(onPageChange).toHaveBeenCalledWith(2);
   });
 
@@ -196,7 +203,9 @@ describe('TenantPagination', () => {
     const onPageChange = jest.fn();
     render(<TenantPagination {...defaultProps} page={3} onPageChange={onPageChange} />);
 
-    await user.click(screen.getByRole('button', { name: /next/i }));
+    const buttons = screen.getAllByRole('button');
+    const nextButton = buttons[buttons.length - 1]; // Last button is Next
+    await user.click(nextButton);
     expect(onPageChange).toHaveBeenCalledWith(4);
   });
 

@@ -241,10 +241,26 @@ const config: Config = {
           from: { opacity: '0', transform: 'translateY(8px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        fadeInUp: {
+          from: { opacity: '0', transform: 'translateY(12px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        checkPop: {
+          '0%': { transform: 'scale(0)', opacity: '0' },
+          '60%': { transform: 'scale(1.2)' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        progressPulse: {
+          '0%, 100%': { opacity: '0.6' },
+          '50%': { opacity: '1' },
+        },
       },
       animation: {
         'pulse-dot': 'pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         fadeIn: 'fadeIn 0.3s ease-out forwards',
+        fadeInUp: 'fadeInUp 0.3s ease-out forwards',
+        checkPop: 'checkPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+        progressPulse: 'progressPulse 1.5s ease-in-out infinite',
       },
     },
   },

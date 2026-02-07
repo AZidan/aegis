@@ -241,7 +241,7 @@ describe('StepProvision - Success', () => {
     );
   });
 
-  it('should show View Tenant and Back to Tenants links', () => {
+  it('should show View Tenant and Provision Another links', () => {
     renderProvision('success', {
       tenantId: 'tnt_abc123def456',
     });
@@ -253,9 +253,9 @@ describe('StepProvision - Success', () => {
       '/admin/tenants/tnt_abc123def456'
     );
 
-    const backLink = screen.getByText('Back to Tenants');
-    expect(backLink).toBeInTheDocument();
-    expect(backLink.closest('a')).toHaveAttribute('href', '/admin/tenants');
+    const provisionLink = screen.getByText('Provision Another');
+    expect(provisionLink).toBeInTheDocument();
+    expect(provisionLink.closest('a')).toHaveAttribute('href', '/admin/tenants');
   });
 });
 
