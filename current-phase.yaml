@@ -69,9 +69,9 @@ phase_3:
         status: completed
         notes: "Full CRUD with pagination, filtering, status management"
 
-  # Sprint 2 - Control Plane Core (IN PROGRESS)
+  # Sprint 2 - Control Plane Core (COMPLETE)
   sprint_2:
-    status: in_progress
+    status: completed
     stories:
       - id: E2-F5
         name: "Platform Admin Login with MFA"
@@ -89,5 +89,6 @@ phase_3:
         notes: "Admin sidebar, 8 UI components, tenant table with search/filters/sort, 72 tests"
       - id: E1-F2
         name: "Container Provisioning"
-        status: pending
+        status: completed
         points: 13
+        notes: "BullMQ provisioning processor, 5 mock steps, retry logic, 3-step wizard, 168 tests"
