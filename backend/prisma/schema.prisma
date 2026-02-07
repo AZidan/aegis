@@ -1,0 +1,660 @@
+// Aegis Platform Database Schema
+// Version: 2.0.0 - Complete Schema Implementation
+// Last Updated: 2026-02-06
+// Based on: API Contract v1.1.0
+// Database: PostgreSQL 15+
+// Multi-Tenant: Row-Level Security (RLS) ready
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated" // Prisma 7 standard: direct import required
+}
+
+datasource db {
+  provider = "postgresql"
+  // Note: URL is configured in prisma.config.ts (Prisma 7 requirement)
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  platform_admin
+  tenant_admin
+  tenant_member
+}
+
+enum TenantStatus {
+  active
+  suspended
+  provisioning
+  failed
+}
+
+enum TenantPlan {
+  starter
+  growth
+  enterprise
+}
+
+enum AgentRole {
+  pm
+  engineering
+  operations
+  custom
+}
+
+enum AgentStatus {
+  active
+  idle
+  error
+  paused
+  provisioning
+}
+
+enum ModelTier {
+  haiku
+  sonnet
+  opus
+}
+
+enum ThinkingMode {
+  off
+  low
+  high
+}
+
+enum SkillCategory {
+  productivity
+  analytics
+  engineering
+  communication
+}
+
+enum SkillStatus {
+  pending
+  in_review
+  approved
+  rejected
+}
+
+enum ChannelType {
+  telegram
+  slack
+  web
+}
+
+enum ActivityType {
+  message
+  tool_invocation
+  error
+}
+
+enum AuditActorType {
+  user
+  agent
+  system
+}
+
+enum AuditTargetType {
+  agent
+  skill
+  tenant
+  user
+  team_member
+  api_key
+}
+
+enum AuditSeverity {
+  info
+  warning
+  error
+}
+
+enum AlertSeverity {
+  info
+  warning
+  critical
+}
+
+enum HealthStatus {
+  healthy
+  degraded
+  down
+}
+
+enum InviteStatus {
+  pending
+  accepted
+  expired
+  cancelled
+}
+
+// ============================================================================
+// CORE MODELS
+// ============================================================================
+
+/// Users - Platform admins, tenant admins, tenant members
+model User {
+  id       String   @id @default(uuid())
+  email    String   @unique
+  name     String
+  password String? // Hashed password (bcrypt), nullable for OAuth users
+  role     UserRole @default(tenant_member)
+
+  // Multi-tenancy
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // MFA (Platform Admins only)
+  mfaEnabled Boolean @default(false)
+  mfaSecret  String? // TOTP secret
+
+  // OAuth
+  oauthProvider String? // "google" | "github" | "microsoft"
+  oauthId       String? // External OAuth ID
+
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+
+  // Relations
+  refreshTokens  RefreshToken[]
+  auditLogs      AuditLog[]
+  teamMembers    TeamMember[]
+  skillsAuthored Skill[]        @relation("SkillAuthor")
+
+  @@unique([oauthProvider, oauthId])
+  @@index([email])
+  @@index([tenantId])
+  @@index([role])
+  @@map("users")
+}
+
+/// Tenants - Companies/organizations with isolated environments
+model Tenant {
+  id          String       @id @default(uuid())
+  companyName String       @unique
+  adminEmail  String
+  status      TenantStatus @default(provisioning)
+  plan        TenantPlan   @default(starter)
+
+  // Provisioning
+  industry           String?
+  expectedAgentCount Int?
+
+  // Model defaults (JSONB for flexible schema)
+  modelDefaults Json? // { tier: ModelTier, thinkingMode: ThinkingMode }
+
+  // Resource limits (JSONB for plan-based configuration)
+  resourceLimits Json? // { cpuCores: number, memoryMb: number, diskGb: number, maxAgents: number }
+
+  // Container info
+  containerId  String? // Docker container ID
+  containerUrl String? // Private container URL
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  users           User[]
+  agents          Agent[]
+  teamMembers     TeamMember[]
+  teamInvites     TeamInvite[]
+  auditLogs       AuditLog[]
+  apiKeys         ApiKey[]
+  containerHealth ContainerHealth[]
+  alerts          Alert[]
+
+  @@index([companyName])
+  @@index([status])
+  @@index([plan])
+  @@map("tenants")
+}
+
+/// Agents - AI agents deployed for tenants
+model Agent {
+  id          String      @id @default(uuid())
+  name        String
+  description String?
+  role        AgentRole
+  status      AgentStatus @default(provisioning)
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Model configuration
+  modelTier    ModelTier
+  thinkingMode ThinkingMode
+
+  // Tool policy (JSONB for flexible rules)
+  toolPolicy Json // { allow: string[], deny: string[] }
+
+  // Role-based agent configuration (JSONB)
+  assistedUser Json? // { userId: string, userRole: string }
+
+  // OpenClaw integration
+  openclawAgentId String? // Agent ID in OpenClaw platform
+
+  // Activity tracking
+  lastActive DateTime?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  channels        AgentChannel[]
+  activities      AgentActivity[]
+  metrics         AgentMetrics[]
+  installedSkills SkillInstallation[]
+  auditLogs       AuditLog[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([role])
+  @@index([lastActive])
+  @@map("agents")
+}
+
+/// Skills - Marketplace skills for agents
+model Skill {
+  id          String        @id @default(uuid())
+  name        String
+  version     String
+  description String
+  category    SkillCategory
+  status      SkillStatus   @default(pending)
+
+  // Authorship
+  authorId    String
+  author      User     @relation("SkillAuthor", fields: [authorId], references: [id])
+  submittedAt DateTime @default(now())
+
+  // Compatible roles
+  compatibleRoles String[] // Array of AgentRole values
+
+  // Code and manifest
+  repositoryUrl String?
+  mainFile      String?
+  sourceCode    String? @db.Text // Full source code for review
+
+  // Capabilities and permissions (JSONB)
+  capabilities  Json? // Skill capabilities metadata
+  configuration Json? // Configuration options
+  permissions   Json // { network: string[], files: string[], env: string[] }
+
+  // Documentation
+  documentation String? @db.Text
+  changelog     String? @db.Text
+
+  // Review
+  reviewNotes String?   @db.Text
+  reviewedAt  DateTime?
+  reviewedBy  String?
+
+  // Marketplace metrics
+  rating       Float @default(0)
+  installCount Int   @default(0)
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  installations SkillInstallation[]
+
+  @@unique([name, version])
+  @@index([category])
+  @@index([status])
+  @@index([rating])
+  @@index([installCount])
+  @@map("skills")
+}
+
+// ============================================================================
+// AUTHENTICATION & AUTHORIZATION
+// ============================================================================
+
+/// RefreshTokens - JWT refresh token tracking
+model RefreshToken {
+  id     String @id @default(uuid())
+  token  String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  // Device tracking
+  userAgent String?
+  ipAddress String?
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+/// ApiKeys - Tenant API keys for programmatic access
+model ApiKey {
+  id   String @id @default(uuid())
+  name String
+
+  // The actual API key (hashed, like password)
+  keyHash   String @unique
+  keyPrefix String // First 12 chars for display (e.g., "aegis_sk_abc")
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Tracking
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime?
+  revokedAt  DateTime?
+
+  @@index([tenantId])
+  @@index([keyHash])
+  @@index([keyPrefix])
+  @@map("api_keys")
+}
+
+// ============================================================================
+// TEAM MANAGEMENT
+// ============================================================================
+
+/// TeamMembers - Users belonging to a tenant
+model TeamMember {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  role UserRole
+
+  // Metadata
+  joinedAt DateTime @default(now())
+
+  @@unique([userId, tenantId])
+  @@index([tenantId])
+  @@index([userId])
+  @@map("team_members")
+}
+
+/// TeamInvites - Pending team invitations
+model TeamInvite {
+  id     String       @id @default(uuid())
+  email  String
+  role   UserRole
+  status InviteStatus @default(pending)
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Invite token
+  token      String @unique
+  inviteLink String // Full URL with token
+
+  // Invited by
+  invitedBy String
+
+  // Expiry
+  expiresAt  DateTime
+  acceptedAt DateTime?
+
+  // Metadata
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([email])
+  @@index([token])
+  @@index([status])
+  @@map("team_invites")
+}
+
+// ============================================================================
+// AGENT CHANNELS & ACTIVITY
+// ============================================================================
+
+/// AgentChannels - Communication channels (Telegram, Slack, Web)
+model AgentChannel {
+  id        String      @id @default(uuid())
+  type      ChannelType
+  connected Boolean     @default(false)
+
+  // Agent relation
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  // Channel-specific config (JSONB for flexibility)
+  config Json // { token, chatId, workspaceId, channelId, etc. }
+
+  // Metadata
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastMessageAt DateTime?
+
+  @@index([agentId])
+  @@index([type])
+  @@map("agent_channels")
+}
+
+/// AgentActivity - Activity feed for agents
+model AgentActivity {
+  id   String       @id @default(uuid())
+  type ActivityType
+
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  summary String
+  details Json? // { toolName, messagePreview, errorMessage, etc. }
+
+  timestamp DateTime @default(now())
+
+  @@index([agentId])
+  @@index([timestamp])
+  @@index([type])
+  @@map("agent_activities")
+}
+
+/// AgentMetrics - Performance metrics for agents
+model AgentMetrics {
+  id String @id @default(uuid())
+
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  // Metrics
+  messageCount    Int    @default(0)
+  toolInvocations Int    @default(0)
+  errorCount      Int    @default(0)
+  avgResponseTime Float? // Milliseconds
+
+  // Time window
+  periodStart DateTime
+  periodEnd   DateTime
+
+  // Metadata
+  createdAt DateTime @default(now())
+
+  @@index([agentId])
+  @@index([periodStart])
+  @@map("agent_metrics")
+}
+
+// ============================================================================
+// SKILL INSTALLATIONS
+// ============================================================================
+
+/// SkillInstallations - Installed skills per agent
+model SkillInstallation {
+  id String @id @default(uuid())
+
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  skillId String
+  skill   Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  // Installation config
+  config Json? // Skill-specific configuration
+
+  // Metadata
+  installedAt DateTime @default(now())
+
+  @@unique([agentId, skillId])
+  @@index([agentId])
+  @@index([skillId])
+  @@map("skill_installations")
+}
+
+// ============================================================================
+// MONITORING & HEALTH
+// ============================================================================
+
+/// ContainerHealth - Container health metrics
+model ContainerHealth {
+  id String @id @default(uuid())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Health status
+  status HealthStatus
+
+  // Resource usage
+  cpuPercent Float
+  memoryMb   Float
+  diskGb     Float
+  uptime     Int // Seconds
+
+  // Metadata
+  timestamp DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([timestamp])
+  @@index([status])
+  @@map("container_health")
+}
+
+/// Alerts - Platform alerts for admins
+model Alert {
+  id       String        @id @default(uuid())
+  severity AlertSeverity
+  title    String
+  message  String        @db.Text
+
+  // Optional tenant relation (null for platform-wide alerts)
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  resolved   Boolean   @default(false)
+  resolvedAt DateTime?
+  resolvedBy String?
+
+  // Metadata
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([severity])
+  @@index([resolved])
+  @@index([createdAt])
+  @@map("alerts")
+}
+
+// ============================================================================
+// AUDIT & COMPLIANCE
+// ============================================================================
+
+/// AuditLogs - Comprehensive audit trail
+model AuditLog {
+  id String @id @default(uuid())
+
+  // Actor (who performed the action)
+  actorType AuditActorType
+  actorId   String
+  actorName String
+
+  // Action details
+  action String // e.g., "agent_created", "tool_invocation"
+
+  // Target (what was affected)
+  targetType AuditTargetType
+  targetId   String
+
+  // Additional context (JSONB for flexibility)
+  details Json? // { toolName, parameters (masked), result, etc. }
+
+  // Severity
+  severity AuditSeverity @default(info)
+
+  // Network
+  ipAddress String?
+  userAgent String?
+
+  // Multi-tenancy (for tenant-scoped logs)
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relations
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  agentId String?
+  agent   Agent?  @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  // Metadata
+  timestamp DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([action])
+  @@index([timestamp])
+  @@index([severity])
+  @@map("audit_logs")
+}
+
+// ============================================================================
+// NOTES & DOCUMENTATION
+// ============================================================================
+
+// Multi-Tenancy Implementation:
+// - All tenant-scoped tables have tenantId with index
+// - Ready for Row-Level Security (RLS) policies
+// - CASCADE deletes for proper cleanup
+//
+// PostgreSQL-Specific Features:
+// - JSONB columns for flexible schemas (agent configs, skill capabilities)
+// - GIN indexes recommended for JSONB queries (add in migration if needed)
+// - UUID primary keys for distributed systems
+// - Enum types for type safety
+//
+// Performance Optimization:
+// - Indexes on all foreign keys
+// - Indexes on frequently queried fields (status, timestamps)
+// - Unique constraints for business logic enforcement
+//
+// Security:
+// - Password hashing (bcrypt) handled in application layer
+// - API key hashing for secure storage
+// - Sensitive fields (tokens, secrets) encrypted in application layer
+// - MFA secrets encrypted before storage
+//
+// Data Retention:
+// - AuditLog: 90 days hot (PostgreSQL), 1 year cold (S3) - implement archival job
+// - ContainerHealth: 24 hours detailed, 30 days aggregated - implement cleanup job
+// - RefreshToken: Auto-cleanup on expiry - implement cleanup job
+// - TeamInvite: Auto-expire after 7 days - implement cleanup job

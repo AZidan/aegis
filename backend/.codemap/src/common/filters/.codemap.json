@@ -1,0 +1,51 @@
+{
+  "directory": "src/common/filters",
+  "files": {
+    "http-exception.filter.ts": {
+      "hash": "f762ac141635",
+      "indexed_at": "2026-02-06T19:16:11.744014+00:00",
+      "language": "typescript",
+      "lines": 108,
+      "symbols": [
+        {
+          "lines": [
+            10,
+            17
+          ],
+          "name": "ApiError",
+          "type": "interface"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                38,
+                85
+              ],
+              "name": "catch",
+              "signature": "(exception: HttpException, host: ArgumentsHost)",
+              "type": "method"
+            },
+            {
+              "lines": [
+                87,
+                107
+              ],
+              "name": "formatValidationErrors",
+              "signature": "(messages: string[]) : Record<string, string[]>",
+              "type": "method"
+            }
+          ],
+          "lines": [
+            37,
+            108
+          ],
+          "name": "HttpExceptionFilter",
+          "type": "class"
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-02-06T23:51:42.649917+00:00",
+  "version": "1.0"
+}

@@ -1,0 +1,1526 @@
+{
+  "directory": "prisma/generated/internal",
+  "files": {
+    "class.ts": {
+      "hash": "3e687e4f972c",
+      "indexed_at": "2026-02-06T18:54:41.657990+00:00",
+      "language": "typescript",
+      "lines": 332,
+      "symbols": [
+        {
+          "lines": [
+            33,
+            37
+          ],
+          "name": "decodeBase64AsWasm",
+          "signature": "(wasmBase64: string) : Promise<WebAssembly.Module>",
+          "type": "async_function"
+        },
+        {
+          "lines": [
+            52,
+            53
+          ],
+          "name": "LogOptions",
+          "type": "type"
+        },
+        {
+          "lines": [
+            55,
+            76
+          ],
+          "name": "PrismaClientConstructor",
+          "type": "interface"
+        },
+        {
+          "lines": [
+            92,
+            328
+          ],
+          "name": "PrismaClient",
+          "type": "interface"
+        },
+        {
+          "lines": [
+            330,
+            332
+          ],
+          "name": "getPrismaClientClass",
+          "signature": "() : PrismaClientConstructor",
+          "type": "function"
+        }
+      ]
+    },
+    "prismaNamespace.ts": {
+      "hash": "cc754d94f648",
+      "indexed_at": "2026-02-06T18:54:41.785777+00:00",
+      "language": "typescript",
+      "lines": 2357,
+      "symbols": [
+        {
+          "lines": [
+            24,
+            24
+          ],
+          "name": "DMMF",
+          "type": "type"
+        },
+        {
+          "lines": [
+            26,
+            26
+          ],
+          "name": "PrismaPromise",
+          "type": "type"
+        },
+        {
+          "lines": [
+            33,
+            33
+          ],
+          "name": "PrismaClientKnownRequestError",
+          "type": "type"
+        },
+        {
+          "lines": [
+            36,
+            36
+          ],
+          "name": "PrismaClientUnknownRequestError",
+          "type": "type"
+        },
+        {
+          "lines": [
+            39,
+            39
+          ],
+          "name": "PrismaClientRustPanicError",
+          "type": "type"
+        },
+        {
+          "lines": [
+            42,
+            42
+          ],
+          "name": "PrismaClientInitializationError",
+          "type": "type"
+        },
+        {
+          "lines": [
+            45,
+            45
+          ],
+          "name": "PrismaClientValidationError",
+          "type": "type"
+        },
+        {
+          "lines": [
+            55,
+            55
+          ],
+          "name": "Sql",
+          "type": "type"
+        },
+        {
+          "lines": [
+            63,
+            63
+          ],
+          "name": "Decimal",
+          "type": "type"
+        },
+        {
+          "lines": [
+            65,
+            65
+          ],
+          "name": "DecimalJsLike",
+          "type": "type"
+        },
+        {
+          "lines": [
+            70,
+            70
+          ],
+          "name": "Extension",
+          "type": "type"
+        },
+        {
+          "lines": [
+            72,
+            72
+          ],
+          "name": "Args",
+          "type": "type"
+        },
+        {
+          "lines": [
+            73,
+            73
+          ],
+          "name": "Payload",
+          "type": "type"
+        },
+        {
+          "lines": [
+            74,
+            74
+          ],
+          "name": "Result",
+          "type": "type"
+        },
+        {
+          "lines": [
+            75,
+            75
+          ],
+          "name": "Exact",
+          "type": "type"
+        },
+        {
+          "lines": [
+            77,
+            80
+          ],
+          "name": "PrismaVersion",
+          "type": "type"
+        },
+        {
+          "lines": [
+            95,
+            95
+          ],
+          "name": "Bytes",
+          "type": "type"
+        },
+        {
+          "lines": [
+            96,
+            96
+          ],
+          "name": "JsonObject",
+          "type": "type"
+        },
+        {
+          "lines": [
+            97,
+            97
+          ],
+          "name": "JsonArray",
+          "type": "type"
+        },
+        {
+          "lines": [
+            98,
+            98
+          ],
+          "name": "JsonValue",
+          "type": "type"
+        },
+        {
+          "lines": [
+            99,
+            99
+          ],
+          "name": "InputJsonObject",
+          "type": "type"
+        },
+        {
+          "lines": [
+            100,
+            100
+          ],
+          "name": "InputJsonArray",
+          "type": "type"
+        },
+        {
+          "lines": [
+            101,
+            101
+          ],
+          "name": "InputJsonValue",
+          "type": "type"
+        },
+        {
+          "lines": [
+            131,
+            134
+          ],
+          "name": "SelectAndInclude",
+          "type": "type"
+        },
+        {
+          "lines": [
+            136,
+            139
+          ],
+          "name": "SelectAndOmit",
+          "type": "type"
+        },
+        {
+          "docstring": "From T, pick a set of properties whose keys are in the union K",
+          "lines": [
+            144,
+            146
+          ],
+          "name": "Prisma__Pick",
+          "type": "type"
+        },
+        {
+          "lines": [
+            148,
+            148
+          ],
+          "name": "Enumerable",
+          "type": "type"
+        },
+        {
+          "lines": [
+            154,
+            156
+          ],
+          "name": "Subset",
+          "type": "type"
+        },
+        {
+          "lines": [
+            163,
+            170
+          ],
+          "name": "SelectSubset",
+          "type": "type"
+        },
+        {
+          "lines": [
+            176,
+            179
+          ],
+          "name": "SubsetIntersection",
+          "type": "type"
+        },
+        {
+          "lines": [
+            181,
+            181
+          ],
+          "name": "Without",
+          "type": "type"
+        },
+        {
+          "lines": [
+            187,
+            191
+          ],
+          "name": "XOR",
+          "type": "type"
+        },
+        {
+          "docstring": "Is T a Record?",
+          "lines": [
+            197,
+            207
+          ],
+          "name": "IsObject",
+          "type": "type"
+        },
+        {
+          "lines": [
+            213,
+            213
+          ],
+          "name": "UnEnumerate",
+          "type": "type"
+        },
+        {
+          "docstring": "From ts-toolbelt",
+          "lines": [
+            219,
+            223
+          ],
+          "name": "__Either",
+          "type": "type"
+        },
+        {
+          "lines": [
+            225,
+            225
+          ],
+          "name": "EitherStrict",
+          "type": "type"
+        },
+        {
+          "lines": [
+            227,
+            227
+          ],
+          "name": "EitherLoose",
+          "type": "type"
+        },
+        {
+          "lines": [
+            229,
+            236
+          ],
+          "name": "_Either",
+          "type": "type"
+        },
+        {
+          "lines": [
+            238,
+            242
+          ],
+          "name": "Either",
+          "type": "type"
+        },
+        {
+          "lines": [
+            244,
+            244
+          ],
+          "name": "Union",
+          "type": "type"
+        },
+        {
+          "lines": [
+            246,
+            248
+          ],
+          "name": "PatchUndefined",
+          "type": "type"
+        },
+        {
+          "lines": [
+            251,
+            255
+          ],
+          "name": "IntersectOf",
+          "type": "type"
+        },
+        {
+          "lines": [
+            257,
+            259
+          ],
+          "name": "Overwrite",
+          "type": "type"
+        },
+        {
+          "lines": [
+            261,
+            263
+          ],
+          "name": "_Merge",
+          "type": "type"
+        },
+        {
+          "lines": [
+            265,
+            265
+          ],
+          "name": "Key",
+          "type": "type"
+        },
+        {
+          "lines": [
+            266,
+            266
+          ],
+          "name": "AtStrict",
+          "type": "type"
+        },
+        {
+          "lines": [
+            267,
+            267
+          ],
+          "name": "AtLoose",
+          "type": "type"
+        },
+        {
+          "lines": [
+            268,
+            271
+          ],
+          "name": "At",
+          "type": "type"
+        },
+        {
+          "lines": [
+            273,
+            275
+          ],
+          "name": "ComputeRaw",
+          "type": "type"
+        },
+        {
+          "lines": [
+            277,
+            279
+          ],
+          "name": "OptionalFlat",
+          "type": "type"
+        },
+        {
+          "lines": [
+            281,
+            283
+          ],
+          "name": "_Record",
+          "type": "type"
+        },
+        {
+          "docstring": "cause typescript not to expand types and preserve names",
+          "lines": [
+            286,
+            286
+          ],
+          "name": "NoExpand",
+          "type": "type"
+        },
+        {
+          "lines": [
+            289,
+            293
+          ],
+          "name": "AtLeast",
+          "type": "type"
+        },
+        {
+          "lines": [
+            295,
+            295
+          ],
+          "name": "_Strict",
+          "type": "type"
+        },
+        {
+          "lines": [
+            297,
+            297
+          ],
+          "name": "Strict",
+          "type": "type"
+        },
+        {
+          "lines": [
+            300,
+            300
+          ],
+          "name": "Merge",
+          "type": "type"
+        },
+        {
+          "lines": [
+            302,
+            302
+          ],
+          "name": "Boolean",
+          "type": "type"
+        },
+        {
+          "lines": [
+            304,
+            304
+          ],
+          "name": "True",
+          "type": "type"
+        },
+        {
+          "lines": [
+            306,
+            306
+          ],
+          "name": "False",
+          "type": "type"
+        },
+        {
+          "lines": [
+            308,
+            311
+          ],
+          "name": "Not",
+          "type": "type"
+        },
+        {
+          "lines": [
+            313,
+            317
+          ],
+          "name": "Extends",
+          "type": "type"
+        },
+        {
+          "lines": [
+            319,
+            321
+          ],
+          "name": "Has",
+          "type": "type"
+        },
+        {
+          "lines": [
+            323,
+            332
+          ],
+          "name": "Or",
+          "type": "type"
+        },
+        {
+          "lines": [
+            334,
+            334
+          ],
+          "name": "Keys",
+          "type": "type"
+        },
+        {
+          "lines": [
+            336,
+            340
+          ],
+          "name": "GetScalarType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            342,
+            345
+          ],
+          "name": "FieldPaths",
+          "type": "type"
+        },
+        {
+          "lines": [
+            347,
+            361
+          ],
+          "name": "GetHavingFields",
+          "type": "type"
+        },
+        {
+          "docstring": "Convert tuple to union",
+          "lines": [
+            366,
+            366
+          ],
+          "name": "_TupleToUnion",
+          "type": "type"
+        },
+        {
+          "lines": [
+            367,
+            367
+          ],
+          "name": "TupleToUnion",
+          "type": "type"
+        },
+        {
+          "lines": [
+            368,
+            368
+          ],
+          "name": "MaybeTupleToUnion",
+          "type": "type"
+        },
+        {
+          "lines": [
+            373,
+            373
+          ],
+          "name": "PickEnumerable",
+          "type": "type"
+        },
+        {
+          "lines": [
+            378,
+            378
+          ],
+          "name": "ExcludeUnderscoreKeys",
+          "type": "type"
+        },
+        {
+          "lines": [
+            381,
+            381
+          ],
+          "name": "FieldRef",
+          "type": "type"
+        },
+        {
+          "lines": [
+            383,
+            383
+          ],
+          "name": "FieldRefInputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            404,
+            404
+          ],
+          "name": "ModelName",
+          "type": "type"
+        },
+        {
+          "lines": [
+            408,
+            410
+          ],
+          "name": "TypeMapCb",
+          "type": "interface"
+        },
+        {
+          "lines": [
+            412,
+            1554
+          ],
+          "name": "TypeMap",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1567,
+            1567
+          ],
+          "name": "TransactionIsolationLevel",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1586,
+            1586
+          ],
+          "name": "UserScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1605,
+            1605
+          ],
+          "name": "TenantScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1625,
+            1625
+          ],
+          "name": "AgentScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1655,
+            1655
+          ],
+          "name": "SkillScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1669,
+            1669
+          ],
+          "name": "RefreshTokenScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1684,
+            1684
+          ],
+          "name": "ApiKeyScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1695,
+            1695
+          ],
+          "name": "TeamMemberScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1712,
+            1712
+          ],
+          "name": "TeamInviteScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1726,
+            1726
+          ],
+          "name": "AgentChannelScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1738,
+            1738
+          ],
+          "name": "AgentActivityScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1753,
+            1753
+          ],
+          "name": "AgentMetricsScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1764,
+            1764
+          ],
+          "name": "SkillInstallationScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1778,
+            1778
+          ],
+          "name": "ContainerHealthScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1793,
+            1793
+          ],
+          "name": "AlertScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1814,
+            1814
+          ],
+          "name": "AuditLogScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1822,
+            1822
+          ],
+          "name": "SortOrder",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1830,
+            1830
+          ],
+          "name": "NullableJsonNullValueInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1837,
+            1837
+          ],
+          "name": "JsonNullValueInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1845,
+            1845
+          ],
+          "name": "QueryMode",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1853,
+            1853
+          ],
+          "name": "NullsOrder",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1862,
+            1862
+          ],
+          "name": "JsonNullValueFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1874,
+            1874
+          ],
+          "name": "StringFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1881,
+            1881
+          ],
+          "name": "ListStringFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1888,
+            1888
+          ],
+          "name": "EnumUserRoleFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1895,
+            1895
+          ],
+          "name": "ListEnumUserRoleFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1902,
+            1902
+          ],
+          "name": "BooleanFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1909,
+            1909
+          ],
+          "name": "DateTimeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1916,
+            1916
+          ],
+          "name": "ListDateTimeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1923,
+            1923
+          ],
+          "name": "EnumTenantStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1930,
+            1930
+          ],
+          "name": "ListEnumTenantStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1937,
+            1937
+          ],
+          "name": "EnumTenantPlanFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1944,
+            1944
+          ],
+          "name": "ListEnumTenantPlanFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1951,
+            1951
+          ],
+          "name": "IntFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1958,
+            1958
+          ],
+          "name": "ListIntFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1965,
+            1965
+          ],
+          "name": "JsonFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1972,
+            1972
+          ],
+          "name": "EnumQueryModeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1979,
+            1979
+          ],
+          "name": "EnumAgentRoleFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1986,
+            1986
+          ],
+          "name": "ListEnumAgentRoleFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1993,
+            1993
+          ],
+          "name": "EnumAgentStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2000,
+            2000
+          ],
+          "name": "ListEnumAgentStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2007,
+            2007
+          ],
+          "name": "EnumModelTierFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2014,
+            2014
+          ],
+          "name": "ListEnumModelTierFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2021,
+            2021
+          ],
+          "name": "EnumThinkingModeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2028,
+            2028
+          ],
+          "name": "ListEnumThinkingModeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2035,
+            2035
+          ],
+          "name": "EnumSkillCategoryFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2042,
+            2042
+          ],
+          "name": "ListEnumSkillCategoryFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2049,
+            2049
+          ],
+          "name": "EnumSkillStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2056,
+            2056
+          ],
+          "name": "ListEnumSkillStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2063,
+            2063
+          ],
+          "name": "FloatFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2070,
+            2070
+          ],
+          "name": "ListFloatFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2077,
+            2077
+          ],
+          "name": "EnumInviteStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2084,
+            2084
+          ],
+          "name": "ListEnumInviteStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2091,
+            2091
+          ],
+          "name": "EnumChannelTypeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2098,
+            2098
+          ],
+          "name": "ListEnumChannelTypeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2105,
+            2105
+          ],
+          "name": "EnumActivityTypeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2112,
+            2112
+          ],
+          "name": "ListEnumActivityTypeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2119,
+            2119
+          ],
+          "name": "EnumHealthStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2126,
+            2126
+          ],
+          "name": "ListEnumHealthStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2133,
+            2133
+          ],
+          "name": "EnumAlertSeverityFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2140,
+            2140
+          ],
+          "name": "ListEnumAlertSeverityFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2147,
+            2147
+          ],
+          "name": "EnumAuditActorTypeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2154,
+            2154
+          ],
+          "name": "ListEnumAuditActorTypeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2161,
+            2161
+          ],
+          "name": "EnumAuditTargetTypeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2168,
+            2168
+          ],
+          "name": "ListEnumAuditTargetTypeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2175,
+            2175
+          ],
+          "name": "EnumAuditSeverityFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2182,
+            2182
+          ],
+          "name": "ListEnumAuditSeverityFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2188,
+            2190
+          ],
+          "name": "BatchPayload",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2193,
+            2193
+          ],
+          "name": "DefaultPrismaClient",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2194,
+            2194
+          ],
+          "name": "ErrorFormat",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2195,
+            2278
+          ],
+          "name": "PrismaClientOptions",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2279,
+            2295
+          ],
+          "name": "GlobalOmitConfig",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2298,
+            2298
+          ],
+          "name": "LogLevel",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2299,
+            2302
+          ],
+          "name": "LogDefinition",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2304,
+            2304
+          ],
+          "name": "CheckIsLogLevel",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2306,
+            2308
+          ],
+          "name": "GetLogType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2310,
+            2312
+          ],
+          "name": "GetEvents",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2314,
+            2320
+          ],
+          "name": "QueryEvent",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2322,
+            2326
+          ],
+          "name": "LogEvent",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2330,
+            2351
+          ],
+          "name": "PrismaAction",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2356,
+            2356
+          ],
+          "name": "TransactionClient",
+          "type": "type"
+        }
+      ]
+    },
+    "prismaNamespaceBrowser.ts": {
+      "hash": "56b9d0aa72ff",
+      "indexed_at": "2026-02-06T18:54:41.827606+00:00",
+      "language": "typescript",
+      "lines": 380,
+      "symbols": [
+        {
+          "lines": [
+            71,
+            71
+          ],
+          "name": "ModelName",
+          "type": "type"
+        },
+        {
+          "lines": [
+            84,
+            84
+          ],
+          "name": "TransactionIsolationLevel",
+          "type": "type"
+        },
+        {
+          "lines": [
+            103,
+            103
+          ],
+          "name": "UserScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            122,
+            122
+          ],
+          "name": "TenantScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            142,
+            142
+          ],
+          "name": "AgentScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            172,
+            172
+          ],
+          "name": "SkillScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            186,
+            186
+          ],
+          "name": "RefreshTokenScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            201,
+            201
+          ],
+          "name": "ApiKeyScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            212,
+            212
+          ],
+          "name": "TeamMemberScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            229,
+            229
+          ],
+          "name": "TeamInviteScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            243,
+            243
+          ],
+          "name": "AgentChannelScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            255,
+            255
+          ],
+          "name": "AgentActivityScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            270,
+            270
+          ],
+          "name": "AgentMetricsScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            281,
+            281
+          ],
+          "name": "SkillInstallationScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            295,
+            295
+          ],
+          "name": "ContainerHealthScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            310,
+            310
+          ],
+          "name": "AlertScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            331,
+            331
+          ],
+          "name": "AuditLogScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            339,
+            339
+          ],
+          "name": "SortOrder",
+          "type": "type"
+        },
+        {
+          "lines": [
+            347,
+            347
+          ],
+          "name": "NullableJsonNullValueInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            354,
+            354
+          ],
+          "name": "JsonNullValueInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            362,
+            362
+          ],
+          "name": "QueryMode",
+          "type": "type"
+        },
+        {
+          "lines": [
+            370,
+            370
+          ],
+          "name": "NullsOrder",
+          "type": "type"
+        },
+        {
+          "lines": [
+            379,
+            379
+          ],
+          "name": "JsonNullValueFilter",
+          "type": "type"
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-02-06T23:51:42.647459+00:00",
+  "version": "1.0"
+}

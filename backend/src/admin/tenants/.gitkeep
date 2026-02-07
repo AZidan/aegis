@@ -1,0 +1,5 @@
+# Tenant management endpoints will be implemented in Sprint 2
+# Placeholder for:
+# - tenants.module.ts
+# - tenants.controller.ts
+# - tenants.service.ts

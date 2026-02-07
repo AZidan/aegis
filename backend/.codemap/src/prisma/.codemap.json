@@ -1,0 +1,23 @@
+{
+  "directory": "src/prisma",
+  "files": {
+    "prisma.module.ts": {
+      "hash": "2597c1167f25",
+      "indexed_at": "2026-02-06T18:02:38.506572+00:00",
+      "language": "typescript",
+      "lines": 9,
+      "symbols": [
+        {
+          "lines": [
+            9,
+            9
+          ],
+          "name": "PrismaModule",
+          "type": "class"
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-02-06T23:51:42.651238+00:00",
+  "version": "1.0"
+}

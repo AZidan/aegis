@@ -1,0 +1,5 @@
+# Passport strategies will be implemented in Stage 3
+# Placeholder for:
+# - jwt.strategy.ts
+# - google-oauth.strategy.ts
+# - github-oauth.strategy.ts

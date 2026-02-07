@@ -1,0 +1,23 @@
+{
+  "directory": "src/admin",
+  "files": {
+    "admin.module.ts": {
+      "hash": "bec3c4fb77da",
+      "indexed_at": "2026-02-06T18:02:38.506888+00:00",
+      "language": "typescript",
+      "lines": 7,
+      "symbols": [
+        {
+          "lines": [
+            7,
+            7
+          ],
+          "name": "AdminModule",
+          "type": "class"
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-02-06T23:51:42.649053+00:00",
+  "version": "1.0"
+}

@@ -1,0 +1,43 @@
+{
+  "directory": "src/common/pipes",
+  "files": {
+    "validation.pipe.ts": {
+      "hash": "9e470e998c7a",
+      "indexed_at": "2026-02-06T19:11:45.431622+00:00",
+      "language": "typescript",
+      "lines": 36,
+      "symbols": [
+        {
+          "children": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "name": "constructor",
+              "signature": "(private schema: ZodType)",
+              "type": "method"
+            },
+            {
+              "lines": [
+                8,
+                35
+              ],
+              "name": "transform",
+              "signature": "(value: unknown)",
+              "type": "method"
+            }
+          ],
+          "lines": [
+            5,
+            36
+          ],
+          "name": "ZodValidationPipe",
+          "type": "class"
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-02-06T23:51:42.650313+00:00",
+  "version": "1.0"
+}

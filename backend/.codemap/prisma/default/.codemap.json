@@ -1,0 +1,51 @@
+{
+  "directory": "prisma/default",
+  "files": {
+    "browser.ts": {
+      "hash": "f02de3b94d30",
+      "indexed_at": "2026-02-06T18:02:38.491196+00:00",
+      "language": "typescript",
+      "lines": 20,
+      "symbols": []
+    },
+    "client.ts": {
+      "hash": "0c8b74c8aecd",
+      "indexed_at": "2026-02-06T18:02:38.491739+00:00",
+      "language": "typescript",
+      "lines": 40,
+      "symbols": [
+        {
+          "lines": [
+            37,
+            37
+          ],
+          "name": "PrismaClient",
+          "type": "type"
+        }
+      ]
+    },
+    "commonInputTypes.ts": {
+      "hash": "f33f89752c05",
+      "indexed_at": "2026-02-06T18:02:38.493204+00:00",
+      "language": "typescript",
+      "lines": 18,
+      "symbols": []
+    },
+    "enums.ts": {
+      "hash": "ebbdce75bbdd",
+      "indexed_at": "2026-02-06T18:02:38.493456+00:00",
+      "language": "typescript",
+      "lines": 15,
+      "symbols": []
+    },
+    "models.ts": {
+      "hash": "d4921d1aeeb9",
+      "indexed_at": "2026-02-06T18:02:38.492910+00:00",
+      "language": "typescript",
+      "lines": 11,
+      "symbols": []
+    }
+  },
+  "generated_at": "2026-02-06T23:51:42.646498+00:00",
+  "version": "1.0"
+}

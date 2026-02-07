@@ -1,0 +1,145 @@
+# Current Feature Tracker
+# Tracks active development scope and requirements per CLAUDE.md
+
+feature:
+  name: "Authentication System"
+  sprint: "Sprint 1 - Backend Foundation"
+  priority: P0
+  started_at: "2026-02-06"
+  status: in_progress
+
+# Feature scope from API contract v1.2.0
+endpoints:
+  - path: "POST /api/auth/login"
+    status: completed
+    agent: api-engineer
+    description: "Email+password login, returns tokens + user"
+
+  - path: "POST /api/auth/login/oauth"
+    status: completed
+    agent: api-engineer
+    description: "OAuth login (Google/GitHub)"
+
+  - path: "POST /api/auth/refresh"
+    status: completed
+    agent: api-engineer
+    description: "Refresh access token"
+
+  - path: "POST /api/auth/logout"
+    status: completed
+    agent: api-engineer
+    description: "Revoke refresh token, requires Bearer auth"
+
+  - path: "POST /api/auth/mfa/verify"
+    status: completed
+    agent: api-engineer
+    description: "Verify TOTP code, returns tokens"
+
+  - path: "GET /api/auth/me"
+    status: completed
+    agent: api-engineer
+    description: "Get current user profile with permissions"
+
+  - path: "POST /api/admin/auth/login"
+    status: completed
+    agent: api-engineer
+    description: "Admin-only login, rejects non-platform_admin with 403"
+
+  - path: "POST /api/admin/auth/mfa/verify"
+    status: completed
+    agent: api-engineer
+    description: "Admin-only MFA verify, rejects non-platform_admin with 403"
+
+# UI screens
+screens:
+  - name: "Login Page"
+    path: "/login"
+    status: completed
+    agent: ui-engineer
+    file: "frontend/src/app/(auth)/login/page.tsx"
+
+  - name: "Register Page"
+    path: "/register"
+    status: completed
+    agent: ui-engineer
+    file: "frontend/src/app/(auth)/register/page.tsx"
+
+  - name: "MFA Setup Page"
+    path: "/mfa-setup"
+    status: completed
+    agent: ui-engineer
+    file: "frontend/src/app/(auth)/mfa-setup/page.tsx"
+
+  - name: "MFA Verify Page"
+    path: "/mfa-verify"
+    status: completed
+    agent: ui-engineer
+    file: "frontend/src/app/(auth)/mfa-verify/page.tsx"
+
+  - name: "Auth Layout"
+    path: "(auth)/layout.tsx"
+    status: completed
+    agent: ui-engineer
+    file: "frontend/src/app/(auth)/layout.tsx"
+
+# Supporting work
+supporting:
+  - name: "Auth Context + Token Management"
+    status: completed
+    agent: ui-engineer
+    files:
+      - "frontend/src/lib/auth/auth-context.tsx"
+      - "frontend/src/lib/auth/token-manager.ts"
+      - "frontend/src/lib/api/client.ts"
+
+  - name: "Test Cases"
+    status: completed
+    agent: qa-engineer
+    files:
+      - "backend/test/auth/auth.service.spec.ts"
+      - "backend/test/auth/auth.controller.spec.ts"
+      - "backend/test/auth/admin-auth.controller.spec.ts"
+      - "backend/test/auth/auth.e2e-spec.ts"
+      - "frontend/src/__tests__/auth/"
+
+  - name: "Login Screen DSL Alignment"
+    status: completed
+    agent: ui-engineer
+    description: "Fixed admin/tenant login screens to match styled DSL PA-01/TA-01"
+    files:
+      - "frontend/src/components/auth/login-form.tsx"
+      - "frontend/src/components/auth/oauth-buttons.tsx"
+      - "frontend/src/components/auth/mfa-verify-form.tsx"
+      - "frontend/src/app/(auth)/admin/login/page.tsx"
+      - "frontend/src/app/(auth)/login/page.tsx"
+      - "frontend/src/lib/api/auth.ts"
+      - "frontend/src/lib/validations/auth.ts"
+      - "frontend/src/lib/constants.ts"
+
+# Agents actively working
+active_agents:
+  - name: api-engineer
+    task: "Implement all 6 auth endpoints"
+    source_of_truth: "docs/api-contract.md"
+
+  - name: ui-engineer
+    task: "Implement 5 auth screens + components + auth context"
+    source_of_truth: "design-artifacts/styled-dsl.yaml"
+
+  - name: qa-engineer
+    task: "Write test cases for backend + frontend auth"
+    source_of_truth: "docs/api-contract.md"
+
+# Acceptance criteria
+acceptance_criteria:
+  - "All endpoints match docs/api-contract.md v1.2.0 exactly"
+  - "JWT access + refresh token flow working"
+  - "MFA TOTP verification working"
+  - "OAuth (Google) login working"
+  - "Frontend forms validate and submit correctly"
+  - "Auth context manages tokens and user state"
+  - "Protected routes redirect unauthenticated users"
+  - "Backend tests >80% coverage"
+  - "Frontend tests >70% coverage"
+  - "Docker containers run all services"
+  - "npm run build passes for both projects"

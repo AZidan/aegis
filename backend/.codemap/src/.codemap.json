@@ -1,0 +1,112 @@
+{
+  "directory": "src",
+  "files": {
+    "app.controller.ts": {
+      "hash": "a2301288423f",
+      "indexed_at": "2026-02-06T18:02:38.500570+00:00",
+      "language": "typescript",
+      "lines": 12,
+      "symbols": [
+        {
+          "children": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "name": "constructor",
+              "signature": "(private readonly appService: AppService)",
+              "type": "method"
+            },
+            {
+              "lines": [
+                9,
+                11
+              ],
+              "name": "getHealth",
+              "signature": "()",
+              "type": "method"
+            }
+          ],
+          "lines": [
+            5,
+            12
+          ],
+          "name": "AppController",
+          "type": "class"
+        }
+      ]
+    },
+    "app.module.ts": {
+      "hash": "f073dc59acfa",
+      "indexed_at": "2026-02-06T18:02:38.500163+00:00",
+      "language": "typescript",
+      "lines": 47,
+      "symbols": [
+        {
+          "lines": [
+            47,
+            47
+          ],
+          "name": "AppModule",
+          "type": "class"
+        }
+      ]
+    },
+    "app.service.ts": {
+      "hash": "e8cd68be1fc8",
+      "indexed_at": "2026-02-06T18:02:38.499534+00:00",
+      "language": "typescript",
+      "lines": 17,
+      "symbols": [
+        {
+          "children": [
+            {
+              "lines": [
+                6,
+                6
+              ],
+              "name": "constructor",
+              "signature": "(private readonly configService: ConfigService)",
+              "type": "method"
+            },
+            {
+              "lines": [
+                8,
+                16
+              ],
+              "name": "getHealth",
+              "signature": "()",
+              "type": "method"
+            }
+          ],
+          "lines": [
+            5,
+            17
+          ],
+          "name": "AppService",
+          "type": "class"
+        }
+      ]
+    },
+    "main.ts": {
+      "hash": "a58284822846",
+      "indexed_at": "2026-02-06T18:02:38.498863+00:00",
+      "language": "typescript",
+      "lines": 62,
+      "symbols": [
+        {
+          "lines": [
+            8,
+            60
+          ],
+          "name": "bootstrap",
+          "signature": "()",
+          "type": "async_function"
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-02-06T23:51:42.648843+00:00",
+  "version": "1.0"
+}

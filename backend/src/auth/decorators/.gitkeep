@@ -1,0 +1,5 @@
+# Custom decorators will be implemented in Stage 3
+# Placeholder for:
+# - current-user.decorator.ts
+# - roles.decorator.ts
+# - public.decorator.ts

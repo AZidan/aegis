@@ -1,0 +1,4 @@
+# JWT and role-based guards will be implemented in Stage 3
+# Placeholder for:
+# - jwt-auth.guard.ts
+# - roles.guard.ts

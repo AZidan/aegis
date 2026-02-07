@@ -1,0 +1,6 @@
+# DTOs (Data Transfer Objects) will be implemented in Stage 3
+# Placeholder for:
+# - login.dto.ts
+# - oauth-login.dto.ts
+# - refresh-token.dto.ts
+# - mfa-verify.dto.ts

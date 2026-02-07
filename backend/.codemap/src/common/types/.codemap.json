@@ -1,0 +1,47 @@
+{
+  "directory": "src/common/types",
+  "files": {
+    "api-response.types.ts": {
+      "hash": "8ddfd8e048e2",
+      "indexed_at": "2026-02-06T18:02:38.510271+00:00",
+      "language": "typescript",
+      "lines": 25,
+      "symbols": [
+        {
+          "lines": [
+            1,
+            6
+          ],
+          "name": "PaginationMeta",
+          "type": "interface"
+        },
+        {
+          "lines": [
+            8,
+            11
+          ],
+          "name": "PaginatedResponse",
+          "type": "interface"
+        },
+        {
+          "lines": [
+            13,
+            20
+          ],
+          "name": "ApiError",
+          "type": "interface"
+        },
+        {
+          "lines": [
+            22,
+            25
+          ],
+          "name": "ApiSuccessResponse",
+          "type": "interface"
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-02-06T23:51:42.650466+00:00",
+  "version": "1.0"
+}

@@ -1,0 +1,43 @@
+{
+  "directory": "src/auth/guards",
+  "files": {
+    "jwt-auth.guard.ts": {
+      "hash": "2387acf8d7c4",
+      "indexed_at": "2026-02-06T19:05:43.280103+00:00",
+      "language": "typescript",
+      "lines": 16,
+      "symbols": [
+        {
+          "children": [
+            {
+              "lines": [
+                6,
+                8
+              ],
+              "name": "canActivate",
+              "signature": "(context: ExecutionContext)",
+              "type": "method"
+            },
+            {
+              "lines": [
+                10,
+                15
+              ],
+              "name": "handleRequest",
+              "signature": "(err: any, user: TUser, info: any) : TUser",
+              "type": "method"
+            }
+          ],
+          "lines": [
+            5,
+            16
+          ],
+          "name": "JwtAuthGuard",
+          "type": "class"
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-02-06T23:51:42.662650+00:00",
+  "version": "1.0"
+}

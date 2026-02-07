@@ -1,0 +1,44 @@
+{
+  "directory": "src/auth/strategies",
+  "files": {
+    "jwt.strategy.ts": {
+      "hash": "d2424015ee6b",
+      "indexed_at": "2026-02-06T19:11:45.384405+00:00",
+      "language": "typescript",
+      "lines": 55,
+      "symbols": [
+        {
+          "children": [
+            {
+              "lines": [
+                10,
+                23
+              ],
+              "name": "constructor",
+              "signature": "(\n    private readonly configService: ConfigService,\n    private readonly prisma: PrismaService,\n  )",
+              "type": "method"
+            },
+            {
+              "docstring": "Validate JWT payload and return user data for request.user Called automatically by Passport after token verification",
+              "lines": [
+                29,
+                54
+              ],
+              "name": "validate",
+              "signature": "(payload: JwtPayload)",
+              "type": "async_method"
+            }
+          ],
+          "lines": [
+            9,
+            55
+          ],
+          "name": "JwtStrategy",
+          "type": "class"
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-02-06T23:51:42.662502+00:00",
+  "version": "1.0"
+}

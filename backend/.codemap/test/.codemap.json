@@ -1,0 +1,14 @@
+{
+  "directory": "test",
+  "files": {
+    "app.e2e-spec.ts": {
+      "hash": "353c19fa2269",
+      "indexed_at": "2026-02-06T18:02:36.788185+00:00",
+      "language": "typescript",
+      "lines": 74,
+      "symbols": []
+    }
+  },
+  "generated_at": "2026-02-06T23:51:42.651359+00:00",
+  "version": "1.0"
+}
