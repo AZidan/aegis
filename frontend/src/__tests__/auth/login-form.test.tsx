@@ -72,34 +72,6 @@ jest.mock('@/components/auth/oauth-buttons', () => ({
   ),
 }));
 
-// Mock PasswordInput component
-jest.mock('@/components/auth/password-input', () => ({
-  PasswordInput: React.forwardRef(function MockPasswordInput(
-    props: {
-      id: string;
-      label: string;
-      error?: string;
-      [key: string]: unknown;
-    },
-    ref: React.ForwardedRef<HTMLInputElement>,
-  ) {
-    const { id, label, error, ...rest } = props;
-    return (
-      <div>
-        <label htmlFor={id}>{label}</label>
-        <input
-          id={id}
-          ref={ref}
-          type="password"
-          aria-invalid={error ? 'true' : 'false'}
-          {...rest}
-        />
-        {error && <p role="alert">{error}</p>}
-      </div>
-    );
-  }),
-}));
-
 // ---------------------------------------------------------------------------
 // Test Suite
 // ---------------------------------------------------------------------------
@@ -125,7 +97,7 @@ describe('LoginForm', () => {
 
       it('should render password input field', () => {
         render(<LoginForm variant="tenant" />);
-        expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+        expect(screen.getByLabelText('Password')).toBeInTheDocument();
       });
 
       it('should render sign in button', () => {
@@ -162,20 +134,20 @@ describe('LoginForm', () => {
       it('should render email input with correct placeholder', () => {
         render(<LoginForm variant="tenant" />);
         expect(
-          screen.getByPlaceholderText('you@company.com'),
+          screen.getByPlaceholderText('ahmed@breadfast.com'),
         ).toBeInTheDocument();
       });
 
-      it('should not render remember me checkbox', () => {
+      it('should render remember me checkbox', () => {
         render(<LoginForm variant="tenant" />);
-        expect(screen.queryByLabelText(/remember me/i)).not.toBeInTheDocument();
+        expect(screen.getByLabelText(/remember me/i)).toBeInTheDocument();
       });
 
-      it('should not render create account link', () => {
+      it('should render contact sales link instead of create account', () => {
         render(<LoginForm variant="tenant" />);
         expect(
-          screen.queryByRole('link', { name: /create an account/i }),
-        ).not.toBeInTheDocument();
+          screen.getByRole('link', { name: /contact sales/i }),
+        ).toBeInTheDocument();
       });
     });
 
@@ -199,8 +171,8 @@ describe('LoginForm', () => {
         await user.click(screen.getByRole('button', { name: /sign in/i }));
 
         await waitFor(() => {
-          const alerts = screen.getAllByRole('alert');
-          expect(alerts.length).toBeGreaterThan(0);
+          // Password error message should appear
+          expect(screen.getByText(/password must be at least 8 characters/i)).toBeInTheDocument();
         });
       });
 
@@ -208,7 +180,7 @@ describe('LoginForm', () => {
         render(<LoginForm variant="tenant" />);
 
         await user.type(screen.getByLabelText(/email address/i), 'not-an-email');
-        await user.type(screen.getByLabelText(/password/i), 'ValidPass123!@');
+        await user.type(screen.getByLabelText('Password'), 'ValidPass123!@');
         await user.click(screen.getByRole('button', { name: /sign in/i }));
 
         await waitFor(() => {
@@ -223,7 +195,7 @@ describe('LoginForm', () => {
           screen.getByLabelText(/email address/i),
           'user@example.com',
         );
-        await user.type(screen.getByLabelText(/password/i), 'short');
+        await user.type(screen.getByLabelText('Password'), 'short');
         await user.click(screen.getByRole('button', { name: /sign in/i }));
 
         await waitFor(() => {
@@ -275,7 +247,7 @@ describe('LoginForm', () => {
           validCredentials.email,
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           validCredentials.password,
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -297,7 +269,7 @@ describe('LoginForm', () => {
           validCredentials.email,
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           validCredentials.password,
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -325,7 +297,7 @@ describe('LoginForm', () => {
           validCredentials.email,
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           validCredentials.password,
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -356,7 +328,7 @@ describe('LoginForm', () => {
           'admin@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'ValidPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -382,7 +354,7 @@ describe('LoginForm', () => {
           'admin@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'ValidPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -414,7 +386,7 @@ describe('LoginForm', () => {
           'admin@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'ValidPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -452,13 +424,15 @@ describe('LoginForm', () => {
           'admin@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'ValidPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
 
         await waitFor(() => {
-          expect(screen.getByRole('button')).toBeDisabled();
+          // The submit button should be disabled
+          const submitBtn = screen.getByRole('button', { name: /signing in/i });
+          expect(submitBtn).toBeDisabled();
         });
 
         await act(async () => {
@@ -487,7 +461,7 @@ describe('LoginForm', () => {
           'wrong@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'WrongPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -510,7 +484,7 @@ describe('LoginForm', () => {
           'locked@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'ValidPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -533,7 +507,7 @@ describe('LoginForm', () => {
           'admin@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'ValidPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -559,7 +533,7 @@ describe('LoginForm', () => {
           'admin@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'ValidPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -580,7 +554,7 @@ describe('LoginForm', () => {
           'admin@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'ValidPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -592,7 +566,7 @@ describe('LoginForm', () => {
         });
       });
 
-      it('should display error in an alert role element', async () => {
+      it('should display error message in the error container', async () => {
         mockLoginApi.mockRejectedValue({
           response: { status: 401 },
         });
@@ -603,13 +577,15 @@ describe('LoginForm', () => {
           'wrong@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'WrongPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
 
         await waitFor(() => {
-          expect(screen.getByRole('alert')).toBeInTheDocument();
+          // The error message is inside a styled container (bg-red-50)
+          const errorText = screen.getByText(/invalid email or password/i);
+          expect(errorText).toBeInTheDocument();
         });
       });
 
@@ -626,7 +602,7 @@ describe('LoginForm', () => {
           'wrong@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'WrongPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -665,28 +641,22 @@ describe('LoginForm', () => {
     // Accessibility
     // -----------------------------------------------------------------------
     describe('Accessibility', () => {
-      it('should have proper aria-invalid on email field when there is an error', async () => {
+      it('should have password toggle button with proper aria-label', () => {
         render(<LoginForm variant="tenant" />);
-
-        await user.click(screen.getByRole('button', { name: /sign in/i }));
-
-        await waitFor(() => {
-          expect(screen.getByLabelText(/email address/i)).toHaveAttribute(
-            'aria-invalid',
-            'true',
-          );
-        });
+        expect(
+          screen.getByRole('button', { name: /toggle password visibility/i }),
+        ).toBeInTheDocument();
       });
 
-      it('should have proper aria-describedby linking error to email field', async () => {
+      it('should toggle password field type when toggle button is clicked', async () => {
         render(<LoginForm variant="tenant" />);
+        const passwordInput = screen.getByLabelText('Password');
+        expect(passwordInput).toHaveAttribute('type', 'password');
 
-        await user.click(screen.getByRole('button', { name: /sign in/i }));
-
-        await waitFor(() => {
-          const emailInput = screen.getByLabelText(/email address/i);
-          expect(emailInput).toHaveAttribute('aria-describedby', 'email-error');
-        });
+        await user.click(
+          screen.getByRole('button', { name: /toggle password visibility/i }),
+        );
+        expect(passwordInput).toHaveAttribute('type', 'text');
       });
 
       it('should have form element with noValidate attribute', () => {
@@ -708,7 +678,7 @@ describe('LoginForm', () => {
       it('should render email and password fields', () => {
         render(<LoginForm variant="admin" />);
         expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+        expect(screen.getByLabelText('Password')).toBeInTheDocument();
       });
 
       it('should render sign in button', () => {
@@ -767,7 +737,7 @@ describe('LoginForm', () => {
           validCredentials.email,
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           validCredentials.password,
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -789,7 +759,7 @@ describe('LoginForm', () => {
           validCredentials.email,
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           validCredentials.password,
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -808,7 +778,7 @@ describe('LoginForm', () => {
           validCredentials.email,
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           validCredentials.password,
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -848,15 +818,15 @@ describe('LoginForm', () => {
           'admin@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'ValidPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
 
         await waitFor(() => {
           // Should render 6 digit inputs for MFA code
-          expect(screen.getByLabelText('Digit 1 of 6')).toBeInTheDocument();
-          expect(screen.getByLabelText('Digit 6 of 6')).toBeInTheDocument();
+          expect(screen.getByLabelText('Digit 1')).toBeInTheDocument();
+          expect(screen.getByLabelText('Digit 6')).toBeInTheDocument();
         });
       });
 
@@ -876,13 +846,13 @@ describe('LoginForm', () => {
           'admin@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'ValidPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
 
         await waitFor(() => {
-          expect(screen.getByLabelText('Digit 1 of 6')).toBeInTheDocument();
+          expect(screen.getByLabelText('Digit 1')).toBeInTheDocument();
         });
 
         expect(mockPush).not.toHaveBeenCalledWith('/mfa-verify');
@@ -904,7 +874,7 @@ describe('LoginForm', () => {
           'user@company.com',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'ValidPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));
@@ -927,7 +897,7 @@ describe('LoginForm', () => {
           'wrong@aegis.ai',
         );
         await user.type(
-          screen.getByLabelText(/password/i),
+          screen.getByLabelText('Password'),
           'WrongPass123!@',
         );
         await user.click(screen.getByRole('button', { name: /sign in/i }));

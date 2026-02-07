@@ -168,7 +168,7 @@ describe('TenantsPage', () => {
       render(<TenantsPage />);
       expect(
         screen.getByText(
-          'Manage all tenant environments and their configurations.',
+          'Manage all platform tenants and their containers',
         ),
       ).toBeInTheDocument();
     });
@@ -197,7 +197,7 @@ describe('TenantsPage', () => {
     it('should render search input with placeholder', () => {
       render(<TenantsPage />);
       expect(
-        screen.getByPlaceholderText('Search tenants by name or email...'),
+        screen.getByPlaceholderText('Search tenants by name, ID, or plan...'),
       ).toBeInTheDocument();
     });
   });
@@ -251,23 +251,27 @@ describe('TenantsPage', () => {
   });
 
   // -----------------------------------------------------------------------
-  // Breadcrumbs
+  // Total Count Badge
   // -----------------------------------------------------------------------
-  describe('Breadcrumbs', () => {
-    beforeEach(() => {
+  describe('Total Count Badge', () => {
+    it('should display total count badge when data is available', () => {
+      const tenants = [
+        createTenant({ id: 't1', companyName: 'Alpha Corp' }),
+        createTenant({ id: 't2', companyName: 'Beta Inc' }),
+      ];
       mockUseTenantsQuery.mockReturnValue({
-        data: createQueryResponse([]),
+        data: createQueryResponse(tenants),
         isLoading: false,
         isError: false,
         error: null,
       });
-    });
 
-    it('should render Admin breadcrumb link', () => {
       render(<TenantsPage />);
-      const adminLink = screen.getByRole('link', { name: 'Admin' });
-      expect(adminLink).toBeInTheDocument();
-      expect(adminLink).toHaveAttribute('href', '/admin');
+      // The count badge is rendered next to the heading with font-mono and primary colors
+      const heading = screen.getByRole('heading', { name: 'Tenants' });
+      const badgeContainer = heading.parentElement;
+      const badge = badgeContainer?.querySelector('.font-mono');
+      expect(badge).toHaveTextContent('2');
     });
   });
 });

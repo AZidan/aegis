@@ -59,9 +59,9 @@ describe('TenantTable', () => {
   // Column Headers
   // -----------------------------------------------------------------------
   describe('Column Headers', () => {
-    it('should render Company column header', () => {
+    it('should render Company Name column header', () => {
       render(<TenantTable {...defaultProps} />);
-      expect(screen.getByText('Company')).toBeInTheDocument();
+      expect(screen.getByText('Company Name')).toBeInTheDocument();
     });
 
     it('should render Status column header', () => {
@@ -109,9 +109,10 @@ describe('TenantTable', () => {
       expect(screen.getByText('Active')).toBeInTheDocument();
     });
 
-    it('should render formatted plan name', () => {
+    it('should render formatted plan name as badge', () => {
       render(<TenantTable {...defaultProps} />);
-      expect(screen.getByText('Growth')).toBeInTheDocument();
+      // "growth" plan maps to "Pro" label in the new component
+      expect(screen.getByText('Pro')).toBeInTheDocument();
     });
 
     it('should render agent count', () => {
@@ -153,13 +154,14 @@ describe('TenantTable', () => {
     it('should show descriptive message in empty state', () => {
       render(<TenantTable {...defaultProps} tenants={[]} />);
       expect(
-        screen.getByText('No tenants match your search criteria.'),
+        screen.getByText('Try adjusting your search or filter criteria'),
       ).toBeInTheDocument();
     });
 
-    it('should not render table headers in empty state', () => {
+    it('should still render table headers in empty state', () => {
       render(<TenantTable {...defaultProps} tenants={[]} />);
-      expect(screen.queryByText('Company')).not.toBeInTheDocument();
+      // The table always renders headers, empty state is in tbody
+      expect(screen.getByText('Company Name')).toBeInTheDocument();
     });
   });
 
@@ -167,12 +169,12 @@ describe('TenantTable', () => {
   // Sorting
   // -----------------------------------------------------------------------
   describe('Sorting', () => {
-    it('should call onSortChange when clicking Company header', async () => {
+    it('should call onSortChange when clicking Company Name header', async () => {
       const user = userEvent.setup();
       const onSortChange = jest.fn();
       render(<TenantTable {...defaultProps} onSortChange={onSortChange} />);
 
-      await user.click(screen.getByText('Company'));
+      await user.click(screen.getByText('Company Name'));
       expect(onSortChange).toHaveBeenCalledWith('company_name');
     });
 

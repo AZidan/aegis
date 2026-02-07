@@ -11,7 +11,7 @@ interface OAuthButtonsProps {
 
 /**
  * OAuth provider buttons (Google + GitHub)
- * Renders sign-in buttons for configured OAuth providers
+ * Grid layout with brand icons, matching login.html design
  */
 export function OAuthButtons({ mode, disabled }: OAuthButtonsProps) {
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
@@ -53,49 +53,44 @@ export function OAuthButtons({ mode, disabled }: OAuthButtonsProps) {
     window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
   };
 
-  const googleLabel = mode === 'login' ? 'Sign in with Google' : 'Sign up with Google';
-  const githubLabel = mode === 'login' ? 'Sign in with GitHub' : 'Sign up with GitHub';
+  const googleLabel = loadingProvider === 'google' ? 'Redirecting...' : 'Google';
+  const githubLabel = loadingProvider === 'github' ? 'Redirecting...' : 'GitHub';
+
+  const buttonClasses = cn(
+    'flex items-center justify-center gap-2.5 py-2.5 px-4',
+    'border border-neutral-300 rounded-lg',
+    'text-sm font-medium text-neutral-700 bg-white',
+    'hover:bg-neutral-50 hover:border-neutral-400',
+    'active:scale-[0.98]',
+    'shadow-sm transition-all duration-150',
+    'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
+    'disabled:opacity-50 disabled:cursor-not-allowed'
+  );
 
   return (
-    <div className="space-y-3">
+    <div className="grid grid-cols-2 gap-3">
+      {/* Google */}
       <button
         type="button"
         onClick={handleGoogleOAuth}
         disabled={disabled || loadingProvider !== null}
-        className={cn(
-          'flex w-full items-center justify-center gap-3 rounded-lg border px-4 py-2.5',
-          'border-slate-300 dark:border-slate-600',
-          'bg-white dark:bg-slate-800',
-          'text-sm font-medium text-slate-700 dark:text-slate-300',
-          'transition-colors duration-150',
-          'hover:bg-slate-50 dark:hover:bg-slate-700',
-          'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
-          'disabled:opacity-50 disabled:cursor-not-allowed'
-        )}
-        aria-label={googleLabel}
+        className={buttonClasses}
+        aria-label={mode === 'login' ? 'Sign in with Google' : 'Sign up with Google'}
       >
         <GoogleIcon />
-        <span>{loadingProvider === 'google' ? 'Redirecting...' : googleLabel}</span>
+        {googleLabel}
       </button>
 
+      {/* GitHub */}
       <button
         type="button"
         onClick={handleGithubOAuth}
         disabled={disabled || loadingProvider !== null}
-        className={cn(
-          'flex w-full items-center justify-center gap-3 rounded-lg border px-4 py-2.5',
-          'border-slate-300 dark:border-slate-600',
-          'bg-white dark:bg-slate-800',
-          'text-sm font-medium text-slate-700 dark:text-slate-300',
-          'transition-colors duration-150',
-          'hover:bg-slate-50 dark:hover:bg-slate-700',
-          'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
-          'disabled:opacity-50 disabled:cursor-not-allowed'
-        )}
-        aria-label={githubLabel}
+        className={buttonClasses}
+        aria-label={mode === 'login' ? 'Sign in with GitHub' : 'Sign up with GitHub'}
       >
         <GitHubIcon />
-        <span>{loadingProvider === 'github' ? 'Redirecting...' : githubLabel}</span>
+        {githubLabel}
       </button>
     </div>
   );
@@ -103,7 +98,7 @@ export function OAuthButtons({ mode, disabled }: OAuthButtonsProps) {
 
 function GoogleIcon() {
   return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+    <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
       <path
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
         fill="#4285F4"
@@ -113,7 +108,7 @@ function GoogleIcon() {
         fill="#34A853"
       />
       <path
-        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A11.96 11.96 0 001 12c0 1.94.46 3.77 1.18 5.07l3.66-2.98z"
         fill="#FBBC05"
       />
       <path
@@ -126,12 +121,8 @@ function GoogleIcon() {
 
 function GitHubIcon() {
   return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-      />
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
     </svg>
   );
 }

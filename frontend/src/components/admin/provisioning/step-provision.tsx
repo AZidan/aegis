@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Copy, CheckCircle2, Loader2 } from 'lucide-react';
+import { Copy, Loader2 } from 'lucide-react';
 import type { ProvisioningFormData } from '@/lib/validations/provisioning';
 import {
   PLANS,
@@ -195,7 +195,7 @@ function ProvisioningProgress({
   const progress = status?.progress ?? 0;
 
   return (
-    <div className="bg-white rounded-xl border border-neutral-200/80 shadow-sm">
+    <div className="bg-white rounded-xl border border-neutral-200/80 shadow-sm animate-fadeIn">
       <div className="px-6 py-5 border-b border-neutral-100">
         <div className="flex items-center justify-between">
           <h2 className="text-[16px] font-semibold text-neutral-900">
@@ -229,7 +229,7 @@ function ProvisioningProgress({
                 {/* Icon */}
                 <div
                   className={cn(
-                    'mt-0.5 w-6 h-6 rounded-full flex items-center justify-center shrink-0',
+                    'mt-0.5 w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-300',
                     stepState === 'completed' && 'bg-emerald-500',
                     stepState === 'active' && 'bg-primary-50',
                     stepState === 'pending' && 'bg-neutral-100'
@@ -237,7 +237,7 @@ function ProvisioningProgress({
                 >
                   {stepState === 'completed' && (
                     <svg
-                      className="w-4 h-4 text-white"
+                      className="w-4 h-4 text-white check-pop"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -262,7 +262,7 @@ function ProvisioningProgress({
                 <div className="flex-1">
                   <div
                     className={cn(
-                      'text-[14px] font-medium',
+                      'text-[13px] font-medium',
                       stepState === 'completed' && 'text-neutral-700',
                       stepState === 'active' && 'text-neutral-900',
                       stepState === 'pending' && 'text-neutral-400'
@@ -275,7 +275,7 @@ function ProvisioningProgress({
                       'text-[12px] font-mono',
                       stepState === 'completed' && 'text-emerald-600',
                       stepState === 'active' &&
-                        'text-neutral-500 animate-pulse',
+                        'text-neutral-500 progress-pulse',
                       stepState === 'pending' && 'text-neutral-300'
                     )}
                   >
@@ -325,57 +325,82 @@ function ProvisionSuccess({ tenantId }: { tenantId: string }) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-emerald-200 shadow-sm">
-      <div className="px-6 py-8 text-center">
-        <div className="w-16 h-16 mx-auto rounded-full bg-emerald-50 flex items-center justify-center mb-4">
-          <CheckCircle2 className="w-8 h-8 text-emerald-500" />
-        </div>
-        <h3 className="text-lg font-semibold text-neutral-900 mb-1">
-          Tenant Provisioned Successfully
-        </h3>
-        <p className="text-[14px] text-neutral-500 mb-6">
-          The tenant environment is ready. An invitation email has been sent to
-          the admin.
-        </p>
+    <div className="animate-fadeIn">
+      <div className="bg-white rounded-xl border border-emerald-200 shadow-sm">
+        <div className="px-6 py-8 text-center">
+          <div className="w-16 h-16 mx-auto rounded-full bg-emerald-50 flex items-center justify-center mb-4">
+            <svg
+              className="w-8 h-8 text-emerald-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-neutral-900 mb-1">
+            Tenant Provisioned Successfully
+          </h3>
+          <p className="text-[14px] text-neutral-500 mb-6">
+            The tenant environment is ready. An invitation email has been sent to
+            the admin.
+          </p>
 
-        {/* Tenant ID */}
-        <div className="inline-flex items-center gap-2 bg-neutral-50 rounded-lg px-4 py-2.5 mb-6">
-          <span className="text-[12px] text-neutral-400">Tenant ID</span>
-          <span
-            className="text-[14px] font-mono font-semibold text-primary-600"
-            data-testid="tenant-id-value"
-          >
-            {tenantId}
-          </span>
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="ml-1 p-1 rounded hover:bg-neutral-200 transition-colors"
-            title="Copy to clipboard"
-          >
-            <Copy
-              className={cn(
-                'w-4 h-4 transition-colors',
-                copied ? 'text-emerald-500' : 'text-neutral-400'
+          {/* Tenant ID */}
+          <div className="inline-flex items-center gap-2 bg-neutral-50 rounded-lg px-4 py-2.5 mb-6">
+            <span className="text-[12px] text-neutral-400">Tenant ID</span>
+            <span
+              className="text-[14px] font-mono font-semibold text-primary-600"
+              data-testid="tenant-id-value"
+            >
+              {tenantId}
+            </span>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="ml-1 p-1 rounded hover:bg-neutral-200 transition-colors"
+              title="Copy to clipboard"
+            >
+              {copied ? (
+                <svg
+                  className="w-4 h-4 text-emerald-500 transition-colors"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4.5 12.75l6 6 9-13.5"
+                  />
+                </svg>
+              ) : (
+                <Copy className="w-4 h-4 text-neutral-400 transition-colors" />
               )}
-            />
-          </button>
-        </div>
+            </button>
+          </div>
 
-        {/* Actions */}
-        <div className="flex items-center justify-center gap-3">
-          <Link
-            href="/admin/tenants"
-            className="px-4 py-2.5 rounded-lg border border-neutral-300 text-[14px] font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
-          >
-            Back to Tenants
-          </Link>
-          <Link
-            href={`/admin/tenants/${tenantId}`}
-            className="px-4 py-2.5 rounded-lg bg-primary-500 text-white text-[14px] font-medium hover:bg-primary-600 transition-colors"
-          >
-            View Tenant
-          </Link>
+          {/* Actions */}
+          <div className="flex items-center justify-center gap-3">
+            <Link
+              href="/admin/tenants"
+              className="px-4 py-2.5 rounded-lg border border-neutral-300 text-[14px] font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
+            >
+              Provision Another
+            </Link>
+            <Link
+              href={`/admin/tenants/${tenantId}`}
+              className="px-4 py-2.5 rounded-lg bg-primary-500 text-white text-[14px] font-medium hover:bg-primary-600 transition-colors"
+            >
+              View Tenant
+            </Link>
+          </div>
         </div>
       </div>
     </div>
