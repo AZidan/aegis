@@ -84,8 +84,9 @@ phase_3:
         notes: "BullMQ scheduling, mock probes, circuit breaker auto-restart, 52 tests"
       - id: E2-F1
         name: "Tenant List View"
-        status: pending
+        status: completed
         points: 5
+        notes: "Admin sidebar, 8 UI components, tenant table with search/filters/sort, 72 tests"
       - id: E1-F2
         name: "Container Provisioning"
         status: pending

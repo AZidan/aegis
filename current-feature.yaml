@@ -8,8 +8,9 @@ feature:
   priority: P0
   points: 5
   started_at: "2026-02-07"
-  status: in_progress
-  branch: tenant-list-view
+  status: completed
+  completed_at: "2026-02-07"
+  branch: tenant-list-view (merged to master)
 
 requirements:
   - "Table view: tenant name, status, agent count, health, plan tier, created date"
