@@ -8,7 +8,10 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../../prisma/generated/client';
 import { CreateAgentDto } from './dto/create-agent.dto';
 import { UpdateAgentDto } from './dto/update-agent.dto';
+import { UpdateToolPolicyDto } from './dto/update-tool-policy.dto';
 import { ListAgentsQueryDto } from './dto/list-agents-query.dto';
+import { TOOL_CATEGORIES } from '../tools/tool-categories';
+import { ROLE_DEFAULT_POLICIES } from '../tools/role-defaults';
 
 /**
  * Plan-based agent limits.
@@ -159,11 +162,19 @@ export class AgentsService {
       });
     }
 
-    // Build tool policy JSON
-    const toolPolicy = {
-      allow: dto.toolPolicy.allow,
-      deny: dto.toolPolicy.deny ?? [],
-    };
+    // Build tool policy JSON - auto-populate from role defaults if empty
+    let toolPolicy: { allow: string[]; deny: string[] };
+    if (dto.toolPolicy && dto.toolPolicy.allow.length > 0) {
+      toolPolicy = {
+        allow: dto.toolPolicy.allow,
+        deny: dto.toolPolicy.deny ?? [],
+      };
+    } else {
+      const roleDefaults = ROLE_DEFAULT_POLICIES[dto.role];
+      toolPolicy = roleDefaults
+        ? { allow: [...roleDefaults.allow], deny: [...roleDefaults.deny] }
+        : { allow: [], deny: [] };
+    }
 
     // Build assistedUser JSON if provided
     const assistedUser =
@@ -524,6 +535,77 @@ export class AgentsService {
       id: agentId,
       status: 'active',
       resumedAt: now.toISOString(),
+    };
+  }
+
+  // ==========================================================================
+  // GET /api/dashboard/agents/:id/tool-policy - Get Agent Tool Policy
+  // Response: { agentId, agentName, role, policy: { allow, deny }, availableCategories }
+  // ==========================================================================
+  async getToolPolicy(tenantId: string, agentId: string) {
+    const agent = await this.prisma.agent.findFirst({
+      where: { id: agentId, tenantId },
+    });
+
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
+
+    const toolPolicy = (agent.toolPolicy as {
+      allow: string[];
+      deny: string[];
+    }) ?? { allow: [], deny: [] };
+
+    return {
+      agentId: agent.id,
+      agentName: agent.name,
+      role: agent.role,
+      policy: {
+        allow: toolPolicy.allow ?? [],
+        deny: toolPolicy.deny ?? [],
+      },
+      availableCategories: TOOL_CATEGORIES,
+    };
+  }
+
+  // ==========================================================================
+  // PUT /api/dashboard/agents/:id/tool-policy - Update Agent Tool Policy
+  // Request: { allow: string[], deny?: string[] }
+  // Response: { agentId, policy: { allow, deny }, updatedAt }
+  // ==========================================================================
+  async updateToolPolicy(
+    tenantId: string,
+    agentId: string,
+    dto: UpdateToolPolicyDto,
+  ) {
+    const agent = await this.prisma.agent.findFirst({
+      where: { id: agentId, tenantId },
+    });
+
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
+
+    const newPolicy = {
+      allow: dto.allow,
+      deny: dto.deny ?? [],
+    };
+
+    const updated = await this.prisma.agent.update({
+      where: { id: agentId },
+      data: {
+        toolPolicy: newPolicy as Prisma.InputJsonValue,
+      },
+    });
+
+    this.logger.log(
+      `Agent tool policy updated: ${agentId} for tenant ${tenantId}`,
+    );
+
+    return {
+      agentId: updated.id,
+      policy: newPolicy,
+      updatedAt: updated.updatedAt.toISOString(),
     };
   }
 }

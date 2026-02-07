@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Patch,
   Delete,
   Body,
@@ -20,6 +21,10 @@ import { AgentsService } from './agents.service';
 import { createAgentSchema, CreateAgentDto } from './dto/create-agent.dto';
 import { updateAgentSchema, UpdateAgentDto } from './dto/update-agent.dto';
 import {
+  updateToolPolicySchema,
+  UpdateToolPolicyDto,
+} from './dto/update-tool-policy.dto';
+import {
   listAgentsQuerySchema,
   ListAgentsQueryDto,
 } from './dto/list-agents-query.dto';
@@ -32,14 +37,16 @@ import {
  * TenantGuard extracts tenantId from JWT and attaches it to the request.
  *
  * Endpoints:
- * 1. GET    /api/dashboard/agents                       - List Agents
- * 2. POST   /api/dashboard/agents                       - Create Agent
- * 3. GET    /api/dashboard/agents/:id                   - Get Agent Detail
- * 4. PATCH  /api/dashboard/agents/:id                   - Update Agent
- * 5. DELETE /api/dashboard/agents/:id                   - Delete Agent
- * 6. POST   /api/dashboard/agents/:id/actions/restart   - Restart Agent
- * 7. POST   /api/dashboard/agents/:id/actions/pause     - Pause Agent
- * 8. POST   /api/dashboard/agents/:id/actions/resume    - Resume Agent
+ * 1.  GET    /api/dashboard/agents                       - List Agents
+ * 2.  POST   /api/dashboard/agents                       - Create Agent
+ * 3.  GET    /api/dashboard/agents/:id                   - Get Agent Detail
+ * 4.  PATCH  /api/dashboard/agents/:id                   - Update Agent
+ * 5.  DELETE /api/dashboard/agents/:id                   - Delete Agent
+ * 6.  GET    /api/dashboard/agents/:id/tool-policy       - Get Agent Tool Policy
+ * 7.  PUT    /api/dashboard/agents/:id/tool-policy       - Update Agent Tool Policy
+ * 8.  POST   /api/dashboard/agents/:id/actions/restart   - Restart Agent
+ * 9.  POST   /api/dashboard/agents/:id/actions/pause     - Pause Agent
+ * 10. POST   /api/dashboard/agents/:id/actions/resume    - Resume Agent
  */
 @Controller('dashboard/agents')
 @UseGuards(JwtAuthGuard, TenantGuard)
@@ -117,6 +124,34 @@ export class AgentsController {
   async deleteAgent(@Req() req: Request, @Param('id') id: string) {
     const tenantId = this.getTenantId(req);
     await this.agentsService.deleteAgent(tenantId, id);
+  }
+
+  // ==========================================================================
+  // GET /api/dashboard/agents/:id/tool-policy - Get Agent Tool Policy
+  // Response: { agentId, agentName, role, policy, availableCategories }
+  // ==========================================================================
+  @Get(':id/tool-policy')
+  @HttpCode(HttpStatus.OK)
+  async getToolPolicy(@Req() req: Request, @Param('id') id: string) {
+    const tenantId = this.getTenantId(req);
+    return this.agentsService.getToolPolicy(tenantId, id);
+  }
+
+  // ==========================================================================
+  // PUT /api/dashboard/agents/:id/tool-policy - Update Agent Tool Policy
+  // Request: { allow: string[], deny?: string[] }
+  // Response: { agentId, policy, updatedAt }
+  // ==========================================================================
+  @Put(':id/tool-policy')
+  @HttpCode(HttpStatus.OK)
+  async updateToolPolicy(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(updateToolPolicySchema))
+    dto: UpdateToolPolicyDto,
+  ) {
+    const tenantId = this.getTenantId(req);
+    return this.agentsService.updateToolPolicy(tenantId, id, dto);
   }
 
   // ==========================================================================

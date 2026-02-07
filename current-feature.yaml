@@ -2,72 +2,50 @@
 # Tracks active development scope and requirements per CLAUDE.md
 
 feature:
-  name: "Agent CRUD API"
-  epic: "E3-F1"
+  name: "Agent Tool Policy Configuration"
+  epic: "E3-F2"
   sprint: "Sprint 3 - Agent Management & Tenant Dashboard"
   priority: P0
-  points: 8
+  points: 5
   started_at: "2026-02-07"
   status: in_progress
-  branch: agent-crud-api
+  branch: agent-tool-policy
 
 requirements:
-  - "Full CRUD for agents scoped to tenant (create, list, detail, update, delete)"
-  - "Agent actions: restart, pause, resume"
-  - "Plan limit enforcement on agent creation (starter=3, growth=10, enterprise=50)"
-  - "Filter by status/role, sort by name/last_active/created_at"
-  - "Tenant auth guard extracting tenantId from JWT for all /dashboard/* routes"
-  - "Agent detail includes metrics and installed skills"
+  - "Define tool categories with metadata (name, description, risk level)"
+  - "Default tool policies per role type (PM, Engineering, Operations, Custom)"
+  - "GET /api/dashboard/tools/categories - list available tool categories"
+  - "GET /api/dashboard/agents/:id/tool-policy - get agent's current policy"
+  - "PUT /api/dashboard/agents/:id/tool-policy - update agent's policy"
+  - "Tool policy changes propagate to OpenClaw within 60s (mock for MVP)"
 
 design_decisions:
-  api_contract: "docs/api-contract.md Section 6: Tenant Agents"
-  base_path: "/api/dashboard/agents"
-  auth: "JWT with X-Tenant-Id extracted from token claims"
-  prisma_models: "Agent, AgentChannel, AgentActivity, AgentMetrics already in schema"
+  tool_categories: "Static config (not DB) - categories are platform-defined"
+  role_defaults: "PM: analytics+project_mgmt, Eng: code+devops, Ops: communication+monitoring"
+  propagation: "Mock - log 'propagating to OpenClaw' (real integration later)"
 
 tasks:
-  - name: "Prisma Migration"
-    status: pending
-    subtasks:
-      - "1.1 Verify Agent-related tables exist in DB"
-      - "1.2 Run migration if needed"
-
-  - name: "Tenant Auth Guard"
-    status: pending
-    subtasks:
-      - "2.1 Create TenantGuard extracting tenantId from JWT"
-      - "2.2 Apply to /dashboard/* routes"
-
-  - name: "Agent CRUD Module"
-    branch: "agent-crud-api/backend"
-    status: pending
+  - name: "Backend Tool Policy Module"
     agent: api-engineer
     subtasks:
-      - "3.1 Create AgentsModule (controller + service)"
-      - "3.2 Zod DTOs for create/update agent"
-      - "3.3 POST /api/dashboard/agents (create with plan limits)"
-      - "3.4 GET /api/dashboard/agents (list with filters/sort)"
-      - "3.5 GET /api/dashboard/agents/:id (detail with metrics)"
-      - "3.6 PATCH /api/dashboard/agents/:id (update)"
-      - "3.7 DELETE /api/dashboard/agents/:id (remove)"
-      - "3.8 POST restart/pause/resume actions"
-      - "3.9 Seed data for dev testing"
+      - "1.1 Define tool categories constant with metadata"
+      - "1.2 Define role-based default policies"
+      - "1.3 GET /api/dashboard/tools/categories endpoint"
+      - "1.4 GET /api/dashboard/agents/:id/tool-policy"
+      - "1.5 PUT /api/dashboard/agents/:id/tool-policy"
+      - "1.6 Auto-apply defaults on agent creation based on role"
 
   - name: "Backend Tests"
-    status: pending
     agent: qa-engineer
     subtasks:
-      - "4.1 DTO validation tests"
-      - "4.2 Service unit tests"
-      - "4.3 Controller integration tests"
-      - "4.4 Plan limit enforcement tests"
+      - "2.1 Tool categories endpoint tests"
+      - "2.2 Tool policy CRUD tests"
+      - "2.3 Role default application tests"
 
 acceptance_criteria:
-  - "All 8 endpoints match API contract Section 6 exactly"
-  - "Plan limits enforced: starter=3, growth=10, enterprise=50"
-  - "Tenant isolation: agents only visible to their own tenant"
-  - "Filter by status (active/idle/error) and role (pm/engineering/operations/custom)"
-  - "Sort by name, last_active, created_at (asc/desc)"
-  - "Agent detail returns metrics and installed skills"
+  - "Tool categories endpoint returns structured list with risk levels"
+  - "Each role type has sensible default tool policies"
+  - "Tool policy can be read and updated per agent"
+  - "Creating an agent auto-populates tool policy from role defaults"
   - "npm run build passes"
   - "All tests pass"
