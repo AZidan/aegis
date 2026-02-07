@@ -2,72 +2,72 @@
 # Tracks active development scope and requirements per CLAUDE.md
 
 feature:
-  name: "Container Health Monitoring"
-  epic: "E1-F5"
+  name: "Tenant List & Overview"
+  epic: "E2-F1"
   sprint: "Sprint 2 - Control Plane Core"
   priority: P0
+  points: 5
   started_at: "2026-02-07"
-  completed_at: "2026-02-07"
-  status: completed
-  branch: health-monitoring (merged to master)
+  status: in_progress
+  branch: tenant-list-view
 
-# Feature scope from roadmap E1-F5
 requirements:
-  - "Health check runs every 30 seconds against each tenant container"
-  - "Health status includes: container up/down, memory, CPU, disk"
-  - "Unhealthy containers trigger automatic restart (max 3 per hour)"
-  - "Platform admin receives alert if container fails 3 consecutive checks"
-  - "GET /api/admin/tenants/:id/health returns current status + 24h history"
+  - "Table view: tenant name, status, agent count, health, plan tier, created date"
+  - "Sortable and filterable by all columns"
+  - "Search by tenant name or admin email"
+  - "Click-through to tenant detail page"
+  - "30s polling refresh (WebSocket deferred)"
 
-# Design decisions (approved)
 design_decisions:
-  scheduling: "BullMQ (via Redis) - repeatable jobs"
-  health_probe: "Pluggable interface - MockHealthProbe for MVP, DockerHealthProbe future"
-  auto_restart: "Redis INCR + 1h TTL for restart counter, circuit breaker at 3"
-  alerting: "DB only (Alert table) - no webhook/email for now"
-  websocket: "Deferred to dashboard features (E2-F1/E2-F4)"
-  data_retention: "Daily cleanup job deletes records >24h"
+  component_library: "shadcn/ui (Radix + Tailwind, components owned in codebase)"
+  data_fetching: "TanStack Query with 30s polling refetchInterval"
+  websocket: "Deferred - use polling for now"
 
-# Tasks
 tasks:
-  - name: "Backend Health Module (BullMQ + Monitoring)"
-    branch: "health/backend-module"
-    status: completed
-    agent: api-engineer
+  - name: "UI Component Foundation + Admin Sidebar"
+    branch: "tenant-list/ui-foundation"
+    status: in_progress
+    agent: ui-engineer
     subtasks:
-      - "1.1 Install BullMQ deps, configure in app.module"
-      - "1.2 HealthProbeStrategy interface + MockHealthProbe"
-      - "1.3 HealthMonitorService (evaluate, auto-restart, alerts)"
-      - "1.4 HealthCheckProcessor (BullMQ worker, 30s schedule)"
-      - "1.5 HealthCleanupProcessor (BullMQ worker, daily)"
-      - "1.6 HealthModule registration + wiring"
+      - "1.1 Install/configure shadcn/ui CLI"
+      - "1.2 Scaffold base components: Button, Badge, Input, Select, DropdownMenu, Table, Tooltip"
+      - "1.3 Build AdminSidebar component per DSL platform_admin_sidebar"
+      - "1.4 Update admin/layout.tsx to use real sidebar"
+
+  - name: "Tenant API Layer"
+    branch: "tenant-list/ui-foundation"
+    status: in_progress
+    agent: ui-engineer
+    subtasks:
+      - "2.1 Create lib/api/tenants.ts with types + TanStack Query hooks"
+
+  - name: "Tenant List Page"
+    branch: "tenant-list/page-implementation"
+    status: pending
+    agent: ui-engineer
+    subtasks:
+      - "2.2 Build tenant-specific components (StatusBadge, HealthDot, filters)"
+      - "2.3 Build TenantDataTable with sortable columns, actions menu"
+      - "2.4 Implement /admin/tenants/page.tsx per DSL PA-03"
 
   - name: "Tests"
-    branch: "health/backend-module"
-    status: completed
+    branch: "tenant-list/tests"
+    status: pending
     agent: qa-engineer
     subtasks:
-      - "2.1 Unit tests for HealthMonitorService (28 tests)"
-      - "2.2 Unit tests for HealthCheckProcessor (11 tests)"
-      - "2.3 Unit tests for MockHealthProbe (13 tests)"
+      - "3.1 Unit tests for tenant API layer and hooks"
+      - "3.2 Component tests for TenantDataTable, StatusBadge, HealthDot"
+      - "3.3 Page-level tests for /admin/tenants"
 
-# Results
-results:
-  files_created: 10
-  files_modified: 3
-  tests: 52
-  test_suites: 3
-  build: passing
-  commit: "315236f"
-  merged_to_master: true
-
-# Acceptance criteria - ALL MET
 acceptance_criteria:
-  - "BullMQ configured with Redis connection [DONE]"
-  - "Health check job runs every 30s for all active tenants [DONE]"
-  - "HealthProbeStrategy interface with MockHealthProbe implementation [DONE]"
-  - "Auto-restart triggers on 'down' status (max 3/hr via Redis counter) [DONE]"
-  - "Alert created in DB after 3 consecutive failures [DONE]"
-  - "Daily cleanup job removes health records >24h [DONE]"
-  - "npm run build passes [DONE]"
-  - "All 159 tests pass (52 health + 107 existing) [DONE]"
+  - "Data table shows all columns per DSL PA-03"
+  - "Search debounced at 300ms"
+  - "Filter by status and plan dropdowns"
+  - "Sortable columns with visual indicators"
+  - "Row click navigates to /admin/tenants/:id"
+  - "Actions menu: View Details, Edit Config, Suspend"
+  - "Empty state with icon + message"
+  - "30s auto-refresh polling"
+  - "Admin sidebar with nav items per DSL"
+  - "npm run build passes"
+  - "All tests pass"
