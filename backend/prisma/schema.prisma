@@ -184,6 +184,18 @@ model Tenant {
   // Provisioning
   industry           String?
   expectedAgentCount Int?
+  companySize        String?  // "1-10", "11-50", "51-200", "201-500", "500+"
+  deploymentRegion   String?  // "us-east-1", "us-west-2", etc.
+  notes              String?  // Max 500 chars
+  billingCycle       String   @default("monthly") // "monthly" | "annual"
+
+  // Provisioning progress tracking
+  provisioningStep         String?   // Current provisioning step name
+  provisioningProgress     Int       @default(0) // 0-100
+  provisioningAttempt      Int       @default(0) // Current attempt number
+  provisioningMessage      String?   // Human-readable status message
+  provisioningStartedAt    DateTime? // When provisioning began
+  provisioningFailedReason String?   // Reason for failure (if any)
 
   // Model defaults (JSONB for flexible schema)
   modelDefaults Json? // { tier: ModelTier, thinkingMode: ThinkingMode }

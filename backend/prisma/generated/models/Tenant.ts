@@ -28,10 +28,14 @@ export type AggregateTenant = {
 
 export type TenantAvgAggregateOutputType = {
   expectedAgentCount: number | null
+  provisioningProgress: number | null
+  provisioningAttempt: number | null
 }
 
 export type TenantSumAggregateOutputType = {
   expectedAgentCount: number | null
+  provisioningProgress: number | null
+  provisioningAttempt: number | null
 }
 
 export type TenantMinAggregateOutputType = {
@@ -42,6 +46,16 @@ export type TenantMinAggregateOutputType = {
   plan: $Enums.TenantPlan | null
   industry: string | null
   expectedAgentCount: number | null
+  companySize: string | null
+  deploymentRegion: string | null
+  notes: string | null
+  billingCycle: string | null
+  provisioningStep: string | null
+  provisioningProgress: number | null
+  provisioningAttempt: number | null
+  provisioningMessage: string | null
+  provisioningStartedAt: Date | null
+  provisioningFailedReason: string | null
   containerId: string | null
   containerUrl: string | null
   createdAt: Date | null
@@ -56,6 +70,16 @@ export type TenantMaxAggregateOutputType = {
   plan: $Enums.TenantPlan | null
   industry: string | null
   expectedAgentCount: number | null
+  companySize: string | null
+  deploymentRegion: string | null
+  notes: string | null
+  billingCycle: string | null
+  provisioningStep: string | null
+  provisioningProgress: number | null
+  provisioningAttempt: number | null
+  provisioningMessage: string | null
+  provisioningStartedAt: Date | null
+  provisioningFailedReason: string | null
   containerId: string | null
   containerUrl: string | null
   createdAt: Date | null
@@ -70,6 +94,16 @@ export type TenantCountAggregateOutputType = {
   plan: number
   industry: number
   expectedAgentCount: number
+  companySize: number
+  deploymentRegion: number
+  notes: number
+  billingCycle: number
+  provisioningStep: number
+  provisioningProgress: number
+  provisioningAttempt: number
+  provisioningMessage: number
+  provisioningStartedAt: number
+  provisioningFailedReason: number
   modelDefaults: number
   resourceLimits: number
   containerId: number
@@ -82,10 +116,14 @@ export type TenantCountAggregateOutputType = {
 
 export type TenantAvgAggregateInputType = {
   expectedAgentCount?: true
+  provisioningProgress?: true
+  provisioningAttempt?: true
 }
 
 export type TenantSumAggregateInputType = {
   expectedAgentCount?: true
+  provisioningProgress?: true
+  provisioningAttempt?: true
 }
 
 export type TenantMinAggregateInputType = {
@@ -96,6 +134,16 @@ export type TenantMinAggregateInputType = {
   plan?: true
   industry?: true
   expectedAgentCount?: true
+  companySize?: true
+  deploymentRegion?: true
+  notes?: true
+  billingCycle?: true
+  provisioningStep?: true
+  provisioningProgress?: true
+  provisioningAttempt?: true
+  provisioningMessage?: true
+  provisioningStartedAt?: true
+  provisioningFailedReason?: true
   containerId?: true
   containerUrl?: true
   createdAt?: true
@@ -110,6 +158,16 @@ export type TenantMaxAggregateInputType = {
   plan?: true
   industry?: true
   expectedAgentCount?: true
+  companySize?: true
+  deploymentRegion?: true
+  notes?: true
+  billingCycle?: true
+  provisioningStep?: true
+  provisioningProgress?: true
+  provisioningAttempt?: true
+  provisioningMessage?: true
+  provisioningStartedAt?: true
+  provisioningFailedReason?: true
   containerId?: true
   containerUrl?: true
   createdAt?: true
@@ -124,6 +182,16 @@ export type TenantCountAggregateInputType = {
   plan?: true
   industry?: true
   expectedAgentCount?: true
+  companySize?: true
+  deploymentRegion?: true
+  notes?: true
+  billingCycle?: true
+  provisioningStep?: true
+  provisioningProgress?: true
+  provisioningAttempt?: true
+  provisioningMessage?: true
+  provisioningStartedAt?: true
+  provisioningFailedReason?: true
   modelDefaults?: true
   resourceLimits?: true
   containerId?: true
@@ -227,6 +295,16 @@ export type TenantGroupByOutputType = {
   plan: $Enums.TenantPlan
   industry: string | null
   expectedAgentCount: number | null
+  companySize: string | null
+  deploymentRegion: string | null
+  notes: string | null
+  billingCycle: string
+  provisioningStep: string | null
+  provisioningProgress: number
+  provisioningAttempt: number
+  provisioningMessage: string | null
+  provisioningStartedAt: Date | null
+  provisioningFailedReason: string | null
   modelDefaults: runtime.JsonValue | null
   resourceLimits: runtime.JsonValue | null
   containerId: string | null
@@ -266,6 +344,16 @@ export type TenantWhereInput = {
   plan?: Prisma.EnumTenantPlanFilter<"Tenant"> | $Enums.TenantPlan
   industry?: Prisma.StringNullableFilter<"Tenant"> | string | null
   expectedAgentCount?: Prisma.IntNullableFilter<"Tenant"> | number | null
+  companySize?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  deploymentRegion?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  notes?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  billingCycle?: Prisma.StringFilter<"Tenant"> | string
+  provisioningStep?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  provisioningProgress?: Prisma.IntFilter<"Tenant"> | number
+  provisioningAttempt?: Prisma.IntFilter<"Tenant"> | number
+  provisioningMessage?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  provisioningStartedAt?: Prisma.DateTimeNullableFilter<"Tenant"> | Date | string | null
+  provisioningFailedReason?: Prisma.StringNullableFilter<"Tenant"> | string | null
   modelDefaults?: Prisma.JsonNullableFilter<"Tenant">
   resourceLimits?: Prisma.JsonNullableFilter<"Tenant">
   containerId?: Prisma.StringNullableFilter<"Tenant"> | string | null
@@ -290,6 +378,16 @@ export type TenantOrderByWithRelationInput = {
   plan?: Prisma.SortOrder
   industry?: Prisma.SortOrderInput | Prisma.SortOrder
   expectedAgentCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  companySize?: Prisma.SortOrderInput | Prisma.SortOrder
+  deploymentRegion?: Prisma.SortOrderInput | Prisma.SortOrder
+  notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  billingCycle?: Prisma.SortOrder
+  provisioningStep?: Prisma.SortOrderInput | Prisma.SortOrder
+  provisioningProgress?: Prisma.SortOrder
+  provisioningAttempt?: Prisma.SortOrder
+  provisioningMessage?: Prisma.SortOrderInput | Prisma.SortOrder
+  provisioningStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  provisioningFailedReason?: Prisma.SortOrderInput | Prisma.SortOrder
   modelDefaults?: Prisma.SortOrderInput | Prisma.SortOrder
   resourceLimits?: Prisma.SortOrderInput | Prisma.SortOrder
   containerId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -317,6 +415,16 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   plan?: Prisma.EnumTenantPlanFilter<"Tenant"> | $Enums.TenantPlan
   industry?: Prisma.StringNullableFilter<"Tenant"> | string | null
   expectedAgentCount?: Prisma.IntNullableFilter<"Tenant"> | number | null
+  companySize?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  deploymentRegion?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  notes?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  billingCycle?: Prisma.StringFilter<"Tenant"> | string
+  provisioningStep?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  provisioningProgress?: Prisma.IntFilter<"Tenant"> | number
+  provisioningAttempt?: Prisma.IntFilter<"Tenant"> | number
+  provisioningMessage?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  provisioningStartedAt?: Prisma.DateTimeNullableFilter<"Tenant"> | Date | string | null
+  provisioningFailedReason?: Prisma.StringNullableFilter<"Tenant"> | string | null
   modelDefaults?: Prisma.JsonNullableFilter<"Tenant">
   resourceLimits?: Prisma.JsonNullableFilter<"Tenant">
   containerId?: Prisma.StringNullableFilter<"Tenant"> | string | null
@@ -341,6 +449,16 @@ export type TenantOrderByWithAggregationInput = {
   plan?: Prisma.SortOrder
   industry?: Prisma.SortOrderInput | Prisma.SortOrder
   expectedAgentCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  companySize?: Prisma.SortOrderInput | Prisma.SortOrder
+  deploymentRegion?: Prisma.SortOrderInput | Prisma.SortOrder
+  notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  billingCycle?: Prisma.SortOrder
+  provisioningStep?: Prisma.SortOrderInput | Prisma.SortOrder
+  provisioningProgress?: Prisma.SortOrder
+  provisioningAttempt?: Prisma.SortOrder
+  provisioningMessage?: Prisma.SortOrderInput | Prisma.SortOrder
+  provisioningStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  provisioningFailedReason?: Prisma.SortOrderInput | Prisma.SortOrder
   modelDefaults?: Prisma.SortOrderInput | Prisma.SortOrder
   resourceLimits?: Prisma.SortOrderInput | Prisma.SortOrder
   containerId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -365,6 +483,16 @@ export type TenantScalarWhereWithAggregatesInput = {
   plan?: Prisma.EnumTenantPlanWithAggregatesFilter<"Tenant"> | $Enums.TenantPlan
   industry?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   expectedAgentCount?: Prisma.IntNullableWithAggregatesFilter<"Tenant"> | number | null
+  companySize?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  deploymentRegion?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  notes?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  billingCycle?: Prisma.StringWithAggregatesFilter<"Tenant"> | string
+  provisioningStep?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  provisioningProgress?: Prisma.IntWithAggregatesFilter<"Tenant"> | number
+  provisioningAttempt?: Prisma.IntWithAggregatesFilter<"Tenant"> | number
+  provisioningMessage?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  provisioningStartedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Tenant"> | Date | string | null
+  provisioningFailedReason?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   modelDefaults?: Prisma.JsonNullableWithAggregatesFilter<"Tenant">
   resourceLimits?: Prisma.JsonNullableWithAggregatesFilter<"Tenant">
   containerId?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
@@ -381,6 +509,16 @@ export type TenantCreateInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -405,6 +543,16 @@ export type TenantUncheckedCreateInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -429,6 +577,16 @@ export type TenantUpdateInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -453,6 +611,16 @@ export type TenantUncheckedUpdateInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -477,6 +645,16 @@ export type TenantCreateManyInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -493,6 +671,16 @@ export type TenantUpdateManyMutationInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -509,6 +697,16 @@ export type TenantUncheckedUpdateManyInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -530,6 +728,16 @@ export type TenantCountOrderByAggregateInput = {
   plan?: Prisma.SortOrder
   industry?: Prisma.SortOrder
   expectedAgentCount?: Prisma.SortOrder
+  companySize?: Prisma.SortOrder
+  deploymentRegion?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
+  billingCycle?: Prisma.SortOrder
+  provisioningStep?: Prisma.SortOrder
+  provisioningProgress?: Prisma.SortOrder
+  provisioningAttempt?: Prisma.SortOrder
+  provisioningMessage?: Prisma.SortOrder
+  provisioningStartedAt?: Prisma.SortOrder
+  provisioningFailedReason?: Prisma.SortOrder
   modelDefaults?: Prisma.SortOrder
   resourceLimits?: Prisma.SortOrder
   containerId?: Prisma.SortOrder
@@ -540,6 +748,8 @@ export type TenantCountOrderByAggregateInput = {
 
 export type TenantAvgOrderByAggregateInput = {
   expectedAgentCount?: Prisma.SortOrder
+  provisioningProgress?: Prisma.SortOrder
+  provisioningAttempt?: Prisma.SortOrder
 }
 
 export type TenantMaxOrderByAggregateInput = {
@@ -550,6 +760,16 @@ export type TenantMaxOrderByAggregateInput = {
   plan?: Prisma.SortOrder
   industry?: Prisma.SortOrder
   expectedAgentCount?: Prisma.SortOrder
+  companySize?: Prisma.SortOrder
+  deploymentRegion?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
+  billingCycle?: Prisma.SortOrder
+  provisioningStep?: Prisma.SortOrder
+  provisioningProgress?: Prisma.SortOrder
+  provisioningAttempt?: Prisma.SortOrder
+  provisioningMessage?: Prisma.SortOrder
+  provisioningStartedAt?: Prisma.SortOrder
+  provisioningFailedReason?: Prisma.SortOrder
   containerId?: Prisma.SortOrder
   containerUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -564,6 +784,16 @@ export type TenantMinOrderByAggregateInput = {
   plan?: Prisma.SortOrder
   industry?: Prisma.SortOrder
   expectedAgentCount?: Prisma.SortOrder
+  companySize?: Prisma.SortOrder
+  deploymentRegion?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
+  billingCycle?: Prisma.SortOrder
+  provisioningStep?: Prisma.SortOrder
+  provisioningProgress?: Prisma.SortOrder
+  provisioningAttempt?: Prisma.SortOrder
+  provisioningMessage?: Prisma.SortOrder
+  provisioningStartedAt?: Prisma.SortOrder
+  provisioningFailedReason?: Prisma.SortOrder
   containerId?: Prisma.SortOrder
   containerUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -572,6 +802,8 @@ export type TenantMinOrderByAggregateInput = {
 
 export type TenantSumOrderByAggregateInput = {
   expectedAgentCount?: Prisma.SortOrder
+  provisioningProgress?: Prisma.SortOrder
+  provisioningAttempt?: Prisma.SortOrder
 }
 
 export type TenantScalarRelationFilter = {
@@ -605,6 +837,14 @@ export type EnumTenantPlanFieldUpdateOperationsInput = {
 
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
   increment?: number
   decrement?: number
   multiply?: number
@@ -721,6 +961,16 @@ export type TenantCreateWithoutUsersInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -744,6 +994,16 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -783,6 +1043,16 @@ export type TenantUpdateWithoutUsersInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -806,6 +1076,16 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -829,6 +1109,16 @@ export type TenantCreateWithoutAgentsInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -852,6 +1142,16 @@ export type TenantUncheckedCreateWithoutAgentsInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -891,6 +1191,16 @@ export type TenantUpdateWithoutAgentsInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -914,6 +1224,16 @@ export type TenantUncheckedUpdateWithoutAgentsInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -937,6 +1257,16 @@ export type TenantCreateWithoutApiKeysInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -960,6 +1290,16 @@ export type TenantUncheckedCreateWithoutApiKeysInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -999,6 +1339,16 @@ export type TenantUpdateWithoutApiKeysInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1022,6 +1372,16 @@ export type TenantUncheckedUpdateWithoutApiKeysInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1045,6 +1405,16 @@ export type TenantCreateWithoutTeamMembersInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -1068,6 +1438,16 @@ export type TenantUncheckedCreateWithoutTeamMembersInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -1107,6 +1487,16 @@ export type TenantUpdateWithoutTeamMembersInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1130,6 +1520,16 @@ export type TenantUncheckedUpdateWithoutTeamMembersInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1153,6 +1553,16 @@ export type TenantCreateWithoutTeamInvitesInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -1176,6 +1586,16 @@ export type TenantUncheckedCreateWithoutTeamInvitesInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -1215,6 +1635,16 @@ export type TenantUpdateWithoutTeamInvitesInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1238,6 +1668,16 @@ export type TenantUncheckedUpdateWithoutTeamInvitesInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1261,6 +1701,16 @@ export type TenantCreateWithoutContainerHealthInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -1284,6 +1734,16 @@ export type TenantUncheckedCreateWithoutContainerHealthInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -1323,6 +1783,16 @@ export type TenantUpdateWithoutContainerHealthInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1346,6 +1816,16 @@ export type TenantUncheckedUpdateWithoutContainerHealthInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1369,6 +1849,16 @@ export type TenantCreateWithoutAlertsInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -1392,6 +1882,16 @@ export type TenantUncheckedCreateWithoutAlertsInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -1431,6 +1931,16 @@ export type TenantUpdateWithoutAlertsInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1454,6 +1964,16 @@ export type TenantUncheckedUpdateWithoutAlertsInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1477,6 +1997,16 @@ export type TenantCreateWithoutAuditLogsInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -1500,6 +2030,16 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   plan?: $Enums.TenantPlan
   industry?: string | null
   expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
@@ -1539,6 +2079,16 @@ export type TenantUpdateWithoutAuditLogsInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1562,6 +2112,16 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
   industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1679,6 +2239,16 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   plan?: boolean
   industry?: boolean
   expectedAgentCount?: boolean
+  companySize?: boolean
+  deploymentRegion?: boolean
+  notes?: boolean
+  billingCycle?: boolean
+  provisioningStep?: boolean
+  provisioningProgress?: boolean
+  provisioningAttempt?: boolean
+  provisioningMessage?: boolean
+  provisioningStartedAt?: boolean
+  provisioningFailedReason?: boolean
   modelDefaults?: boolean
   resourceLimits?: boolean
   containerId?: boolean
@@ -1704,6 +2274,16 @@ export type TenantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   plan?: boolean
   industry?: boolean
   expectedAgentCount?: boolean
+  companySize?: boolean
+  deploymentRegion?: boolean
+  notes?: boolean
+  billingCycle?: boolean
+  provisioningStep?: boolean
+  provisioningProgress?: boolean
+  provisioningAttempt?: boolean
+  provisioningMessage?: boolean
+  provisioningStartedAt?: boolean
+  provisioningFailedReason?: boolean
   modelDefaults?: boolean
   resourceLimits?: boolean
   containerId?: boolean
@@ -1720,6 +2300,16 @@ export type TenantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   plan?: boolean
   industry?: boolean
   expectedAgentCount?: boolean
+  companySize?: boolean
+  deploymentRegion?: boolean
+  notes?: boolean
+  billingCycle?: boolean
+  provisioningStep?: boolean
+  provisioningProgress?: boolean
+  provisioningAttempt?: boolean
+  provisioningMessage?: boolean
+  provisioningStartedAt?: boolean
+  provisioningFailedReason?: boolean
   modelDefaults?: boolean
   resourceLimits?: boolean
   containerId?: boolean
@@ -1736,6 +2326,16 @@ export type TenantSelectScalar = {
   plan?: boolean
   industry?: boolean
   expectedAgentCount?: boolean
+  companySize?: boolean
+  deploymentRegion?: boolean
+  notes?: boolean
+  billingCycle?: boolean
+  provisioningStep?: boolean
+  provisioningProgress?: boolean
+  provisioningAttempt?: boolean
+  provisioningMessage?: boolean
+  provisioningStartedAt?: boolean
+  provisioningFailedReason?: boolean
   modelDefaults?: boolean
   resourceLimits?: boolean
   containerId?: boolean
@@ -1744,7 +2344,7 @@ export type TenantSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyName" | "adminEmail" | "status" | "plan" | "industry" | "expectedAgentCount" | "modelDefaults" | "resourceLimits" | "containerId" | "containerUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["tenant"]>
+export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyName" | "adminEmail" | "status" | "plan" | "industry" | "expectedAgentCount" | "companySize" | "deploymentRegion" | "notes" | "billingCycle" | "provisioningStep" | "provisioningProgress" | "provisioningAttempt" | "provisioningMessage" | "provisioningStartedAt" | "provisioningFailedReason" | "modelDefaults" | "resourceLimits" | "containerId" | "containerUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["tenant"]>
 export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Tenant$usersArgs<ExtArgs>
   agents?: boolean | Prisma.Tenant$agentsArgs<ExtArgs>
@@ -1779,6 +2379,16 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     plan: $Enums.TenantPlan
     industry: string | null
     expectedAgentCount: number | null
+    companySize: string | null
+    deploymentRegion: string | null
+    notes: string | null
+    billingCycle: string
+    provisioningStep: string | null
+    provisioningProgress: number
+    provisioningAttempt: number
+    provisioningMessage: string | null
+    provisioningStartedAt: Date | null
+    provisioningFailedReason: string | null
     modelDefaults: runtime.JsonValue | null
     resourceLimits: runtime.JsonValue | null
     containerId: string | null
@@ -2223,6 +2833,16 @@ export interface TenantFieldRefs {
   readonly plan: Prisma.FieldRef<"Tenant", 'TenantPlan'>
   readonly industry: Prisma.FieldRef<"Tenant", 'String'>
   readonly expectedAgentCount: Prisma.FieldRef<"Tenant", 'Int'>
+  readonly companySize: Prisma.FieldRef<"Tenant", 'String'>
+  readonly deploymentRegion: Prisma.FieldRef<"Tenant", 'String'>
+  readonly notes: Prisma.FieldRef<"Tenant", 'String'>
+  readonly billingCycle: Prisma.FieldRef<"Tenant", 'String'>
+  readonly provisioningStep: Prisma.FieldRef<"Tenant", 'String'>
+  readonly provisioningProgress: Prisma.FieldRef<"Tenant", 'Int'>
+  readonly provisioningAttempt: Prisma.FieldRef<"Tenant", 'Int'>
+  readonly provisioningMessage: Prisma.FieldRef<"Tenant", 'String'>
+  readonly provisioningStartedAt: Prisma.FieldRef<"Tenant", 'DateTime'>
+  readonly provisioningFailedReason: Prisma.FieldRef<"Tenant", 'String'>
   readonly modelDefaults: Prisma.FieldRef<"Tenant", 'Json'>
   readonly resourceLimits: Prisma.FieldRef<"Tenant", 'Json'>
   readonly containerId: Prisma.FieldRef<"Tenant", 'String'>

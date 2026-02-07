@@ -1,10 +1,10 @@
 # Aegis Platform API Contract
 
-**Version:** 1.1.0
-**Last Updated:** 2026-02-06
+**Version:** 1.2.0
+**Last Updated:** 2026-02-07
 **Status:** Single Source of Truth
 **Framework:** NestJS + TypeScript
-**Database:** MySQL 8.0 + Redis 7+
+**Database:** PostgreSQL 16 + Redis 7+
 
 ---
 
@@ -432,8 +432,11 @@ interface ApiError {
   companyName: string;          // Unique, 3-50 chars
   adminEmail: string;           // Valid email, unique
   industry?: string;
-  expectedAgentCount?: number;
+  companySize?: "1-10" | "11-50" | "51-200" | "201-500" | "500+";
+  deploymentRegion?: "us-east-1" | "us-west-2" | "eu-west-1" | "eu-central-1" | "ap-southeast-1" | "ap-northeast-1";
+  notes?: string;               // Max 500 chars
   plan: "starter" | "growth" | "enterprise";
+  billingCycle?: "monthly" | "annual";  // Default: "monthly"
   modelDefaults?: {
     tier: "haiku" | "sonnet" | "opus";
     thinkingMode: "off" | "low" | "high";
@@ -443,6 +446,7 @@ interface ApiError {
     memoryMb: number;           // Default based on plan
     diskGb: number;             // Default based on plan
     maxAgents: number;          // Default based on plan
+    maxSkills: number;          // Default based on plan
   };
 }
 ```
@@ -455,6 +459,7 @@ interface ApiError {
   companyName: string;
   adminEmail: string;
   status: "provisioning";
+  plan: string;
   inviteLink: string;           // URL for tenant admin to accept
   createdAt: string;
 }
@@ -472,8 +477,10 @@ interface ApiError {
 ```
 
 **Notes:**
-- Provisioning is async. Poll `/api/admin/tenants/:id` for status updates
+- Provisioning is async. Poll `/api/admin/tenants/:id` (with `provisioning` field) for progress updates every 2s
 - Status transitions: `provisioning` → `active` | `failed`
+- Provisioning steps: `creating_namespace` → `spinning_container` → `configuring` → `installing_skills` → `health_check` → `completed`
+- Max 3 retry attempts on failure. Creates Alert for platform admin on final failure
 - Sends invite email to adminEmail automatically
 
 ---
@@ -496,6 +503,9 @@ interface ApiError {
   adminEmail: string;
   status: "active" | "suspended" | "provisioning" | "failed";
   plan: "starter" | "growth" | "enterprise";
+  billingCycle: "monthly" | "annual";
+  companySize?: string;
+  deploymentRegion?: string;
   agentCount: number;
   containerHealth: {
     status: "healthy" | "degraded" | "down";
@@ -505,11 +515,20 @@ interface ApiError {
     uptime: number;           // Seconds
     lastHealthCheck: string;  // ISO 8601
   };
+  provisioning?: {              // Present when status is "provisioning" or "failed"
+    step: "creating_namespace" | "spinning_container" | "configuring" | "installing_skills" | "health_check" | "completed" | "failed";
+    progress: number;           // 0-100
+    message: string;            // Human-readable step description
+    attemptNumber: number;      // Current attempt (1-3)
+    startedAt: string;          // ISO 8601
+    failedReason?: string;      // Only when step is "failed"
+  };
   resourceLimits: {
     cpuCores: number;
     memoryMb: number;
     diskGb: number;
     maxAgents: number;
+    maxSkills: number;
   };
   config: {
     modelDefaults: {

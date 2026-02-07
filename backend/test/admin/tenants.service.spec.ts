@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { TenantsService } from '../../src/admin/tenants/tenants.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
+import { ProvisioningService } from '../../src/provisioning/provisioning.service';
 
 // ---------------------------------------------------------------------------
 // Test Data Factories
@@ -63,9 +64,9 @@ const createMockHealthRecord = (
 // Default resource limits per plan (must match implementation)
 // ---------------------------------------------------------------------------
 const PLAN_DEFAULTS = {
-  starter: { cpuCores: 2, memoryMb: 2048, diskGb: 10, maxAgents: 3 },
-  growth: { cpuCores: 4, memoryMb: 4096, diskGb: 25, maxAgents: 10 },
-  enterprise: { cpuCores: 8, memoryMb: 8192, diskGb: 50, maxAgents: 50 },
+  starter: { cpuCores: 2, memoryMb: 2048, diskGb: 10, maxAgents: 3, maxSkills: 5 },
+  growth: { cpuCores: 4, memoryMb: 4096, diskGb: 25, maxAgents: 10, maxSkills: 15 },
+  enterprise: { cpuCores: 8, memoryMb: 8192, diskGb: 50, maxAgents: 50, maxSkills: 50 },
 };
 
 const MODEL_DEFAULTS = {
@@ -122,6 +123,13 @@ describe('TenantsService', () => {
       providers: [
         TenantsService,
         { provide: PrismaService, useValue: prisma },
+        {
+          provide: ProvisioningService,
+          useValue: {
+            startProvisioning: jest.fn().mockResolvedValue(undefined),
+            getProvisioningStatus: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -514,7 +522,7 @@ describe('TenantsService', () => {
       expect(prisma.tenant.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            resourceLimits: customLimits,
+            resourceLimits: expect.objectContaining(customLimits),
           }),
         }),
       );
@@ -700,8 +708,8 @@ describe('TenantsService', () => {
 
       expect(typeof result.createdAt).toBe('string');
       expect(typeof result.updatedAt).toBe('string');
-      expect(new Date(result.createdAt).toISOString()).toBe(result.createdAt);
-      expect(new Date(result.updatedAt).toISOString()).toBe(result.updatedAt);
+      expect(new Date(result.createdAt as string).toISOString()).toBe(result.createdAt);
+      expect(new Date(result.updatedAt as string).toISOString()).toBe(result.updatedAt);
     });
   });
 

@@ -5,14 +5,16 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { ProvisioningService } from '../../provisioning/provisioning.service';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
 import { ListTenantsQueryDto } from './dto/list-tenants-query.dto';
 import { Prisma } from '../../../prisma/generated/client';
+import { PLAN_MAX_SKILLS } from '../../provisioning/provisioning.constants';
 
 /**
  * Tenants Service - Platform Admin: Tenants
- * Implements all 8 tenant management operations from API Contract v1.1.0 Section 3.
+ * Implements all 8 tenant management operations from API Contract v1.2.0 Section 3.
  *
  * NOTE on delete: The contract specifies "pending_deletion" status but the Prisma
  * TenantStatus enum only has: active | suspended | provisioning | failed.
@@ -20,14 +22,38 @@ import { Prisma } from '../../../prisma/generated/client';
  * TODO: Add "pending_deletion" to the TenantStatus enum via a Prisma migration.
  */
 
-/** Default resource limits per plan */
+/** Default resource limits per plan (including maxSkills) */
 const PLAN_DEFAULTS: Record<
   string,
-  { cpuCores: number; memoryMb: number; diskGb: number; maxAgents: number }
+  {
+    cpuCores: number;
+    memoryMb: number;
+    diskGb: number;
+    maxAgents: number;
+    maxSkills: number;
+  }
 > = {
-  starter: { cpuCores: 2, memoryMb: 2048, diskGb: 10, maxAgents: 3 },
-  growth: { cpuCores: 4, memoryMb: 4096, diskGb: 25, maxAgents: 10 },
-  enterprise: { cpuCores: 8, memoryMb: 8192, diskGb: 50, maxAgents: 50 },
+  starter: {
+    cpuCores: 2,
+    memoryMb: 2048,
+    diskGb: 10,
+    maxAgents: 3,
+    maxSkills: 5,
+  },
+  growth: {
+    cpuCores: 4,
+    memoryMb: 4096,
+    diskGb: 25,
+    maxAgents: 10,
+    maxSkills: 15,
+  },
+  enterprise: {
+    cpuCores: 8,
+    memoryMb: 8192,
+    diskGb: 50,
+    maxAgents: 50,
+    maxSkills: 50,
+  },
 };
 
 /** Default model defaults per plan */
@@ -44,7 +70,10 @@ const MODEL_DEFAULTS: Record<
 export class TenantsService {
   private readonly logger = new Logger(TenantsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly provisioningService: ProvisioningService,
+  ) {}
 
   // ==========================================================================
   // GET /api/admin/tenants - List Tenants (Paginated)
@@ -194,7 +223,16 @@ export class TenantsService {
     // Resolve defaults based on plan
     const planDefaults = PLAN_DEFAULTS[dto.plan];
     const modelDefaults = dto.modelDefaults || MODEL_DEFAULTS[dto.plan];
-    const resourceLimits = dto.resourceLimits || planDefaults;
+
+    // Build resource limits, merging any provided maxSkills
+    const baseResourceLimits = dto.resourceLimits || planDefaults;
+    const resourceLimits = {
+      ...baseResourceLimits,
+      maxSkills:
+        dto.resourceLimits?.maxSkills ??
+        PLAN_MAX_SKILLS[dto.plan] ??
+        planDefaults.maxSkills,
+    };
 
     const tenant = await this.prisma.tenant.create({
       data: {
@@ -204,6 +242,10 @@ export class TenantsService {
         plan: dto.plan,
         industry: dto.industry,
         expectedAgentCount: dto.expectedAgentCount,
+        companySize: dto.companySize,
+        deploymentRegion: dto.deploymentRegion,
+        notes: dto.notes,
+        billingCycle: dto.billingCycle || 'monthly',
         modelDefaults: modelDefaults as Prisma.InputJsonValue,
         resourceLimits: resourceLimits as Prisma.InputJsonValue,
       },
@@ -216,12 +258,16 @@ export class TenantsService {
       `Tenant created: ${tenant.id} (${tenant.companyName}) - status: provisioning`,
     );
 
-    // Contract response: { id, companyName, adminEmail, status, inviteLink, createdAt }
+    // Start async provisioning via BullMQ
+    await this.provisioningService.startProvisioning(tenant.id);
+
+    // Contract response: { id, companyName, adminEmail, status, plan, inviteLink, createdAt }
     return {
       id: tenant.id,
       companyName: tenant.companyName,
       adminEmail: tenant.adminEmail,
       status: tenant.status,
+      plan: tenant.plan,
       inviteLink,
       createdAt: tenant.createdAt.toISOString(),
     };
@@ -269,13 +315,14 @@ export class TenantsService {
           lastHealthCheck: new Date().toISOString(),
         };
 
-    // Parse JSON fields with safe defaults
+    // Parse JSON fields with safe defaults (now includes maxSkills)
     const resourceLimits = (tenant.resourceLimits as Record<string, number>) ||
       PLAN_DEFAULTS[tenant.plan] || {
         cpuCores: 2,
         memoryMb: 2048,
         diskGb: 10,
         maxAgents: 3,
+        maxSkills: 5,
       };
 
     const modelDefaults = (tenant.modelDefaults as Record<string, string>) ||
@@ -284,13 +331,14 @@ export class TenantsService {
         thinkingMode: 'off',
       };
 
-    // Contract response
-    return {
+    // Build response per contract
+    const response: Record<string, unknown> = {
       id: tenant.id,
       companyName: tenant.companyName,
       adminEmail: tenant.adminEmail,
       status: tenant.status,
       plan: tenant.plan,
+      billingCycle: tenant.billingCycle,
       agentCount: tenant._count.agents,
       containerHealth,
       resourceLimits: {
@@ -298,6 +346,7 @@ export class TenantsService {
         memoryMb: resourceLimits.memoryMb,
         diskGb: resourceLimits.diskGb,
         maxAgents: resourceLimits.maxAgents,
+        maxSkills: resourceLimits.maxSkills ?? PLAN_MAX_SKILLS[tenant.plan] ?? 5,
       },
       config: {
         modelDefaults: {
@@ -309,6 +358,36 @@ export class TenantsService {
       createdAt: tenant.createdAt.toISOString(),
       updatedAt: tenant.updatedAt.toISOString(),
     };
+
+    // Include optional fields per contract
+    if (tenant.companySize) {
+      response.companySize = tenant.companySize;
+    }
+    if (tenant.deploymentRegion) {
+      response.deploymentRegion = tenant.deploymentRegion;
+    }
+
+    // Include provisioning object when status is "provisioning" or "failed"
+    // Per contract: provisioning?: { step, progress, message, attemptNumber, startedAt, failedReason? }
+    if (tenant.status === 'provisioning' || tenant.status === 'failed') {
+      const provisioningData: Record<string, unknown> = {
+        step: tenant.provisioningStep || 'creating_namespace',
+        progress: tenant.provisioningProgress,
+        message: tenant.provisioningMessage || 'Provisioning in progress...',
+        attemptNumber: tenant.provisioningAttempt,
+        startedAt: tenant.provisioningStartedAt
+          ? tenant.provisioningStartedAt.toISOString()
+          : new Date().toISOString(),
+      };
+
+      if (tenant.provisioningFailedReason) {
+        provisioningData.failedReason = tenant.provisioningFailedReason;
+      }
+
+      response.provisioning = provisioningData;
+    }
+
+    return response;
   }
 
   // ==========================================================================

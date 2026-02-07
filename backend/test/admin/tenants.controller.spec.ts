@@ -454,11 +454,11 @@ describe('TenantsController', () => {
       // Assert - matches API contract Section 3 Get Tenant Detail response
       expect(result).toEqual(mockTenantDetailResponse);
       expect(result.containerHealth).toBeDefined();
-      expect(result.containerHealth.status).toBe('healthy');
+      expect((result.containerHealth as Record<string, unknown>).status).toBe('healthy');
       expect(result.resourceLimits).toBeDefined();
       expect(result.config).toBeDefined();
-      expect(result.config.modelDefaults).toBeDefined();
-      expect(result.config.containerEndpoint).toBeDefined();
+      expect((result.config as Record<string, unknown>).modelDefaults).toBeDefined();
+      expect((result.config as Record<string, unknown>).containerEndpoint).toBeDefined();
     });
 
     it('should throw NotFoundException for non-existent tenant', async () => {

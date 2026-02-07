@@ -172,6 +172,7 @@ export const ROUTES = {
   // Platform admin routes
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_TENANTS: '/admin/tenants',
+  ADMIN_TENANT_NEW: '/admin/tenants/new',
   ADMIN_TENANT_DETAIL: (id: string) => `/admin/tenants/${id}`,
   ADMIN_SKILLS_REVIEW: '/admin/skills',
   ADMIN_SKILL_REVIEW_DETAIL: (id: string) => `/admin/skills/${id}`,
