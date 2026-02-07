@@ -2,93 +2,67 @@
 # Tracks active development scope and requirements per CLAUDE.md
 
 feature:
-  name: "Tenant Registration & Management API"
-  epic: "E1-F1"
-  sprint: "Sprint 1 - Backend Foundation"
+  name: "Container Health Monitoring"
+  epic: "E1-F5"
+  sprint: "Sprint 2 - Control Plane Core"
   priority: P0
   started_at: "2026-02-07"
   status: in_progress
-  branch: tenant-management
+  branch: health-monitoring
 
-# Feature scope from API contract v1.2.0 Section 3
-endpoints:
-  - path: "GET /api/admin/tenants"
-    status: in_progress
-    agent: api-engineer
-    description: "Paginated list of all tenants with filtering"
+# Feature scope from roadmap E1-F5
+requirements:
+  - "Health check runs every 30 seconds against each tenant container"
+  - "Health status includes: container up/down, memory, CPU, disk"
+  - "Unhealthy containers trigger automatic restart (max 3 per hour)"
+  - "Platform admin receives alert if container fails 3 consecutive checks"
+  - "GET /api/admin/tenants/:id/health returns current status + 24h history"
 
-  - path: "POST /api/admin/tenants"
-    status: in_progress
-    agent: api-engineer
-    description: "Provision new tenant (async operation)"
-
-  - path: "GET /api/admin/tenants/:id"
-    status: in_progress
-    agent: api-engineer
-    description: "Detailed tenant information including container health"
-
-  - path: "PATCH /api/admin/tenants/:id"
-    status: in_progress
-    agent: api-engineer
-    description: "Update tenant configuration (plan, limits, model defaults)"
-
-  - path: "DELETE /api/admin/tenants/:id"
-    status: in_progress
-    agent: api-engineer
-    description: "Decommission tenant (soft delete with 7-day grace period)"
-
-  - path: "POST /api/admin/tenants/:id/actions/restart"
-    status: in_progress
-    agent: api-engineer
-    description: "Restart tenant's OpenClaw container"
-
-  - path: "GET /api/admin/tenants/:id/health"
-    status: in_progress
-    agent: api-engineer
-    description: "Container health metrics (current + 24h history)"
-
-  - path: "GET /api/admin/tenants/:id/agents"
-    status: in_progress
-    agent: api-engineer
-    description: "List all agents within a tenant"
+# Design decisions (approved)
+design_decisions:
+  scheduling: "BullMQ (via Redis) - repeatable jobs"
+  health_probe: "Pluggable interface - MockHealthProbe for MVP, DockerHealthProbe future"
+  auto_restart: "Redis INCR + 1h TTL for restart counter, circuit breaker at 3"
+  alerting: "DB only (Alert table) - no webhook/email for now"
+  websocket: "Deferred to dashboard features (E2-F1/E2-F4)"
+  data_retention: "Daily cleanup job deletes records >24h"
 
 # Tasks
 tasks:
-  - name: "Backend Tenant CRUD + Operations API"
-    branch: "tenants/backend-crud"
+  - name: "Backend Health Module (BullMQ + Monitoring)"
+    branch: "health/backend-module"
     status: in_progress
     agent: api-engineer
     subtasks:
-      - "1.1 DTOs & validation schemas"
-      - "1.2 TenantsService (CRUD + business logic)"
-      - "1.3 TenantsController (all 8 endpoints)"
-      - "1.4 TenantsModule registration"
+      - "1.1 Install BullMQ deps, configure in app.module"
+      - "1.2 HealthProbeStrategy interface + MockHealthProbe"
+      - "1.3 HealthMonitorService (evaluate, auto-restart, alerts)"
+      - "1.4 HealthCheckProcessor (BullMQ worker, 30s schedule)"
+      - "1.5 HealthCleanupProcessor (BullMQ worker, daily)"
+      - "1.6 HealthModule registration + wiring"
 
   - name: "Tests"
-    branch: "tenants/tests"
-    status: in_progress
+    branch: "health/tests"
+    status: pending
     agent: qa-engineer
     subtasks:
-      - "2.1 Unit tests for TenantsService"
-      - "2.2 Unit tests for TenantsController"
+      - "2.1 Unit tests for HealthMonitorService"
+      - "2.2 Unit tests for HealthCheckProcessor"
+      - "2.3 Unit tests for MockHealthProbe"
 
-# Agents actively working
+# Agents
 active_agents:
   - name: api-engineer
-    task: "Implement all 8 tenant endpoints"
-    source_of_truth: "docs/api-contract.md Section 3"
-
-  - name: qa-engineer
-    task: "Write tenant unit tests"
-    source_of_truth: "docs/api-contract.md Section 3"
+    task: "Implement health monitoring module with BullMQ"
+    source_of_truth: "Design decisions above + docs/api-contract.md Section 3"
 
 # Acceptance criteria
 acceptance_criteria:
-  - "All 8 endpoints match docs/api-contract.md v1.2.0 Section 3 exactly"
-  - "JWT auth guard on all endpoints (platform_admin only)"
-  - "Zod validation on all request bodies"
-  - "Proper error responses (400, 401, 403, 404, 409)"
-  - "Pagination, filtering, sorting on list endpoint"
-  - "Soft delete with grace period on delete endpoint"
+  - "BullMQ configured with Redis connection"
+  - "Health check job runs every 30s for all active tenants"
+  - "HealthProbeStrategy interface with MockHealthProbe implementation"
+  - "Auto-restart triggers on 'down' status (max 3/hr via Redis counter)"
+  - "Alert created in DB after 3 consecutive failures"
+  - "Daily cleanup job removes health records >24h"
   - "npm run build passes"
   - "All tests pass"
