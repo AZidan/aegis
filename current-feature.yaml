@@ -2,144 +2,93 @@
 # Tracks active development scope and requirements per CLAUDE.md
 
 feature:
-  name: "Authentication System"
+  name: "Tenant Registration & Management API"
+  epic: "E1-F1"
   sprint: "Sprint 1 - Backend Foundation"
   priority: P0
-  started_at: "2026-02-06"
+  started_at: "2026-02-07"
   status: in_progress
+  branch: tenant-management
 
-# Feature scope from API contract v1.2.0
+# Feature scope from API contract v1.2.0 Section 3
 endpoints:
-  - path: "POST /api/auth/login"
-    status: completed
+  - path: "GET /api/admin/tenants"
+    status: in_progress
     agent: api-engineer
-    description: "Email+password login, returns tokens + user"
+    description: "Paginated list of all tenants with filtering"
 
-  - path: "POST /api/auth/login/oauth"
-    status: completed
+  - path: "POST /api/admin/tenants"
+    status: in_progress
     agent: api-engineer
-    description: "OAuth login (Google/GitHub)"
+    description: "Provision new tenant (async operation)"
 
-  - path: "POST /api/auth/refresh"
-    status: completed
+  - path: "GET /api/admin/tenants/:id"
+    status: in_progress
     agent: api-engineer
-    description: "Refresh access token"
+    description: "Detailed tenant information including container health"
 
-  - path: "POST /api/auth/logout"
-    status: completed
+  - path: "PATCH /api/admin/tenants/:id"
+    status: in_progress
     agent: api-engineer
-    description: "Revoke refresh token, requires Bearer auth"
+    description: "Update tenant configuration (plan, limits, model defaults)"
 
-  - path: "POST /api/auth/mfa/verify"
-    status: completed
+  - path: "DELETE /api/admin/tenants/:id"
+    status: in_progress
     agent: api-engineer
-    description: "Verify TOTP code, returns tokens"
+    description: "Decommission tenant (soft delete with 7-day grace period)"
 
-  - path: "GET /api/auth/me"
-    status: completed
+  - path: "POST /api/admin/tenants/:id/actions/restart"
+    status: in_progress
     agent: api-engineer
-    description: "Get current user profile with permissions"
+    description: "Restart tenant's OpenClaw container"
 
-  - path: "POST /api/admin/auth/login"
-    status: completed
+  - path: "GET /api/admin/tenants/:id/health"
+    status: in_progress
     agent: api-engineer
-    description: "Admin-only login, rejects non-platform_admin with 403"
+    description: "Container health metrics (current + 24h history)"
 
-  - path: "POST /api/admin/auth/mfa/verify"
-    status: completed
+  - path: "GET /api/admin/tenants/:id/agents"
+    status: in_progress
     agent: api-engineer
-    description: "Admin-only MFA verify, rejects non-platform_admin with 403"
+    description: "List all agents within a tenant"
 
-# UI screens
-screens:
-  - name: "Login Page"
-    path: "/login"
-    status: completed
-    agent: ui-engineer
-    file: "frontend/src/app/(auth)/login/page.tsx"
+# Tasks
+tasks:
+  - name: "Backend Tenant CRUD + Operations API"
+    branch: "tenants/backend-crud"
+    status: in_progress
+    agent: api-engineer
+    subtasks:
+      - "1.1 DTOs & validation schemas"
+      - "1.2 TenantsService (CRUD + business logic)"
+      - "1.3 TenantsController (all 8 endpoints)"
+      - "1.4 TenantsModule registration"
 
-  - name: "Register Page"
-    path: "/register"
-    status: completed
-    agent: ui-engineer
-    file: "frontend/src/app/(auth)/register/page.tsx"
-
-  - name: "MFA Setup Page"
-    path: "/mfa-setup"
-    status: completed
-    agent: ui-engineer
-    file: "frontend/src/app/(auth)/mfa-setup/page.tsx"
-
-  - name: "MFA Verify Page"
-    path: "/mfa-verify"
-    status: completed
-    agent: ui-engineer
-    file: "frontend/src/app/(auth)/mfa-verify/page.tsx"
-
-  - name: "Auth Layout"
-    path: "(auth)/layout.tsx"
-    status: completed
-    agent: ui-engineer
-    file: "frontend/src/app/(auth)/layout.tsx"
-
-# Supporting work
-supporting:
-  - name: "Auth Context + Token Management"
-    status: completed
-    agent: ui-engineer
-    files:
-      - "frontend/src/lib/auth/auth-context.tsx"
-      - "frontend/src/lib/auth/token-manager.ts"
-      - "frontend/src/lib/api/client.ts"
-
-  - name: "Test Cases"
-    status: completed
+  - name: "Tests"
+    branch: "tenants/tests"
+    status: in_progress
     agent: qa-engineer
-    files:
-      - "backend/test/auth/auth.service.spec.ts"
-      - "backend/test/auth/auth.controller.spec.ts"
-      - "backend/test/auth/admin-auth.controller.spec.ts"
-      - "backend/test/auth/auth.e2e-spec.ts"
-      - "frontend/src/__tests__/auth/"
-
-  - name: "Login Screen DSL Alignment"
-    status: completed
-    agent: ui-engineer
-    description: "Fixed admin/tenant login screens to match styled DSL PA-01/TA-01"
-    files:
-      - "frontend/src/components/auth/login-form.tsx"
-      - "frontend/src/components/auth/oauth-buttons.tsx"
-      - "frontend/src/components/auth/mfa-verify-form.tsx"
-      - "frontend/src/app/(auth)/admin/login/page.tsx"
-      - "frontend/src/app/(auth)/login/page.tsx"
-      - "frontend/src/lib/api/auth.ts"
-      - "frontend/src/lib/validations/auth.ts"
-      - "frontend/src/lib/constants.ts"
+    subtasks:
+      - "2.1 Unit tests for TenantsService"
+      - "2.2 Unit tests for TenantsController"
 
 # Agents actively working
 active_agents:
   - name: api-engineer
-    task: "Implement all 6 auth endpoints"
-    source_of_truth: "docs/api-contract.md"
-
-  - name: ui-engineer
-    task: "Implement 5 auth screens + components + auth context"
-    source_of_truth: "design-artifacts/styled-dsl.yaml"
+    task: "Implement all 8 tenant endpoints"
+    source_of_truth: "docs/api-contract.md Section 3"
 
   - name: qa-engineer
-    task: "Write test cases for backend + frontend auth"
-    source_of_truth: "docs/api-contract.md"
+    task: "Write tenant unit tests"
+    source_of_truth: "docs/api-contract.md Section 3"
 
 # Acceptance criteria
 acceptance_criteria:
-  - "All endpoints match docs/api-contract.md v1.2.0 exactly"
-  - "JWT access + refresh token flow working"
-  - "MFA TOTP verification working"
-  - "OAuth (Google) login working"
-  - "Frontend forms validate and submit correctly"
-  - "Auth context manages tokens and user state"
-  - "Protected routes redirect unauthenticated users"
-  - "Backend tests >80% coverage"
-  - "Frontend tests >70% coverage"
-  - "Docker containers run all services"
-  - "npm run build passes for both projects"
+  - "All 8 endpoints match docs/api-contract.md v1.2.0 Section 3 exactly"
+  - "JWT auth guard on all endpoints (platform_admin only)"
+  - "Zod validation on all request bodies"
+  - "Proper error responses (400, 401, 403, 404, 409)"
+  - "Pagination, filtering, sorting on list endpoint"
+  - "Soft delete with grace period on delete endpoint"
+  - "npm run build passes"
+  - "All tests pass"
