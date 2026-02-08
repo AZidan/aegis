@@ -93,6 +93,12 @@ describe('TenantsService', () => {
       findMany: jest.Mock;
       count: jest.Mock;
     };
+    tenantConfigHistory: {
+      create: jest.Mock;
+      findMany: jest.Mock;
+      findFirst: jest.Mock;
+      count: jest.Mock;
+    };
     containerHealth: {
       findFirst: jest.Mock;
       findMany: jest.Mock;
@@ -111,6 +117,12 @@ describe('TenantsService', () => {
       },
       agent: {
         findMany: jest.fn(),
+        count: jest.fn(),
+      },
+      tenantConfigHistory: {
+        create: jest.fn().mockResolvedValue({}),
+        findMany: jest.fn(),
+        findFirst: jest.fn(),
         count: jest.fn(),
       },
       containerHealth: {
@@ -227,7 +239,6 @@ describe('TenantsService', () => {
     });
 
     it('should apply health filter via post-query filtering', async () => {
-      // Implementation filters health post-query (not in where clause)
       const tenantWithHealth = createMockTenant({
         containerHealth: [createMockHealthRecord({ status: 'degraded' })],
       });
@@ -244,7 +255,6 @@ describe('TenantsService', () => {
         health: 'degraded',
       });
 
-      // Only the degraded tenant should remain after filtering
       expect(result.data).toHaveLength(1);
       expect(result.data[0].id).toBe('tenant-uuid-1');
     });
@@ -377,7 +387,7 @@ describe('TenantsService', () => {
         plan: 'growth',
         _count: { agents: 0 },
       });
-      prisma.tenant.findUnique.mockResolvedValue(null); // No duplicate
+      prisma.tenant.findUnique.mockResolvedValue(null);
       prisma.tenant.create.mockResolvedValue(newTenant);
 
       const result = await service.createTenant({
@@ -395,7 +405,6 @@ describe('TenantsService', () => {
     });
 
     it('should throw ConflictException for duplicate companyName', async () => {
-      // Implementation uses findUnique on companyName
       prisma.tenant.findUnique.mockResolvedValue(createMockTenant());
 
       await expect(
@@ -448,7 +457,6 @@ describe('TenantsService', () => {
         plan: 'starter',
       });
 
-      // Implementation stores resourceLimits as a JSON field
       expect(prisma.tenant.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
@@ -589,7 +597,6 @@ describe('TenantsService', () => {
         plan: 'starter',
       });
 
-      // Implementation uses findUnique with companyName
       expect(prisma.tenant.findUnique).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({ companyName: 'Unique Company' }),
@@ -752,7 +759,6 @@ describe('TenantsService', () => {
         },
       });
 
-      // Implementation merges into JSON resourceLimits field
       expect(prisma.tenant.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: 'tenant-uuid-1' },
@@ -840,7 +846,6 @@ describe('TenantsService', () => {
         resourceLimits: { cpuCores: 8 },
       });
 
-      // Implementation merges partial update with existing resourceLimits
       expect(prisma.tenant.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
@@ -874,7 +879,6 @@ describe('TenantsService', () => {
 
       const result = await service.deleteTenant('tenant-uuid-1');
 
-      // API response uses pending_deletion (even though DB uses suspended)
       expect(result).toHaveProperty('id');
       expect(result).toHaveProperty('status', 'pending_deletion');
       expect(result).toHaveProperty('gracePeriodEnds');
@@ -892,7 +896,6 @@ describe('TenantsService', () => {
       const gracePeriod = new Date(result.gracePeriodEnds);
       const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
       const diff = gracePeriod.getTime() - beforeCall.getTime();
-      // Allow 5 seconds tolerance for test execution time
       expect(diff).toBeGreaterThanOrEqual(sevenDaysMs - 5000);
       expect(diff).toBeLessThanOrEqual(sevenDaysMs + 5000);
     });
@@ -903,7 +906,6 @@ describe('TenantsService', () => {
 
       await service.deleteTenant('tenant-uuid-1');
 
-      // Implementation uses suspended status + metadata (pending_deletion not in enum yet)
       expect(prisma.tenant.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: 'tenant-uuid-1' },
@@ -1098,7 +1100,6 @@ describe('TenantsService', () => {
 
       const result = await service.getTenantHealth('tenant-uuid-1');
 
-      // Implementation returns stub data when no records exist
       expect(result.current.status).toBe('healthy');
       expect(result.history24h.length).toBeGreaterThan(0);
     });
@@ -1110,7 +1111,7 @@ describe('TenantsService', () => {
   describe('getTenantAgents', () => {
     it('should return agents array with correct data shape', async () => {
       prisma.tenant.findUnique.mockResolvedValue(createMockTenant());
-      prisma.agent.findMany.mockResolvedValue([
+      (prisma as any).agent.findMany.mockResolvedValue([
         createMockAgent(),
         createMockAgent({
           id: 'agent-uuid-2',
@@ -1138,7 +1139,7 @@ describe('TenantsService', () => {
 
     it('should return agents with valid role values per contract', async () => {
       prisma.tenant.findUnique.mockResolvedValue(createMockTenant());
-      prisma.agent.findMany.mockResolvedValue([
+      (prisma as any).agent.findMany.mockResolvedValue([
         createMockAgent({ role: 'pm' }),
         createMockAgent({ id: 'agent-2', role: 'engineering' }),
         createMockAgent({ id: 'agent-3', role: 'operations' }),
@@ -1155,7 +1156,7 @@ describe('TenantsService', () => {
 
     it('should return agents with valid status values per contract', async () => {
       prisma.tenant.findUnique.mockResolvedValue(createMockTenant());
-      prisma.agent.findMany.mockResolvedValue([
+      (prisma as any).agent.findMany.mockResolvedValue([
         createMockAgent({ status: 'active' }),
         createMockAgent({ id: 'agent-2', status: 'idle' }),
         createMockAgent({ id: 'agent-3', status: 'error' }),
@@ -1171,7 +1172,7 @@ describe('TenantsService', () => {
 
     it('should return agents with valid modelTier values per contract', async () => {
       prisma.tenant.findUnique.mockResolvedValue(createMockTenant());
-      prisma.agent.findMany.mockResolvedValue([
+      (prisma as any).agent.findMany.mockResolvedValue([
         createMockAgent({ modelTier: 'haiku' }),
         createMockAgent({ id: 'agent-2', modelTier: 'sonnet' }),
         createMockAgent({ id: 'agent-3', modelTier: 'opus' }),
@@ -1199,11 +1200,11 @@ describe('TenantsService', () => {
 
     it('should query agents filtered by tenant id', async () => {
       prisma.tenant.findUnique.mockResolvedValue(createMockTenant());
-      prisma.agent.findMany.mockResolvedValue([]);
+      (prisma as any).agent.findMany.mockResolvedValue([]);
 
       await service.getTenantAgents('tenant-uuid-1');
 
-      expect(prisma.agent.findMany).toHaveBeenCalledWith(
+      expect((prisma as any).agent.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({ tenantId: 'tenant-uuid-1' }),
         }),
@@ -1212,7 +1213,7 @@ describe('TenantsService', () => {
 
     it('should return empty data array when tenant has no agents', async () => {
       prisma.tenant.findUnique.mockResolvedValue(createMockTenant());
-      prisma.agent.findMany.mockResolvedValue([]);
+      (prisma as any).agent.findMany.mockResolvedValue([]);
 
       const result = await service.getTenantAgents('tenant-uuid-1');
 
@@ -1221,7 +1222,7 @@ describe('TenantsService', () => {
 
     it('should return lastActive and createdAt as ISO 8601 strings', async () => {
       prisma.tenant.findUnique.mockResolvedValue(createMockTenant());
-      prisma.agent.findMany.mockResolvedValue([createMockAgent()]);
+      (prisma as any).agent.findMany.mockResolvedValue([createMockAgent()]);
 
       const result = await service.getTenantAgents('tenant-uuid-1');
 
@@ -1232,7 +1233,7 @@ describe('TenantsService', () => {
 
     it('should verify tenant exists before querying agents', async () => {
       prisma.tenant.findUnique.mockResolvedValue(createMockTenant());
-      prisma.agent.findMany.mockResolvedValue([]);
+      (prisma as any).agent.findMany.mockResolvedValue([]);
 
       await service.getTenantAgents('tenant-uuid-1');
 

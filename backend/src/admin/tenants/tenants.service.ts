@@ -66,6 +66,18 @@ const MODEL_DEFAULTS: Record<
   enterprise: { tier: 'opus', thinkingMode: 'high' },
 };
 
+/**
+ * Accessor for the tenantConfigHistory model on PrismaService.
+ * This model was added to schema.prisma but the Prisma client has not been
+ * regenerated yet.  We cast through `any` so that the existing (stale)
+ * generated types do not block compilation.  After running `prisma generate`
+ * this helper can be removed and the service can reference
+ * `this.prisma.tenantConfigHistory` directly.
+ */
+function configHistoryModel(prisma: PrismaService): any {
+  return (prisma as any).tenantConfigHistory;
+}
+
 @Injectable()
 export class TenantsService {
   private readonly logger = new Logger(TenantsService.name);
@@ -394,7 +406,7 @@ export class TenantsService {
   // PATCH /api/admin/tenants/:id - Update Tenant Config
   // Contract: Section 3 - Update Tenant Config
   // ==========================================================================
-  async updateTenantConfig(id: string, dto: UpdateTenantDto) {
+  async updateTenantConfig(id: string, dto: UpdateTenantDto, userId?: string) {
     const tenant = await this.prisma.tenant.findUnique({
       where: { id },
     });
@@ -402,6 +414,20 @@ export class TenantsService {
     if (!tenant) {
       throw new NotFoundException('Tenant not found');
     }
+
+    // Save current config to history before updating
+    await configHistoryModel(this.prisma).create({
+      data: {
+        tenantId: id,
+        config: {
+          plan: tenant.plan,
+          resourceLimits: tenant.resourceLimits,
+          modelDefaults: tenant.modelDefaults,
+        } as Prisma.InputJsonValue,
+        changedBy: userId || 'system',
+        changeDescription: this.buildChangeDescription(tenant, dto),
+      },
+    });
 
     // Build update data
     const updateData: Prisma.TenantUpdateInput = {};
@@ -625,6 +651,102 @@ export class TenantsService {
         createdAt: agent.createdAt.toISOString(),
       })),
     };
+  }
+
+  // ==========================================================================
+  // GET /api/admin/tenants/:id/config/history - Get Config History
+  // ==========================================================================
+  async getConfigHistory(tenantId: string, page = 1, limit = 20) {
+    const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
+    if (!tenant) throw new NotFoundException('Tenant not found');
+
+    const configHistory = configHistoryModel(this.prisma);
+
+    const [history, total] = await Promise.all([
+      configHistory.findMany({
+        where: { tenantId },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      configHistory.count({ where: { tenantId } }),
+    ]);
+
+    return {
+      data: (history as any[]).map((h: any) => ({
+        id: h.id,
+        config: h.config,
+        changedBy: h.changedBy,
+        changeDescription: h.changeDescription,
+        createdAt: h.createdAt.toISOString(),
+      })),
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
+  }
+
+  // ==========================================================================
+  // POST /api/admin/tenants/:id/config/rollback - Rollback Config
+  // ==========================================================================
+  async rollbackConfig(tenantId: string, historyId: string, userId?: string) {
+    const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
+    if (!tenant) throw new NotFoundException('Tenant not found');
+
+    const configHistory = configHistoryModel(this.prisma);
+
+    const historyEntry = await configHistory.findFirst({
+      where: { id: historyId, tenantId },
+    });
+    if (!historyEntry) throw new NotFoundException('Config history entry not found');
+
+    const config = historyEntry.config as { plan?: string; resourceLimits?: any; modelDefaults?: any };
+
+    // Save current config to history before rolling back (audit trail)
+    await configHistory.create({
+      data: {
+        tenantId,
+        config: {
+          plan: tenant.plan,
+          resourceLimits: tenant.resourceLimits,
+          modelDefaults: tenant.modelDefaults,
+        } as Prisma.InputJsonValue,
+        changedBy: userId || 'system',
+        changeDescription: `Rollback to version from ${historyEntry.createdAt.toISOString()}`,
+      },
+    });
+
+    // Apply the historical config
+    const updateData: Prisma.TenantUpdateInput = {};
+    if (config.plan) updateData.plan = config.plan as any;
+    if (config.resourceLimits) updateData.resourceLimits = config.resourceLimits as Prisma.InputJsonValue;
+    if (config.modelDefaults) updateData.modelDefaults = config.modelDefaults as Prisma.InputJsonValue;
+
+    const updated = await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: updateData,
+    });
+
+    this.logger.log(`Config rolled back for tenant ${tenantId} to history entry ${historyId}`);
+
+    return {
+      id: updated.id,
+      companyName: updated.companyName,
+      plan: updated.plan,
+      resourceLimits: updated.resourceLimits,
+      modelDefaults: updated.modelDefaults,
+      updatedAt: updated.updatedAt.toISOString(),
+      message: 'Configuration rolled back successfully. Changes will propagate within 60 seconds.',
+    };
+  }
+
+  // ==========================================================================
+  // Helper: Build human-readable change description for config history
+  // ==========================================================================
+  buildChangeDescription(tenant: any, dto: UpdateTenantDto): string {
+    const changes: string[] = [];
+    if (dto.plan && dto.plan !== tenant.plan) changes.push(`Plan: ${tenant.plan} -> ${dto.plan}`);
+    if (dto.resourceLimits) changes.push('Resource limits updated');
+    if (dto.modelDefaults) changes.push('Model defaults updated');
+    return changes.join(', ') || 'Configuration updated';
   }
 
   // ==========================================================================

@@ -550,6 +550,7 @@ describe('TenantsController', () => {
       expect(tenantsService.updateTenantConfig).toHaveBeenCalledWith(
         'tenant-uuid-1',
         dto,
+        'admin-uuid',
       );
     });
 
@@ -570,6 +571,7 @@ describe('TenantsController', () => {
       expect(tenantsService.updateTenantConfig).toHaveBeenCalledWith(
         'tenant-uuid-1',
         dto,
+        'admin-uuid',
       );
     });
 

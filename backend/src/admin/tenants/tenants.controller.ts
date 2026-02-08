@@ -26,7 +26,8 @@ import {
 
 /**
  * Tenants Controller - Platform Admin: Tenants
- * Implements all 8 endpoints from API Contract v1.1.0 Section 3.
+ * Implements all 8 endpoints from API Contract v1.1.0 Section 3,
+ * plus config history and rollback endpoints.
  *
  * All endpoints require JWT authentication and platform_admin role.
  *
@@ -39,6 +40,8 @@ import {
  * 6. POST   /api/admin/tenants/:id/actions/restart - Restart Container
  * 7. GET    /api/admin/tenants/:id/health   - Get Container Health
  * 8. GET    /api/admin/tenants/:id/agents   - Get Tenant Agents
+ * 9. GET    /api/admin/tenants/:id/config/history  - Get Config History
+ * 10. POST  /api/admin/tenants/:id/config/rollback - Rollback Config
  */
 @Controller('admin/tenants')
 @UseGuards(JwtAuthGuard)
@@ -105,12 +108,12 @@ export class TenantsController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async updateTenantConfig(
-    @CurrentUser() user: { role: string },
+    @CurrentUser() user: { id: string; role: string },
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateTenantSchema)) dto: UpdateTenantDto,
   ) {
     this.assertPlatformAdmin(user);
-    return this.tenantsService.updateTenantConfig(id, dto);
+    return this.tenantsService.updateTenantConfig(id, dto, user.id);
   }
 
   // ==========================================================================
@@ -167,5 +170,36 @@ export class TenantsController {
   ) {
     this.assertPlatformAdmin(user);
     return this.tenantsService.getTenantAgents(id);
+  }
+
+  // ==========================================================================
+  // GET /api/admin/tenants/:id/config/history - Get Config History
+  // Contract: 200 OK
+  // ==========================================================================
+  @Get(':id/config/history')
+  @HttpCode(HttpStatus.OK)
+  async getConfigHistory(
+    @CurrentUser() user: { role: string },
+    @Param('id') id: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    this.assertPlatformAdmin(user);
+    return this.tenantsService.getConfigHistory(id, Number(page) || 1, Number(limit) || 20);
+  }
+
+  // ==========================================================================
+  // POST /api/admin/tenants/:id/config/rollback - Rollback Config
+  // Contract: 200 OK
+  // ==========================================================================
+  @Post(':id/config/rollback')
+  @HttpCode(HttpStatus.OK)
+  async rollbackConfig(
+    @CurrentUser() user: { id: string; role: string },
+    @Param('id') id: string,
+    @Body() body: { historyId: string },
+  ) {
+    this.assertPlatformAdmin(user);
+    return this.tenantsService.rollbackConfig(id, body.historyId, user.id);
   }
 }
