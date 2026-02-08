@@ -1736,6 +1736,7 @@ export const SkillScalarFieldEnum = {
   description: 'description',
   category: 'category',
   status: 'status',
+  isCore: 'isCore',
   authorId: 'authorId',
   submittedAt: 'submittedAt',
   compatibleRoles: 'compatibleRoles',

@@ -285,6 +285,16 @@ export class SkillsService {
       throw new NotFoundException('Skill installation not found');
     }
 
+    // Prevent uninstallation of core skills
+    const skill = await this.prisma.skill.findUnique({
+      where: { id: skillId },
+      select: { isCore: true },
+    });
+
+    if (skill?.isCore === true) {
+      throw new BadRequestException('Core skills cannot be uninstalled');
+    }
+
     // Delete installation
     await this.prisma.skillInstallation.delete({
       where: { id: installation.id },

@@ -299,6 +299,7 @@ model Skill {
   description String
   category    SkillCategory
   status      SkillStatus   @default(pending)
+  isCore      Boolean       @default(false)
 
   // Authorship
   authorId    String

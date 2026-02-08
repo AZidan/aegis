@@ -67,6 +67,7 @@ describe('SkillsService', () => {
       count: jest.Mock;
       findMany: jest.Mock;
       findFirst: jest.Mock;
+      findUnique: jest.Mock;
       update: jest.Mock;
     };
     agent: {
@@ -87,6 +88,7 @@ describe('SkillsService', () => {
         count: jest.fn(),
         findMany: jest.fn(),
         findFirst: jest.fn(),
+        findUnique: jest.fn().mockResolvedValue({ isCore: false }),
         update: jest.fn(),
       },
       agent: {
