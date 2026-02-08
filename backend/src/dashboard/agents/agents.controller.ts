@@ -127,6 +127,36 @@ export class AgentsController {
   }
 
   // ==========================================================================
+  // GET /api/dashboard/agents/:id/activity - Agent Activity Log
+  // Contract: Section 6 - Agent Activity
+  // ==========================================================================
+  @Get(':id/activity')
+  @HttpCode(HttpStatus.OK)
+  async getAgentActivity(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Query('period') period?: 'today' | 'week' | 'month',
+  ) {
+    const tenantId = this.getTenantId(req);
+    return this.agentsService.getAgentActivity(tenantId, id, period);
+  }
+
+  // ==========================================================================
+  // GET /api/dashboard/agents/:id/logs - Agent Logs
+  // Contract: Section 6 - Agent Logs
+  // ==========================================================================
+  @Get(':id/logs')
+  @HttpCode(HttpStatus.OK)
+  async getAgentLogs(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Query('level') level?: 'info' | 'warn' | 'error',
+  ) {
+    const tenantId = this.getTenantId(req);
+    return this.agentsService.getAgentLogs(tenantId, id, level);
+  }
+
+  // ==========================================================================
   // GET /api/dashboard/agents/:id/tool-policy - Get Agent Tool Policy
   // Response: { agentId, agentName, role, policy, availableCategories }
   // ==========================================================================

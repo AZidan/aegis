@@ -62,6 +62,7 @@ const createMockMetrics = (overrides: Partial<Record<string, unknown>> = {}) => 
   agentId: AGENT_ID,
   messageCount: 25,
   toolInvocations: 10,
+  errorCount: 0,
   avgResponseTime: 1500,
   periodStart: new Date('2026-02-05T00:00:00.000Z'),
   periodEnd: new Date('2026-02-05T01:00:00.000Z'),
@@ -89,9 +90,12 @@ describe('AgentsService', () => {
     };
     agentMetrics: {
       findMany: jest.Mock;
+      groupBy: jest.Mock;
+      aggregate: jest.Mock;
     };
     agentActivity: {
       findFirst: jest.Mock;
+      findMany: jest.Mock;
     };
   };
 
@@ -112,9 +116,12 @@ describe('AgentsService', () => {
       },
       agentMetrics: {
         findMany: jest.fn(),
+        groupBy: jest.fn().mockResolvedValue([]),
+        aggregate: jest.fn().mockResolvedValue({ _sum: { messageCount: 0 } }),
       },
       agentActivity: {
         findFirst: jest.fn(),
+        findMany: jest.fn().mockResolvedValue([]),
       },
     };
 
@@ -470,11 +477,10 @@ describe('AgentsService', () => {
 
       const result = await service.listAgents(TENANT_ID, {});
 
-      expect(result.data[0]).toHaveProperty('channel');
-      expect((result.data[0] as Record<string, unknown>).channel).toEqual({
-        type: 'telegram',
-        connected: true,
-      });
+      expect(result.data[0]).toHaveProperty('channels');
+      expect((result.data[0] as Record<string, unknown>).channels).toEqual([
+        { type: 'telegram', handle: '', connected: true },
+      ]);
     });
 
     it('should include description when present', async () => {
@@ -525,7 +531,6 @@ describe('AgentsService', () => {
         expect.objectContaining({
           include: expect.objectContaining({
             channels: expect.objectContaining({
-              take: 1,
               select: { type: true, connected: true },
             }),
           }),
@@ -592,22 +597,23 @@ describe('AgentsService', () => {
     it('should return aggregated metrics for last 24 hours', async () => {
       prisma.agent.findFirst.mockResolvedValue(createMockAgent());
       prisma.agentMetrics.findMany.mockResolvedValue([
-        createMockMetrics({ messageCount: 10, toolInvocations: 5, avgResponseTime: 1000 }),
+        createMockMetrics({ messageCount: 10, toolInvocations: 5, errorCount: 1, avgResponseTime: 1000 }),
         createMockMetrics({
           id: 'metrics-2',
           messageCount: 15,
           toolInvocations: 8,
+          errorCount: 0,
           avgResponseTime: 2000,
         }),
       ]);
 
       const result = await service.getAgentDetail(TENANT_ID, AGENT_ID);
+      const metrics = (result as Record<string, unknown>).metrics as Record<string, unknown>;
 
-      expect((result as Record<string, unknown>).metrics).toEqual({
-        messagesLast24h: 25,
-        toolInvocationsLast24h: 13,
-        avgResponseTime: 1500,
-      });
+      expect(metrics).toHaveProperty('tasksCompletedToday', 38); // 10+15+5+8
+      expect(metrics).toHaveProperty('avgResponseTime', 1.5); // (1000+2000)/2 / 1000
+      expect(metrics).toHaveProperty('successRate');
+      expect(metrics).toHaveProperty('uptime', 99.9);
     });
 
     it('should return zero metrics when no records exist', async () => {
@@ -615,12 +621,12 @@ describe('AgentsService', () => {
       prisma.agentMetrics.findMany.mockResolvedValue([]);
 
       const result = await service.getAgentDetail(TENANT_ID, AGENT_ID);
+      const metrics = (result as Record<string, unknown>).metrics as Record<string, unknown>;
 
-      expect((result as Record<string, unknown>).metrics).toEqual({
-        messagesLast24h: 0,
-        toolInvocationsLast24h: 0,
-        avgResponseTime: 0,
-      });
+      expect(metrics).toHaveProperty('tasksCompletedToday', 0);
+      expect(metrics).toHaveProperty('avgResponseTime', 0);
+      expect(metrics).toHaveProperty('successRate', 100);
+      expect(metrics).toHaveProperty('uptime', 99.9);
     });
 
     it('should return toolPolicy as allow-only from agent', async () => {
@@ -652,8 +658,8 @@ describe('AgentsService', () => {
       const result = await service.getAgentDetail(TENANT_ID, AGENT_ID);
 
       expect((result as Record<string, unknown>).skills).toEqual([
-        { id: 'skill-1', name: 'Web Search', version: '1.0.0' },
-        { id: 'skill-2', name: 'Code Exec', version: '2.1.0' },
+        { id: 'skill-1', name: 'Web Search', version: '1.0.0', enabled: true },
+        { id: 'skill-2', name: 'Code Exec', version: '2.1.0', enabled: true },
       ]);
     });
 
@@ -669,12 +675,10 @@ describe('AgentsService', () => {
 
       const result = await service.getAgentDetail(TENANT_ID, AGENT_ID);
 
-      expect(result).toHaveProperty('channel');
-      expect((result as Record<string, unknown>).channel).toEqual({
-        type: 'telegram',
-        connected: true,
-        lastMessageAt: '2026-02-05T10:00:00.000Z',
-      });
+      expect(result).toHaveProperty('channels');
+      expect((result as Record<string, unknown>).channels).toEqual([
+        { type: 'telegram', handle: '', connected: true },
+      ]);
     });
 
     it('should include description when present', async () => {

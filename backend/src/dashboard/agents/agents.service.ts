@@ -657,6 +657,126 @@ export class AgentsService {
   }
 
   // ==========================================================================
+  // GET /api/dashboard/agents/:id/activity - Agent Activity Log
+  // Returns activity entries mapped to the frontend AgentActionLog shape.
+  // ==========================================================================
+  async getAgentActivity(
+    tenantId: string,
+    agentId: string,
+    period?: 'today' | 'week' | 'month',
+  ) {
+    const agent = await this.prisma.agent.findFirst({
+      where: { id: agentId, tenantId },
+    });
+
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
+
+    // Determine time range from period
+    const now = new Date();
+    const since = new Date();
+    switch (period) {
+      case 'week':
+        since.setDate(now.getDate() - 7);
+        break;
+      case 'month':
+        since.setDate(now.getDate() - 30);
+        break;
+      case 'today':
+      default:
+        since.setHours(0, 0, 0, 0);
+        break;
+    }
+
+    const activities = await this.prisma.agentActivity.findMany({
+      where: {
+        agentId,
+        timestamp: { gte: since },
+      },
+      orderBy: { timestamp: 'desc' },
+      take: 100,
+    });
+
+    // Map DB ActivityType → frontend ActionType
+    const typeMap: Record<string, string> = {
+      message: 'skill_invocation',
+      tool_invocation: 'tool_execution',
+      error: 'error',
+    };
+
+    return activities.map((a) => {
+      const details = (a.details as Record<string, unknown>) ?? {};
+      return {
+        id: a.id,
+        time: a.timestamp.toISOString(),
+        actionType: typeMap[a.type] ?? a.type,
+        target: (details.toolName as string) ?? a.summary,
+        detail: (details.errorMessage as string) ?? (details.messagePreview as string) ?? undefined,
+        duration: details.durationMs
+          ? `${Math.round(details.durationMs as number)}ms`
+          : '--',
+        status:
+          a.type === 'error'
+            ? 'error'
+            : details.warning
+              ? 'warning'
+              : 'success',
+      };
+    });
+  }
+
+  // ==========================================================================
+  // GET /api/dashboard/agents/:id/logs - Agent Logs
+  // Returns activity entries mapped to the frontend AgentLogEntry shape.
+  // ==========================================================================
+  async getAgentLogs(
+    tenantId: string,
+    agentId: string,
+    level?: 'info' | 'warn' | 'error',
+  ) {
+    const agent = await this.prisma.agent.findFirst({
+      where: { id: agentId, tenantId },
+    });
+
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
+
+    // Map log level filter to DB ActivityType
+    const levelToType: Record<string, string> = {
+      info: 'message',
+      warn: 'tool_invocation',
+      error: 'error',
+    };
+
+    const where: Record<string, unknown> = { agentId };
+    if (level && levelToType[level]) {
+      where.type = levelToType[level];
+    }
+
+    const activities = await this.prisma.agentActivity.findMany({
+      where,
+      orderBy: { timestamp: 'asc' },
+      take: 200,
+    });
+
+    // Map DB type → log level
+    const typeToLevel: Record<string, string> = {
+      message: 'info',
+      tool_invocation: 'info',
+      error: 'error',
+    };
+
+    return activities.map((a) => ({
+      id: a.id,
+      timestamp: a.timestamp.toISOString(),
+      level: typeToLevel[a.type] ?? 'info',
+      message: a.summary,
+    }));
+  }
+
+  // ==========================================================================
   // GET /api/dashboard/agents/:id/tool-policy - Get Agent Tool Policy
   // Response: { agentId, agentName, role, policy: { allow }, availableCategories }
   // ==========================================================================
