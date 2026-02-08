@@ -17,6 +17,16 @@ const mockPrismaService = {
   alert: {
     create: jest.fn().mockResolvedValue({}),
   },
+  agent: {
+    findMany: jest.fn().mockResolvedValue([]),
+  },
+  skill: {
+    findMany: jest.fn().mockResolvedValue([]),
+    update: jest.fn().mockResolvedValue({}),
+  },
+  skillInstallation: {
+    create: jest.fn().mockResolvedValue({}),
+  },
 };
 
 // Helper to create a mock Job
