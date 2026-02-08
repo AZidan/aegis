@@ -135,17 +135,18 @@ export class AuthService {
     });
 
     if (!user) {
-      // Create new user via OAuth
-      user = await this.prisma.user.create({
-        data: {
-          email: oauthProfile.email,
-          name: oauthProfile.name,
-          role: 'tenant_member',
-          oauthProvider: provider,
-          oauthId: oauthProfile.oauthId,
-        },
-      });
-    } else if (!user.oauthProvider) {
+      throw new BadRequestException(
+        'No account found for this email. Please accept a team invitation from your tenant admin first.',
+      );
+    }
+
+    if (!user.tenantId) {
+      throw new BadRequestException(
+        'Your account is not assigned to any tenant. Please contact your tenant admin for an invitation.',
+      );
+    }
+
+    if (!user.oauthProvider) {
       // Link OAuth to existing user
       await this.prisma.user.update({
         where: { id: user.id },

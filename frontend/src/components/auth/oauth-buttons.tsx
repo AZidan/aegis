@@ -23,6 +23,7 @@ export function OAuthButtons({ mode, disabled }: OAuthButtonsProps) {
     }
 
     setLoadingProvider('google');
+    sessionStorage.setItem('oauth_provider', 'google');
 
     const params = new URLSearchParams({
       client_id: GOOGLE_CLIENT_ID,
@@ -43,6 +44,7 @@ export function OAuthButtons({ mode, disabled }: OAuthButtonsProps) {
     }
 
     setLoadingProvider('github');
+    sessionStorage.setItem('oauth_provider', 'github');
 
     const params = new URLSearchParams({
       client_id: GITHUB_CLIENT_ID,

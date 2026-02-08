@@ -6,6 +6,7 @@ import { Plus, ArrowRight, Loader2 } from 'lucide-react';
 
 import { cn } from '@/lib/utils/cn';
 import { ROUTES } from '@/lib/constants';
+import { useAuthStore } from '@/lib/store/auth-store';
 import {
   StatsCard,
   ProgressRing,
@@ -179,9 +180,18 @@ function AgentsSkeleton() {
 // ---------------------------------------------------------------------------
 
 export default function DashboardPage() {
+  const user = useAuthStore((s) => s.user);
   const { data: stats, isLoading: statsLoading, error: statsError } = useDashboardStats();
   const { data: agents, isLoading: agentsLoading, error: agentsError } = useAgents();
   const { data: roles } = useRoles();
+
+  const greeting = (() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  })();
+  const firstName = user?.name?.split(' ')[0] || 'there';
 
   return (
     <div className="flex min-h-screen">
@@ -190,7 +200,7 @@ export default function DashboardPage() {
         {/* Welcome header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-neutral-900">
-            Good morning, Jane
+            {greeting}, {firstName}
           </h1>
           <p className="text-sm text-neutral-500 mt-1">
             Here&apos;s what your agents are up to today.

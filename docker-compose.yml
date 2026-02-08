@@ -7,9 +7,9 @@ services:
     container_name: aegis-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: aegis_dev
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB:-aegis_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -53,20 +53,20 @@ services:
       NODE_ENV: development
       PORT: 3000
       API_PREFIX: api
-      DATABASE_URL: postgresql://postgres:password@postgres:5432/aegis_dev
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-aegis_dev}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ""
-      JWT_ACCESS_SECRET: dev-super-secret-access-key-change-in-production
-      JWT_REFRESH_SECRET: dev-super-secret-refresh-key-change-in-production
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_ACCESS_EXPIRES_IN: 15m
       JWT_REFRESH_EXPIRES_IN: 7d
-      GOOGLE_CLIENT_ID: your-google-client-id
-      GOOGLE_CLIENT_SECRET: your-google-client-secret
-      GOOGLE_CALLBACK_URL: http://localhost:3000/api/auth/google/callback
-      GITHUB_CLIENT_ID: your-github-client-id
-      GITHUB_CLIENT_SECRET: your-github-client-secret
-      GITHUB_CALLBACK_URL: http://localhost:3000/api/auth/github/callback
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_CALLBACK_URL: http://localhost:3001/auth/callback
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      GITHUB_CALLBACK_URL: http://localhost:3001/auth/callback
       CORS_ORIGINS: http://localhost:3001,http://localhost:3000
       BCRYPT_ROUNDS: 12
       MFA_ISSUER: Aegis Platform

@@ -23,6 +23,7 @@ import {
   SIDEBAR_WIDTH_EXPANDED,
   SIDEBAR_WIDTH_COLLAPSED,
 } from '@/lib/constants';
+import { useAuthStore } from '@/lib/store/auth-store';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -152,6 +153,9 @@ function SidebarNavItemCollapsed({
 export function TenantSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const user = useAuthStore((s) => s.user);
+  const userInitials = user?.name?.split(' ').map((n) => n[0]).join('').toUpperCase() || 'U';
+  const userRole = user?.role?.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || 'User';
 
   const [collapsed, setCollapsed] = React.useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
@@ -281,16 +285,16 @@ export function TenantSidebar() {
               >
                 <Avatar className="h-8 w-8 shrink-0">
                   <AvatarFallback className="bg-primary-100 text-primary-600 text-xs font-semibold">
-                    JD
+                    {userInitials}
                   </AvatarFallback>
                 </Avatar>
                 {!collapsed && (
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-neutral-900">
-                      Jane Doe
+                      {user?.name || 'User'}
                     </p>
                     <p className="truncate text-xs text-neutral-500">
-                      Tenant Admin
+                      {userRole}
                     </p>
                   </div>
                 )}
