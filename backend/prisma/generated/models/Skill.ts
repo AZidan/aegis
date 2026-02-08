@@ -43,6 +43,7 @@ export type SkillMinAggregateOutputType = {
   description: string | null
   category: $Enums.SkillCategory | null
   status: $Enums.SkillStatus | null
+  isCore: boolean | null
   authorId: string | null
   submittedAt: Date | null
   repositoryUrl: string | null
@@ -66,6 +67,7 @@ export type SkillMaxAggregateOutputType = {
   description: string | null
   category: $Enums.SkillCategory | null
   status: $Enums.SkillStatus | null
+  isCore: boolean | null
   authorId: string | null
   submittedAt: Date | null
   repositoryUrl: string | null
@@ -89,6 +91,7 @@ export type SkillCountAggregateOutputType = {
   description: number
   category: number
   status: number
+  isCore: number
   authorId: number
   submittedAt: number
   compatibleRoles: number
@@ -128,6 +131,7 @@ export type SkillMinAggregateInputType = {
   description?: true
   category?: true
   status?: true
+  isCore?: true
   authorId?: true
   submittedAt?: true
   repositoryUrl?: true
@@ -151,6 +155,7 @@ export type SkillMaxAggregateInputType = {
   description?: true
   category?: true
   status?: true
+  isCore?: true
   authorId?: true
   submittedAt?: true
   repositoryUrl?: true
@@ -174,6 +179,7 @@ export type SkillCountAggregateInputType = {
   description?: true
   category?: true
   status?: true
+  isCore?: true
   authorId?: true
   submittedAt?: true
   compatibleRoles?: true
@@ -288,6 +294,7 @@ export type SkillGroupByOutputType = {
   description: string
   category: $Enums.SkillCategory
   status: $Enums.SkillStatus
+  isCore: boolean
   authorId: string
   submittedAt: Date
   compatibleRoles: string[]
@@ -338,6 +345,7 @@ export type SkillWhereInput = {
   description?: Prisma.StringFilter<"Skill"> | string
   category?: Prisma.EnumSkillCategoryFilter<"Skill"> | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFilter<"Skill"> | $Enums.SkillStatus
+  isCore?: Prisma.BoolFilter<"Skill"> | boolean
   authorId?: Prisma.StringFilter<"Skill"> | string
   submittedAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
   compatibleRoles?: Prisma.StringNullableListFilter<"Skill">
@@ -367,6 +375,7 @@ export type SkillOrderByWithRelationInput = {
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  isCore?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   compatibleRoles?: Prisma.SortOrder
@@ -400,6 +409,7 @@ export type SkillWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringFilter<"Skill"> | string
   category?: Prisma.EnumSkillCategoryFilter<"Skill"> | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFilter<"Skill"> | $Enums.SkillStatus
+  isCore?: Prisma.BoolFilter<"Skill"> | boolean
   authorId?: Prisma.StringFilter<"Skill"> | string
   submittedAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
   compatibleRoles?: Prisma.StringNullableListFilter<"Skill">
@@ -429,6 +439,7 @@ export type SkillOrderByWithAggregationInput = {
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  isCore?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   compatibleRoles?: Prisma.SortOrder
@@ -464,6 +475,7 @@ export type SkillScalarWhereWithAggregatesInput = {
   description?: Prisma.StringWithAggregatesFilter<"Skill"> | string
   category?: Prisma.EnumSkillCategoryWithAggregatesFilter<"Skill"> | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusWithAggregatesFilter<"Skill"> | $Enums.SkillStatus
+  isCore?: Prisma.BoolWithAggregatesFilter<"Skill"> | boolean
   authorId?: Prisma.StringWithAggregatesFilter<"Skill"> | string
   submittedAt?: Prisma.DateTimeWithAggregatesFilter<"Skill"> | Date | string
   compatibleRoles?: Prisma.StringNullableListFilter<"Skill">
@@ -491,6 +503,7 @@ export type SkillCreateInput = {
   description: string
   category: $Enums.SkillCategory
   status?: $Enums.SkillStatus
+  isCore?: boolean
   submittedAt?: Date | string
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
   repositoryUrl?: string | null
@@ -519,6 +532,7 @@ export type SkillUncheckedCreateInput = {
   description: string
   category: $Enums.SkillCategory
   status?: $Enums.SkillStatus
+  isCore?: boolean
   authorId: string
   submittedAt?: Date | string
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
@@ -547,6 +561,7 @@ export type SkillUpdateInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
+  isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
   repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -575,6 +590,7 @@ export type SkillUncheckedUpdateInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
+  isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
@@ -603,6 +619,7 @@ export type SkillCreateManyInput = {
   description: string
   category: $Enums.SkillCategory
   status?: $Enums.SkillStatus
+  isCore?: boolean
   authorId: string
   submittedAt?: Date | string
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
@@ -630,6 +647,7 @@ export type SkillUpdateManyMutationInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
+  isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
   repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -656,6 +674,7 @@ export type SkillUncheckedUpdateManyInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
+  isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
@@ -698,6 +717,7 @@ export type SkillCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  isCore?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   compatibleRoles?: Prisma.SortOrder
@@ -730,6 +750,7 @@ export type SkillMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  isCore?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   repositoryUrl?: Prisma.SortOrder
@@ -753,6 +774,7 @@ export type SkillMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  isCore?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   repositoryUrl?: Prisma.SortOrder
@@ -859,6 +881,7 @@ export type SkillCreateWithoutAuthorInput = {
   description: string
   category: $Enums.SkillCategory
   status?: $Enums.SkillStatus
+  isCore?: boolean
   submittedAt?: Date | string
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
   repositoryUrl?: string | null
@@ -886,6 +909,7 @@ export type SkillUncheckedCreateWithoutAuthorInput = {
   description: string
   category: $Enums.SkillCategory
   status?: $Enums.SkillStatus
+  isCore?: boolean
   submittedAt?: Date | string
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
   repositoryUrl?: string | null
@@ -942,6 +966,7 @@ export type SkillScalarWhereInput = {
   description?: Prisma.StringFilter<"Skill"> | string
   category?: Prisma.EnumSkillCategoryFilter<"Skill"> | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFilter<"Skill"> | $Enums.SkillStatus
+  isCore?: Prisma.BoolFilter<"Skill"> | boolean
   authorId?: Prisma.StringFilter<"Skill"> | string
   submittedAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
   compatibleRoles?: Prisma.StringNullableListFilter<"Skill">
@@ -969,6 +994,7 @@ export type SkillCreateWithoutInstallationsInput = {
   description: string
   category: $Enums.SkillCategory
   status?: $Enums.SkillStatus
+  isCore?: boolean
   submittedAt?: Date | string
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
   repositoryUrl?: string | null
@@ -996,6 +1022,7 @@ export type SkillUncheckedCreateWithoutInstallationsInput = {
   description: string
   category: $Enums.SkillCategory
   status?: $Enums.SkillStatus
+  isCore?: boolean
   authorId: string
   submittedAt?: Date | string
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
@@ -1039,6 +1066,7 @@ export type SkillUpdateWithoutInstallationsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
+  isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
   repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1066,6 +1094,7 @@ export type SkillUncheckedUpdateWithoutInstallationsInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
+  isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
@@ -1093,6 +1122,7 @@ export type SkillCreateManyAuthorInput = {
   description: string
   category: $Enums.SkillCategory
   status?: $Enums.SkillStatus
+  isCore?: boolean
   submittedAt?: Date | string
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
   repositoryUrl?: string | null
@@ -1119,6 +1149,7 @@ export type SkillUpdateWithoutAuthorInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
+  isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
   repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1146,6 +1177,7 @@ export type SkillUncheckedUpdateWithoutAuthorInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
+  isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
   repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1173,6 +1205,7 @@ export type SkillUncheckedUpdateManyWithoutAuthorInput = {
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
+  isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
   repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1230,6 +1263,7 @@ export type SkillSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   description?: boolean
   category?: boolean
   status?: boolean
+  isCore?: boolean
   authorId?: boolean
   submittedAt?: boolean
   compatibleRoles?: boolean
@@ -1260,6 +1294,7 @@ export type SkillSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   description?: boolean
   category?: boolean
   status?: boolean
+  isCore?: boolean
   authorId?: boolean
   submittedAt?: boolean
   compatibleRoles?: boolean
@@ -1288,6 +1323,7 @@ export type SkillSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   description?: boolean
   category?: boolean
   status?: boolean
+  isCore?: boolean
   authorId?: boolean
   submittedAt?: boolean
   compatibleRoles?: boolean
@@ -1316,6 +1352,7 @@ export type SkillSelectScalar = {
   description?: boolean
   category?: boolean
   status?: boolean
+  isCore?: boolean
   authorId?: boolean
   submittedAt?: boolean
   compatibleRoles?: boolean
@@ -1336,7 +1373,7 @@ export type SkillSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SkillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "version" | "description" | "category" | "status" | "authorId" | "submittedAt" | "compatibleRoles" | "repositoryUrl" | "mainFile" | "sourceCode" | "capabilities" | "configuration" | "permissions" | "documentation" | "changelog" | "reviewNotes" | "reviewedAt" | "reviewedBy" | "rating" | "installCount" | "createdAt" | "updatedAt", ExtArgs["result"]["skill"]>
+export type SkillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "version" | "description" | "category" | "status" | "isCore" | "authorId" | "submittedAt" | "compatibleRoles" | "repositoryUrl" | "mainFile" | "sourceCode" | "capabilities" | "configuration" | "permissions" | "documentation" | "changelog" | "reviewNotes" | "reviewedAt" | "reviewedBy" | "rating" | "installCount" | "createdAt" | "updatedAt", ExtArgs["result"]["skill"]>
 export type SkillInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   installations?: boolean | Prisma.Skill$installationsArgs<ExtArgs>
@@ -1362,6 +1399,7 @@ export type $SkillPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     description: string
     category: $Enums.SkillCategory
     status: $Enums.SkillStatus
+    isCore: boolean
     authorId: string
     submittedAt: Date
     compatibleRoles: string[]
@@ -1811,6 +1849,7 @@ export interface SkillFieldRefs {
   readonly description: Prisma.FieldRef<"Skill", 'String'>
   readonly category: Prisma.FieldRef<"Skill", 'SkillCategory'>
   readonly status: Prisma.FieldRef<"Skill", 'SkillStatus'>
+  readonly isCore: Prisma.FieldRef<"Skill", 'Boolean'>
   readonly authorId: Prisma.FieldRef<"Skill", 'String'>
   readonly submittedAt: Prisma.FieldRef<"Skill", 'DateTime'>
   readonly compatibleRoles: Prisma.FieldRef<"Skill", 'String[]'>

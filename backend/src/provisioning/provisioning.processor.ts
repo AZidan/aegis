@@ -104,6 +104,9 @@ export class ProvisioningProcessor extends WorkerHost {
       this.logger.log(
         `Provisioning completed for tenant: ${tenantId} -> containerId: ${containerId}`,
       );
+
+      // Auto-install core skills on all tenant agents
+      await this.installCoreSkills(tenantId);
     } catch (error) {
       await this.handleProvisioningFailure(tenantId, error);
     }
@@ -190,6 +193,58 @@ export class ProvisioningProcessor extends WorkerHost {
         `Provisioning permanently failed for tenant ${tenantId} after ${MAX_PROVISIONING_RETRIES} attempts`,
       );
     }
+  }
+
+  /**
+   * Auto-install all approved core skills on every agent belonging to the tenant.
+   * Called after successful provisioning to bootstrap agents with platform-bundled skills.
+   */
+  private async installCoreSkills(tenantId: string): Promise<void> {
+    const agents = await this.prisma.agent.findMany({
+      where: { tenantId },
+      select: { id: true },
+    });
+
+    if (agents.length === 0) {
+      this.logger.debug(
+        `No agents found for tenant ${tenantId} — skipping core skill installation`,
+      );
+      return;
+    }
+
+    const coreSkills = await this.prisma.skill.findMany({
+      where: { isCore: true, status: 'approved' },
+      select: { id: true, name: true },
+    });
+
+    if (coreSkills.length === 0) {
+      this.logger.debug('No core skills found — skipping installation');
+      return;
+    }
+
+    let installCount = 0;
+
+    for (const skill of coreSkills) {
+      for (const agent of agents) {
+        await this.prisma.skillInstallation.create({
+          data: {
+            agentId: agent.id,
+            skillId: skill.id,
+          },
+        });
+        installCount++;
+      }
+
+      // Increment installCount for this skill by the number of agents
+      await this.prisma.skill.update({
+        where: { id: skill.id },
+        data: { installCount: { increment: agents.length } },
+      });
+    }
+
+    this.logger.log(
+      `Installed ${coreSkills.length} core skills on ${agents.length} agents (${installCount} total installations) for tenant ${tenantId}`,
+    );
   }
 
   /**

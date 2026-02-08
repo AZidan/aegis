@@ -229,6 +229,7 @@ async function main() {
         'Automates repetitive task workflows including ticket triage, status updates, and cross-tool synchronization. Supports Jira, Linear, and Asana integrations.',
       category: 'productivity',
       status: 'approved',
+      isCore: true,
       authorId: admin.id,
       compatibleRoles: ['pm', 'operations', 'custom'],
       permissions: {
@@ -254,6 +255,7 @@ async function main() {
         'Generates professional documents from templates including PRDs, design docs, and meeting notes. Supports Markdown, PDF, and Confluence export.',
       category: 'productivity',
       status: 'approved',
+      isCore: true,
       authorId: admin.id,
       compatibleRoles: ['pm', 'engineering', 'data', 'custom'],
       permissions: {
@@ -279,6 +281,7 @@ async function main() {
         'Listens to meeting transcripts and produces structured summaries with action items, decisions, and key takeaways. Integrates with Zoom and Google Meet.',
       category: 'productivity',
       status: 'approved',
+      isCore: true,
       authorId: admin.id,
       compatibleRoles: ['pm', 'hr', 'custom'],
       permissions: {
@@ -305,6 +308,7 @@ async function main() {
         'Creates interactive data dashboards from SQL queries, CSV uploads, and API data sources. Supports chart types including bar, line, pie, and heatmaps.',
       category: 'analytics',
       status: 'approved',
+      isCore: true,
       authorId: admin.id,
       compatibleRoles: ['data', 'pm', 'engineering', 'custom'],
       permissions: {
@@ -332,6 +336,7 @@ async function main() {
         'Analyzes time-series data to identify trends, anomalies, and seasonal patterns. Provides forecasting with confidence intervals and alerting on significant deviations.',
       category: 'analytics',
       status: 'approved',
+      isCore: true,
       authorId: admin.id,
       compatibleRoles: ['data', 'operations', 'custom'],
       permissions: {
@@ -357,6 +362,7 @@ async function main() {
         'Generates scheduled and on-demand reports from multiple data sources. Supports weekly summaries, sprint retrospectives, and executive briefings with auto-distribution.',
       category: 'analytics',
       status: 'approved',
+      isCore: true,
       authorId: admin.id,
       compatibleRoles: ['data', 'pm', 'operations', 'custom'],
       permissions: {
@@ -383,6 +389,7 @@ async function main() {
         'Performs automated code reviews on pull requests. Checks for security vulnerabilities, code style violations, performance issues, and suggests improvements with inline comments.',
       category: 'engineering',
       status: 'approved',
+      isCore: true,
       authorId: admin.id,
       compatibleRoles: ['engineering', 'custom'],
       permissions: {
@@ -410,6 +417,7 @@ async function main() {
         'Monitors and manages CI/CD pipelines across GitHub Actions, GitLab CI, and Jenkins. Provides build failure diagnostics, deployment status tracking, and rollback automation.',
       category: 'engineering',
       status: 'approved',
+      isCore: true,
       authorId: admin.id,
       compatibleRoles: ['engineering', 'operations', 'custom'],
       permissions: {
@@ -441,6 +449,7 @@ async function main() {
         'Scans repositories and dependencies for known CVEs, license compliance issues, and secret leaks. Integrates with Snyk, Trivy, and GitHub Advanced Security.',
       category: 'engineering',
       status: 'approved',
+      isCore: true,
       authorId: admin.id,
       compatibleRoles: ['engineering', 'operations', 'custom'],
       permissions: {
@@ -467,6 +476,7 @@ async function main() {
         'Manages Slack bot interactions including automated responses, channel notifications, thread summarization, and workflow triggers based on message patterns.',
       category: 'communication',
       status: 'approved',
+      isCore: true,
       authorId: admin.id,
       compatibleRoles: ['operations', 'support', 'pm', 'custom'],
       permissions: {
@@ -492,6 +502,7 @@ async function main() {
         'Drafts and sends professional emails using templates and context-aware composition. Supports scheduling, follow-up tracking, and A/B subject line testing.',
       category: 'communication',
       status: 'approved',
+      isCore: true,
       authorId: admin.id,
       compatibleRoles: ['support', 'hr', 'pm', 'custom'],
       permissions: {
@@ -517,6 +528,7 @@ async function main() {
         'Routes notifications across multiple channels based on priority, recipient preferences, and escalation rules. Supports Slack, email, SMS, and PagerDuty.',
       category: 'communication',
       status: 'approved',
+      isCore: true,
       authorId: admin.id,
       compatibleRoles: ['operations', 'engineering', 'support', 'custom'],
       permissions: {
