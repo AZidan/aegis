@@ -2,14 +2,11 @@
 # Tracks active development scope and requirements per CLAUDE.md
 
 feature:
-  name: "Agent Dashboard + Activity Feed (Alignment v1.3.0)"
-  epic: "E5-F2"
-  sprint: "Sprint 3 - Agent Management & Tenant Dashboard"
+  name: "Sprint 4 — Integration, Config & Polish"
+  sprint: "Sprint 4 - Integration, Skills & Polish"
   priority: P0
-  points: 8
-  started_at: "2026-02-07"
-  status: in_progress
-  branch: agent-dashboard
+  started_at: "2026-02-08"
+  status: planning
 
 previous_completed:
   - epic: E3-F1
@@ -20,17 +17,42 @@ previous_completed:
     name: "Agent Tool Policy Configuration"
     points: 5
     tests: 65
+  - epic: E5-F2
+    name: "Agent Dashboard + Activity Feed"
+    points: 8
+    notes: "Includes E5-F3 agent creation wizard"
+  - epic: E5-F1
+    name: "Tenant Login OAuth"
+    points: 5
+    notes: "OAuth callback page + provider detection"
+  - epic: E4-F1
+    name: "Skill Catalog & Browsing UI"
+    points: 5
+    notes: "Includes E4-F2 install/uninstall — 91 backend tests"
 
-scope_changes:
-  - "Channels deferred to future sprint (requires OAuth/deep-link flows)"
-  - "Dynamic roles: new AgentRoleConfig table + GET /api/dashboard/roles"
-  - "ThinkingMode renamed: off→fast, low→standard, high→extended"
-  - "Tool policy: allow-only (deny removed)"
-  - "New agent fields: temperature, avatarColor, personality, errorMessage"
-  - "Dashboard stats: plan info, skillsInstalled, teamMembers, messageTrend"
-  - "All frontend pages wired to real backend APIs (no mock data)"
-
-notes: |
-  API Contract bumped to v1.3.0 with all alignment changes.
-  Backend: schema migration + roles module + DTO/service updates.
-  Frontend: types, hooks, pages, wizard all updated to match contract.
+sprint_4_stories:
+  - id: E4-F4
+    name: "Core Skill Bundle"
+    points: 5
+    scope: backend
+    notes: "Auto-install core skills on tenant provisioning"
+  - id: E2-F2
+    name: "Tenant Provisioning Wizard"
+    points: 5
+    scope: full-stack
+    notes: "3-step admin wizard: Company → Plan → Review & Provision"
+  - id: E1-F3
+    name: "Tenant Configuration Management"
+    points: 5
+    scope: backend
+    notes: "Config API with validation and hot-reload"
+  - id: E2-F3
+    name: "Tenant Detail & Configuration Panel"
+    points: 5
+    scope: full-stack
+    notes: "Tabbed detail page with config editor"
+  - id: E2E
+    name: "End-to-End Testing"
+    points: 5
+    scope: testing
+    notes: "Happy path integration tests"

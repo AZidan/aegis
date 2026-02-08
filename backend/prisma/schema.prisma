@@ -214,10 +214,29 @@ model Tenant {
   containerHealth ContainerHealth[]
   alerts          Alert[]
 
+  configHistory   TenantConfigHistory[]
   @@index([companyName])
   @@index([status])
   @@index([plan])
   @@map("tenants")
+}
+
+/// TenantConfigHistory - Versioned snapshots of tenant configuration changes
+model TenantConfigHistory {
+  id                String   @id @default(uuid())
+
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  config            Json     // Full config snapshot at this point in time
+  changedBy         String   // userId who made the change
+  changeDescription String?  // Optional human-readable description of what changed
+
+  createdAt         DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([createdAt])
+  @@map("tenant_config_history")
 }
 
 /// Agents - AI agents deployed for tenants
