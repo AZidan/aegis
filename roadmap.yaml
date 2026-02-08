@@ -606,6 +606,37 @@ epics:
           - "Skill catalog embedded page"
           - "Agent skill management panel"
 
+      - id: E5-F6
+        title: "Channel Integration (OAuth/Deep-Link)"
+        priority: "P1"
+        user_story: >
+          As a Tenant Admin, I want to connect agents to communication channels
+          (Telegram, Slack) via OAuth or deep-link flows so that agents can
+          receive and respond to messages from external platforms.
+        acceptance_criteria:
+          - "OAuth flow for Slack workspace connection"
+          - "Telegram bot token setup with deep-link verification"
+          - "Channel status shown on agent detail page"
+          - "Wizard step 4 enables channel binding after OAuth completes"
+        screens:
+          - "Channel connection OAuth redirect flow"
+          - "Channel status indicator on agent card"
+        notes: "Deferred from Sprint 3 — requires OAuth provider integration and deep-link flows"
+
+      - id: E5-F7
+        title: "Dynamic Agent Role Configuration"
+        priority: "P0"
+        user_story: >
+          As a Tenant Admin, I want agent roles to be dynamic and configurable
+          so that I can add custom department roles beyond the default PM/Eng/Ops.
+        acceptance_criteria:
+          - "GET /api/dashboard/roles returns available role configurations"
+          - "Roles stored in AgentRoleConfig table with name, label, color, default tools"
+          - "Agent creation wizard populates roles dynamically from API"
+          - "7 default roles: pm, engineering, operations, support, data, hr, custom"
+        screens:
+          - "Role selection in agent creation wizard"
+
       - id: E5-F5
         title: "Communication Allowlist Configuration"
         priority: "P1"

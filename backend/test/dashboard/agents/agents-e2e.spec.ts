@@ -32,7 +32,7 @@ const mockCreateResponse = {
   role: 'pm',
   status: 'provisioning',
   modelTier: 'sonnet',
-  thinkingMode: 'low',
+  thinkingMode: 'standard',
   createdAt: '2026-02-05T12:00:00.000Z',
 };
 
@@ -44,7 +44,9 @@ const mockListResponse = {
       role: 'pm',
       status: 'active',
       modelTier: 'sonnet',
-      thinkingMode: 'low',
+      thinkingMode: 'standard',
+      temperature: 0.3,
+      avatarColor: '#6366f1',
       lastActive: '2026-02-05T11:30:00.000Z',
       createdAt: '2026-01-20T09:00:00.000Z',
     },
@@ -54,7 +56,9 @@ const mockListResponse = {
       role: 'engineering',
       status: 'idle',
       modelTier: 'opus',
-      thinkingMode: 'high',
+      thinkingMode: 'extended',
+      temperature: 0.5,
+      avatarColor: '#10b981',
       lastActive: '2026-02-04T16:00:00.000Z',
       createdAt: '2026-01-22T10:00:00.000Z',
     },
@@ -67,8 +71,10 @@ const mockDetailResponse = {
   role: 'pm',
   status: 'active',
   modelTier: 'sonnet',
-  thinkingMode: 'low',
-  toolPolicy: { allow: ['web_search'], deny: [] },
+  thinkingMode: 'standard',
+  temperature: 0.3,
+  avatarColor: '#6366f1',
+  toolPolicy: { allow: ['web_search'] },
   metrics: { messagesLast24h: 25, toolInvocationsLast24h: 10, avgResponseTime: 1500 },
   skills: [{ id: 'skill-1', name: 'Web Search', version: '1.0.0' }],
   lastActive: '2026-02-05T11:30:00.000Z',
@@ -80,7 +86,7 @@ const mockUpdateResponse = {
   id: AGENT_ID,
   name: 'Updated Bot',
   modelTier: 'opus',
-  thinkingMode: 'high',
+  thinkingMode: 'extended',
   updatedAt: '2026-02-05T14:00:00.000Z',
 };
 
@@ -151,9 +157,11 @@ describe('AgentsController', () => {
 
       const dto = {
         name: 'New Agent',
-        role: 'pm' as const,
+        role: 'pm',
         modelTier: 'sonnet' as const,
-        thinkingMode: 'low' as const,
+        thinkingMode: 'standard' as const,
+        temperature: 0.3,
+        avatarColor: '#6366f1',
         toolPolicy: { allow: ['web_search'] },
       };
 
@@ -176,9 +184,11 @@ describe('AgentsController', () => {
 
       const dto = {
         name: 'New Agent',
-        role: 'pm' as const,
+        role: 'pm',
         modelTier: 'sonnet' as const,
-        thinkingMode: 'low' as const,
+        thinkingMode: 'standard' as const,
+        temperature: 0.3,
+        avatarColor: '#6366f1',
         toolPolicy: { allow: [] },
       };
 
@@ -192,16 +202,14 @@ describe('AgentsController', () => {
 
       const dto = {
         name: 'New Agent',
-        role: 'pm' as const,
+        role: 'pm',
         description: 'Manages project tasks',
         modelTier: 'sonnet' as const,
-        thinkingMode: 'low' as const,
-        toolPolicy: { allow: ['web_search'], deny: ['file_delete'] },
-        channel: {
-          type: 'telegram' as const,
-          token: 'bot-token',
-          chatId: '-1001234567890',
-        },
+        thinkingMode: 'standard' as const,
+        toolPolicy: { allow: ['web_search'] },
+        temperature: 0.5,
+        avatarColor: '#ff0000',
+        personality: 'Friendly',
       };
 
       await controller.createAgent(mockRequest, dto);
@@ -226,7 +234,7 @@ describe('AgentsController', () => {
 
     it('should pass filter query params to service', async () => {
       agentsService.listAgents.mockResolvedValue(mockListResponse);
-      const query = { status: 'active' as const, role: 'pm' as const };
+      const query = { status: 'active' as const, role: 'pm' };
 
       await controller.listAgents(mockRequest, query);
 
@@ -315,7 +323,7 @@ describe('AgentsController', () => {
     it('should allow partial update (single field)', async () => {
       agentsService.updateAgent.mockResolvedValue(mockUpdateResponse);
 
-      const dto = { thinkingMode: 'high' as const };
+      const dto = { thinkingMode: 'extended' as const };
       await controller.updateAgent(mockRequest, AGENT_ID, dto);
 
       expect(agentsService.updateAgent).toHaveBeenCalledWith(

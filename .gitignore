@@ -16,6 +16,9 @@ backup_*.sql
 logs/
 *.log
 
+# CodeMap indexes
+.codemap/
+
 # OS files
 .DS_Store
 Thumbs.db

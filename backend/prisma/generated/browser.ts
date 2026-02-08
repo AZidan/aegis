@@ -33,6 +33,11 @@ export type Tenant = Prisma.TenantModel
  */
 export type Agent = Prisma.AgentModel
 /**
+ * Model AgentRoleConfig
+ * AgentRoleConfig - Dynamic agent role configuration
+ */
+export type AgentRoleConfig = Prisma.AgentRoleConfigModel
+/**
  * Model Skill
  * Skills - Marketplace skills for agents
  */

@@ -30,12 +30,12 @@ export class ToolsService {
    * Validates that the role exists in ROLE_DEFAULT_POLICIES.
    * Throws 404 if the role is not recognized.
    *
-   * Response format:
-   * { role: string, policy: { allow: string[], deny: string[] } }
+   * Response format (v1.3.0 - allow-only):
+   * { role: string, policy: { allow: string[] } }
    */
   getDefaultsForRole(role: string): {
     role: string;
-    policy: { allow: string[]; deny: string[] };
+    policy: { allow: string[] };
   } {
     const policy = ROLE_DEFAULT_POLICIES[role];
 

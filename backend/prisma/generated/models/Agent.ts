@@ -20,19 +20,32 @@ export type AgentModel = runtime.Types.Result.DefaultSelection<Prisma.$AgentPayl
 
 export type AggregateAgent = {
   _count: AgentCountAggregateOutputType | null
+  _avg: AgentAvgAggregateOutputType | null
+  _sum: AgentSumAggregateOutputType | null
   _min: AgentMinAggregateOutputType | null
   _max: AgentMaxAggregateOutputType | null
+}
+
+export type AgentAvgAggregateOutputType = {
+  temperature: number | null
+}
+
+export type AgentSumAggregateOutputType = {
+  temperature: number | null
 }
 
 export type AgentMinAggregateOutputType = {
   id: string | null
   name: string | null
   description: string | null
-  role: $Enums.AgentRole | null
+  role: string | null
   status: $Enums.AgentStatus | null
   tenantId: string | null
   modelTier: $Enums.ModelTier | null
   thinkingMode: $Enums.ThinkingMode | null
+  temperature: number | null
+  avatarColor: string | null
+  personality: string | null
   openclawAgentId: string | null
   lastActive: Date | null
   createdAt: Date | null
@@ -43,11 +56,14 @@ export type AgentMaxAggregateOutputType = {
   id: string | null
   name: string | null
   description: string | null
-  role: $Enums.AgentRole | null
+  role: string | null
   status: $Enums.AgentStatus | null
   tenantId: string | null
   modelTier: $Enums.ModelTier | null
   thinkingMode: $Enums.ThinkingMode | null
+  temperature: number | null
+  avatarColor: string | null
+  personality: string | null
   openclawAgentId: string | null
   lastActive: Date | null
   createdAt: Date | null
@@ -63,6 +79,9 @@ export type AgentCountAggregateOutputType = {
   tenantId: number
   modelTier: number
   thinkingMode: number
+  temperature: number
+  avatarColor: number
+  personality: number
   toolPolicy: number
   assistedUser: number
   openclawAgentId: number
@@ -73,6 +92,14 @@ export type AgentCountAggregateOutputType = {
 }
 
 
+export type AgentAvgAggregateInputType = {
+  temperature?: true
+}
+
+export type AgentSumAggregateInputType = {
+  temperature?: true
+}
+
 export type AgentMinAggregateInputType = {
   id?: true
   name?: true
@@ -82,6 +109,9 @@ export type AgentMinAggregateInputType = {
   tenantId?: true
   modelTier?: true
   thinkingMode?: true
+  temperature?: true
+  avatarColor?: true
+  personality?: true
   openclawAgentId?: true
   lastActive?: true
   createdAt?: true
@@ -97,6 +127,9 @@ export type AgentMaxAggregateInputType = {
   tenantId?: true
   modelTier?: true
   thinkingMode?: true
+  temperature?: true
+  avatarColor?: true
+  personality?: true
   openclawAgentId?: true
   lastActive?: true
   createdAt?: true
@@ -112,6 +145,9 @@ export type AgentCountAggregateInputType = {
   tenantId?: true
   modelTier?: true
   thinkingMode?: true
+  temperature?: true
+  avatarColor?: true
+  personality?: true
   toolPolicy?: true
   assistedUser?: true
   openclawAgentId?: true
@@ -159,6 +195,18 @@ export type AgentAggregateArgs<ExtArgs extends runtime.Types.Extensions.Internal
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: AgentAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: AgentSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: AgentMinAggregateInputType
@@ -189,6 +237,8 @@ export type AgentGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   _count?: AgentCountAggregateInputType | true
+  _avg?: AgentAvgAggregateInputType
+  _sum?: AgentSumAggregateInputType
   _min?: AgentMinAggregateInputType
   _max?: AgentMaxAggregateInputType
 }
@@ -197,11 +247,14 @@ export type AgentGroupByOutputType = {
   id: string
   name: string
   description: string | null
-  role: $Enums.AgentRole
+  role: string
   status: $Enums.AgentStatus
   tenantId: string
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature: number
+  avatarColor: string
+  personality: string | null
   toolPolicy: runtime.JsonValue
   assistedUser: runtime.JsonValue | null
   openclawAgentId: string | null
@@ -209,6 +262,8 @@ export type AgentGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   _count: AgentCountAggregateOutputType | null
+  _avg: AgentAvgAggregateOutputType | null
+  _sum: AgentSumAggregateOutputType | null
   _min: AgentMinAggregateOutputType | null
   _max: AgentMaxAggregateOutputType | null
 }
@@ -235,11 +290,14 @@ export type AgentWhereInput = {
   id?: Prisma.StringFilter<"Agent"> | string
   name?: Prisma.StringFilter<"Agent"> | string
   description?: Prisma.StringNullableFilter<"Agent"> | string | null
-  role?: Prisma.EnumAgentRoleFilter<"Agent"> | $Enums.AgentRole
+  role?: Prisma.StringFilter<"Agent"> | string
   status?: Prisma.EnumAgentStatusFilter<"Agent"> | $Enums.AgentStatus
   tenantId?: Prisma.StringFilter<"Agent"> | string
   modelTier?: Prisma.EnumModelTierFilter<"Agent"> | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFilter<"Agent"> | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFilter<"Agent"> | number
+  avatarColor?: Prisma.StringFilter<"Agent"> | string
+  personality?: Prisma.StringNullableFilter<"Agent"> | string | null
   toolPolicy?: Prisma.JsonFilter<"Agent">
   assistedUser?: Prisma.JsonNullableFilter<"Agent">
   openclawAgentId?: Prisma.StringNullableFilter<"Agent"> | string | null
@@ -263,6 +321,9 @@ export type AgentOrderByWithRelationInput = {
   tenantId?: Prisma.SortOrder
   modelTier?: Prisma.SortOrder
   thinkingMode?: Prisma.SortOrder
+  temperature?: Prisma.SortOrder
+  avatarColor?: Prisma.SortOrder
+  personality?: Prisma.SortOrderInput | Prisma.SortOrder
   toolPolicy?: Prisma.SortOrder
   assistedUser?: Prisma.SortOrderInput | Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -284,11 +345,14 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.AgentWhereInput | Prisma.AgentWhereInput[]
   name?: Prisma.StringFilter<"Agent"> | string
   description?: Prisma.StringNullableFilter<"Agent"> | string | null
-  role?: Prisma.EnumAgentRoleFilter<"Agent"> | $Enums.AgentRole
+  role?: Prisma.StringFilter<"Agent"> | string
   status?: Prisma.EnumAgentStatusFilter<"Agent"> | $Enums.AgentStatus
   tenantId?: Prisma.StringFilter<"Agent"> | string
   modelTier?: Prisma.EnumModelTierFilter<"Agent"> | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFilter<"Agent"> | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFilter<"Agent"> | number
+  avatarColor?: Prisma.StringFilter<"Agent"> | string
+  personality?: Prisma.StringNullableFilter<"Agent"> | string | null
   toolPolicy?: Prisma.JsonFilter<"Agent">
   assistedUser?: Prisma.JsonNullableFilter<"Agent">
   openclawAgentId?: Prisma.StringNullableFilter<"Agent"> | string | null
@@ -312,6 +376,9 @@ export type AgentOrderByWithAggregationInput = {
   tenantId?: Prisma.SortOrder
   modelTier?: Prisma.SortOrder
   thinkingMode?: Prisma.SortOrder
+  temperature?: Prisma.SortOrder
+  avatarColor?: Prisma.SortOrder
+  personality?: Prisma.SortOrderInput | Prisma.SortOrder
   toolPolicy?: Prisma.SortOrder
   assistedUser?: Prisma.SortOrderInput | Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -319,8 +386,10 @@ export type AgentOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.AgentCountOrderByAggregateInput
+  _avg?: Prisma.AgentAvgOrderByAggregateInput
   _max?: Prisma.AgentMaxOrderByAggregateInput
   _min?: Prisma.AgentMinOrderByAggregateInput
+  _sum?: Prisma.AgentSumOrderByAggregateInput
 }
 
 export type AgentScalarWhereWithAggregatesInput = {
@@ -330,11 +399,14 @@ export type AgentScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Agent"> | string
   name?: Prisma.StringWithAggregatesFilter<"Agent"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
-  role?: Prisma.EnumAgentRoleWithAggregatesFilter<"Agent"> | $Enums.AgentRole
+  role?: Prisma.StringWithAggregatesFilter<"Agent"> | string
   status?: Prisma.EnumAgentStatusWithAggregatesFilter<"Agent"> | $Enums.AgentStatus
   tenantId?: Prisma.StringWithAggregatesFilter<"Agent"> | string
   modelTier?: Prisma.EnumModelTierWithAggregatesFilter<"Agent"> | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeWithAggregatesFilter<"Agent"> | $Enums.ThinkingMode
+  temperature?: Prisma.FloatWithAggregatesFilter<"Agent"> | number
+  avatarColor?: Prisma.StringWithAggregatesFilter<"Agent"> | string
+  personality?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
   toolPolicy?: Prisma.JsonWithAggregatesFilter<"Agent">
   assistedUser?: Prisma.JsonNullableWithAggregatesFilter<"Agent">
   openclawAgentId?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
@@ -347,10 +419,13 @@ export type AgentCreateInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -369,11 +444,14 @@ export type AgentUncheckedCreateInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   tenantId: string
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -391,10 +469,13 @@ export type AgentUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -413,11 +494,14 @@ export type AgentUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -435,11 +519,14 @@ export type AgentCreateManyInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   tenantId: string
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -452,10 +539,13 @@ export type AgentUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -468,11 +558,14 @@ export type AgentUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -500,12 +593,19 @@ export type AgentCountOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   modelTier?: Prisma.SortOrder
   thinkingMode?: Prisma.SortOrder
+  temperature?: Prisma.SortOrder
+  avatarColor?: Prisma.SortOrder
+  personality?: Prisma.SortOrder
   toolPolicy?: Prisma.SortOrder
   assistedUser?: Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrder
   lastActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type AgentAvgOrderByAggregateInput = {
+  temperature?: Prisma.SortOrder
 }
 
 export type AgentMaxOrderByAggregateInput = {
@@ -517,6 +617,9 @@ export type AgentMaxOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   modelTier?: Prisma.SortOrder
   thinkingMode?: Prisma.SortOrder
+  temperature?: Prisma.SortOrder
+  avatarColor?: Prisma.SortOrder
+  personality?: Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrder
   lastActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -532,10 +635,17 @@ export type AgentMinOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   modelTier?: Prisma.SortOrder
   thinkingMode?: Prisma.SortOrder
+  temperature?: Prisma.SortOrder
+  avatarColor?: Prisma.SortOrder
+  personality?: Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrder
   lastActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type AgentSumOrderByAggregateInput = {
+  temperature?: Prisma.SortOrder
 }
 
 export type AgentScalarRelationFilter = {
@@ -590,10 +700,6 @@ export type AgentUncheckedUpdateManyWithoutTenantNestedInput = {
   deleteMany?: Prisma.AgentScalarWhereInput | Prisma.AgentScalarWhereInput[]
 }
 
-export type EnumAgentRoleFieldUpdateOperationsInput = {
-  set?: $Enums.AgentRole
-}
-
 export type EnumAgentStatusFieldUpdateOperationsInput = {
   set?: $Enums.AgentStatus
 }
@@ -604,6 +710,14 @@ export type EnumModelTierFieldUpdateOperationsInput = {
 
 export type EnumThinkingModeFieldUpdateOperationsInput = {
   set?: $Enums.ThinkingMode
+}
+
+export type FloatFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type AgentCreateNestedOneWithoutChannelsInput = {
@@ -682,10 +796,13 @@ export type AgentCreateWithoutTenantInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -703,10 +820,13 @@ export type AgentUncheckedCreateWithoutTenantInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -753,11 +873,14 @@ export type AgentScalarWhereInput = {
   id?: Prisma.StringFilter<"Agent"> | string
   name?: Prisma.StringFilter<"Agent"> | string
   description?: Prisma.StringNullableFilter<"Agent"> | string | null
-  role?: Prisma.EnumAgentRoleFilter<"Agent"> | $Enums.AgentRole
+  role?: Prisma.StringFilter<"Agent"> | string
   status?: Prisma.EnumAgentStatusFilter<"Agent"> | $Enums.AgentStatus
   tenantId?: Prisma.StringFilter<"Agent"> | string
   modelTier?: Prisma.EnumModelTierFilter<"Agent"> | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFilter<"Agent"> | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFilter<"Agent"> | number
+  avatarColor?: Prisma.StringFilter<"Agent"> | string
+  personality?: Prisma.StringNullableFilter<"Agent"> | string | null
   toolPolicy?: Prisma.JsonFilter<"Agent">
   assistedUser?: Prisma.JsonNullableFilter<"Agent">
   openclawAgentId?: Prisma.StringNullableFilter<"Agent"> | string | null
@@ -770,10 +893,13 @@ export type AgentCreateWithoutChannelsInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -791,11 +917,14 @@ export type AgentUncheckedCreateWithoutChannelsInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   tenantId: string
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -828,10 +957,13 @@ export type AgentUpdateWithoutChannelsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -849,11 +981,14 @@ export type AgentUncheckedUpdateWithoutChannelsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -870,10 +1005,13 @@ export type AgentCreateWithoutActivitiesInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -891,11 +1029,14 @@ export type AgentUncheckedCreateWithoutActivitiesInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   tenantId: string
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -928,10 +1069,13 @@ export type AgentUpdateWithoutActivitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -949,11 +1093,14 @@ export type AgentUncheckedUpdateWithoutActivitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -970,10 +1117,13 @@ export type AgentCreateWithoutMetricsInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -991,11 +1141,14 @@ export type AgentUncheckedCreateWithoutMetricsInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   tenantId: string
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -1028,10 +1181,13 @@ export type AgentUpdateWithoutMetricsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1049,11 +1205,14 @@ export type AgentUncheckedUpdateWithoutMetricsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1070,10 +1229,13 @@ export type AgentCreateWithoutInstalledSkillsInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -1091,11 +1253,14 @@ export type AgentUncheckedCreateWithoutInstalledSkillsInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   tenantId: string
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -1128,10 +1293,13 @@ export type AgentUpdateWithoutInstalledSkillsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1149,11 +1317,14 @@ export type AgentUncheckedUpdateWithoutInstalledSkillsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1170,10 +1341,13 @@ export type AgentCreateWithoutAuditLogsInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -1191,11 +1365,14 @@ export type AgentUncheckedCreateWithoutAuditLogsInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   tenantId: string
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -1228,10 +1405,13 @@ export type AgentUpdateWithoutAuditLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1249,11 +1429,14 @@ export type AgentUncheckedUpdateWithoutAuditLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1270,10 +1453,13 @@ export type AgentCreateManyTenantInput = {
   id?: string
   name: string
   description?: string | null
-  role: $Enums.AgentRole
+  role: string
   status?: $Enums.AgentStatus
   modelTier: $Enums.ModelTier
   thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
@@ -1286,10 +1472,13 @@ export type AgentUpdateWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1307,10 +1496,13 @@ export type AgentUncheckedUpdateWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1328,10 +1520,13 @@ export type AgentUncheckedUpdateManyWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumAgentRoleFieldUpdateOperationsInput | $Enums.AgentRole
+  role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
   thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1416,6 +1611,9 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   tenantId?: boolean
   modelTier?: boolean
   thinkingMode?: boolean
+  temperature?: boolean
+  avatarColor?: boolean
+  personality?: boolean
   toolPolicy?: boolean
   assistedUser?: boolean
   openclawAgentId?: boolean
@@ -1440,6 +1638,9 @@ export type AgentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   tenantId?: boolean
   modelTier?: boolean
   thinkingMode?: boolean
+  temperature?: boolean
+  avatarColor?: boolean
+  personality?: boolean
   toolPolicy?: boolean
   assistedUser?: boolean
   openclawAgentId?: boolean
@@ -1458,6 +1659,9 @@ export type AgentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   tenantId?: boolean
   modelTier?: boolean
   thinkingMode?: boolean
+  temperature?: boolean
+  avatarColor?: boolean
+  personality?: boolean
   toolPolicy?: boolean
   assistedUser?: boolean
   openclawAgentId?: boolean
@@ -1476,6 +1680,9 @@ export type AgentSelectScalar = {
   tenantId?: boolean
   modelTier?: boolean
   thinkingMode?: boolean
+  temperature?: boolean
+  avatarColor?: boolean
+  personality?: boolean
   toolPolicy?: boolean
   assistedUser?: boolean
   openclawAgentId?: boolean
@@ -1484,7 +1691,7 @@ export type AgentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "role" | "status" | "tenantId" | "modelTier" | "thinkingMode" | "toolPolicy" | "assistedUser" | "openclawAgentId" | "lastActive" | "createdAt" | "updatedAt", ExtArgs["result"]["agent"]>
+export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "role" | "status" | "tenantId" | "modelTier" | "thinkingMode" | "temperature" | "avatarColor" | "personality" | "toolPolicy" | "assistedUser" | "openclawAgentId" | "lastActive" | "createdAt" | "updatedAt", ExtArgs["result"]["agent"]>
 export type AgentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   channels?: boolean | Prisma.Agent$channelsArgs<ExtArgs>
@@ -1515,11 +1722,14 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     id: string
     name: string
     description: string | null
-    role: $Enums.AgentRole
+    role: string
     status: $Enums.AgentStatus
     tenantId: string
     modelTier: $Enums.ModelTier
     thinkingMode: $Enums.ThinkingMode
+    temperature: number
+    avatarColor: string
+    personality: string | null
     toolPolicy: runtime.JsonValue
     assistedUser: runtime.JsonValue | null
     openclawAgentId: string | null
@@ -1958,11 +2168,14 @@ export interface AgentFieldRefs {
   readonly id: Prisma.FieldRef<"Agent", 'String'>
   readonly name: Prisma.FieldRef<"Agent", 'String'>
   readonly description: Prisma.FieldRef<"Agent", 'String'>
-  readonly role: Prisma.FieldRef<"Agent", 'AgentRole'>
+  readonly role: Prisma.FieldRef<"Agent", 'String'>
   readonly status: Prisma.FieldRef<"Agent", 'AgentStatus'>
   readonly tenantId: Prisma.FieldRef<"Agent", 'String'>
   readonly modelTier: Prisma.FieldRef<"Agent", 'ModelTier'>
   readonly thinkingMode: Prisma.FieldRef<"Agent", 'ThinkingMode'>
+  readonly temperature: Prisma.FieldRef<"Agent", 'Float'>
+  readonly avatarColor: Prisma.FieldRef<"Agent", 'String'>
+  readonly personality: Prisma.FieldRef<"Agent", 'String'>
   readonly toolPolicy: Prisma.FieldRef<"Agent", 'Json'>
   readonly assistedUser: Prisma.FieldRef<"Agent", 'Json'>
   readonly openclawAgentId: Prisma.FieldRef<"Agent", 'String'>

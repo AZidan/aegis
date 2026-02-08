@@ -4,7 +4,7 @@ import { createAgentSchema } from '../../../src/dashboard/agents/dto/create-agen
  * CreateAgentDto Validation Tests
  *
  * Tests the Zod validation schema for the Create Agent endpoint
- * (POST /api/dashboard/agents) as specified in API Contract v1.2.0 Section 6.
+ * (POST /api/dashboard/agents) as specified in API Contract v1.3.0 Section 6.
  */
 describe('CreateAgentDto (Zod Schema)', () => {
   // ============================================================
@@ -13,9 +13,9 @@ describe('CreateAgentDto (Zod Schema)', () => {
   describe('valid payloads', () => {
     const validBase = {
       name: 'Project Manager Bot',
-      role: 'pm' as const,
+      role: 'pm',
       modelTier: 'sonnet' as const,
-      thinkingMode: 'low' as const,
+      thinkingMode: 'standard' as const,
       toolPolicy: { allow: ['web_search', 'code_exec'] },
     };
 
@@ -30,11 +30,9 @@ describe('CreateAgentDto (Zod Schema)', () => {
         description: 'Manages project tasks and sprints',
         assistedUserId: '550e8400-e29b-41d4-a716-446655440000',
         assistedUserRole: 'product_manager',
-        channel: {
-          type: 'telegram',
-          token: 'bot123456:ABC-DEF1234ghIkl',
-          chatId: '-1001234567890',
-        },
+        temperature: 0.5,
+        avatarColor: '#ff0000',
+        personality: 'Friendly and organized',
       });
 
       expect(result.success).toBe(true);
@@ -58,8 +56,8 @@ describe('CreateAgentDto (Zod Schema)', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should accept all valid role values', () => {
-      const roles = ['pm', 'engineering', 'operations', 'custom'] as const;
+    it('should accept any string as role (dynamic roles)', () => {
+      const roles = ['pm', 'engineering', 'operations', 'custom', 'support', 'data', 'hr', 'my_custom_role'];
       for (const role of roles) {
         const result = createAgentSchema.safeParse({ ...validBase, role });
         expect(result.success).toBe(true);
@@ -75,7 +73,7 @@ describe('CreateAgentDto (Zod Schema)', () => {
     });
 
     it('should accept all valid thinkingMode values', () => {
-      const modes = ['off', 'low', 'high'] as const;
+      const modes = ['fast', 'standard', 'extended'] as const;
       for (const thinkingMode of modes) {
         const result = createAgentSchema.safeParse({
           ...validBase,
@@ -94,18 +92,6 @@ describe('CreateAgentDto (Zod Schema)', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should accept toolPolicy with allow and deny arrays', () => {
-      const result = createAgentSchema.safeParse({
-        ...validBase,
-        toolPolicy: {
-          allow: ['web_search', 'code_exec'],
-          deny: ['file_delete'],
-        },
-      });
-
-      expect(result.success).toBe(true);
-    });
-
     it('should accept empty allow array in toolPolicy', () => {
       const result = createAgentSchema.safeParse({
         ...validBase,
@@ -115,40 +101,34 @@ describe('CreateAgentDto (Zod Schema)', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should accept telegram channel binding', () => {
-      const result = createAgentSchema.safeParse({
-        ...validBase,
-        channel: {
-          type: 'telegram',
-          token: 'bot-token-123',
-          chatId: '-1001234567890',
-        },
-      });
-
-      expect(result.success).toBe(true);
+    it('should accept temperature values between 0 and 1', () => {
+      for (const temperature of [0, 0.3, 0.5, 1]) {
+        const result = createAgentSchema.safeParse({ ...validBase, temperature });
+        expect(result.success).toBe(true);
+      }
     });
 
-    it('should accept slack channel binding', () => {
-      const result = createAgentSchema.safeParse({
-        ...validBase,
-        channel: {
-          type: 'slack',
-          workspaceId: 'T01234567',
-          channelId: 'C01234567',
-        },
-      });
-
+    it('should default temperature to 0.3 when not provided', () => {
+      const result = createAgentSchema.safeParse(validBase);
       expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.temperature).toBe(0.3);
+      }
     });
 
-    it('should accept channel with type only (no credentials)', () => {
+    it('should default avatarColor to #6366f1 when not provided', () => {
+      const result = createAgentSchema.safeParse(validBase);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.avatarColor).toBe('#6366f1');
+      }
+    });
+
+    it('should accept personality string', () => {
       const result = createAgentSchema.safeParse({
         ...validBase,
-        channel: {
-          type: 'telegram',
-        },
+        personality: 'Helpful and detail-oriented',
       });
-
       expect(result.success).toBe(true);
     });
 
@@ -159,14 +139,6 @@ describe('CreateAgentDto (Zod Schema)', () => {
       };
       const result = createAgentSchema.safeParse(withoutDescription);
       expect(result.success).toBe(true);
-    });
-
-    it('should accept without optional channel', () => {
-      const result = createAgentSchema.safeParse(validBase);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.channel).toBeUndefined();
-      }
     });
 
     it('should accept without optional assistedUserId and assistedUserRole', () => {
@@ -185,9 +157,9 @@ describe('CreateAgentDto (Zod Schema)', () => {
   describe('invalid payloads', () => {
     const validBase = {
       name: 'Project Manager Bot',
-      role: 'pm' as const,
+      role: 'pm',
       modelTier: 'sonnet' as const,
-      thinkingMode: 'low' as const,
+      thinkingMode: 'standard' as const,
       toolPolicy: { allow: ['web_search'] },
     };
 
@@ -219,10 +191,10 @@ describe('CreateAgentDto (Zod Schema)', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should reject invalid role value', () => {
+    it('should reject empty role string', () => {
       const result = createAgentSchema.safeParse({
         ...validBase,
-        role: 'invalid_role',
+        role: '',
       });
       expect(result.success).toBe(false);
     });
@@ -255,6 +227,16 @@ describe('CreateAgentDto (Zod Schema)', () => {
       expect(result.success).toBe(false);
     });
 
+    it('should reject old thinkingMode values (off, low, high)', () => {
+      for (const mode of ['off', 'low', 'high']) {
+        const result = createAgentSchema.safeParse({
+          ...validBase,
+          thinkingMode: mode,
+        });
+        expect(result.success).toBe(false);
+      }
+    });
+
     it('should reject missing toolPolicy', () => {
       const { toolPolicy, ...withoutToolPolicy } = validBase;
       const result = createAgentSchema.safeParse(withoutToolPolicy);
@@ -264,15 +246,7 @@ describe('CreateAgentDto (Zod Schema)', () => {
     it('should reject toolPolicy without allow array', () => {
       const result = createAgentSchema.safeParse({
         ...validBase,
-        toolPolicy: { deny: ['file_delete'] },
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('should reject invalid channel type', () => {
-      const result = createAgentSchema.safeParse({
-        ...validBase,
-        channel: { type: 'discord' },
+        toolPolicy: {},
       });
       expect(result.success).toBe(false);
     });
@@ -281,6 +255,22 @@ describe('CreateAgentDto (Zod Schema)', () => {
       const result = createAgentSchema.safeParse({
         ...validBase,
         assistedUserId: 'not-a-uuid',
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject temperature below 0', () => {
+      const result = createAgentSchema.safeParse({
+        ...validBase,
+        temperature: -0.1,
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject temperature above 1', () => {
+      const result = createAgentSchema.safeParse({
+        ...validBase,
+        temperature: 1.1,
       });
       expect(result.success).toBe(false);
     });

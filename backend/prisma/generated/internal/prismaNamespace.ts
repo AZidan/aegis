@@ -387,6 +387,7 @@ export const ModelName = {
   User: 'User',
   Tenant: 'Tenant',
   Agent: 'Agent',
+  AgentRoleConfig: 'AgentRoleConfig',
   Skill: 'Skill',
   RefreshToken: 'RefreshToken',
   ApiKey: 'ApiKey',
@@ -414,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "tenant" | "agent" | "skill" | "refreshToken" | "apiKey" | "teamMember" | "teamInvite" | "agentChannel" | "agentActivity" | "agentMetrics" | "skillInstallation" | "containerHealth" | "alert" | "auditLog"
+    modelProps: "user" | "tenant" | "agent" | "agentRoleConfig" | "skill" | "refreshToken" | "apiKey" | "teamMember" | "teamInvite" | "agentChannel" | "agentActivity" | "agentMetrics" | "skillInstallation" | "containerHealth" | "alert" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -637,6 +638,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AgentCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AgentCountAggregateOutputType> | number
+        }
+      }
+    }
+    AgentRoleConfig: {
+      payload: Prisma.$AgentRoleConfigPayload<ExtArgs>
+      fields: Prisma.AgentRoleConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgentRoleConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRoleConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgentRoleConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRoleConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.AgentRoleConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRoleConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgentRoleConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRoleConfigPayload>
+        }
+        findMany: {
+          args: Prisma.AgentRoleConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRoleConfigPayload>[]
+        }
+        create: {
+          args: Prisma.AgentRoleConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRoleConfigPayload>
+        }
+        createMany: {
+          args: Prisma.AgentRoleConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgentRoleConfigCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRoleConfigPayload>[]
+        }
+        delete: {
+          args: Prisma.AgentRoleConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRoleConfigPayload>
+        }
+        update: {
+          args: Prisma.AgentRoleConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRoleConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.AgentRoleConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgentRoleConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgentRoleConfigUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRoleConfigPayload>[]
+        }
+        upsert: {
+          args: Prisma.AgentRoleConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRoleConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.AgentRoleConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgentRoleConfig>
+        }
+        groupBy: {
+          args: Prisma.AgentRoleConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentRoleConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgentRoleConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentRoleConfigCountAggregateOutputType> | number
         }
       }
     }
@@ -1624,6 +1699,9 @@ export const AgentScalarFieldEnum = {
   tenantId: 'tenantId',
   modelTier: 'modelTier',
   thinkingMode: 'thinkingMode',
+  temperature: 'temperature',
+  avatarColor: 'avatarColor',
+  personality: 'personality',
   toolPolicy: 'toolPolicy',
   assistedUser: 'assistedUser',
   openclawAgentId: 'openclawAgentId',
@@ -1633,6 +1711,22 @@ export const AgentScalarFieldEnum = {
 } as const
 
 export type AgentScalarFieldEnum = (typeof AgentScalarFieldEnum)[keyof typeof AgentScalarFieldEnum]
+
+
+export const AgentRoleConfigScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  label: 'label',
+  description: 'description',
+  color: 'color',
+  defaultToolCategories: 'defaultToolCategories',
+  sortOrder: 'sortOrder',
+  isSystem: 'isSystem',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgentRoleConfigScalarFieldEnum = (typeof AgentRoleConfigScalarFieldEnum)[keyof typeof AgentRoleConfigScalarFieldEnum]
 
 
 export const SkillScalarFieldEnum = {
@@ -1984,20 +2078,6 @@ export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
 
 
 /**
- * Reference to a field of type 'AgentRole'
- */
-export type EnumAgentRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentRole'>
-    
-
-
-/**
- * Reference to a field of type 'AgentRole[]'
- */
-export type ListEnumAgentRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentRole[]'>
-    
-
-
-/**
  * Reference to a field of type 'AgentStatus'
  */
 export type EnumAgentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentStatus'>
@@ -2040,6 +2120,20 @@ export type ListEnumThinkingModeFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
  * Reference to a field of type 'SkillCategory'
  */
 export type EnumSkillCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SkillCategory'>
@@ -2064,20 +2158,6 @@ export type EnumSkillStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'SkillStatus[]'
  */
 export type ListEnumSkillStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SkillStatus[]'>
-    
-
-
-/**
- * Reference to a field of type 'Float'
- */
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-/**
- * Reference to a field of type 'Float[]'
- */
-export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 
@@ -2290,6 +2370,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   tenant?: Prisma.TenantOmit
   agent?: Prisma.AgentOmit
+  agentRoleConfig?: Prisma.AgentRoleConfigOmit
   skill?: Prisma.SkillOmit
   refreshToken?: Prisma.RefreshTokenOmit
   apiKey?: Prisma.ApiKeyOmit

@@ -54,6 +54,7 @@ export const ModelName = {
   User: 'User',
   Tenant: 'Tenant',
   Agent: 'Agent',
+  AgentRoleConfig: 'AgentRoleConfig',
   Skill: 'Skill',
   RefreshToken: 'RefreshToken',
   ApiKey: 'ApiKey',
@@ -141,6 +142,9 @@ export const AgentScalarFieldEnum = {
   tenantId: 'tenantId',
   modelTier: 'modelTier',
   thinkingMode: 'thinkingMode',
+  temperature: 'temperature',
+  avatarColor: 'avatarColor',
+  personality: 'personality',
   toolPolicy: 'toolPolicy',
   assistedUser: 'assistedUser',
   openclawAgentId: 'openclawAgentId',
@@ -150,6 +154,22 @@ export const AgentScalarFieldEnum = {
 } as const
 
 export type AgentScalarFieldEnum = (typeof AgentScalarFieldEnum)[keyof typeof AgentScalarFieldEnum]
+
+
+export const AgentRoleConfigScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  label: 'label',
+  description: 'description',
+  color: 'color',
+  defaultToolCategories: 'defaultToolCategories',
+  sortOrder: 'sortOrder',
+  isSystem: 'isSystem',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgentRoleConfigScalarFieldEnum = (typeof AgentRoleConfigScalarFieldEnum)[keyof typeof AgentRoleConfigScalarFieldEnum]
 
 
 export const SkillScalarFieldEnum = {

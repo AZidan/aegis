@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * Update Agent DTO - PATCH /api/dashboard/agents/:id
- * Matches API Contract v1.2.0 Section 6: Tenant: Agents - Update Agent
+ * Matches API Contract v1.3.0 Section 6: Tenant: Agents - Update Agent
  *
  * All fields are optional (partial update).
  */
@@ -19,14 +19,16 @@ export const updateAgentSchema = z.object({
     })
     .optional(),
   thinkingMode: z
-    .enum(['off', 'low', 'high'], {
-      error: 'Thinking mode must be one of: off, low, high',
+    .enum(['fast', 'standard', 'extended'], {
+      error: 'Thinking mode must be one of: fast, standard, extended',
     })
     .optional(),
+  temperature: z.number().min(0).max(1).optional(),
+  avatarColor: z.string().optional(),
+  personality: z.string().optional(),
   toolPolicy: z
     .object({
       allow: z.array(z.string()).optional(),
-      deny: z.array(z.string()).optional(),
     })
     .optional(),
 });
