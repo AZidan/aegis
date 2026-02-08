@@ -1,7 +1,7 @@
 // Aegis Platform Database Schema
-// Version: 2.0.0 - Complete Schema Implementation
-// Last Updated: 2026-02-06
-// Based on: API Contract v1.1.0
+// Version: 3.0.0 - v1.3.0 API Contract Alignment
+// Last Updated: 2026-02-07
+// Based on: API Contract v1.3.0
 // Database: PostgreSQL 15+
 // Multi-Tenant: Row-Level Security (RLS) ready
 
@@ -38,13 +38,6 @@ enum TenantPlan {
   enterprise
 }
 
-enum AgentRole {
-  pm
-  engineering
-  operations
-  custom
-}
-
 enum AgentStatus {
   active
   idle
@@ -60,9 +53,9 @@ enum ModelTier {
 }
 
 enum ThinkingMode {
-  off
-  low
-  high
+  fast
+  standard
+  extended
 }
 
 enum SkillCategory {
@@ -232,7 +225,7 @@ model Agent {
   id          String      @id @default(uuid())
   name        String
   description String?
-  role        AgentRole
+  role        String
   status      AgentStatus @default(provisioning)
 
   // Multi-tenancy
@@ -242,9 +235,16 @@ model Agent {
   // Model configuration
   modelTier    ModelTier
   thinkingMode ThinkingMode
+  temperature  Float        @default(0.3)
+
+  // Appearance
+  avatarColor String @default("#6366f1")
+
+  // Personality
+  personality String?
 
   // Tool policy (JSONB for flexible rules)
-  toolPolicy Json // { allow: string[], deny: string[] }
+  toolPolicy Json // { allow: string[] }
 
   // Role-based agent configuration (JSONB)
   assistedUser Json? // { userId: string, userRole: string }
@@ -271,6 +271,24 @@ model Agent {
   @@index([role])
   @@index([lastActive])
   @@map("agents")
+}
+
+/// AgentRoleConfig - Dynamic agent role configuration
+model AgentRoleConfig {
+  id                    String   @id @default(uuid())
+  name                  String   @unique  // Machine name: "pm", "engineering", etc.
+  label                 String   // Display name: "Product Management"
+  description           String   // Role description
+  color                 String   // Hex color for badges
+  defaultToolCategories String[] // Default allowed tool categories
+  sortOrder             Int      @default(0)
+  isSystem              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([name])
+  @@index([sortOrder])
+  @@map("agent_role_configs")
 }
 
 /// Skills - Marketplace skills for agents

@@ -2,10 +2,10 @@ import { z } from 'zod';
 
 /**
  * Create Agent DTO - POST /api/dashboard/agents
- * Matches API Contract v1.2.0 Section 6: Tenant: Agents - Create Agent
+ * Matches API Contract v1.3.0 Section 6: Tenant: Agents - Create Agent
  *
  * Required: name, role, modelTier, thinkingMode, toolPolicy
- * Optional: description, assistedUserId, assistedUserRole, channel
+ * Optional: description, assistedUserId, assistedUserRole, temperature, avatarColor, personality
  */
 export const createAgentSchema = z.object({
   // Step 1: Basic Info
@@ -13,9 +13,9 @@ export const createAgentSchema = z.object({
     .string({ error: 'Agent name is required' })
     .min(3, 'Agent name must be at least 3 characters')
     .max(50, 'Agent name must be at most 50 characters'),
-  role: z.enum(['pm', 'engineering', 'operations', 'custom'], {
-    error: 'Role must be one of: pm, engineering, operations, custom',
-  }),
+  role: z
+    .string({ error: 'Role is required' })
+    .min(1, 'Role must not be empty'),
   description: z.string().optional(),
   assistedUserId: z.string().uuid('assistedUserId must be a valid UUID').optional(),
   assistedUserRole: z.string().optional(),
@@ -24,28 +24,17 @@ export const createAgentSchema = z.object({
   modelTier: z.enum(['haiku', 'sonnet', 'opus'], {
     error: 'Model tier must be one of: haiku, sonnet, opus',
   }),
-  thinkingMode: z.enum(['off', 'low', 'high'], {
-    error: 'Thinking mode must be one of: off, low, high',
+  thinkingMode: z.enum(['fast', 'standard', 'extended'], {
+    error: 'Thinking mode must be one of: fast, standard, extended',
   }),
+  temperature: z.number().min(0).max(1).optional().default(0.3),
+  avatarColor: z.string().optional().default('#6366f1'),
+  personality: z.string().optional(),
 
-  // Step 3: Tool Policy
+  // Step 3: Tool Policy (allow-only)
   toolPolicy: z.object({
     allow: z.array(z.string()),
-    deny: z.array(z.string()).optional(),
   }),
-
-  // Step 4: Channel Binding (optional)
-  channel: z
-    .object({
-      type: z.enum(['telegram', 'slack'], {
-        error: 'Channel type must be one of: telegram, slack',
-      }),
-      token: z.string().optional(),
-      chatId: z.string().optional(),
-      workspaceId: z.string().optional(),
-      channelId: z.string().optional(),
-    })
-    .optional(),
 });
 
 export type CreateAgentDto = z.infer<typeof createAgentSchema>;

@@ -112,6 +112,30 @@ async function main() {
   console.log(`  Tenant member: ${member.email} (${member.id})`);
 
   // ---------------------------------------------------------------------------
+  // Default Agent Role Configs (upsert to avoid duplicates)
+  // ---------------------------------------------------------------------------
+  console.log('\n  Seeding agent role configs...');
+
+  const roleConfigs = [
+    { name: 'pm', label: 'Product Management', description: 'Product managers, sprint planning, backlog management', color: '#8b5cf6', defaultToolCategories: ['analytics', 'project_management', 'communication', 'web_search'], sortOrder: 1 },
+    { name: 'engineering', label: 'Engineering', description: 'Software engineers, code review, architecture', color: '#3b82f6', defaultToolCategories: ['code_management', 'devops', 'monitoring', 'web_search'], sortOrder: 2 },
+    { name: 'operations', label: 'Operations', description: 'Operations team, monitoring, incident response', color: '#14b8a6', defaultToolCategories: ['communication', 'monitoring', 'project_management', 'web_search'], sortOrder: 3 },
+    { name: 'support', label: 'Customer Support', description: 'Customer support, ticket management, knowledge base', color: '#ec4899', defaultToolCategories: ['communication', 'web_search'], sortOrder: 4 },
+    { name: 'data', label: 'Data & Analytics', description: 'Data analysis, reporting, business intelligence', color: '#6366f1', defaultToolCategories: ['analytics', 'data_access', 'web_search'], sortOrder: 5 },
+    { name: 'hr', label: 'Human Resources', description: 'HR operations, recruiting, employee management', color: '#f59e0b', defaultToolCategories: ['communication', 'web_search'], sortOrder: 6 },
+    { name: 'custom', label: 'Custom', description: 'Custom agent role with minimal defaults', color: '#6b7280', defaultToolCategories: ['web_search', 'communication'], sortOrder: 7 },
+  ];
+
+  for (const rc of roleConfigs) {
+    await prisma.agentRoleConfig.upsert({
+      where: { name: rc.name },
+      update: { label: rc.label, description: rc.description, color: rc.color, defaultToolCategories: rc.defaultToolCategories, sortOrder: rc.sortOrder },
+      create: { ...rc, isSystem: true },
+    });
+    console.log(`  Role config: ${rc.name} (${rc.label})`);
+  }
+
+  // ---------------------------------------------------------------------------
   // Demo Agents (for Acme Corp tenant)
   // ---------------------------------------------------------------------------
   console.log('\n  Seeding agents for Acme Corp...');
@@ -126,8 +150,10 @@ async function main() {
       role: 'pm',
       status: 'active',
       modelTier: 'sonnet',
-      thinkingMode: 'low',
-      toolPolicy: { allow: ['jira', 'confluence', 'slack'], deny: [] },
+      thinkingMode: 'standard',
+      temperature: 0.3,
+      avatarColor: '#8b5cf6',
+      toolPolicy: { allow: ['jira', 'confluence', 'slack'] },
       tenantId: tenant.id,
       lastActive: new Date(),
     },
@@ -141,8 +167,10 @@ async function main() {
       role: 'engineering',
       status: 'idle',
       modelTier: 'opus',
-      thinkingMode: 'high',
-      toolPolicy: { allow: ['github', 'sonarqube', 'eslint'], deny: ['deploy'] },
+      thinkingMode: 'extended',
+      temperature: 0.1,
+      avatarColor: '#3b82f6',
+      toolPolicy: { allow: ['github', 'sonarqube', 'eslint'] },
       tenantId: tenant.id,
       lastActive: new Date(Date.now() - 72 * 60 * 60 * 1000), // 3 days ago
     },
@@ -156,8 +184,10 @@ async function main() {
       role: 'operations',
       status: 'error',
       modelTier: 'haiku',
-      thinkingMode: 'off',
-      toolPolicy: { allow: ['datadog', 'pagerduty', 'aws'], deny: [] },
+      thinkingMode: 'fast',
+      temperature: 0.5,
+      avatarColor: '#14b8a6',
+      toolPolicy: { allow: ['datadog', 'pagerduty', 'aws'] },
       tenantId: tenant.id,
       lastActive: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
     },
@@ -171,8 +201,10 @@ async function main() {
       role: 'custom',
       status: 'active',
       modelTier: 'sonnet',
-      thinkingMode: 'low',
-      toolPolicy: { allow: ['intercom', 'google-analytics', 'notion'], deny: [] },
+      thinkingMode: 'standard',
+      temperature: 0.7,
+      avatarColor: '#6b7280',
+      toolPolicy: { allow: ['intercom', 'google-analytics', 'notion'] },
       tenantId: tenant.id,
       lastActive: new Date(Date.now() - 30 * 60 * 1000), // 30 mins ago
     },

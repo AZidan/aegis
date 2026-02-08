@@ -4,7 +4,10 @@ import { listAgentsQuerySchema } from '../../../src/dashboard/agents/dto/list-ag
  * ListAgentsQueryDto Validation Tests
  *
  * Tests the Zod validation schema for the List Agents query parameters
- * (GET /api/dashboard/agents) as specified in API Contract v1.2.0 Section 6.
+ * (GET /api/dashboard/agents) as specified in API Contract v1.3.0 Section 6.
+ *
+ * v1.3.0 change: role is now a free-form string (not enum) since roles
+ * are dynamic from the AgentRoleConfig table.
  */
 describe('ListAgentsQueryDto (Zod Schema)', () => {
   // ============================================================
@@ -24,8 +27,8 @@ describe('ListAgentsQueryDto (Zod Schema)', () => {
       }
     });
 
-    it('should accept all valid role values', () => {
-      const roles = ['pm', 'engineering', 'operations', 'custom'] as const;
+    it('should accept any string as role (dynamic roles)', () => {
+      const roles = ['pm', 'engineering', 'operations', 'custom', 'support', 'data', 'hr', 'my_custom_role'];
       for (const role of roles) {
         const result = listAgentsQuerySchema.safeParse({ role });
         expect(result.success).toBe(true);
@@ -78,11 +81,6 @@ describe('ListAgentsQueryDto (Zod Schema)', () => {
   describe('invalid payloads', () => {
     it('should reject invalid status value', () => {
       const result = listAgentsQuerySchema.safeParse({ status: 'running' });
-      expect(result.success).toBe(false);
-    });
-
-    it('should reject invalid role value', () => {
-      const result = listAgentsQuerySchema.safeParse({ role: 'developer' });
       expect(result.success).toBe(false);
     });
 

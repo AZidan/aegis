@@ -1,6 +1,6 @@
 # Aegis Platform API Contract
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 **Last Updated:** 2026-02-07
 **Status:** Single Source of Truth
 **Framework:** NestJS + TypeScript
@@ -706,7 +706,7 @@ interface ApiError {
   data: Array<{
     id: string;
     name: string;
-    role: "pm" | "engineering" | "operations" | "custom";
+    role: string;                  // Dynamic role
     status: "active" | "idle" | "error";
     modelTier: "haiku" | "sonnet" | "opus";
     lastActive: string;       // ISO 8601
@@ -920,6 +920,42 @@ interface ApiError {
     estimatedDaily: number;   // USD
     estimatedMonthly: number;
   };
+  plan: {
+    name: "starter" | "growth" | "enterprise";
+    totalSlots: number;       // Max agents allowed by plan
+  };
+  skillsInstalled: number;    // Total skill installations for tenant
+  teamMembers: number;        // Total team members for tenant
+  messageTrend: number;       // % change vs yesterday (positive = up)
+}
+```
+
+---
+
+### Get Agent Roles
+- **Path**: `/api/dashboard/roles`
+- **Method**: `GET`
+- **Description**: List available agent role configurations (dynamic from DB)
+
+#### Request
+- **Headers**:
+  - `Authorization: Bearer <access_token>` (role: tenant_admin | tenant_member)
+  - `X-Tenant-Id: <tenant_uuid>` (auto-injected from JWT)
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  data: Array<{
+    id: string;               // UUID
+    name: string;             // Machine name: "pm", "engineering", etc.
+    label: string;            // Display name: "Product Management"
+    description: string;      // Role description
+    color: string;            // Hex color for badges
+    defaultToolCategories: string[];  // Default allowed tool categories
+    sortOrder: number;        // Display order
+    isSystem: boolean;        // true = built-in, false = custom
+  }>;
 }
 ```
 
@@ -936,7 +972,7 @@ interface ApiError {
 - **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id`
 - **Query Params**:
   - `status` (optional): `active` | `idle` | `error`
-  - `role` (optional): `pm` | `engineering` | `operations` | `custom`
+  - `role` (optional): string (dynamic role name, e.g., `pm`, `engineering`)
   - `sort` (optional): `name:asc` | `name:desc` | `last_active:asc` | `last_active:desc` | `created_at:asc` | `created_at:desc`
 
 #### Response
@@ -947,10 +983,13 @@ interface ApiError {
     id: string;
     name: string;
     description?: string;
-    role: "pm" | "engineering" | "operations" | "custom";
+    role: string;                  // Dynamic role (from AgentRoleConfig)
     status: "active" | "idle" | "error";
     modelTier: "haiku" | "sonnet" | "opus";
-    thinkingMode: "off" | "low" | "high";
+    thinkingMode: "fast" | "standard" | "extended";
+    temperature: number;           // 0.0 - 1.0
+    avatarColor: string;           // Hex color
+    errorMessage?: string;         // Present when status is "error"
     channel?: {
       type: "telegram" | "slack";
       connected: boolean;
@@ -979,29 +1018,25 @@ interface ApiError {
 {
   // Step 1: Basic Info
   name: string;               // 3-50 chars
-  role: "pm" | "engineering" | "operations" | "custom";
+  role: string;               // Dynamic role name (validated against AgentRoleConfig)
   description?: string;
   assistedUserId?: string;    // User being assisted by this agent
   assistedUserRole?: string;  // Role of the assisted user
 
   // Step 2: Model Configuration
   modelTier: "haiku" | "sonnet" | "opus";
-  thinkingMode: "off" | "low" | "high";
+  thinkingMode: "fast" | "standard" | "extended";
+  temperature?: number;       // 0.0 - 1.0, default 0.3
+  avatarColor?: string;       // Hex color, default '#6366f1'
+  personality?: string;       // Agent personality description
 
   // Step 3: Tool Policy
   toolPolicy: {
-    allow: string[];          // Tool category IDs
-    deny?: string[];
+    allow: string[];          // Tool category IDs (allow-only)
   };
 
-  // Step 4: Channel Binding (optional)
-  channel?: {
-    type: "telegram" | "slack";
-    token?: string;           // For Telegram
-    chatId?: string;          // For Telegram
-    workspaceId?: string;     // For Slack
-    channelId?: string;       // For Slack
-  };
+  // Step 4: Channel Binding — Coming Soon (deferred to future sprint)
+  // channel integration requires OAuth/deep-link flows
 }
 ```
 
@@ -1059,13 +1094,16 @@ interface ApiError {
   id: string;
   name: string;
   description?: string;
-  role: "pm" | "engineering" | "operations" | "custom";
+  role: string;                    // Dynamic role
   status: "active" | "idle" | "error" | "paused";
   modelTier: "haiku" | "sonnet" | "opus";
-  thinkingMode: "off" | "low" | "high";
+  thinkingMode: "fast" | "standard" | "extended";
+  temperature: number;             // 0.0 - 1.0
+  avatarColor: string;             // Hex color
+  personality?: string;            // Agent personality description
+  errorMessage?: string;           // Present when status is "error"
   toolPolicy: {
-    allow: string[];
-    deny: string[];
+    allow: string[];               // Allow-only (no deny)
   };
   channel?: {
     type: string;
@@ -1104,10 +1142,12 @@ interface ApiError {
   name?: string;
   description?: string;
   modelTier?: "haiku" | "sonnet" | "opus";
-  thinkingMode?: "off" | "low" | "high";
+  thinkingMode?: "fast" | "standard" | "extended";
+  temperature?: number;          // 0.0 - 1.0
+  avatarColor?: string;          // Hex color
+  personality?: string;          // Agent personality description
   toolPolicy?: {
-    allow?: string[];
-    deny?: string[];
+    allow?: string[];            // Allow-only (no deny)
   };
 }
 ```
@@ -1949,13 +1989,16 @@ interface Agent {
   id: string;
   name: string;
   description?: string;
-  role: "pm" | "engineering" | "operations" | "custom";
+  role: string;                // Dynamic role (from AgentRoleConfig)
   status: "active" | "idle" | "error" | "paused";
   modelTier: "haiku" | "sonnet" | "opus";
-  thinkingMode: "off" | "low" | "high";
+  thinkingMode: "fast" | "standard" | "extended";
+  temperature: number;         // 0.0 - 1.0
+  avatarColor: string;         // Hex color
+  personality?: string;
+  errorMessage?: string;       // Present when status is "error"
   toolPolicy: {
-    allow: string[];
-    deny: string[];
+    allow: string[];           // Allow-only
   };
   channel?: {
     type: "telegram" | "slack";
@@ -2111,6 +2154,7 @@ Last-Modified: Wed, 05 Feb 2026 10:30:00 GMT
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3.0 | 2026-02-07 | Dynamic roles (AgentRoleConfig), thinkingMode→fast/standard/extended, allow-only toolPolicy (drop deny), new fields: temperature/avatarColor/personality/errorMessage, dashboard stats: plan/skillsInstalled/teamMembers/messageTrend, new endpoint: GET /api/dashboard/roles, channels deferred |
 | 1.1.0 | 2026-02-06 | Added assistedUser fields to agent creation, API key management endpoints, and sorting parameters to list endpoints |
 | 1.0.0 | 2026-02-05 | Initial API contract for MVP |
 

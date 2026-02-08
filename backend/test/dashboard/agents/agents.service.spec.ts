@@ -27,9 +27,12 @@ const createMockAgent = (overrides: Partial<Record<string, unknown>> = {}) => ({
   role: 'pm',
   status: 'active',
   modelTier: 'sonnet',
-  thinkingMode: 'low',
+  thinkingMode: 'standard',
+  temperature: 0.3,
+  avatarColor: '#6366f1',
+  personality: null,
   description: 'Manages projects',
-  toolPolicy: { allow: ['web_search'], deny: [] },
+  toolPolicy: { allow: ['web_search'] },
   assistedUser: null,
   lastActive: new Date('2026-02-05T11:30:00.000Z'),
   createdAt: new Date('2026-01-20T09:00:00.000Z'),
@@ -37,6 +40,20 @@ const createMockAgent = (overrides: Partial<Record<string, unknown>> = {}) => ({
   tenantId: TENANT_ID,
   channels: [],
   installedSkills: [],
+  ...overrides,
+});
+
+const createMockRoleConfig = (overrides: Partial<Record<string, unknown>> = {}) => ({
+  id: 'role-config-uuid-1',
+  name: 'pm',
+  label: 'Product Manager',
+  description: 'Product management agents',
+  color: '#8b5cf6',
+  defaultToolCategories: ['analytics', 'project_management', 'communication', 'web_search'],
+  sortOrder: 1,
+  isSystem: true,
+  createdAt: new Date('2026-01-01T00:00:00.000Z'),
+  updatedAt: new Date('2026-01-01T00:00:00.000Z'),
   ...overrides,
 });
 
@@ -67,11 +84,14 @@ describe('AgentsService', () => {
     tenant: {
       findUnique: jest.Mock;
     };
-    agentChannel: {
-      create: jest.Mock;
+    agentRoleConfig: {
+      findUnique: jest.Mock;
     };
     agentMetrics: {
       findMany: jest.Mock;
+    };
+    agentActivity: {
+      findFirst: jest.Mock;
     };
   };
 
@@ -87,11 +107,14 @@ describe('AgentsService', () => {
       tenant: {
         findUnique: jest.fn(),
       },
-      agentChannel: {
-        create: jest.fn(),
+      agentRoleConfig: {
+        findUnique: jest.fn(),
       },
       agentMetrics: {
         findMany: jest.fn(),
+      },
+      agentActivity: {
+        findFirst: jest.fn(),
       },
     };
 
@@ -115,9 +138,11 @@ describe('AgentsService', () => {
   describe('createAgent', () => {
     const createDto = {
       name: 'New Agent',
-      role: 'pm' as const,
+      role: 'pm',
       modelTier: 'sonnet' as const,
-      thinkingMode: 'low' as const,
+      thinkingMode: 'standard' as const,
+      temperature: 0.3,
+      avatarColor: '#6366f1',
       toolPolicy: { allow: ['web_search'] },
     };
 
@@ -125,6 +150,7 @@ describe('AgentsService', () => {
       prisma.tenant.findUnique.mockResolvedValue(
         createMockTenant({ _count: { agents: 2 } }),
       );
+      prisma.agentRoleConfig.findUnique.mockResolvedValue(createMockRoleConfig());
       prisma.agent.create.mockResolvedValue(
         createMockAgent({ name: 'New Agent', status: 'provisioning' }),
       );
@@ -139,7 +165,7 @@ describe('AgentsService', () => {
             role: 'pm',
             status: 'provisioning',
             modelTier: 'sonnet',
-            thinkingMode: 'low',
+            thinkingMode: 'standard',
           }),
         }),
       );
@@ -152,6 +178,7 @@ describe('AgentsService', () => {
       prisma.tenant.findUnique.mockResolvedValue(
         createMockTenant({ _count: { agents: 0 } }),
       );
+      prisma.agentRoleConfig.findUnique.mockResolvedValue(createMockRoleConfig());
       const mockCreated = createMockAgent({
         name: 'New Agent',
         status: 'provisioning',
@@ -226,6 +253,7 @@ describe('AgentsService', () => {
       prisma.tenant.findUnique.mockResolvedValue(
         createMockTenant({ plan: 'growth', _count: { agents: 9 } }),
       );
+      prisma.agentRoleConfig.findUnique.mockResolvedValue(createMockRoleConfig());
       prisma.agent.create.mockResolvedValue(
         createMockAgent({ status: 'provisioning' }),
       );
@@ -243,17 +271,29 @@ describe('AgentsService', () => {
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('should store toolPolicy as JSON', async () => {
+    it('should throw BadRequestException for invalid role', async () => {
       prisma.tenant.findUnique.mockResolvedValue(
         createMockTenant({ _count: { agents: 0 } }),
       );
+      prisma.agentRoleConfig.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.createAgent(TENANT_ID, { ...createDto, role: 'nonexistent_role' }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should store toolPolicy as allow-only JSON', async () => {
+      prisma.tenant.findUnique.mockResolvedValue(
+        createMockTenant({ _count: { agents: 0 } }),
+      );
+      prisma.agentRoleConfig.findUnique.mockResolvedValue(createMockRoleConfig());
       prisma.agent.create.mockResolvedValue(
         createMockAgent({ status: 'provisioning' }),
       );
 
       await service.createAgent(TENANT_ID, {
         ...createDto,
-        toolPolicy: { allow: ['web_search', 'code_exec'], deny: ['file_delete'] },
+        toolPolicy: { allow: ['web_search', 'code_exec'] },
       });
 
       expect(prisma.agent.create).toHaveBeenCalledWith(
@@ -261,71 +301,34 @@ describe('AgentsService', () => {
           data: expect.objectContaining({
             toolPolicy: {
               allow: ['web_search', 'code_exec'],
-              deny: ['file_delete'],
             },
           }),
         }),
       );
     });
 
-    it('should create channel when provided', async () => {
+    it('should store temperature and avatarColor', async () => {
       prisma.tenant.findUnique.mockResolvedValue(
         createMockTenant({ _count: { agents: 0 } }),
       );
+      prisma.agentRoleConfig.findUnique.mockResolvedValue(createMockRoleConfig());
       prisma.agent.create.mockResolvedValue(
         createMockAgent({ status: 'provisioning' }),
       );
-      prisma.agentChannel.create.mockResolvedValue({});
 
       await service.createAgent(TENANT_ID, {
         ...createDto,
-        channel: {
-          type: 'telegram' as const,
-          token: 'bot-token',
-          chatId: '-1001234567890',
-        },
+        temperature: 0.7,
+        avatarColor: '#ff0000',
+        personality: 'Friendly',
       });
-
-      expect(prisma.agentChannel.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            type: 'telegram',
-            connected: false,
-            agentId: AGENT_ID,
-          }),
-        }),
-      );
-    });
-
-    it('should not create channel when not provided', async () => {
-      prisma.tenant.findUnique.mockResolvedValue(
-        createMockTenant({ _count: { agents: 0 } }),
-      );
-      prisma.agent.create.mockResolvedValue(
-        createMockAgent({ status: 'provisioning' }),
-      );
-
-      await service.createAgent(TENANT_ID, createDto);
-
-      expect(prisma.agentChannel.create).not.toHaveBeenCalled();
-    });
-
-    it('should default toolPolicy.deny to empty array when not provided', async () => {
-      prisma.tenant.findUnique.mockResolvedValue(
-        createMockTenant({ _count: { agents: 0 } }),
-      );
-      prisma.agent.create.mockResolvedValue(
-        createMockAgent({ status: 'provisioning' }),
-      );
-
-      await service.createAgent(TENANT_ID, createDto);
 
       expect(prisma.agent.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            toolPolicy: expect.objectContaining({
-              deny: [],
-            }),
+            temperature: 0.7,
+            avatarColor: '#ff0000',
+            personality: 'Friendly',
           }),
         }),
       );
@@ -447,6 +450,17 @@ describe('AgentsService', () => {
       expect(result.data[0]).toHaveProperty('createdAt');
     });
 
+    it('should include temperature and avatarColor in list response', async () => {
+      prisma.agent.findMany.mockResolvedValue([
+        createMockAgent({ temperature: 0.5, avatarColor: '#ff0000' }),
+      ]);
+
+      const result = await service.listAgents(TENANT_ID, {});
+
+      expect(result.data[0]).toHaveProperty('temperature', 0.5);
+      expect(result.data[0]).toHaveProperty('avatarColor', '#ff0000');
+    });
+
     it('should include channel info when present', async () => {
       prisma.agent.findMany.mockResolvedValue([
         createMockAgent({
@@ -536,6 +550,8 @@ describe('AgentsService', () => {
       expect(result).toHaveProperty('status');
       expect(result).toHaveProperty('modelTier');
       expect(result).toHaveProperty('thinkingMode');
+      expect(result).toHaveProperty('temperature');
+      expect(result).toHaveProperty('avatarColor');
       expect(result).toHaveProperty('toolPolicy');
       expect(result).toHaveProperty('metrics');
       expect(result).toHaveProperty('skills');
@@ -607,10 +623,10 @@ describe('AgentsService', () => {
       });
     });
 
-    it('should return toolPolicy from agent', async () => {
+    it('should return toolPolicy as allow-only from agent', async () => {
       prisma.agent.findFirst.mockResolvedValue(
         createMockAgent({
-          toolPolicy: { allow: ['web_search', 'code_exec'], deny: ['file_delete'] },
+          toolPolicy: { allow: ['web_search', 'code_exec'] },
         }),
       );
       prisma.agentMetrics.findMany.mockResolvedValue([]);
@@ -619,7 +635,6 @@ describe('AgentsService', () => {
 
       expect((result as Record<string, unknown>).toolPolicy).toEqual({
         allow: ['web_search', 'code_exec'],
-        deny: ['file_delete'],
       });
     });
 
@@ -726,22 +741,22 @@ describe('AgentsService', () => {
     it('should perform partial update of thinkingMode', async () => {
       prisma.agent.findFirst.mockResolvedValue(createMockAgent());
       prisma.agent.update.mockResolvedValue(
-        createMockAgent({ thinkingMode: 'high' }),
+        createMockAgent({ thinkingMode: 'extended' }),
       );
 
-      await service.updateAgent(TENANT_ID, AGENT_ID, { thinkingMode: 'high' });
+      await service.updateAgent(TENANT_ID, AGENT_ID, { thinkingMode: 'extended' });
 
       expect(prisma.agent.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({ thinkingMode: 'high' }),
+          data: expect.objectContaining({ thinkingMode: 'extended' }),
         }),
       );
     });
 
-    it('should merge toolPolicy with existing policy', async () => {
+    it('should merge toolPolicy with existing policy (allow-only)', async () => {
       prisma.agent.findFirst.mockResolvedValue(
         createMockAgent({
-          toolPolicy: { allow: ['web_search'], deny: ['file_delete'] },
+          toolPolicy: { allow: ['web_search'] },
         }),
       );
       prisma.agent.update.mockResolvedValue(createMockAgent());
@@ -755,9 +770,53 @@ describe('AgentsService', () => {
           data: expect.objectContaining({
             toolPolicy: expect.objectContaining({
               allow: ['web_search', 'code_exec'],
-              deny: ['file_delete'],
             }),
           }),
+        }),
+      );
+    });
+
+    it('should perform partial update of temperature', async () => {
+      prisma.agent.findFirst.mockResolvedValue(createMockAgent());
+      prisma.agent.update.mockResolvedValue(
+        createMockAgent({ temperature: 0.8 }),
+      );
+
+      await service.updateAgent(TENANT_ID, AGENT_ID, { temperature: 0.8 });
+
+      expect(prisma.agent.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ temperature: 0.8 }),
+        }),
+      );
+    });
+
+    it('should perform partial update of avatarColor', async () => {
+      prisma.agent.findFirst.mockResolvedValue(createMockAgent());
+      prisma.agent.update.mockResolvedValue(
+        createMockAgent({ avatarColor: '#ff0000' }),
+      );
+
+      await service.updateAgent(TENANT_ID, AGENT_ID, { avatarColor: '#ff0000' });
+
+      expect(prisma.agent.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ avatarColor: '#ff0000' }),
+        }),
+      );
+    });
+
+    it('should perform partial update of personality', async () => {
+      prisma.agent.findFirst.mockResolvedValue(createMockAgent());
+      prisma.agent.update.mockResolvedValue(
+        createMockAgent({ personality: 'Helpful' }),
+      );
+
+      await service.updateAgent(TENANT_ID, AGENT_ID, { personality: 'Helpful' });
+
+      expect(prisma.agent.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ personality: 'Helpful' }),
         }),
       );
     });

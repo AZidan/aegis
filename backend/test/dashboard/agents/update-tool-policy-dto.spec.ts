@@ -5,10 +5,10 @@ import { updateToolPolicySchema } from '../../../src/dashboard/agents/dto/update
  *
  * Tests the Zod validation schema for the Update Tool Policy endpoint
  * (PUT /api/dashboard/agents/:id/tool-policy) as specified in
- * API Contract v1.2.0 Section 6.
+ * API Contract v1.3.0 Section 6.
  *
+ * v1.3.0: Allow-only model (no deny field).
  * Required: allow (string[])
- * Optional: deny (string[], defaults to [])
  */
 describe('UpdateToolPolicyDto (Zod Schema)', () => {
   // ============================================================
@@ -22,37 +22,11 @@ describe('UpdateToolPolicyDto (Zod Schema)', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should accept body with both allow and deny arrays', () => {
-      const result = updateToolPolicySchema.safeParse({
-        allow: ['analytics', 'web_search'],
-        deny: ['devops', 'data_access'],
-      });
-      expect(result.success).toBe(true);
-    });
-
     it('should accept empty allow array', () => {
       const result = updateToolPolicySchema.safeParse({
         allow: [],
       });
       expect(result.success).toBe(true);
-    });
-
-    it('should accept empty deny array', () => {
-      const result = updateToolPolicySchema.safeParse({
-        allow: ['web_search'],
-        deny: [],
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('should default deny to empty array when omitted', () => {
-      const result = updateToolPolicySchema.safeParse({
-        allow: ['web_search'],
-      });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.deny).toEqual([]);
-      }
     });
 
     it('should accept a single-element allow array', () => {
@@ -87,17 +61,6 @@ describe('UpdateToolPolicyDto (Zod Schema)', () => {
         expect(result.data.allow).toEqual(['web_search', 'analytics']);
       }
     });
-
-    it('should preserve the exact deny values provided', () => {
-      const result = updateToolPolicySchema.safeParse({
-        allow: ['web_search'],
-        deny: ['devops', 'data_access'],
-      });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.deny).toEqual(['devops', 'data_access']);
-      }
-    });
   });
 
   // ============================================================
@@ -123,14 +86,6 @@ describe('UpdateToolPolicyDto (Zod Schema)', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should reject non-string elements in deny array', () => {
-      const result = updateToolPolicySchema.safeParse({
-        allow: ['web_search'],
-        deny: [123],
-      });
-      expect(result.success).toBe(false);
-    });
-
     it('should reject allow as null', () => {
       const result = updateToolPolicySchema.safeParse({
         allow: null,
@@ -141,14 +96,6 @@ describe('UpdateToolPolicyDto (Zod Schema)', () => {
     it('should reject allow as a number', () => {
       const result = updateToolPolicySchema.safeParse({
         allow: 42,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('should reject deny as a string instead of array', () => {
-      const result = updateToolPolicySchema.safeParse({
-        allow: ['web_search'],
-        deny: 'devops',
       });
       expect(result.success).toBe(false);
     });

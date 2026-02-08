@@ -37,16 +37,6 @@ export const TenantPlan = {
 export type TenantPlan = (typeof TenantPlan)[keyof typeof TenantPlan]
 
 
-export const AgentRole = {
-  pm: 'pm',
-  engineering: 'engineering',
-  operations: 'operations',
-  custom: 'custom'
-} as const
-
-export type AgentRole = (typeof AgentRole)[keyof typeof AgentRole]
-
-
 export const AgentStatus = {
   active: 'active',
   idle: 'idle',
@@ -68,9 +58,9 @@ export type ModelTier = (typeof ModelTier)[keyof typeof ModelTier]
 
 
 export const ThinkingMode = {
-  off: 'off',
-  low: 'low',
-  high: 'high'
+  fast: 'fast',
+  standard: 'standard',
+  extended: 'extended'
 } as const
 
 export type ThinkingMode = (typeof ThinkingMode)[keyof typeof ThinkingMode]

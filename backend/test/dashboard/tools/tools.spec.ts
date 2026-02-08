@@ -136,16 +136,41 @@ describe('ToolsService', () => {
       });
     });
 
-    it('should include allow and deny arrays in every role policy', () => {
-      const validRoles = ['pm', 'engineering', 'operations', 'custom'];
+    it('should return support defaults with correct policy', () => {
+      const result = service.getDefaultsForRole('support');
+
+      expect(result).toEqual({
+        role: 'support',
+        policy: ROLE_DEFAULT_POLICIES['support'],
+      });
+    });
+
+    it('should return data defaults with correct policy', () => {
+      const result = service.getDefaultsForRole('data');
+
+      expect(result).toEqual({
+        role: 'data',
+        policy: ROLE_DEFAULT_POLICIES['data'],
+      });
+    });
+
+    it('should return hr defaults with correct policy', () => {
+      const result = service.getDefaultsForRole('hr');
+
+      expect(result).toEqual({
+        role: 'hr',
+        policy: ROLE_DEFAULT_POLICIES['hr'],
+      });
+    });
+
+    it('should include allow array in every role policy (allow-only model)', () => {
+      const validRoles = ['pm', 'engineering', 'operations', 'custom', 'support', 'data', 'hr'];
 
       for (const role of validRoles) {
         const result = service.getDefaultsForRole(role);
 
         expect(result.policy).toHaveProperty('allow');
-        expect(result.policy).toHaveProperty('deny');
         expect(Array.isArray(result.policy.allow)).toBe(true);
-        expect(Array.isArray(result.policy.deny)).toBe(true);
       }
     });
 
@@ -176,27 +201,28 @@ describe('ToolsService', () => {
         expect(message).toContain('engineering');
         expect(message).toContain('operations');
         expect(message).toContain('custom');
+        expect(message).toContain('support');
+        expect(message).toContain('data');
+        expect(message).toContain('hr');
       }
     });
 
-    it('should have PM defaults deny devops and data_access', () => {
+    it('should have PM defaults with correct allow categories', () => {
       const result = service.getDefaultsForRole('pm');
 
-      expect(result.policy.deny).toContain('devops');
-      expect(result.policy.deny).toContain('data_access');
+      expect(result.policy.allow).toContain('analytics');
+      expect(result.policy.allow).toContain('project_management');
+      expect(result.policy.allow).toContain('communication');
+      expect(result.policy.allow).toContain('web_search');
     });
 
-    it('should have engineering defaults with empty deny list', () => {
+    it('should have engineering defaults with correct allow categories', () => {
       const result = service.getDefaultsForRole('engineering');
 
-      expect(result.policy.deny).toEqual([]);
-    });
-
-    it('should have operations defaults deny code_management and devops', () => {
-      const result = service.getDefaultsForRole('operations');
-
-      expect(result.policy.deny).toContain('code_management');
-      expect(result.policy.deny).toContain('devops');
+      expect(result.policy.allow).toContain('code_management');
+      expect(result.policy.allow).toContain('devops');
+      expect(result.policy.allow).toContain('monitoring');
+      expect(result.policy.allow).toContain('web_search');
     });
   });
 });

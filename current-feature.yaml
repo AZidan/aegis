@@ -2,13 +2,13 @@
 # Tracks active development scope and requirements per CLAUDE.md
 
 feature:
-  name: "Agent Dashboard + Activity Feed"
+  name: "Agent Dashboard + Activity Feed (Alignment v1.3.0)"
   epic: "E5-F2"
   sprint: "Sprint 3 - Agent Management & Tenant Dashboard"
   priority: P0
   points: 8
-  started_at: null
-  status: pending
+  started_at: "2026-02-07"
+  status: in_progress
   branch: agent-dashboard
 
 previous_completed:
@@ -21,9 +21,16 @@ previous_completed:
     points: 5
     tests: 65
 
+scope_changes:
+  - "Channels deferred to future sprint (requires OAuth/deep-link flows)"
+  - "Dynamic roles: new AgentRoleConfig table + GET /api/dashboard/roles"
+  - "ThinkingMode renamed: off→fast, low→standard, high→extended"
+  - "Tool policy: allow-only (deny removed)"
+  - "New agent fields: temperature, avatarColor, personality, errorMessage"
+  - "Dashboard stats: plan info, skillsInstalled, teamMembers, messageTrend"
+  - "All frontend pages wired to real backend APIs (no mock data)"
+
 notes: |
-  Backend APIs for agents are complete (234 tests).
-  This feature is frontend-heavy: tenant sidebar, dashboard stats,
-  agent list/detail pages, agent creation wizard.
-  Also needs GET /api/dashboard/stats backend endpoint.
-  Design screens: tenant-dashboard.html, agent-list.html, agent-detail.html, agent-wizard.html
+  API Contract bumped to v1.3.0 with all alignment changes.
+  Backend: schema migration + roles module + DTO/service updates.
+  Frontend: types, hooks, pages, wizard all updated to match contract.

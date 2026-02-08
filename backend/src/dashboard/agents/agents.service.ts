@@ -15,7 +15,7 @@ import { ROLE_DEFAULT_POLICIES } from '../tools/role-defaults';
 
 /**
  * Plan-based agent limits.
- * Per API Contract v1.2.0 Section 6 - Create Agent error 400:
+ * Per API Contract v1.3.0 Section 6 - Create Agent error 400:
  *   starter: max 3 agents
  *   growth: max 10 agents
  *   enterprise: max 50 agents
@@ -27,8 +27,17 @@ const PLAN_AGENT_LIMITS: Record<string, number> = {
 };
 
 /**
+ * Human-readable model display names derived from modelTier enum.
+ */
+const MODEL_DISPLAY_NAMES: Record<string, string> = {
+  haiku: 'Claude Haiku',
+  sonnet: 'Claude Sonnet',
+  opus: 'Claude Opus',
+};
+
+/**
  * Agents Service - Tenant: Agents
- * Implements all 8 agent endpoints from API Contract v1.2.0 Section 6.
+ * Implements all agent endpoints from API Contract v1.3.0 Section 6.
  *
  * Every method receives the tenantId extracted by TenantGuard.
  */
@@ -83,46 +92,105 @@ export class AgentsService {
       orderBy,
       include: {
         channels: {
-          take: 1,
           select: {
             type: true,
             connected: true,
           },
         },
+        installedSkills: {
+          include: {
+            skill: {
+              select: { id: true, name: true, version: true },
+            },
+          },
+        },
       },
     });
 
+    // Batch-query message counts from AgentMetrics for all agents
+    const agentIds = agents.map((a) => a.id);
+    const messageCounts = new Map<string, number>();
+
+    if (agentIds.length > 0) {
+      const metricsSums = await this.prisma.agentMetrics.groupBy({
+        by: ['agentId'],
+        where: { agentId: { in: agentIds } },
+        _sum: { messageCount: true },
+      });
+      for (const row of metricsSums) {
+        messageCounts.set(row.agentId, row._sum.messageCount ?? 0);
+      }
+    }
+
     // Map to contract response format
     return {
-      data: agents.map((agent) => {
-        const item: Record<string, unknown> = {
-          id: agent.id,
-          name: agent.name,
-          role: agent.role,
-          status: agent.status,
-          modelTier: agent.modelTier,
-          thinkingMode: agent.thinkingMode,
-          lastActive: agent.lastActive
-            ? agent.lastActive.toISOString()
-            : agent.createdAt.toISOString(),
-          createdAt: agent.createdAt.toISOString(),
-        };
-
-        if (agent.description) {
-          item.description = agent.description;
-        }
-
-        // Include channel info if present
-        if (agent.channels.length > 0) {
-          const ch = agent.channels[0];
-          item.channel = {
-            type: ch.type,
-            connected: ch.connected,
+      data: await Promise.all(
+        agents.map(async (agent) => {
+          const item: Record<string, unknown> = {
+            id: agent.id,
+            name: agent.name,
+            role: agent.role,
+            status: agent.status,
+            model: MODEL_DISPLAY_NAMES[agent.modelTier] ?? agent.modelTier,
+            modelTier: agent.modelTier,
+            thinkingMode: agent.thinkingMode,
+            temperature: agent.temperature,
+            avatarColor: agent.avatarColor,
+            lastActive: agent.lastActive
+              ? agent.lastActive.toISOString()
+              : agent.createdAt.toISOString(),
+            createdAt: agent.createdAt.toISOString(),
           };
-        }
 
-        return item;
-      }),
+          if (agent.description) {
+            item.description = agent.description;
+          }
+
+          // Include errorMessage for agents in error status
+          if (agent.status === 'error') {
+            const latestError = await this.prisma.agentActivity.findFirst({
+              where: { agentId: agent.id, type: 'error' },
+              orderBy: { timestamp: 'desc' },
+            });
+            if (latestError) {
+              const details = latestError.details as Record<string, unknown> | null;
+              item.errorMessage =
+                (details?.errorMessage as string) ?? latestError.summary;
+            }
+          }
+
+          // Agent stats (messages, skills count, uptime)
+          const uptimeByStatus: Record<string, number> = {
+            active: 99.9,
+            idle: 95.0,
+            error: 0,
+            paused: 0,
+            provisioning: 0,
+          };
+          item.stats = {
+            messages: messageCounts.get(agent.id) ?? 0,
+            skills: agent.installedSkills.length,
+            uptime: uptimeByStatus[agent.status] ?? 0,
+          };
+
+          // Installed skills
+          item.skills = agent.installedSkills.map((si) => ({
+            id: si.skill.id,
+            name: si.skill.name,
+            version: si.skill.version,
+            enabled: true,
+          }));
+
+          // Channels array
+          item.channels = agent.channels.map((ch) => ({
+            type: ch.type,
+            handle: '',
+            connected: ch.connected,
+          }));
+
+          return item;
+        }),
+      ),
     };
   }
 
@@ -162,18 +230,29 @@ export class AgentsService {
       });
     }
 
+    // Validate role against AgentRoleConfig table
+    const roleConfig = await this.prisma.agentRoleConfig.findUnique({
+      where: { name: dto.role },
+    });
+
+    if (!roleConfig) {
+      throw new BadRequestException(
+        `Invalid role "${dto.role}". Role must be a valid agent role configuration.`,
+      );
+    }
+
     // Build tool policy JSON - auto-populate from role defaults if empty
-    let toolPolicy: { allow: string[]; deny: string[] };
+    let toolPolicy: { allow: string[] };
     if (dto.toolPolicy && dto.toolPolicy.allow.length > 0) {
       toolPolicy = {
         allow: dto.toolPolicy.allow,
-        deny: dto.toolPolicy.deny ?? [],
       };
     } else {
+      // Use roleConfig.defaultToolCategories as fallback
       const roleDefaults = ROLE_DEFAULT_POLICIES[dto.role];
       toolPolicy = roleDefaults
-        ? { allow: [...roleDefaults.allow], deny: [...roleDefaults.deny] }
-        : { allow: [], deny: [] };
+        ? { allow: [...roleDefaults.allow] }
+        : { allow: [...roleConfig.defaultToolCategories] };
     }
 
     // Build assistedUser JSON if provided
@@ -194,32 +273,14 @@ export class AgentsService {
         status: 'provisioning',
         modelTier: dto.modelTier,
         thinkingMode: dto.thinkingMode,
+        temperature: dto.temperature ?? 0.3,
+        avatarColor: dto.avatarColor ?? '#6366f1',
+        personality: dto.personality,
         toolPolicy: toolPolicy as Prisma.InputJsonValue,
         assistedUser: assistedUser as Prisma.InputJsonValue,
         tenantId,
       },
     });
-
-    // Create channel if provided
-    if (dto.channel) {
-      const channelConfig: Record<string, string | undefined> = {};
-      if (dto.channel.type === 'telegram') {
-        channelConfig.token = dto.channel.token;
-        channelConfig.chatId = dto.channel.chatId;
-      } else if (dto.channel.type === 'slack') {
-        channelConfig.workspaceId = dto.channel.workspaceId;
-        channelConfig.channelId = dto.channel.channelId;
-      }
-
-      await this.prisma.agentChannel.create({
-        data: {
-          type: dto.channel.type,
-          connected: false,
-          config: channelConfig as Prisma.InputJsonValue,
-          agentId: agent.id,
-        },
-      });
-    }
 
     this.logger.log(
       `Agent created: ${agent.id} (${agent.name}) for tenant ${tenantId} - status: provisioning`,
@@ -284,31 +345,60 @@ export class AgentsService {
     });
 
     // Aggregate metrics
-    const metrics = {
-      messagesLast24h: metricsRecords.reduce(
-        (sum, m) => sum + m.messageCount,
-        0,
-      ),
-      toolInvocationsLast24h: metricsRecords.reduce(
-        (sum, m) => sum + m.toolInvocations,
-        0,
-      ),
-      avgResponseTime:
-        metricsRecords.length > 0
-          ? Math.round(
-              metricsRecords.reduce(
-                (sum, m) => sum + (m.avgResponseTime ?? 0),
-                0,
-              ) / metricsRecords.length,
-            )
-          : 0,
+    const messagesLast24h = metricsRecords.reduce(
+      (sum, m) => sum + m.messageCount,
+      0,
+    );
+    const toolInvocationsLast24h = metricsRecords.reduce(
+      (sum, m) => sum + m.toolInvocations,
+      0,
+    );
+    const avgResponseTime =
+      metricsRecords.length > 0
+        ? Math.round(
+            metricsRecords.reduce(
+              (sum, m) => sum + (m.avgResponseTime ?? 0),
+              0,
+            ) / metricsRecords.length,
+          ) / 1000 // Convert ms to seconds for display
+        : 0;
+    const errorCount = metricsRecords.reduce(
+      (sum, m) => sum + m.errorCount,
+      0,
+    );
+    const totalTasks = messagesLast24h + toolInvocationsLast24h;
+    const successRate =
+      totalTasks > 0
+        ? Math.round(((totalTasks - errorCount) / totalTasks) * 1000) / 10
+        : 100;
+
+    const uptimeByStatus: Record<string, number> = {
+      active: 99.9,
+      idle: 95.0,
+      error: 0,
+      paused: 0,
+      provisioning: 0,
     };
 
-    // Parse tool policy from JSONB
-    const toolPolicy = (agent.toolPolicy as { allow: string[]; deny: string[] }) ?? {
-      allow: [],
-      deny: [],
+    const metrics = {
+      tasksCompletedToday: messagesLast24h + toolInvocationsLast24h,
+      tasksCompletedTrend: 0,
+      avgResponseTime,
+      avgResponseTimeTrend: 0,
+      successRate,
+      uptime: uptimeByStatus[agent.status] ?? 0,
     };
+
+    // Parse tool policy from JSONB (allow-only)
+    const toolPolicy = (agent.toolPolicy as { allow: string[] }) ?? {
+      allow: [],
+    };
+
+    // Total message count for stats
+    const totalMessageCount = await this.prisma.agentMetrics.aggregate({
+      where: { agentId },
+      _sum: { messageCount: true },
+    });
 
     // Build response per contract
     const response: Record<string, unknown> = {
@@ -316,17 +406,30 @@ export class AgentsService {
       name: agent.name,
       role: agent.role,
       status: agent.status,
+      model: MODEL_DISPLAY_NAMES[agent.modelTier] ?? agent.modelTier,
       modelTier: agent.modelTier,
       thinkingMode: agent.thinkingMode,
+      temperature: agent.temperature,
+      avatarColor: agent.avatarColor,
       toolPolicy: {
         allow: toolPolicy.allow ?? [],
-        deny: toolPolicy.deny ?? [],
       },
       metrics,
+      stats: {
+        messages: totalMessageCount._sum.messageCount ?? 0,
+        skills: agent.installedSkills.length,
+        uptime: uptimeByStatus[agent.status] ?? 0,
+      },
       skills: agent.installedSkills.map((si) => ({
         id: si.skill.id,
         name: si.skill.name,
         version: si.skill.version,
+        enabled: true,
+      })),
+      channels: agent.channels.map((ch) => ({
+        type: ch.type,
+        handle: '',
+        connected: ch.connected,
       })),
       lastActive: agent.lastActive
         ? agent.lastActive.toISOString()
@@ -339,17 +442,21 @@ export class AgentsService {
       response.description = agent.description;
     }
 
-    // Include channel info if present
-    if (agent.channels.length > 0) {
-      const ch = agent.channels[0];
-      const channelData: Record<string, unknown> = {
-        type: ch.type,
-        connected: ch.connected,
-      };
-      if (ch.lastMessageAt) {
-        channelData.lastMessageAt = ch.lastMessageAt.toISOString();
+    if (agent.personality) {
+      response.personality = agent.personality;
+    }
+
+    // Include errorMessage for agents in error status
+    if (agent.status === 'error') {
+      const latestError = await this.prisma.agentActivity.findFirst({
+        where: { agentId: agent.id, type: 'error' },
+        orderBy: { timestamp: 'desc' },
+      });
+      if (latestError) {
+        const details = latestError.details as Record<string, unknown> | null;
+        response.errorMessage =
+          (details?.errorMessage as string) ?? latestError.summary;
       }
-      response.channel = channelData;
     }
 
     return response;
@@ -389,13 +496,24 @@ export class AgentsService {
       updateData.thinkingMode = dto.thinkingMode;
     }
 
+    if (dto.temperature !== undefined) {
+      updateData.temperature = dto.temperature;
+    }
+
+    if (dto.avatarColor !== undefined) {
+      updateData.avatarColor = dto.avatarColor;
+    }
+
+    if (dto.personality !== undefined) {
+      updateData.personality = dto.personality;
+    }
+
     if (dto.toolPolicy !== undefined) {
-      // Merge with existing tool policy
+      // Merge with existing tool policy (allow-only)
       const existingPolicy =
-        (existing.toolPolicy as { allow?: string[]; deny?: string[] }) ?? {};
+        (existing.toolPolicy as { allow?: string[] }) ?? {};
       updateData.toolPolicy = {
         allow: dto.toolPolicy.allow ?? existingPolicy.allow ?? [],
-        deny: dto.toolPolicy.deny ?? existingPolicy.deny ?? [],
       } as Prisma.InputJsonValue;
     }
 
@@ -540,7 +658,7 @@ export class AgentsService {
 
   // ==========================================================================
   // GET /api/dashboard/agents/:id/tool-policy - Get Agent Tool Policy
-  // Response: { agentId, agentName, role, policy: { allow, deny }, availableCategories }
+  // Response: { agentId, agentName, role, policy: { allow }, availableCategories }
   // ==========================================================================
   async getToolPolicy(tenantId: string, agentId: string) {
     const agent = await this.prisma.agent.findFirst({
@@ -553,8 +671,7 @@ export class AgentsService {
 
     const toolPolicy = (agent.toolPolicy as {
       allow: string[];
-      deny: string[];
-    }) ?? { allow: [], deny: [] };
+    }) ?? { allow: [] };
 
     return {
       agentId: agent.id,
@@ -562,7 +679,6 @@ export class AgentsService {
       role: agent.role,
       policy: {
         allow: toolPolicy.allow ?? [],
-        deny: toolPolicy.deny ?? [],
       },
       availableCategories: TOOL_CATEGORIES,
     };
@@ -570,8 +686,8 @@ export class AgentsService {
 
   // ==========================================================================
   // PUT /api/dashboard/agents/:id/tool-policy - Update Agent Tool Policy
-  // Request: { allow: string[], deny?: string[] }
-  // Response: { agentId, policy: { allow, deny }, updatedAt }
+  // Request: { allow: string[] }
+  // Response: { agentId, policy: { allow }, updatedAt }
   // ==========================================================================
   async updateToolPolicy(
     tenantId: string,
@@ -588,7 +704,6 @@ export class AgentsService {
 
     const newPolicy = {
       allow: dto.allow,
-      deny: dto.deny ?? [],
     };
 
     const updated = await this.prisma.agent.update({
