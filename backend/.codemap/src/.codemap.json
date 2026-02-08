@@ -37,22 +37,6 @@
         }
       ]
     },
-    "app.module.ts": {
-      "hash": "f073dc59acfa",
-      "indexed_at": "2026-02-06T18:02:38.500163+00:00",
-      "language": "typescript",
-      "lines": 47,
-      "symbols": [
-        {
-          "lines": [
-            47,
-            47
-          ],
-          "name": "AppModule",
-          "type": "class"
-        }
-      ]
-    },
     "app.service.ts": {
       "hash": "e8cd68be1fc8",
       "indexed_at": "2026-02-06T18:02:38.499534+00:00",
@@ -107,6 +91,6 @@
       ]
     }
   },
-  "generated_at": "2026-02-06T23:51:42.648843+00:00",
+  "generated_at": "2026-02-08T21:12:26.605132+00:00",
   "version": "1.0"
 }

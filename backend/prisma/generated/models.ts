@@ -10,6 +10,7 @@
  */
 export type * from './models/User'
 export type * from './models/Tenant'
+export type * from './models/TenantConfigHistory'
 export type * from './models/Agent'
 export type * from './models/AgentRoleConfig'
 export type * from './models/Skill'

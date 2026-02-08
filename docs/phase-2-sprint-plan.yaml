@@ -1,0 +1,1310 @@
+# =============================================================================
+# Aegis Platform -- Phase 2: Coordination & Security
+# Sprint Plan (Sprints 5-10)
+# =============================================================================
+# Timeline: Weeks 9-20 (6 sprints of 2 weeks each)
+# Team: 2 backend engineers, 1 frontend engineer, 1 full-stack/DevOps
+# Velocity baseline: ~30 story points per sprint (from MVP actuals)
+# =============================================================================
+# Last Updated: 2026-02-08
+# Document Owner: Strategy & Product Team
+# =============================================================================
+
+phase_2:
+  name: "Phase 2: Coordination & Security"
+  timeline: "Weeks 9-20 (12 weeks, 6 sprints)"
+  start_date: "2026-02-10"  # Monday after MVP completion
+  epics: ["E7", "E8", "E9", "E10", "E11"]
+  goal: >
+    Enable multi-agent coordination (the key differentiator), build comprehensive
+    audit trails for enterprise compliance, harden security with permission manifests
+    and network policies, deliver custom skill SDK for tenant extensibility, and
+    launch channel integration (Slack, Teams, Discord) for agents to communicate
+    with users in the tools they already use. Phase 2 transforms Aegis from a
+    "managed agent platform" into an "enterprise multi-agent coordination platform"
+    with real-world channel reach.
+
+  # ===========================================================================
+  # UPDATED EPIC DEFINITIONS (Refined from roadmap.yaml)
+  # ===========================================================================
+
+  epics:
+
+    # -------------------------------------------------------------------------
+    # EPIC 8: Audit Trail & Compliance (P0 -- Sprint 5)
+    # -------------------------------------------------------------------------
+    - id: E8
+      title: "Audit Trail & Compliance"
+      priority: "P0"
+      sprint_allocation: "S5 (primary), S6 (UI + alerting)"
+      description: >
+        Comprehensive audit logging for all agent actions, admin operations,
+        and system events. The Prisma AuditLog schema and enums already exist;
+        Phase 2 implements the service layer, NestJS interceptor for automatic
+        capture, query API, UI viewer, and security alerting. Foundation for
+        SOC2 preparation and enterprise security reviews.
+      existing_foundations:
+        - "AuditLog model in Prisma schema (full structure with indexes)"
+        - "AuditActorType, AuditTargetType, AuditSeverity enums defined"
+        - "Alert model with severity and resolution tracking"
+        - "Tenant-scoped audit logs with agent/user relations"
+      estimated_effort: "2.5 weeks (reduced from 3 -- schema exists)"
+      success_metrics:
+        - "100% of API mutations logged with actor, timestamp, and outcome"
+        - "Audit log query returns results within 3 seconds for last 30 days"
+        - "Audit data retained for 90 days hot, 1 year cold"
+        - "Security alerts fire within 60 seconds of triggering event"
+
+      features:
+        - id: E8-F1
+          title: "Audit Service & Interceptor"
+          priority: "P0"
+          sprint: "S5"
+          points: 8
+          scope: "backend"
+          user_story: >
+            As a Platform Admin, I want every API mutation automatically logged
+            with actor identity, action, target, and result so that I have a
+            complete audit trail without manual instrumentation.
+          acceptance_criteria:
+            - "NestJS AuditModule with AuditService providing logAction() method"
+            - "Global AuditInterceptor captures all POST/PUT/PATCH/DELETE requests"
+            - "Interceptor extracts actor from JWT (userId, role, tenantId)"
+            - "Request body sanitized (passwords, tokens removed) before logging"
+            - "Async write to AuditLog table (non-blocking -- must not add latency to API responses)"
+            - "Before/after diff captured for config change operations (E1-F3)"
+            - "Agent-initiated actions logged with agentId as actor"
+          technical_notes:
+            - "Use NestJS Interceptor pattern (not middleware) for access to ExecutionContext"
+            - "BullMQ queue for async audit writes to prevent API latency impact"
+            - "Sanitization regex strips password, token, secret, key fields from details JSONB"
+          dependencies: []
+
+        - id: E8-F2
+          title: "Admin Operation Audit Logging"
+          priority: "P0"
+          sprint: "S5"
+          points: 5
+          scope: "backend"
+          user_story: >
+            As a Platform Admin, I want login/logout events, config changes, and
+            tenant operations logged with IP address and before/after diffs so
+            that I can investigate unauthorized changes.
+          acceptance_criteria:
+            - "Login/logout events logged with IP address, user agent, success/failure"
+            - "Failed login attempts logged with severity 'warning'"
+            - "Configuration changes include before/after JSON diff in details"
+            - "Tenant create/update/delete/suspend logged with full context"
+            - "Skill install/uninstall logged with agent and skill identifiers"
+            - "Logs immutable after write (no UPDATE/DELETE on audit_logs table)"
+          technical_notes:
+            - "Add audit calls to existing auth.service.ts login/logout flows"
+            - "Add audit calls to admin/tenants.service.ts CRUD operations"
+            - "PostgreSQL: consider adding trigger to prevent DELETE on audit_logs"
+          dependencies:
+            - "E8-F1"
+
+        - id: E8-F1b
+          title: "Agent Action Audit Logging"
+          priority: "P0"
+          sprint: "S5"
+          points: 5
+          scope: "backend"
+          user_story: >
+            As a VP of Product, I want every agent tool invocation, message, and
+            error logged with sanitized parameters so that I can satisfy compliance
+            requirements and investigate incidents.
+          acceptance_criteria:
+            - "Every agent tool invocation logged: agent_id, tool_name, parameters (sanitized), result_status, duration_ms"
+            - "Agent status changes logged (active/idle/error transitions)"
+            - "Skill installation/removal on agents logged with skill metadata"
+            - "Tool policy changes logged with before/after policy diff"
+            - "Logs indexed by tenant_id, agent_id, timestamp for fast queries"
+          technical_notes:
+            - "Integrate with existing AgentActivity model -- AuditLog is the compliance copy"
+            - "AgentActivity is for real-time dashboard; AuditLog is for compliance (append-only)"
+          dependencies:
+            - "E8-F1"
+
+        - id: E8-F3
+          title: "Audit Log Query API & Viewer"
+          priority: "P1"
+          sprint: "S6"
+          points: 8
+          scope: "full-stack"
+          user_story: >
+            As a Tenant Admin, I want to search and browse my company's audit
+            logs from the dashboard with filters for agent, action type, date
+            range, and severity so that I can quickly investigate incidents.
+          acceptance_criteria:
+            - "GET /api/dashboard/audit-logs returns paginated, filtered audit entries"
+            - "Filters: agentId, action, targetType, severity, dateFrom, dateTo"
+            - "Full-text search on action and actorName fields"
+            - "Log entries expandable to show full details (sanitized JSONB)"
+            - "Export filtered logs as CSV or JSON (max 10,000 rows)"
+            - "Pagination: 50 entries per page, cursor-based for performance"
+            - "Admin dashboard: GET /api/admin/audit-logs for cross-tenant view"
+          screens:
+            - "Audit log table with filter sidebar (tenant dashboard)"
+            - "Log entry detail modal with expandable JSON viewer"
+            - "Export dialog with format selection"
+            - "Platform admin: cross-tenant audit log viewer"
+          technical_notes:
+            - "Use cursor-based pagination (not offset) for audit log performance"
+            - "Add composite index on (tenantId, timestamp DESC) for common query"
+            - "CSV export via streaming response (not in-memory buffer)"
+          dependencies:
+            - "E8-F1"
+            - "E8-F2"
+
+        - id: E8-F4
+          title: "Security Event Alerting"
+          priority: "P1"
+          sprint: "S6"
+          points: 5
+          scope: "backend"
+          user_story: >
+            As a Platform Admin, I want automatic alerts when security-sensitive
+            events occur (failed logins, cross-tenant attempts, tool policy
+            violations) so that I can respond to threats in real time.
+          acceptance_criteria:
+            - "Alert rules engine evaluating audit events in real-time"
+            - "Built-in rules: 5+ failed logins in 5min, cross-tenant API attempt, tool policy violation, agent error spike (10+ in 1hr)"
+            - "Alerts written to Alert table with severity (info/warning/critical)"
+            - "Critical alerts trigger webhook notification (configurable URL)"
+            - "Alert dashboard in platform admin with severity filtering"
+            - "Alert suppression: max 1 alert per rule per 15-minute window"
+          technical_notes:
+            - "BullMQ consumer processes audit events and evaluates alert rules"
+            - "Redis sliding window counter for rate-based rules (failed logins)"
+            - "Webhook delivery via BullMQ with retry (3 attempts, exponential backoff)"
+          dependencies:
+            - "E8-F1"
+
+        - id: E8-F5
+          title: "Audit Log Retention & Archival"
+          priority: "P2"
+          sprint: "S6"
+          points: 3
+          scope: "backend"
+          user_story: >
+            As a Platform Admin, I want audit logs automatically archived after
+            90 days and deleted after 1 year so that storage costs stay
+            manageable while meeting compliance retention requirements.
+          acceptance_criteria:
+            - "BullMQ scheduled job runs daily at 02:00 UTC"
+            - "Logs older than 90 days exported to JSON files (S3-ready format)"
+            - "Exported logs removed from PostgreSQL audit_logs table"
+            - "Export files include checksum for tamper detection"
+            - "Retention period configurable per tenant (enterprise override)"
+            - "Archival job metrics: rows archived, duration, errors"
+          technical_notes:
+            - "Phase 2: export to local filesystem (docs/ or /tmp/audit-archive/)"
+            - "Phase 3: integrate with S3 or object storage"
+            - "Use COPY command for fast PostgreSQL export"
+          dependencies:
+            - "E8-F1"
+
+    # -------------------------------------------------------------------------
+    # EPIC 7: Inter-Agent Communication & Coordination (P0 -- Sprint 6)
+    # -------------------------------------------------------------------------
+    - id: E7
+      title: "Inter-Agent Communication & Coordination"
+      priority: "P0"
+      sprint_allocation: "S6 (messaging), S7 (dashboard + workflows)"
+      description: >
+        The KEY DIFFERENTIATOR of the Aegis platform. Enables structured
+        messaging between agents within a tenant, with allowlist-based access
+        control, message type schemas, coordination workflow templates, and
+        a real-time message dashboard. Builds on the OpenClaw sessions_send
+        architecture with explicit allowlists.
+      existing_foundations:
+        - "Agent model with tenantId scoping"
+        - "AgentActivity model for event tracking"
+        - "AuditLog model for compliance logging"
+        - "WebSocket patterns from health monitoring"
+      estimated_effort: "3 weeks"
+      success_metrics:
+        - "Inter-agent messages delivered within 2 seconds"
+        - "All inter-agent messages captured in audit trail"
+        - "Message dashboard shows real-time agent communication"
+        - "60%+ of multi-agent tenants use peer-to-peer communication"
+
+      features:
+        - id: E7-F1
+          title: "Structured Inter-Agent Messaging API"
+          priority: "P0"
+          sprint: "S6"
+          points: 13
+          scope: "backend"
+          user_story: >
+            As a COO, I want my PM agent and Engineering agent to exchange
+            structured messages (task handoffs, status updates, data requests)
+            so that they can coordinate on cross-functional work.
+          acceptance_criteria:
+            - "New Prisma models: AgentMessage, AgentAllowlist"
+            - "AgentMessage fields: id, senderId, recipientId, type, payload (JSONB), correlationId, status, timestamps"
+            - "Message types enum: task_handoff, status_update, data_request, data_response, escalation, notification"
+            - "POST /api/dashboard/agents/:id/messages sends message (validates allowlist)"
+            - "GET /api/dashboard/agents/:id/messages retrieves message history (paginated)"
+            - "GET /api/dashboard/messages returns all inter-agent messages for tenant"
+            - "Messages validated against JSON schema per type before delivery"
+            - "Undeliverable messages (blocked by allowlist) return 403 with clear reason"
+            - "Message delivery via BullMQ queue (async, reliable)"
+            - "All messages automatically logged to AuditLog"
+          technical_notes:
+            - "New AgentMessage model added to schema.prisma"
+            - "New AgentAllowlist model: { agentId, allowedAgentId, direction: 'both'|'send'|'receive' }"
+            - "BullMQ 'agent-messages' queue for reliable delivery"
+            - "Message payload max size: 64KB"
+            - "Correlation IDs enable request-response tracking across agent pairs"
+          dependencies:
+            - "E8-F1 (audit interceptor for message logging)"
+
+        - id: E7-F5
+          title: "WebSocket Real-Time Message Feed"
+          priority: "P1"
+          sprint: "S6"
+          points: 5
+          scope: "backend"
+          user_story: >
+            As a Tenant Admin watching the message dashboard, I want to see
+            inter-agent messages appear in real-time without refreshing so
+            that I can monitor agent coordination as it happens.
+          acceptance_criteria:
+            - "WebSocket gateway: /ws/messages (tenant-scoped)"
+            - "Events emitted: message_sent, message_delivered, message_failed"
+            - "Events include: messageId, senderId, recipientId, type, timestamp"
+            - "Only messages within authenticated tenant's scope are emitted"
+            - "Reconnection with missed-message catch-up (last 5 minutes)"
+          technical_notes:
+            - "Extend existing NestJS WebSocket gateway pattern"
+            - "Redis Pub/Sub for multi-instance message fan-out"
+            - "JWT authentication on WebSocket handshake"
+          dependencies:
+            - "E7-F1"
+
+        - id: E7-F4
+          title: "Agent Communication Allowlist Editor"
+          priority: "P1"
+          sprint: "S7"
+          points: 8
+          scope: "full-stack"
+          user_story: >
+            As a Tenant Admin, I want to visually configure which agents can
+            communicate with each other using an interactive graph so that I
+            can control information flow between agent roles.
+          acceptance_criteria:
+            - "PUT /api/dashboard/agents/:id/allowlist manages per-agent allowlist"
+            - "GET /api/dashboard/communication-graph returns all agents with their allowlist edges"
+            - "Visual graph view: agents as nodes, allowlist links as edges"
+            - "Click to add/remove communication links between agents"
+            - "Default: hub agent can message all; peer-to-peer is opt-in"
+            - "Table fallback view for accessibility"
+            - "Changes propagate within 60 seconds"
+            - "Allowlist changes logged in audit trail"
+          screens:
+            - "Interactive agent communication graph (D3.js or similar)"
+            - "Allowlist management table (accessible fallback)"
+            - "Edge creation modal with direction selection"
+          technical_notes:
+            - "Consolidates deferred E5-F5 into E7 epic"
+            - "D3.js force-directed graph or React Flow for visualization"
+            - "Optimistic UI updates with rollback on API error"
+          dependencies:
+            - "E7-F1"
+
+        - id: E7-F3
+          title: "Inter-Agent Message Dashboard"
+          priority: "P1"
+          sprint: "S7"
+          points: 8
+          scope: "full-stack"
+          user_story: >
+            As a Tenant Admin, I want to see all inter-agent messages in a
+            timeline view with filtering and search so that I can understand
+            how my agents collaborate and identify bottlenecks.
+          acceptance_criteria:
+            - "Timeline view of all inter-agent messages within tenant"
+            - "Filter by: agent pair, message type, date range, status"
+            - "Message detail shows full payload (with sensitive fields masked)"
+            - "Visual flow diagram showing message paths between agents (mini-graph)"
+            - "Real-time updates via WebSocket (E7-F5)"
+            - "Export message history as JSON or CSV"
+            - "Pagination: 50 messages per page"
+          screens:
+            - "Message timeline with filter sidebar"
+            - "Message detail drawer with JSON payload viewer"
+            - "Mini communication flow diagram (simplified graph)"
+            - "Export dialog"
+          dependencies:
+            - "E7-F1"
+            - "E7-F5"
+
+        - id: E7-F2
+          title: "Coordination Workflow Templates"
+          priority: "P2"
+          sprint: "S7"
+          points: 5
+          scope: "backend"
+          user_story: >
+            As a VP of Product, I want to trigger predefined coordination
+            workflows (sprint handoff, daily sync) so that my agent team
+            operates on a predictable cadence.
+          acceptance_criteria:
+            - "3 built-in workflow templates: daily_sync, weekly_standup, sprint_handoff"
+            - "POST /api/dashboard/workflows/:templateId/trigger starts workflow"
+            - "Workflow defines: participating agents, message sequence, expected responses"
+            - "Workflow execution tracked with status (running/completed/failed)"
+            - "GET /api/dashboard/workflows returns available templates and execution history"
+            - "Failed workflows retry once and log failure to audit trail"
+          technical_notes:
+            - "Phase 2: manual trigger only (no scheduled cron)"
+            - "Phase 3: add cron-based scheduling and custom workflow builder"
+            - "Workflow execution via BullMQ flow (parent/child jobs)"
+          dependencies:
+            - "E7-F1"
+
+    # -------------------------------------------------------------------------
+    # EPIC 9: Advanced Security & Isolation (P1 -- Sprint 7-8)
+    # -------------------------------------------------------------------------
+    - id: E9
+      title: "Advanced Security & Isolation"
+      priority: "P1"
+      sprint_allocation: "S7 (permission manifests), S8 (network policy + hardening)"
+      description: >
+        Security hardening beyond MVP baseline. Phase 2 focuses on skill
+        permission manifests (Deno-style declaration + soft enforcement) and
+        network policy enforcement. Secret rotation and full data encryption
+        deferred to Phase 3.
+      existing_foundations:
+        - "Skill model already has permissions JSONB column"
+        - "Alert model for logging violations"
+        - "AuditLog for security event capture"
+        - "Docker container-per-tenant isolation"
+      estimated_effort: "2.5 weeks (reduced scope -- E9-F3/F4 deferred)"
+      success_metrics:
+        - "100% of marketplace skills have permission manifests"
+        - "Network policy violations logged and alerted"
+        - "Permission usage reports available per skill"
+
+      features:
+        - id: E9-F1
+          title: "Skill Permission Manifests & Validation"
+          priority: "P1"
+          sprint: "S7"
+          points: 8
+          scope: "backend"
+          user_story: >
+            As a Platform Admin, I want every skill to declare its required
+            permissions (network domains, file paths, environment variables)
+            with validation at submission and runtime logging so that I can
+            review and approve only skills with minimal access.
+          acceptance_criteria:
+            - "Permission manifest schema: { network: { allowedDomains: string[] }, files: { readPaths: string[], writePaths: string[] }, env: { required: string[], optional: string[] } }"
+            - "Manifest validated on skill creation/update (reject if missing or malformed)"
+            - "Existing skills backfilled with auto-generated manifests from current permissions JSONB"
+            - "Runtime permission usage logging (soft enforcement -- log violations, do not block)"
+            - "Dashboard shows permission summary for each installed skill"
+            - "Skills without valid manifests rejected from marketplace catalog"
+            - "Permission diff shown when skill updates change manifest"
+          technical_notes:
+            - "Extend existing Skill.permissions JSONB column with richer schema"
+            - "JSON Schema validation for manifest format"
+            - "Soft enforcement in Phase 2; hard enforcement in Phase 3"
+          dependencies:
+            - "E8-F1 (violations logged to audit trail)"
+
+        - id: E9-F2
+          title: "Network Policy Enforcement"
+          priority: "P1"
+          sprint: "S8"
+          points: 8
+          scope: "backend + infrastructure"
+          user_story: >
+            As a Director of Engineering, I want network egress from agent
+            containers restricted to domains declared in installed skills'
+            permission manifests so that compromised skills cannot exfiltrate
+            data to unauthorized servers.
+          acceptance_criteria:
+            - "Network policy derived from union of installed skills' allowedDomains"
+            - "Policy applied per tenant container (Kubernetes NetworkPolicy or iptables)"
+            - "Blocked outbound requests logged with source agent, destination domain, timestamp"
+            - "Platform admin can add tenant-level domain allowlist overrides"
+            - "Policy auto-updates when skills installed/removed (within 60 seconds)"
+            - "DNS-based enforcement (resolve domain to IPs, apply to network policy)"
+          technical_notes:
+            - "Phase 2: generate Kubernetes NetworkPolicy YAML from manifest data"
+            - "Apply via kubectl or Kubernetes API from control plane"
+            - "For Docker Compose dev: log-only mode (no actual iptables changes)"
+            - "Policy regeneration triggered by skill install/uninstall events"
+          dependencies:
+            - "E9-F1 (needs manifests to derive allowed domains)"
+
+        - id: E9-F5
+          title: "Security Posture Dashboard"
+          priority: "P2"
+          sprint: "S8"
+          points: 5
+          scope: "full-stack"
+          user_story: >
+            As a Platform Admin, I want a security overview showing permission
+            manifest coverage, network policy status, and recent security
+            events so that I can assess platform security posture at a glance.
+          acceptance_criteria:
+            - "GET /api/admin/security-posture returns aggregate security metrics"
+            - "Metrics: manifest coverage (% of skills with valid manifests), network policy coverage (% of tenants with active policies), security events (last 24h/7d/30d)"
+            - "Top security events by severity"
+            - "Skills with broadest permissions flagged for review"
+            - "Tenants with most security alerts highlighted"
+          screens:
+            - "Security posture card on admin dashboard"
+            - "Drill-down security detail page"
+          dependencies:
+            - "E8-F4 (security alerting)"
+            - "E9-F1 (permission manifests)"
+
+    # -------------------------------------------------------------------------
+    # EPIC 10: Custom Skill Development (P1 -- Sprint 8)
+    # -------------------------------------------------------------------------
+    - id: E10
+      title: "Custom Skill Development"
+      priority: "P1"
+      sprint_allocation: "S8"
+      description: >
+        Enable tenant engineers to create and deploy custom skills (Layer 3)
+        that integrate with their internal APIs. Delivers SDK, private
+        registry, and simplified validation. Full sandbox deferred to Phase 3.
+      existing_foundations:
+        - "Skill model and SkillInstallation model in schema"
+        - "Skill catalog API and installation flow"
+        - "Permission manifest validation (E9-F1)"
+      estimated_effort: "2 weeks"
+      success_metrics:
+        - "SDK installable via npm with working scaffold command"
+        - "At least 1 custom skill deployed by Breadfast in Phase 2"
+        - "Private registry stores tenant-scoped skills"
+
+      features:
+        - id: E10-F1
+          title: "Skill Development SDK"
+          priority: "P1"
+          sprint: "S8"
+          points: 8
+          scope: "backend + tooling"
+          user_story: >
+            As a Director of Engineering, I want an SDK and CLI for building
+            custom skills so that my team can create integrations with our
+            internal APIs using TypeScript without reverse-engineering the format.
+          acceptance_criteria:
+            - "NPM package: @aegis/skill-sdk with TypeScript types"
+            - "CLI scaffold: npx @aegis/skill-sdk init <skill-name>"
+            - "Scaffold generates: skill manifest (permissions.json), main handler (index.ts), test file, README"
+            - "SDK types: SkillRequest, SkillResponse, SkillManifest, SkillConfig"
+            - "Built-in helpers: httpClient (respects manifest domains), logger, configReader"
+            - "Documentation in SDK README with 3 example skills (HTTP API, file reader, data transformer)"
+            - "SDK version pinned to platform version for compatibility"
+          technical_notes:
+            - "Separate npm package in /packages/skill-sdk/ monorepo directory"
+            - "TypeScript project with tsup bundler"
+            - "CLI via commander.js"
+            - "Examples: weather-api, csv-parser, internal-api-connector"
+          dependencies:
+            - "E9-F1 (manifest format must be finalized)"
+
+        - id: E10-F2
+          title: "Private Skill Registry"
+          priority: "P1"
+          sprint: "S8"
+          points: 8
+          scope: "full-stack"
+          user_story: >
+            As a Tenant Admin, I want a private registry where my team's
+            custom skills are stored and only available to my agents so that
+            proprietary integrations are not exposed to other tenants.
+          acceptance_criteria:
+            - "POST /api/dashboard/skills/custom creates a custom skill in tenant's private namespace"
+            - "Custom skills stored with tenantId scope (not visible to other tenants)"
+            - "Custom skills appear in tenant's skill catalog with 'Custom' badge"
+            - "Custom skills can override core skill names for the tenant (Layer 3 overlay)"
+            - "Version management: upload new version, list versions, rollback to previous"
+            - "Custom skill count limited by plan tier (starter: 3, growth: 10, enterprise: unlimited)"
+            - "DELETE /api/dashboard/skills/custom/:id removes custom skill"
+          screens:
+            - "Custom skills section in tenant skill catalog"
+            - "Custom skill upload form (code + manifest)"
+            - "Version history with rollback button"
+          technical_notes:
+            - "Add tenantId nullable FK to Skill model (null = marketplace, non-null = private)"
+            - "Skill code stored in database (sourceCode field already exists)"
+            - "File upload via multipart/form-data (max 1MB per skill)"
+          dependencies:
+            - "E9-F1 (manifest validation)"
+
+        - id: E10-F3
+          title: "Skill Validation & Dry-Run"
+          priority: "P2"
+          sprint: "S8"
+          points: 5
+          scope: "backend"
+          user_story: >
+            As a Director of Engineering, I want to validate my custom skill
+            against its permission manifest before deploying to production
+            so that I can catch permission violations early.
+          acceptance_criteria:
+            - "POST /api/dashboard/skills/custom/:id/validate runs validation suite"
+            - "Validation checks: manifest schema valid, TypeScript compiles, no undeclared network calls in source"
+            - "Static analysis: regex scan for fetch/http calls vs. manifest allowedDomains"
+            - "Validation result: pass/fail with detailed findings"
+            - "Validation history retained per skill version"
+          technical_notes:
+            - "Phase 2: static analysis only (no runtime sandbox)"
+            - "Phase 3: add actual runtime sandbox execution"
+            - "Use AST parsing (ts-morph) for detecting network calls"
+          dependencies:
+            - "E10-F1 (SDK defines manifest format)"
+            - "E10-F2 (skill must exist in registry)"
+
+    # -------------------------------------------------------------------------
+    # EPIC 11: Channel Integration Framework (P0 -- Sprints 6-10)
+    # -------------------------------------------------------------------------
+    - id: E11
+      title: "Channel Integration Framework"
+      priority: "P0"
+      sprint_allocation: "S6 (data model), S7 (proxy), S8 (Slack), S9 (Teams+Discord), S10 (UI+proactive)"
+      description: >
+        Enable agents to communicate with users through enterprise messaging
+        platforms (Slack, Microsoft Teams, Discord). Uses Aegis Channel Proxy
+        architecture: one shared app per platform (multi-workspace), centralized
+        proxy for tenant routing/audit/control, per-tenant OpenClaw containers
+        for isolated agent execution, and a custom "aegis" OpenClaw channel plugin
+        as the bridge. Supports both reactive (user-initiated) and proactive
+        (cron/heartbeat/alerts) agent communication.
+      architecture_doc: "docs/channel-integration-architecture.md"
+      epic_doc: "docs/e11-channel-integration-epic.md"
+      existing_foundations:
+        - "Agent model with tenantId scoping"
+        - "Tenant container provisioning pipeline"
+        - "AuditLog and AuditService (E8-F1, Sprint 5)"
+        - "OpenClaw webhook API at /hooks/<name>"
+        - "OpenClaw plugin SDK for custom channels"
+      estimated_effort: "7 weeks (parallelized from 11.5 weeks raw)"
+      success_metrics:
+        - "Slack message round-trip latency < 3 seconds"
+        - "Proactive message delivery rate > 99%"
+        - "Tenant admin self-serve connection < 5 minutes"
+        - "Cross-tenant message leakage: 0 incidents"
+        - "Channel uptime > 99.5%"
+
+      features:
+        - id: E11-F1
+          title: "Channel Data Model & Aegis Channel Plugin"
+          priority: "P0"
+          sprint: "S6"
+          points: 8
+          scope: "backend + plugin"
+          user_story: >
+            As a Platform Engineer, I want the data model for channel connections
+            and routing rules, plus the custom OpenClaw channel plugin that bridges
+            tenant containers to the Aegis proxy bidirectionally.
+          acceptance_criteria:
+            - "Prisma models: ChannelConnection (tenant→platform workspace), ChannelRouting (user/channel→agent mapping)"
+            - "Enums: ChannelPlatform (SLACK/TEAMS/DISCORD/GOOGLE_CHAT), ConnectionStatus, RouteType"
+            - "ChannelModule with ChannelConnectionService and ChannelRoutingService"
+            - "CRUD endpoints for connections and routing rules (tenant-scoped)"
+            - "OpenClaw aegis channel plugin (@aegis/openclaw-channel-plugin npm package)"
+            - "Plugin inbound: webhook listener at /hooks/aegis (OpenClaw native)"
+            - "Plugin outbound: HTTP POST to Aegis proxy /api/v1/channel/outbound"
+            - "Plugin carries metadata: agentId, sessionKey, targetType, messageType (reply/proactive)"
+            - "Auth: Bearer token per tenant container"
+            - "All mutations write audit log entries"
+          technical_notes:
+            - "ChannelConnection stores encrypted OAuth tokens in credentials JSONB"
+            - "ChannelRouting uses priority-based resolution (slash cmd > channel > user > default)"
+            - "Plugin follows OpenClaw plugin manifest structure (TypeScript npm package)"
+            - "Plugin retry with exponential backoff + dead-letter queue"
+          dependencies:
+            - "E8-F1 (audit service)"
+
+        - id: E11-F2
+          title: "Channel Proxy Core & Routing Engine"
+          priority: "P0"
+          sprint: "S7"
+          points: 13
+          scope: "backend"
+          user_story: >
+            As a Platform Engineer, I want the core Channel Proxy handling
+            tenant resolution, agent routing, session management, and outbound
+            dispatch so that all channel messages flow through centralized
+            audit and control.
+          acceptance_criteria:
+            - "Inbound pipeline: receive platform event → resolve workspace→tenant → resolve agent → build session key → forward to OpenClaw /hooks/aegis"
+            - "Outbound pipeline: receive from aegis plugin → validate tenant token → resolve delivery target → dispatch to platform API"
+            - "Routing engine: slash command > channel mapping > user mapping > tenant default (priority order)"
+            - "Redis caching for routing rules with TTL and invalidation on CRUD"
+            - "Session keys in Redis: channel-session:{tenantId}:{sessionKey} with 24h TTL"
+            - "Rate limiting per tenant (configurable by plan tier)"
+            - "Graceful container unavailability handling (queue in Redis, retry)"
+            - "Audit log entries for all inbound (CHANNEL_MESSAGE_INBOUND) and outbound (CHANNEL_MESSAGE_OUTBOUND, AGENT_PROACTIVE_MESSAGE)"
+            - "Integration tests with mocked platform APIs"
+          technical_notes:
+            - "NestJS ChannelProxyModule with ChannelProxyService"
+            - "BullMQ queue for reliable message forwarding to containers"
+            - "Redis Pub/Sub for multi-instance deployment"
+            - "Session maps OpenClaw session key for conversation continuity"
+          dependencies:
+            - "E11-F1"
+
+        - id: E11-F3
+          title: "Slack App Integration"
+          priority: "P0"
+          sprint: "S8"
+          points: 13
+          scope: "backend"
+          user_story: >
+            As a Tenant Admin, I want to connect my Slack workspace to Aegis
+            so that my agents can respond to messages and proactively send
+            updates in Slack channels and DMs.
+          acceptance_criteria:
+            - "Aegis Slack App with Socket Mode (enterprise-friendly, no public URL)"
+            - "OAuth2 'Add to Slack' flow: stores bot_token in ChannelConnection.credentials (encrypted)"
+            - "Event subscriptions: message.channels, message.groups, message.im, app_mention"
+            - "Slash commands: /aegis ask <agent> <message>, /aegis status, /aegis help"
+            - "App mentions (@Aegis) in channels route to channel-mapped agent"
+            - "DMs to bot route to user-mapped agent"
+            - "Thread replies maintain same session/agent as parent message"
+            - "Outbound: plain text, markdown (mrkdwn), code blocks"
+            - "Proactive messages from cron/heartbeat delivered as Slack DMs"
+            - "Multi-workspace support (single app, many workspaces)"
+            - "Error handling: workspace disconnected, token revoked, rate limited"
+          technical_notes:
+            - "Use @slack/bolt for Socket Mode and Events API"
+            - "Scopes: chat:write, channels:history, groups:history, im:history, channels:read, users:read, commands, app_mentions:read"
+            - "Token refresh handled by Slack OAuth (no manual rotation)"
+          dependencies:
+            - "E11-F2"
+
+        - id: E11-F4
+          title: "Microsoft Teams App Integration"
+          priority: "P0"
+          sprint: "S9"
+          points: 13
+          scope: "backend"
+          user_story: >
+            As a Tenant Admin, I want to connect my Microsoft Teams organization
+            to Aegis so that agents can respond in Teams channels and send
+            proactive updates to team members.
+          acceptance_criteria:
+            - "Teams App via M365 Agents SDK (successor to Bot Framework)"
+            - "Azure Bot Service registration"
+            - "Org-wide admin consent flow: stores tokens in ChannelConnection"
+            - "Personal chat (1:1 with bot) routes to user-mapped agent"
+            - "Channel messages (@mention) route to channel-mapped agent"
+            - "Proactive messaging via stored conversation references"
+            - "Works across multiple Teams organizations"
+          technical_notes:
+            - "Teams App manifest (teams-app-manifest.json)"
+            - "Conversation reference storage per user for outbound capability"
+            - "Can be developed in parallel with E11-F5 (Discord)"
+          dependencies:
+            - "E11-F2"
+
+        - id: E11-F5
+          title: "Discord Bot Integration"
+          priority: "P0"
+          sprint: "S9"
+          points: 8
+          scope: "backend"
+          user_story: >
+            As a Tenant Admin, I want to connect my Discord server to Aegis
+            so that agents can respond to messages and slash commands in
+            Discord channels and DMs.
+          acceptance_criteria:
+            - "Discord Application with Bot user (multi-guild capable)"
+            - "OAuth2 authorization with bot + applications.commands scopes"
+            - "Slash commands: /aegis ask <agent> <message>"
+            - "Bot mentions in channels route to channel-mapped agent"
+            - "DMs to bot route to user-mapped agent"
+            - "Proactive DMs from agent cron/heartbeat delivered"
+            - "Required intents: GUILDS, GUILD_MESSAGES, DIRECT_MESSAGES, MESSAGE_CONTENT"
+            - "Works across multiple guilds simultaneously"
+          technical_notes:
+            - "Use discord.js v14 for API v10"
+            - "Slash commands registered globally via REST API"
+            - "Parallel development with E11-F4 (Teams)"
+          dependencies:
+            - "E11-F2"
+
+        - id: E11-F6
+          title: "Channel Admin UI"
+          priority: "P1"
+          sprint: "S10"
+          points: 8
+          scope: "full-stack"
+          user_story: >
+            As a Tenant Admin, I want a Channels tab in my dashboard settings
+            to manage platform connections and agent routing so that I can
+            self-serve without contacting support.
+          acceptance_criteria:
+            - "Channels settings page listing connected platforms with status indicators"
+            - "Connect buttons triggering OAuth flow per platform"
+            - "Disconnect with confirmation dialog"
+            - "Agent routing table: map platform users → agents"
+            - "Channel routing table: map platform channels → agents"
+            - "Default agent selector"
+            - "Auto-discovery: pull user/channel lists from platform APIs for dropdowns"
+            - "Connection health indicator (last message, token valid)"
+            - "Responsive design matching existing tenant dashboard"
+          screens:
+            - "Channel connections list with status badges"
+            - "Routing configuration table (users + channels)"
+            - "Connect/disconnect confirmation modals"
+          dependencies:
+            - "E11-F1"
+            - "E11-F3 (Slack at minimum for testing)"
+
+        - id: E11-F7
+          title: "Proactive Agent Configuration UI"
+          priority: "P1"
+          sprint: "S10"
+          points: 5
+          scope: "full-stack"
+          user_story: >
+            As a Tenant Admin, I want to configure proactive agent behaviors
+            (cron schedules, heartbeat intervals) through the Aegis UI so that
+            my agents send morning briefs and monitoring alerts automatically.
+          acceptance_criteria:
+            - "Proactive Behaviors section in agent detail view"
+            - "Cron job configuration: schedule (with human-readable helper), prompt template, target user/channel, enable/disable toggle"
+            - "Heartbeat configuration: interval (minutes), prompt template, enable/disable toggle"
+            - "Config changes sync to tenant's OpenClaw openclaw.json"
+            - "Gateway restart or hot-reload triggered on save"
+            - "Enable/disable toggle works without deleting configuration"
+          technical_notes:
+            - "API: PUT /api/dashboard/agents/:id/proactive"
+            - "Config sync via container orchestrator (existing provisioning pipeline)"
+          dependencies:
+            - "E11-F6"
+
+  # ===========================================================================
+  # SPRINT BREAKDOWN
+  # ===========================================================================
+
+  sprints:
+
+    # -------------------------------------------------------------------------
+    # SPRINT 5: Audit Trail Foundation
+    # -------------------------------------------------------------------------
+    - id: S5
+      name: "Sprint 5: Audit Trail Foundation"
+      duration: "2 weeks"
+      dates: "Weeks 9-10"
+      goal: >
+        Implement comprehensive audit logging infrastructure -- the NestJS
+        audit module, global interceptor, admin/agent action logging. This is
+        the foundation everything in Phase 2 depends on.
+      stories:
+        - feature: "E8-F1"
+          description: "Audit service, global interceptor, async BullMQ writer"
+          points: 8
+          scope: "backend"
+          assignee: "backend-1"
+        - feature: "E8-F2"
+          description: "Admin operation audit logging (login, config, tenant ops)"
+          points: 5
+          scope: "backend"
+          assignee: "backend-1"
+        - feature: "E8-F1b"
+          description: "Agent action audit logging (tool invocations, status changes, skills)"
+          points: 5
+          scope: "backend"
+          assignee: "backend-2"
+        - feature: "Database"
+          description: "Prisma migration for AgentMessage, AgentAllowlist models (prep for S6)"
+          points: 3
+          scope: "backend"
+          assignee: "backend-2"
+        - feature: "Testing"
+          description: "Audit module unit tests, interceptor integration tests"
+          points: 5
+          scope: "testing"
+          assignee: "backend-2"
+      total_points: 26
+      deliverables:
+        - "AuditModule with AuditService (logAction, queryLogs methods)"
+        - "Global AuditInterceptor on all mutation endpoints"
+        - "Async audit write pipeline (BullMQ 'audit-events' queue)"
+        - "Admin operations logged: login/logout, tenant CRUD, config changes"
+        - "Agent operations logged: tool invocations, status changes, skill installs"
+        - "Sanitization pipeline removing passwords/tokens from audit details"
+        - "Database migration adding AgentMessage and AgentAllowlist tables"
+        - "60+ unit/integration tests for audit module"
+      risks:
+        - risk: "Audit interceptor adds latency to API responses"
+          mitigation: "Async write via BullMQ -- interceptor only enqueues, never awaits DB write"
+        - risk: "High write volume on audit_logs table"
+          mitigation: "Batch inserts, partitioned table by month, indexes only on query-critical columns"
+
+    # -------------------------------------------------------------------------
+    # SPRINT 6: Inter-Agent Messaging + Audit UI + Channel Foundation
+    # -------------------------------------------------------------------------
+    - id: S6
+      name: "Sprint 6: Messaging, Audit UI & Channel Foundation"
+      duration: "2 weeks"
+      dates: "Weeks 11-12"
+      goal: >
+        Deliver inter-agent messaging API (the core differentiator), audit log
+        viewer UI, and channel integration data model + aegis plugin. Backend
+        team splits: messaging (backend-1+2) and channel foundation (devops).
+        Frontend builds audit log viewer.
+      stories:
+        - feature: "E7-F1"
+          description: "Structured inter-agent messaging API with allowlist enforcement"
+          points: 13
+          scope: "backend"
+          assignee: "backend-1 + backend-2"
+        - feature: "E7-F5"
+          description: "WebSocket real-time message feed"
+          points: 5
+          scope: "backend"
+          assignee: "backend-2"
+        - feature: "E8-F3"
+          description: "Audit log query API + viewer UI (tenant + admin dashboards)"
+          points: 8
+          scope: "full-stack"
+          assignee: "frontend + backend-1"
+        - feature: "E11-F1"
+          description: "Channel data model (Prisma), CRUD services, aegis OpenClaw plugin skeleton"
+          points: 8
+          scope: "backend + plugin"
+          assignee: "devops + backend-2"
+      total_points: 34
+      deliverables:
+        - "AgentMessage and AgentAllowlist Prisma models with full API"
+        - "POST/GET endpoints for inter-agent messaging"
+        - "Allowlist enforcement on message send"
+        - "BullMQ 'agent-messages' queue for reliable delivery"
+        - "WebSocket /ws/messages for real-time message streaming"
+        - "Audit log viewer in tenant dashboard (table + filters + search)"
+        - "Audit log viewer in admin dashboard (cross-tenant)"
+        - "ChannelConnection + ChannelRouting Prisma models with migration"
+        - "ChannelModule with connection/routing CRUD services"
+        - "@aegis/openclaw-channel-plugin skeleton (inbound webhook + outbound POST)"
+      risks:
+        - risk: "Inter-agent messaging latency exceeds 2-second target"
+          mitigation: "BullMQ priority queues; Redis caching for allowlist lookups"
+        - risk: "Sprint has 34 points across 4 features"
+          mitigation: "E11-F1 is data model + skeleton (low risk); devops handles independently"
+
+    # -------------------------------------------------------------------------
+    # SPRINT 7: Dashboards + Security + Channel Proxy
+    # -------------------------------------------------------------------------
+    - id: S7
+      name: "Sprint 7: Dashboards, Security & Channel Proxy"
+      duration: "2 weeks"
+      dates: "Weeks 13-14"
+      goal: >
+        Build inter-agent communication dashboards, permission manifest system,
+        security alerting, and the channel proxy core (routing engine). Backend
+        splits: proxy core (backend-2 + devops) and security (backend-1).
+        Frontend builds communication graph + message dashboard.
+      stories:
+        - feature: "E7-F4"
+          description: "Agent communication allowlist graph editor (interactive UI)"
+          points: 8
+          scope: "full-stack"
+          assignee: "frontend + backend-1"
+        - feature: "E9-F1"
+          description: "Skill permission manifests with validation and runtime logging"
+          points: 8
+          scope: "backend"
+          assignee: "backend-1"
+        - feature: "E8-F4"
+          description: "Security event alerting (rules engine + webhook delivery)"
+          points: 5
+          scope: "backend"
+          assignee: "backend-1"
+        - feature: "E11-F2"
+          description: "Channel proxy core: tenant resolution, routing engine, session mgmt, outbound dispatch"
+          points: 13
+          scope: "backend"
+          assignee: "backend-2 + devops"
+      total_points: 34
+      deliverables:
+        - "Interactive agent communication graph (React Flow)"
+        - "Allowlist CRUD API with graph data endpoint"
+        - "Permission manifest schema and validation pipeline"
+        - "Existing skills backfilled with auto-generated manifests"
+        - "Runtime permission usage logging (soft enforcement)"
+        - "Security alert rules engine (failed logins, cross-tenant attempts)"
+        - "Webhook delivery for critical alerts"
+        - "Channel proxy inbound pipeline (platform event → tenant → agent → OpenClaw)"
+        - "Channel proxy outbound pipeline (aegis plugin → platform API dispatch)"
+        - "Redis-cached routing rules with TTL + invalidation"
+        - "Session management in Redis (24h TTL)"
+      risks:
+        - risk: "Channel proxy + security in same sprint is ambitious (34pts)"
+          mitigation: "Proxy and security are independent workstreams; different engineers"
+        - risk: "Graph visualization complexity (D3.js learning curve)"
+          mitigation: "Use React Flow (higher-level abstraction); table fallback always available"
+        - risk: "Manifest backfill breaks existing skill installations"
+          mitigation: "Auto-generate permissive manifests from current permissions JSONB"
+
+    # -------------------------------------------------------------------------
+    # SPRINT 8: Slack Integration + Custom Skills SDK
+    # -------------------------------------------------------------------------
+    - id: S8
+      name: "Sprint 8: Slack App & Custom Skills SDK"
+      duration: "2 weeks"
+      dates: "Weeks 15-16"
+      goal: >
+        Deliver Slack App integration (first channel live!) and custom skill
+        SDK with private registry. End-to-end: user types in Slack → agent
+        responds. Agent cron fires → user gets Slack DM. Developers can
+        scaffold and publish custom skills.
+      stories:
+        - feature: "E11-F3"
+          description: "Slack App: OAuth flow, Socket Mode, events, slash commands, outbound delivery"
+          points: 13
+          scope: "backend"
+          assignee: "backend-2 + devops"
+        - feature: "E10-F1"
+          description: "Skill development SDK (npm package + CLI scaffold)"
+          points: 8
+          scope: "backend + tooling"
+          assignee: "backend-1"
+        - feature: "E10-F2"
+          description: "Private skill registry (tenant-scoped custom skills)"
+          points: 8
+          scope: "full-stack"
+          assignee: "frontend + backend-1"
+        - feature: "E7-F3"
+          description: "Inter-agent message dashboard (timeline + filters + export)"
+          points: 8
+          scope: "full-stack"
+          assignee: "frontend"
+      total_points: 37
+      deliverables:
+        - "Aegis Slack App with Socket Mode (enterprise-friendly)"
+        - "OAuth2 'Add to Slack' flow with encrypted token storage"
+        - "Slack events: channel messages, DMs, @mentions, slash commands"
+        - "End-to-end Slack flow: user message → agent response → Slack reply"
+        - "Proactive messages from cron/heartbeat → Slack DMs"
+        - "@aegis/skill-sdk npm package with TypeScript types"
+        - "CLI: npx @aegis/skill-sdk init <name> generates scaffold"
+        - "3 example skills: HTTP API connector, CSV parser, internal API"
+        - "Private skill registry with tenant scoping and versioning"
+        - "Message timeline dashboard with real-time WebSocket updates"
+      risks:
+        - risk: "Sprint at 37 points (above baseline)"
+          mitigation: "E7-F3 (8pts) is frontend-only, independent of backend Slack work"
+        - risk: "Slack App review delays"
+          mitigation: "Use Socket Mode (no public URL needed); submit app early"
+        - risk: "SDK packaging and npm publishing complexity"
+          mitigation: "Publish to private npm registry first; public npm in Phase 3"
+
+    # -------------------------------------------------------------------------
+    # SPRINT 9: Teams + Discord + Network Security
+    # -------------------------------------------------------------------------
+    - id: S9
+      name: "Sprint 9: Teams, Discord & Network Security"
+      duration: "2 weeks"
+      dates: "Weeks 17-18"
+      goal: >
+        Complete channel coverage with Teams and Discord (developed in parallel).
+        Deliver network policy enforcement and coordination workflow templates.
+        All three enterprise communication platforms live.
+      stories:
+        - feature: "E11-F4"
+          description: "Microsoft Teams App: M365 Agents SDK, consent flow, personal/channel messages, proactive"
+          points: 13
+          scope: "backend"
+          assignee: "backend-1"
+        - feature: "E11-F5"
+          description: "Discord Bot: OAuth, slash commands, guild messages, DMs, proactive"
+          points: 8
+          scope: "backend"
+          assignee: "backend-2"
+        - feature: "E9-F2"
+          description: "Network policy enforcement (derive from manifests, apply per container)"
+          points: 8
+          scope: "backend + infrastructure"
+          assignee: "devops"
+        - feature: "E7-F2"
+          description: "Coordination workflow templates (3 templates, manual trigger)"
+          points: 5
+          scope: "backend"
+          assignee: "backend-2"
+      total_points: 34
+      deliverables:
+        - "Aegis Teams App via M365 Agents SDK"
+        - "Teams org-wide admin consent flow"
+        - "Teams personal chat + channel @mention routing"
+        - "Teams proactive messaging via conversation references"
+        - "Aegis Discord Bot with slash commands"
+        - "Discord guild install via OAuth2"
+        - "Discord channel/DM routing + proactive DMs"
+        - "Network policy generation from skill manifests"
+        - "Kubernetes NetworkPolicy templates per tenant"
+        - "Network violation logging and alerting"
+        - "3 workflow templates: daily_sync, weekly_standup, sprint_handoff"
+        - "Workflow trigger API and execution tracking"
+      risks:
+        - risk: "Teams consent flow complexity (Azure AD)"
+          mitigation: "Azure Bot Service simplifies; test with dev tenant first"
+        - risk: "Three platform integrations in one sprint"
+          mitigation: "E11-F4 and E11-F5 developed in parallel by different engineers; E9-F2 is devops track"
+        - risk: "Kubernetes NetworkPolicy requires cluster access"
+          mitigation: "Docker Compose dev mode: log-only enforcement; K8s tested in staging"
+
+    # -------------------------------------------------------------------------
+    # SPRINT 10: Channel UI + Proactive Config + Phase 2 Polish
+    # -------------------------------------------------------------------------
+    - id: S10
+      name: "Sprint 10: Channel UI, Proactive Config & Phase 2 Wrap-Up"
+      duration: "2 weeks"
+      dates: "Weeks 19-20"
+      goal: >
+        Deliver tenant-facing channel admin UI and proactive agent config.
+        Complete remaining P2 features (security dashboard, skill validation,
+        audit retention). Phase 2 E2E test suite. Full Phase 2 demo-ready.
+      stories:
+        - feature: "E11-F6"
+          description: "Channel admin UI: connections page, routing config, status indicators"
+          points: 8
+          scope: "full-stack"
+          assignee: "frontend + backend-1"
+        - feature: "E11-F7"
+          description: "Proactive agent config UI: cron schedules, heartbeat, config sync to containers"
+          points: 5
+          scope: "full-stack"
+          assignee: "frontend"
+        - feature: "E9-F5"
+          description: "Security posture dashboard (admin)"
+          points: 5
+          scope: "full-stack"
+          assignee: "frontend"
+        - feature: "E10-F3"
+          description: "Skill validation and dry-run (static analysis)"
+          points: 5
+          scope: "backend"
+          assignee: "backend-2"
+        - feature: "E8-F5"
+          description: "Audit log retention and archival job"
+          points: 3
+          scope: "backend"
+          assignee: "backend-1"
+        - feature: "E2E-Phase2"
+          description: "Phase 2 E2E tests: audit, messaging, channels, skills, security"
+          points: 5
+          scope: "testing"
+          assignee: "full-stack + backend-2"
+      total_points: 31
+      deliverables:
+        - "Channel settings page: connect/disconnect Slack/Teams/Discord"
+        - "Routing configuration UI: user→agent + channel→agent mapping"
+        - "Auto-discovery of workspace users/channels for dropdowns"
+        - "Proactive Behaviors section in agent detail (cron + heartbeat config)"
+        - "Config sync to OpenClaw containers on save"
+        - "Security posture dashboard in admin panel"
+        - "Skill static analysis validation (dry-run)"
+        - "Daily audit log archival job (90-day rotation)"
+        - "Phase 2 E2E test suite (audit, messaging, channels, custom skills, security)"
+        - "Full Phase 2 demo: agent coordination + channel integration + custom skills"
+      risks:
+        - risk: "Sprint has many small features (6 stories)"
+          mitigation: "All are independent; P2 items (E9-F5, E10-F3, E8-F5) can slip to Phase 3 start"
+        - risk: "Config sync to OpenClaw containers for proactive behaviors"
+          mitigation: "Start with manual restart; hot-reload as enhancement"
+
+  # ===========================================================================
+  # PHASE 2 TOTAL STORY POINTS
+  # ===========================================================================
+
+  totals:
+    sprint_5: 26
+    sprint_6: 34
+    sprint_7: 34
+    sprint_8: 37
+    sprint_9: 34
+    sprint_10: 31
+    phase_2_total: 196
+    average_per_sprint: 32.7
+    e7_e8_e9_e10_subtotal: 128
+    e11_subtotal: 68
+    notes: >
+      Phase 2 expanded from 4 sprints (128pts) to 6 sprints (196pts) with the
+      addition of E11 (Channel Integration, 68pts). Average remains ~33pts/sprint,
+      consistent with MVP velocity. Sprint 8 is heaviest at 37pts but features
+      split cleanly between backend (Slack) and frontend (SDK/dashboard).
+      P2 features in S10 (E9-F5, E10-F3, E8-F5 = 13pts) are deferrable if
+      velocity drops. E11-F4 and E11-F5 (Teams + Discord) developed in parallel
+      in S9 by different engineers.
+
+  # ===========================================================================
+  # API CONTRACT ADDITIONS (for docs/api-contract.md v2.0)
+  # ===========================================================================
+
+  api_contract_additions:
+    version: "2.0.0"
+    new_endpoints:
+      audit:
+        - "GET /api/dashboard/audit-logs"
+        - "GET /api/admin/audit-logs"
+        - "GET /api/admin/audit-logs/export"
+      messaging:
+        - "POST /api/dashboard/agents/:id/messages"
+        - "GET /api/dashboard/agents/:id/messages"
+        - "GET /api/dashboard/messages"
+        - "PUT /api/dashboard/agents/:id/allowlist"
+        - "GET /api/dashboard/communication-graph"
+        - "WS /ws/messages"
+      workflows:
+        - "GET /api/dashboard/workflows"
+        - "POST /api/dashboard/workflows/:templateId/trigger"
+        - "GET /api/dashboard/workflows/executions"
+      security:
+        - "GET /api/admin/security-posture"
+        - "GET /api/admin/alerts"
+        - "PUT /api/admin/alerts/:id/resolve"
+      custom_skills:
+        - "POST /api/dashboard/skills/custom"
+        - "GET /api/dashboard/skills/custom"
+        - "PUT /api/dashboard/skills/custom/:id"
+        - "DELETE /api/dashboard/skills/custom/:id"
+        - "POST /api/dashboard/skills/custom/:id/validate"
+        - "GET /api/dashboard/skills/custom/:id/versions"
+      channels:
+        - "GET /api/v1/tenant/channels"
+        - "POST /api/v1/tenant/channels"
+        - "GET /api/v1/tenant/channels/:id"
+        - "PATCH /api/v1/tenant/channels/:id"
+        - "DELETE /api/v1/tenant/channels/:id"
+        - "GET /api/v1/tenant/channels/:id/routing"
+        - "POST /api/v1/tenant/channels/:id/routing"
+        - "PATCH /api/v1/tenant/channels/:id/routing/:ruleId"
+        - "DELETE /api/v1/tenant/channels/:id/routing/:ruleId"
+        - "POST /api/v1/channel/outbound  (internal -- from OpenClaw containers)"
+        - "POST /api/v1/channel/inbound/:platform  (internal -- from platform webhooks)"
+        - "PUT /api/dashboard/agents/:id/proactive"
+        - "GET /api/v1/channel/oauth/slack/callback"
+        - "GET /api/v1/channel/oauth/teams/callback"
+        - "GET /api/v1/channel/oauth/discord/callback"
+    new_models:
+      - "AgentMessage"
+      - "AgentAllowlist"
+      - "WorkflowTemplate"
+      - "WorkflowExecution"
+      - "ChannelConnection"
+      - "ChannelRouting"
+    modified_models:
+      - "Skill (add tenantId nullable FK for private skills)"
+      - "Skill (permissions schema extended)"
+      - "Agent (add ChannelRouting relation, proactive config JSONB)"
+      - "Tenant (add ChannelConnection relation)"
+
+  # ===========================================================================
+  # DATABASE SCHEMA ADDITIONS
+  # ===========================================================================
+
+  schema_additions:
+    new_enums:
+      - name: "MessageType"
+        values: ["task_handoff", "status_update", "data_request", "data_response", "escalation", "notification"]
+      - name: "MessageStatus"
+        values: ["pending", "delivered", "failed", "read"]
+      - name: "AllowlistDirection"
+        values: ["both", "send_only", "receive_only"]
+      - name: "WorkflowStatus"
+        values: ["pending", "running", "completed", "failed"]
+      - name: "ChannelPlatform"
+        values: ["SLACK", "TEAMS", "DISCORD", "GOOGLE_CHAT"]
+      - name: "ConnectionStatus"
+        values: ["ACTIVE", "DISCONNECTED", "REVOKED", "PENDING"]
+      - name: "RouteType"
+        values: ["USER", "CHANNEL", "DEFAULT"]
+
+    new_models:
+      - name: "AgentMessage"
+        fields:
+          - "id: UUID PK"
+          - "senderId: FK Agent"
+          - "recipientId: FK Agent"
+          - "type: MessageType"
+          - "payload: JSONB"
+          - "correlationId: UUID (nullable)"
+          - "status: MessageStatus"
+          - "deliveredAt: DateTime (nullable)"
+          - "createdAt: DateTime"
+        indexes:
+          - "[senderId, createdAt]"
+          - "[recipientId, createdAt]"
+          - "[correlationId]"
+          - "[type]"
+
+      - name: "AgentAllowlist"
+        fields:
+          - "id: UUID PK"
+          - "agentId: FK Agent"
+          - "allowedAgentId: FK Agent"
+          - "direction: AllowlistDirection"
+          - "createdAt: DateTime"
+          - "updatedAt: DateTime"
+        indexes:
+          - "[agentId, allowedAgentId] UNIQUE"
+          - "[allowedAgentId]"
+
+      - name: "WorkflowTemplate"
+        fields:
+          - "id: UUID PK"
+          - "name: String UNIQUE"
+          - "description: String"
+          - "agentRoles: String[] (participating role types)"
+          - "messageSequence: JSONB (ordered list of message steps)"
+          - "isSystem: Boolean"
+          - "createdAt: DateTime"
+
+      - name: "WorkflowExecution"
+        fields:
+          - "id: UUID PK"
+          - "templateId: FK WorkflowTemplate"
+          - "tenantId: FK Tenant"
+          - "status: WorkflowStatus"
+          - "triggeredBy: String (userId)"
+          - "participants: JSONB (agentId-to-role mapping)"
+          - "progress: JSONB (step completion tracking)"
+          - "startedAt: DateTime"
+          - "completedAt: DateTime (nullable)"
+          - "failureReason: String (nullable)"
+
+      - name: "ChannelConnection"
+        fields:
+          - "id: UUID PK"
+          - "tenantId: FK Tenant"
+          - "platform: ChannelPlatform"
+          - "platformWorkspaceId: String (Slack workspace ID, Teams tenant ID, Discord guild ID)"
+          - "platformWorkspaceName: String"
+          - "credentials: JSONB (encrypted OAuth tokens)"
+          - "status: ConnectionStatus"
+          - "connectedBy: String"
+          - "connectedAt: DateTime"
+          - "updatedAt: DateTime"
+        indexes:
+          - "[platform, platformWorkspaceId] UNIQUE"
+          - "[tenantId]"
+
+      - name: "ChannelRouting"
+        fields:
+          - "id: UUID PK"
+          - "tenantId: FK Tenant"
+          - "connectionId: FK ChannelConnection"
+          - "routeType: RouteType (USER/CHANNEL/DEFAULT)"
+          - "platformEntityId: String (Slack user/channel ID, or '*' for default)"
+          - "agentId: FK Agent"
+          - "priority: Int (default 0)"
+          - "createdAt: DateTime"
+          - "updatedAt: DateTime"
+        indexes:
+          - "[connectionId, routeType, platformEntityId] UNIQUE"
+          - "[tenantId]"
+          - "[connectionId, routeType]"

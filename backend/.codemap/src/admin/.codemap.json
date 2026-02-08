@@ -2,15 +2,15 @@
   "directory": "src/admin",
   "files": {
     "admin.module.ts": {
-      "hash": "bec3c4fb77da",
-      "indexed_at": "2026-02-06T18:02:38.506888+00:00",
+      "hash": "b03c2d2f0690",
+      "indexed_at": "2026-02-07T01:29:36.445216+00:00",
       "language": "typescript",
-      "lines": 7,
+      "lines": 8,
       "symbols": [
         {
           "lines": [
-            7,
-            7
+            8,
+            8
           ],
           "name": "AdminModule",
           "type": "class"
@@ -18,6 +18,6 @@
       ]
     }
   },
-  "generated_at": "2026-02-06T23:51:42.649053+00:00",
+  "generated_at": "2026-02-08T21:12:26.623771+00:00",
   "version": "1.0"
 }
