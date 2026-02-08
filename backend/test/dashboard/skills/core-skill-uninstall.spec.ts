@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { SkillsService } from '../../../src/dashboard/skills/skills.service';
 import { PrismaService } from '../../../src/prisma/prisma.service';
+import { AuditService } from '../../../src/audit/audit.service';
 
 // ---------------------------------------------------------------------------
 // Test Data
@@ -81,6 +82,7 @@ describe('SkillsService - Core Skill Uninstall Guard', () => {
       providers: [
         SkillsService,
         { provide: PrismaService, useValue: prisma },
+        { provide: AuditService, useValue: { logAction: jest.fn() } },
       ],
     }).compile();
 
@@ -98,7 +100,7 @@ describe('SkillsService - Core Skill Uninstall Guard', () => {
     it('should throw BadRequestException when trying to uninstall a core skill', async () => {
       prisma.agent.findFirst.mockResolvedValue(createMockAgent());
       prisma.skillInstallation.findUnique.mockResolvedValue(createMockInstallation());
-      prisma.skill.findUnique.mockResolvedValue({ isCore: true });
+      prisma.skill.findUnique.mockResolvedValue({ isCore: true, name: 'Core Skill', version: '1.0.0' });
 
       await expect(
         service.uninstallSkill(TENANT_ID, SKILL_ID, AGENT_ID),
@@ -112,7 +114,7 @@ describe('SkillsService - Core Skill Uninstall Guard', () => {
     it('should not delete installation when skill is core', async () => {
       prisma.agent.findFirst.mockResolvedValue(createMockAgent());
       prisma.skillInstallation.findUnique.mockResolvedValue(createMockInstallation());
-      prisma.skill.findUnique.mockResolvedValue({ isCore: true });
+      prisma.skill.findUnique.mockResolvedValue({ isCore: true, name: 'Core Skill', version: '1.0.0' });
 
       await expect(
         service.uninstallSkill(TENANT_ID, SKILL_ID, AGENT_ID),
@@ -126,7 +128,7 @@ describe('SkillsService - Core Skill Uninstall Guard', () => {
     it('should allow uninstalling non-core skills normally', async () => {
       prisma.agent.findFirst.mockResolvedValue(createMockAgent());
       prisma.skillInstallation.findUnique.mockResolvedValue(createMockInstallation());
-      prisma.skill.findUnique.mockResolvedValue({ isCore: false });
+      prisma.skill.findUnique.mockResolvedValue({ isCore: false, name: 'Web Search', version: '1.2.0' });
       prisma.skillInstallation.delete.mockResolvedValue(createMockInstallation());
       prisma.skill.update.mockResolvedValue({});
 
@@ -145,7 +147,7 @@ describe('SkillsService - Core Skill Uninstall Guard', () => {
     it('should look up skill isCore flag using findUnique with select', async () => {
       prisma.agent.findFirst.mockResolvedValue(createMockAgent());
       prisma.skillInstallation.findUnique.mockResolvedValue(createMockInstallation());
-      prisma.skill.findUnique.mockResolvedValue({ isCore: false });
+      prisma.skill.findUnique.mockResolvedValue({ isCore: false, name: 'Web Search', version: '1.2.0' });
       prisma.skillInstallation.delete.mockResolvedValue(createMockInstallation());
       prisma.skill.update.mockResolvedValue({});
 
@@ -153,7 +155,7 @@ describe('SkillsService - Core Skill Uninstall Guard', () => {
 
       expect(prisma.skill.findUnique).toHaveBeenCalledWith({
         where: { id: SKILL_ID },
-        select: { isCore: true },
+        select: { isCore: true, name: true, version: true },
       });
     });
 

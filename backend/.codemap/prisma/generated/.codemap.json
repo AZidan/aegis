@@ -2,10 +2,10 @@
   "directory": "prisma/generated",
   "files": {
     "browser.ts": {
-      "hash": "1b15f37b9330",
-      "indexed_at": "2026-02-08T19:05:03.770658+00:00",
+      "hash": "3b6b5ba4e182",
+      "indexed_at": "2026-02-08T21:27:41.805268+00:00",
       "language": "typescript",
-      "lines": 104,
+      "lines": 114,
       "symbols": [
         {
           "lines": [
@@ -142,14 +142,30 @@
           ],
           "name": "AuditLog",
           "type": "type"
+        },
+        {
+          "lines": [
+            109,
+            109
+          ],
+          "name": "AgentMessage",
+          "type": "type"
+        },
+        {
+          "lines": [
+            114,
+            114
+          ],
+          "name": "AgentAllowlist",
+          "type": "type"
         }
       ]
     },
     "client.ts": {
-      "hash": "32bf914a64da",
-      "indexed_at": "2026-02-08T19:05:03.821021+00:00",
+      "hash": "a9a525b18a9c",
+      "indexed_at": "2026-02-08T21:27:41.927614+00:00",
       "language": "typescript",
-      "lines": 124,
+      "lines": 134,
       "symbols": [
         {
           "lines": [
@@ -294,14 +310,30 @@
           ],
           "name": "AuditLog",
           "type": "type"
+        },
+        {
+          "lines": [
+            129,
+            129
+          ],
+          "name": "AgentMessage",
+          "type": "type"
+        },
+        {
+          "lines": [
+            134,
+            134
+          ],
+          "name": "AgentAllowlist",
+          "type": "type"
         }
       ]
     },
     "commonInputTypes.ts": {
-      "hash": "21fdd399a6c4",
-      "indexed_at": "2026-02-08T19:05:03.871096+00:00",
+      "hash": "2987fab0e719",
+      "indexed_at": "2026-02-08T21:27:41.857654+00:00",
       "language": "typescript",
-      "lines": 1186,
+      "lines": 1288,
       "symbols": [
         {
           "lines": [
@@ -778,313 +810,313 @@
         {
           "lines": [
             633,
+            638
+          ],
+          "name": "EnumMessageTypeFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            640,
             645
+          ],
+          "name": "EnumMessageStatusFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            647,
+            655
+          ],
+          "name": "EnumMessageTypeWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            657,
+            665
+          ],
+          "name": "EnumMessageStatusWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            667,
+            672
+          ],
+          "name": "EnumAllowlistDirectionFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            674,
+            682
+          ],
+          "name": "EnumAllowlistDirectionWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            684,
+            696
           ],
           "name": "NestedStringFilter",
           "type": "type"
         },
         {
           "lines": [
-            647,
-            659
+            698,
+            710
           ],
           "name": "NestedStringNullableFilter",
           "type": "type"
         },
         {
           "lines": [
-            661,
-            666
+            712,
+            717
           ],
           "name": "NestedEnumUserRoleFilter",
           "type": "type"
         },
         {
           "lines": [
-            668,
-            671
+            719,
+            722
           ],
           "name": "NestedBoolFilter",
           "type": "type"
         },
         {
           "lines": [
-            673,
-            682
+            724,
+            733
           ],
           "name": "NestedDateTimeFilter",
           "type": "type"
         },
         {
           "lines": [
-            684,
-            693
+            735,
+            744
           ],
           "name": "NestedDateTimeNullableFilter",
           "type": "type"
         },
         {
           "lines": [
-            695,
-            710
+            746,
+            761
           ],
           "name": "NestedStringWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            712,
-            721
+            763,
+            772
           ],
           "name": "NestedIntFilter",
           "type": "type"
         },
         {
           "lines": [
-            723,
-            738
+            774,
+            789
           ],
           "name": "NestedStringNullableWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            740,
-            749
+            791,
+            800
           ],
           "name": "NestedIntNullableFilter",
           "type": "type"
         },
         {
           "lines": [
-            751,
-            759
+            802,
+            810
           ],
           "name": "NestedEnumUserRoleWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            761,
-            767
+            812,
+            818
           ],
           "name": "NestedBoolWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            769,
-            781
+            820,
+            832
           ],
           "name": "NestedDateTimeWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            783,
-            795
+            834,
+            846
           ],
           "name": "NestedDateTimeNullableWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            797,
-            802
+            848,
+            853
           ],
           "name": "NestedEnumTenantStatusFilter",
           "type": "type"
         },
         {
           "lines": [
-            804,
-            809
+            855,
+            860
           ],
           "name": "NestedEnumTenantPlanFilter",
           "type": "type"
         },
         {
           "lines": [
-            811,
-            819
+            862,
+            870
           ],
           "name": "NestedEnumTenantStatusWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            821,
-            829
+            872,
+            880
           ],
           "name": "NestedEnumTenantPlanWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            831,
-            845
+            882,
+            896
           ],
           "name": "NestedIntNullableWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            847,
-            856
+            898,
+            907
           ],
           "name": "NestedFloatNullableFilter",
           "type": "type"
         },
         {
           "lines": [
-            858,
-            872
+            909,
+            923
           ],
           "name": "NestedIntWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            874,
-            883
+            925,
+            934
           ],
           "name": "NestedFloatFilter",
           "type": "type"
         },
         {
           "lines": [
-            885,
-            890
+            936,
+            941
           ],
           "name": "NestedJsonNullableFilter",
           "type": "type"
         },
         {
           "lines": [
-            892,
-            907
+            943,
+            958
           ],
           "name": "NestedJsonNullableFilterBase",
           "type": "type"
         },
         {
           "lines": [
-            909,
-            914
+            960,
+            965
           ],
           "name": "NestedJsonFilter",
           "type": "type"
         },
         {
           "lines": [
-            916,
-            931
+            967,
+            982
           ],
           "name": "NestedJsonFilterBase",
           "type": "type"
         },
         {
           "lines": [
-            933,
-            938
+            984,
+            989
           ],
           "name": "NestedEnumAgentStatusFilter",
           "type": "type"
         },
         {
           "lines": [
-            940,
-            945
+            991,
+            996
           ],
           "name": "NestedEnumModelTierFilter",
           "type": "type"
         },
         {
           "lines": [
-            947,
-            952
+            998,
+            1003
           ],
           "name": "NestedEnumThinkingModeFilter",
           "type": "type"
         },
         {
           "lines": [
-            954,
-            962
+            1005,
+            1013
           ],
           "name": "NestedEnumAgentStatusWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            964,
-            972
+            1015,
+            1023
           ],
           "name": "NestedEnumModelTierWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            974,
-            982
+            1025,
+            1033
           ],
           "name": "NestedEnumThinkingModeWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            984,
-            998
-          ],
-          "name": "NestedFloatWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1000,
-            1005
-          ],
-          "name": "NestedEnumSkillCategoryFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1007,
-            1012
-          ],
-          "name": "NestedEnumSkillStatusFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1014,
-            1022
-          ],
-          "name": "NestedEnumSkillCategoryWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1024,
-            1032
-          ],
-          "name": "NestedEnumSkillStatusWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1034,
-            1039
-          ],
-          "name": "NestedEnumInviteStatusFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1041,
+            1035,
             1049
           ],
-          "name": "NestedEnumInviteStatusWithAggregatesFilter",
+          "name": "NestedFloatWithAggregatesFilter",
           "type": "type"
         },
         {
@@ -1092,23 +1124,23 @@
             1051,
             1056
           ],
-          "name": "NestedEnumChannelTypeFilter",
+          "name": "NestedEnumSkillCategoryFilter",
           "type": "type"
         },
         {
           "lines": [
             1058,
-            1066
+            1063
           ],
-          "name": "NestedEnumChannelTypeWithAggregatesFilter",
+          "name": "NestedEnumSkillStatusFilter",
           "type": "type"
         },
         {
           "lines": [
-            1068,
+            1065,
             1073
           ],
-          "name": "NestedEnumActivityTypeFilter",
+          "name": "NestedEnumSkillCategoryWithAggregatesFilter",
           "type": "type"
         },
         {
@@ -1116,87 +1148,87 @@
             1075,
             1083
           ],
-          "name": "NestedEnumActivityTypeWithAggregatesFilter",
+          "name": "NestedEnumSkillStatusWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
             1085,
-            1099
+            1090
+          ],
+          "name": "NestedEnumInviteStatusFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1092,
+            1100
+          ],
+          "name": "NestedEnumInviteStatusWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1102,
+            1107
+          ],
+          "name": "NestedEnumChannelTypeFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1109,
+            1117
+          ],
+          "name": "NestedEnumChannelTypeWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1119,
+            1124
+          ],
+          "name": "NestedEnumActivityTypeFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1126,
+            1134
+          ],
+          "name": "NestedEnumActivityTypeWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1136,
+            1150
           ],
           "name": "NestedFloatNullableWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            1101,
-            1106
+            1152,
+            1157
           ],
           "name": "NestedEnumHealthStatusFilter",
           "type": "type"
         },
         {
           "lines": [
-            1108,
-            1116
+            1159,
+            1167
           ],
           "name": "NestedEnumHealthStatusWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            1118,
-            1123
-          ],
-          "name": "NestedEnumAlertSeverityFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1125,
-            1133
-          ],
-          "name": "NestedEnumAlertSeverityWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1135,
-            1140
-          ],
-          "name": "NestedEnumAuditActorTypeFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1142,
-            1147
-          ],
-          "name": "NestedEnumAuditTargetTypeFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1149,
-            1154
-          ],
-          "name": "NestedEnumAuditSeverityFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1156,
-            1164
-          ],
-          "name": "NestedEnumAuditActorTypeWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1166,
+            1169,
             1174
           ],
-          "name": "NestedEnumAuditTargetTypeWithAggregatesFilter",
+          "name": "NestedEnumAlertSeverityFilter",
           "type": "type"
         },
         {
@@ -1204,16 +1236,112 @@
             1176,
             1184
           ],
+          "name": "NestedEnumAlertSeverityWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1186,
+            1191
+          ],
+          "name": "NestedEnumAuditActorTypeFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1193,
+            1198
+          ],
+          "name": "NestedEnumAuditTargetTypeFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1200,
+            1205
+          ],
+          "name": "NestedEnumAuditSeverityFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1207,
+            1215
+          ],
+          "name": "NestedEnumAuditActorTypeWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1217,
+            1225
+          ],
+          "name": "NestedEnumAuditTargetTypeWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1227,
+            1235
+          ],
           "name": "NestedEnumAuditSeverityWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1237,
+            1242
+          ],
+          "name": "NestedEnumMessageTypeFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1244,
+            1249
+          ],
+          "name": "NestedEnumMessageStatusFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1251,
+            1259
+          ],
+          "name": "NestedEnumMessageTypeWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1261,
+            1269
+          ],
+          "name": "NestedEnumMessageStatusWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1271,
+            1276
+          ],
+          "name": "NestedEnumAllowlistDirectionFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1278,
+            1286
+          ],
+          "name": "NestedEnumAllowlistDirectionWithAggregatesFilter",
           "type": "type"
         }
       ]
     },
     "enums.ts": {
-      "hash": "be10caebab21",
-      "indexed_at": "2026-02-08T19:00:37.352430+00:00",
+      "hash": "600e939c7b3c",
+      "indexed_at": "2026-02-08T21:27:41.894941+00:00",
       "language": "typescript",
-      "lines": 162,
+      "lines": 193,
       "symbols": [
         {
           "lines": [
@@ -1342,17 +1470,41 @@
           ],
           "name": "InviteStatus",
           "type": "type"
+        },
+        {
+          "lines": [
+            174,
+            174
+          ],
+          "name": "MessageType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            184,
+            184
+          ],
+          "name": "MessageStatus",
+          "type": "type"
+        },
+        {
+          "lines": [
+            193,
+            193
+          ],
+          "name": "AllowlistDirection",
+          "type": "type"
         }
       ]
     },
     "models.ts": {
-      "hash": "8c24955121ab",
-      "indexed_at": "2026-02-08T19:05:04.052234+00:00",
+      "hash": "4538fbcbde98",
+      "indexed_at": "2026-02-08T21:27:42.036117+00:00",
       "language": "typescript",
-      "lines": 28,
+      "lines": 30,
       "symbols": []
     }
   },
-  "generated_at": "2026-02-08T21:12:26.598655+00:00",
+  "generated_at": "2026-02-08T21:35:43.219573+00:00",
   "version": "1.0"
 }

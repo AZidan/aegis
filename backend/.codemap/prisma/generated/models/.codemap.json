@@ -2,10 +2,10 @@
   "directory": "prisma/generated/models",
   "files": {
     "Agent.ts": {
-      "hash": "f065b97bd00c",
-      "indexed_at": "2026-02-08T19:00:37.770986+00:00",
+      "hash": "7046fae367f3",
+      "indexed_at": "2026-02-08T21:27:42.300574+00:00",
       "language": "typescript",
-      "lines": 2716,
+      "lines": 3556,
       "symbols": [
         {
           "lines": [
@@ -146,257 +146,225 @@
         {
           "lines": [
             286,
-            313
+            317
           ],
           "name": "AgentWhereInput",
           "type": "type"
         },
         {
           "lines": [
-            315,
-            339
+            319,
+            347
           ],
           "name": "AgentOrderByWithRelationInput",
           "type": "type"
         },
         {
           "lines": [
-            341,
-            368
+            349,
+            380
           ],
           "name": "AgentWhereUniqueInput",
           "type": "type"
         },
         {
           "lines": [
-            370,
-            393
+            382,
+            405
           ],
           "name": "AgentOrderByWithAggregationInput",
           "type": "type"
         },
         {
           "lines": [
-            395,
-            416
+            407,
+            428
           ],
           "name": "AgentScalarWhereWithAggregatesInput",
           "type": "type"
         },
         {
           "lines": [
-            418,
-            441
+            430,
+            457
           ],
           "name": "AgentCreateInput",
           "type": "type"
         },
         {
           "lines": [
-            443,
-            466
+            459,
+            486
           ],
           "name": "AgentUncheckedCreateInput",
           "type": "type"
         },
         {
           "lines": [
-            468,
-            491
+            488,
+            515
           ],
           "name": "AgentUpdateInput",
           "type": "type"
         },
         {
           "lines": [
-            493,
-            516
+            517,
+            544
           ],
           "name": "AgentUncheckedUpdateInput",
           "type": "type"
         },
         {
           "lines": [
-            518,
-            536
+            546,
+            564
           ],
           "name": "AgentCreateManyInput",
           "type": "type"
         },
         {
           "lines": [
-            538,
-            555
+            566,
+            583
           ],
           "name": "AgentUpdateManyMutationInput",
           "type": "type"
         },
         {
           "lines": [
-            557,
-            575
+            585,
+            603
           ],
           "name": "AgentUncheckedUpdateManyInput",
           "type": "type"
         },
         {
           "lines": [
-            577,
-            581
+            605,
+            609
           ],
           "name": "AgentListRelationFilter",
           "type": "type"
         },
         {
           "lines": [
-            583,
-            585
+            611,
+            613
           ],
           "name": "AgentOrderByRelationAggregateInput",
           "type": "type"
         },
         {
           "lines": [
-            587,
-            605
+            615,
+            633
           ],
           "name": "AgentCountOrderByAggregateInput",
           "type": "type"
         },
         {
           "lines": [
-            607,
-            609
+            635,
+            637
           ],
           "name": "AgentAvgOrderByAggregateInput",
           "type": "type"
         },
         {
           "lines": [
-            611,
-            627
+            639,
+            655
           ],
           "name": "AgentMaxOrderByAggregateInput",
           "type": "type"
         },
         {
           "lines": [
-            629,
-            645
+            657,
+            673
           ],
           "name": "AgentMinOrderByAggregateInput",
           "type": "type"
         },
         {
           "lines": [
-            647,
-            649
+            675,
+            677
           ],
           "name": "AgentSumOrderByAggregateInput",
           "type": "type"
         },
         {
           "lines": [
-            651,
-            654
+            679,
+            682
           ],
           "name": "AgentScalarRelationFilter",
           "type": "type"
         },
         {
           "lines": [
-            656,
-            659
+            684,
+            687
           ],
           "name": "AgentNullableScalarRelationFilter",
           "type": "type"
         },
         {
           "lines": [
-            661,
-            666
+            689,
+            694
           ],
           "name": "AgentCreateNestedManyWithoutTenantInput",
           "type": "type"
         },
         {
           "lines": [
-            668,
-            673
+            696,
+            701
           ],
           "name": "AgentUncheckedCreateNestedManyWithoutTenantInput",
           "type": "type"
         },
         {
           "lines": [
-            675,
-            687
+            703,
+            715
           ],
           "name": "AgentUpdateManyWithoutTenantNestedInput",
           "type": "type"
         },
         {
           "lines": [
-            689,
-            701
+            717,
+            729
           ],
           "name": "AgentUncheckedUpdateManyWithoutTenantNestedInput",
           "type": "type"
         },
         {
           "lines": [
-            703,
-            705
+            731,
+            733
           ],
           "name": "EnumAgentStatusFieldUpdateOperationsInput",
           "type": "type"
         },
         {
           "lines": [
-            707,
-            709
+            735,
+            737
           ],
           "name": "EnumModelTierFieldUpdateOperationsInput",
           "type": "type"
         },
         {
           "lines": [
-            711,
-            713
-          ],
-          "name": "EnumThinkingModeFieldUpdateOperationsInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            715,
-            721
-          ],
-          "name": "FloatFieldUpdateOperationsInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            723,
-            727
-          ],
-          "name": "AgentCreateNestedOneWithoutChannelsInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            729,
-            735
-          ],
-          "name": "AgentUpdateOneRequiredWithoutChannelsNestedInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            737,
+            739,
             741
           ],
-          "name": "AgentCreateNestedOneWithoutActivitiesInput",
+          "name": "EnumThinkingModeFieldUpdateOperationsInput",
           "type": "type"
         },
         {
@@ -404,7 +372,7 @@
             743,
             749
           ],
-          "name": "AgentUpdateOneRequiredWithoutActivitiesNestedInput",
+          "name": "FloatFieldUpdateOperationsInput",
           "type": "type"
         },
         {
@@ -412,7 +380,7 @@
             751,
             755
           ],
-          "name": "AgentCreateNestedOneWithoutMetricsInput",
+          "name": "AgentCreateNestedOneWithoutChannelsInput",
           "type": "type"
         },
         {
@@ -420,7 +388,7 @@
             757,
             763
           ],
-          "name": "AgentUpdateOneRequiredWithoutMetricsNestedInput",
+          "name": "AgentUpdateOneRequiredWithoutChannelsNestedInput",
           "type": "type"
         },
         {
@@ -428,7 +396,7 @@
             765,
             769
           ],
-          "name": "AgentCreateNestedOneWithoutInstalledSkillsInput",
+          "name": "AgentCreateNestedOneWithoutActivitiesInput",
           "type": "type"
         },
         {
@@ -436,7 +404,7 @@
             771,
             777
           ],
-          "name": "AgentUpdateOneRequiredWithoutInstalledSkillsNestedInput",
+          "name": "AgentUpdateOneRequiredWithoutActivitiesNestedInput",
           "type": "type"
         },
         {
@@ -444,95 +412,135 @@
             779,
             783
           ],
-          "name": "AgentCreateNestedOneWithoutAuditLogsInput",
+          "name": "AgentCreateNestedOneWithoutMetricsInput",
           "type": "type"
         },
         {
           "lines": [
             785,
-            793
+            791
+          ],
+          "name": "AgentUpdateOneRequiredWithoutMetricsNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            793,
+            797
+          ],
+          "name": "AgentCreateNestedOneWithoutInstalledSkillsInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            799,
+            805
+          ],
+          "name": "AgentUpdateOneRequiredWithoutInstalledSkillsNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            807,
+            811
+          ],
+          "name": "AgentCreateNestedOneWithoutAuditLogsInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            813,
+            821
           ],
           "name": "AgentUpdateOneWithoutAuditLogsNestedInput",
           "type": "type"
         },
         {
           "lines": [
-            795,
-            817
+            823,
+            827
+          ],
+          "name": "AgentCreateNestedOneWithoutMessagesSentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            829,
+            833
+          ],
+          "name": "AgentCreateNestedOneWithoutMessagesReceivedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            835,
+            841
+          ],
+          "name": "AgentUpdateOneRequiredWithoutMessagesSentNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            843,
+            849
+          ],
+          "name": "AgentUpdateOneRequiredWithoutMessagesReceivedNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            851,
+            855
+          ],
+          "name": "AgentCreateNestedOneWithoutAllowlistOwnerInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            857,
+            861
+          ],
+          "name": "AgentCreateNestedOneWithoutAllowlistTargetInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            863,
+            869
+          ],
+          "name": "AgentUpdateOneRequiredWithoutAllowlistOwnerNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            871,
+            877
+          ],
+          "name": "AgentUpdateOneRequiredWithoutAllowlistTargetNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            879,
+            905
           ],
           "name": "AgentCreateWithoutTenantInput",
           "type": "type"
         },
         {
           "lines": [
-            819,
-            841
+            907,
+            933
           ],
           "name": "AgentUncheckedCreateWithoutTenantInput",
           "type": "type"
         },
         {
           "lines": [
-            843,
-            846
-          ],
-          "name": "AgentCreateOrConnectWithoutTenantInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            848,
-            851
-          ],
-          "name": "AgentCreateManyTenantInputEnvelope",
-          "type": "type"
-        },
-        {
-          "lines": [
-            853,
-            857
-          ],
-          "name": "AgentUpsertWithWhereUniqueWithoutTenantInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            859,
-            862
-          ],
-          "name": "AgentUpdateWithWhereUniqueWithoutTenantInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            864,
-            867
-          ],
-          "name": "AgentUpdateManyWithWhereWithoutTenantInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            869,
-            890
-          ],
-          "name": "AgentScalarWhereInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            892,
-            914
-          ],
-          "name": "AgentCreateWithoutChannelsInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            916,
+            935,
             938
           ],
-          "name": "AgentUncheckedCreateWithoutChannelsInput",
+          "name": "AgentCreateOrConnectWithoutTenantInput",
           "type": "type"
         },
         {
@@ -540,7 +548,7 @@
             940,
             943
           ],
-          "name": "AgentCreateOrConnectWithoutChannelsInput",
+          "name": "AgentCreateManyTenantInputEnvelope",
           "type": "type"
         },
         {
@@ -548,7 +556,7 @@
             945,
             949
           ],
-          "name": "AgentUpsertWithoutChannelsInput",
+          "name": "AgentUpsertWithWhereUniqueWithoutTenantInput",
           "type": "type"
         },
         {
@@ -556,613 +564,957 @@
             951,
             954
           ],
-          "name": "AgentUpdateToOneWithWhereWithoutChannelsInput",
+          "name": "AgentUpdateWithWhereUniqueWithoutTenantInput",
           "type": "type"
         },
         {
           "lines": [
             956,
-            978
+            959
+          ],
+          "name": "AgentUpdateManyWithWhereWithoutTenantInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            961,
+            982
+          ],
+          "name": "AgentScalarWhereInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            984,
+            1010
+          ],
+          "name": "AgentCreateWithoutChannelsInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1012,
+            1038
+          ],
+          "name": "AgentUncheckedCreateWithoutChannelsInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1040,
+            1043
+          ],
+          "name": "AgentCreateOrConnectWithoutChannelsInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1045,
+            1049
+          ],
+          "name": "AgentUpsertWithoutChannelsInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1051,
+            1054
+          ],
+          "name": "AgentUpdateToOneWithWhereWithoutChannelsInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1056,
+            1082
           ],
           "name": "AgentUpdateWithoutChannelsInput",
           "type": "type"
         },
         {
           "lines": [
-            980,
-            1002
+            1084,
+            1110
           ],
           "name": "AgentUncheckedUpdateWithoutChannelsInput",
           "type": "type"
         },
         {
           "lines": [
-            1004,
-            1026
+            1112,
+            1138
           ],
           "name": "AgentCreateWithoutActivitiesInput",
           "type": "type"
         },
         {
           "lines": [
-            1028,
-            1050
+            1140,
+            1166
           ],
           "name": "AgentUncheckedCreateWithoutActivitiesInput",
           "type": "type"
         },
         {
           "lines": [
-            1052,
-            1055
+            1168,
+            1171
           ],
           "name": "AgentCreateOrConnectWithoutActivitiesInput",
           "type": "type"
         },
         {
           "lines": [
-            1057,
-            1061
+            1173,
+            1177
           ],
           "name": "AgentUpsertWithoutActivitiesInput",
           "type": "type"
         },
         {
           "lines": [
-            1063,
-            1066
+            1179,
+            1182
           ],
           "name": "AgentUpdateToOneWithWhereWithoutActivitiesInput",
           "type": "type"
         },
         {
           "lines": [
-            1068,
-            1090
+            1184,
+            1210
           ],
           "name": "AgentUpdateWithoutActivitiesInput",
           "type": "type"
         },
         {
           "lines": [
-            1092,
-            1114
+            1212,
+            1238
           ],
           "name": "AgentUncheckedUpdateWithoutActivitiesInput",
           "type": "type"
         },
         {
           "lines": [
-            1116,
-            1138
+            1240,
+            1266
           ],
           "name": "AgentCreateWithoutMetricsInput",
           "type": "type"
         },
         {
           "lines": [
-            1140,
-            1162
+            1268,
+            1294
           ],
           "name": "AgentUncheckedCreateWithoutMetricsInput",
           "type": "type"
         },
         {
           "lines": [
-            1164,
-            1167
+            1296,
+            1299
           ],
           "name": "AgentCreateOrConnectWithoutMetricsInput",
           "type": "type"
         },
         {
           "lines": [
-            1169,
-            1173
+            1301,
+            1305
           ],
           "name": "AgentUpsertWithoutMetricsInput",
           "type": "type"
         },
         {
           "lines": [
-            1175,
-            1178
+            1307,
+            1310
           ],
           "name": "AgentUpdateToOneWithWhereWithoutMetricsInput",
           "type": "type"
         },
         {
           "lines": [
-            1180,
-            1202
+            1312,
+            1338
           ],
           "name": "AgentUpdateWithoutMetricsInput",
           "type": "type"
         },
         {
           "lines": [
-            1204,
-            1226
+            1340,
+            1366
           ],
           "name": "AgentUncheckedUpdateWithoutMetricsInput",
           "type": "type"
         },
         {
           "lines": [
-            1228,
-            1250
+            1368,
+            1394
           ],
           "name": "AgentCreateWithoutInstalledSkillsInput",
           "type": "type"
         },
         {
           "lines": [
-            1252,
-            1274
+            1396,
+            1422
           ],
           "name": "AgentUncheckedCreateWithoutInstalledSkillsInput",
           "type": "type"
         },
         {
           "lines": [
-            1276,
-            1279
+            1424,
+            1427
           ],
           "name": "AgentCreateOrConnectWithoutInstalledSkillsInput",
           "type": "type"
         },
         {
           "lines": [
-            1281,
-            1285
+            1429,
+            1433
           ],
           "name": "AgentUpsertWithoutInstalledSkillsInput",
           "type": "type"
         },
         {
           "lines": [
-            1287,
-            1290
+            1435,
+            1438
           ],
           "name": "AgentUpdateToOneWithWhereWithoutInstalledSkillsInput",
           "type": "type"
         },
         {
           "lines": [
-            1292,
-            1314
+            1440,
+            1466
           ],
           "name": "AgentUpdateWithoutInstalledSkillsInput",
           "type": "type"
         },
         {
           "lines": [
-            1316,
-            1338
+            1468,
+            1494
           ],
           "name": "AgentUncheckedUpdateWithoutInstalledSkillsInput",
           "type": "type"
         },
         {
           "lines": [
-            1340,
-            1362
+            1496,
+            1522
           ],
           "name": "AgentCreateWithoutAuditLogsInput",
           "type": "type"
         },
         {
           "lines": [
-            1364,
-            1386
+            1524,
+            1550
           ],
           "name": "AgentUncheckedCreateWithoutAuditLogsInput",
           "type": "type"
         },
         {
           "lines": [
-            1388,
-            1391
+            1552,
+            1555
           ],
           "name": "AgentCreateOrConnectWithoutAuditLogsInput",
           "type": "type"
         },
         {
           "lines": [
-            1393,
-            1397
+            1557,
+            1561
           ],
           "name": "AgentUpsertWithoutAuditLogsInput",
           "type": "type"
         },
         {
           "lines": [
-            1399,
-            1402
+            1563,
+            1566
           ],
           "name": "AgentUpdateToOneWithWhereWithoutAuditLogsInput",
           "type": "type"
         },
         {
           "lines": [
-            1404,
-            1426
+            1568,
+            1594
           ],
           "name": "AgentUpdateWithoutAuditLogsInput",
           "type": "type"
         },
         {
           "lines": [
-            1428,
-            1450
+            1596,
+            1622
           ],
           "name": "AgentUncheckedUpdateWithoutAuditLogsInput",
           "type": "type"
         },
         {
           "lines": [
-            1452,
-            1469
+            1624,
+            1650
+          ],
+          "name": "AgentCreateWithoutMessagesSentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1652,
+            1678
+          ],
+          "name": "AgentUncheckedCreateWithoutMessagesSentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1680,
+            1683
+          ],
+          "name": "AgentCreateOrConnectWithoutMessagesSentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1685,
+            1711
+          ],
+          "name": "AgentCreateWithoutMessagesReceivedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1713,
+            1739
+          ],
+          "name": "AgentUncheckedCreateWithoutMessagesReceivedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1741,
+            1744
+          ],
+          "name": "AgentCreateOrConnectWithoutMessagesReceivedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1746,
+            1750
+          ],
+          "name": "AgentUpsertWithoutMessagesSentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1752,
+            1755
+          ],
+          "name": "AgentUpdateToOneWithWhereWithoutMessagesSentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1757,
+            1783
+          ],
+          "name": "AgentUpdateWithoutMessagesSentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1785,
+            1811
+          ],
+          "name": "AgentUncheckedUpdateWithoutMessagesSentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1813,
+            1817
+          ],
+          "name": "AgentUpsertWithoutMessagesReceivedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1819,
+            1822
+          ],
+          "name": "AgentUpdateToOneWithWhereWithoutMessagesReceivedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1824,
+            1850
+          ],
+          "name": "AgentUpdateWithoutMessagesReceivedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1852,
+            1878
+          ],
+          "name": "AgentUncheckedUpdateWithoutMessagesReceivedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1880,
+            1906
+          ],
+          "name": "AgentCreateWithoutAllowlistOwnerInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1908,
+            1934
+          ],
+          "name": "AgentUncheckedCreateWithoutAllowlistOwnerInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1936,
+            1939
+          ],
+          "name": "AgentCreateOrConnectWithoutAllowlistOwnerInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1941,
+            1967
+          ],
+          "name": "AgentCreateWithoutAllowlistTargetInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1969,
+            1995
+          ],
+          "name": "AgentUncheckedCreateWithoutAllowlistTargetInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1997,
+            2000
+          ],
+          "name": "AgentCreateOrConnectWithoutAllowlistTargetInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2002,
+            2006
+          ],
+          "name": "AgentUpsertWithoutAllowlistOwnerInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2008,
+            2011
+          ],
+          "name": "AgentUpdateToOneWithWhereWithoutAllowlistOwnerInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2013,
+            2039
+          ],
+          "name": "AgentUpdateWithoutAllowlistOwnerInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2041,
+            2067
+          ],
+          "name": "AgentUncheckedUpdateWithoutAllowlistOwnerInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2069,
+            2073
+          ],
+          "name": "AgentUpsertWithoutAllowlistTargetInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2075,
+            2078
+          ],
+          "name": "AgentUpdateToOneWithWhereWithoutAllowlistTargetInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2080,
+            2106
+          ],
+          "name": "AgentUpdateWithoutAllowlistTargetInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2108,
+            2134
+          ],
+          "name": "AgentUncheckedUpdateWithoutAllowlistTargetInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2136,
+            2153
           ],
           "name": "AgentCreateManyTenantInput",
           "type": "type"
         },
         {
           "lines": [
-            1471,
-            1493
+            2155,
+            2181
           ],
           "name": "AgentUpdateWithoutTenantInput",
           "type": "type"
         },
         {
           "lines": [
-            1495,
-            1517
+            2183,
+            2209
           ],
           "name": "AgentUncheckedUpdateWithoutTenantInput",
           "type": "type"
         },
         {
           "lines": [
-            1519,
-            1536
+            2211,
+            2228
           ],
           "name": "AgentUncheckedUpdateManyWithoutTenantInput",
           "type": "type"
         },
         {
           "lines": [
-            1543,
-            1549
+            2235,
+            2245
           ],
           "name": "AgentCountOutputType",
           "type": "type"
         },
         {
           "lines": [
-            1551,
-            1557
+            2247,
+            2257
           ],
           "name": "AgentCountOutputTypeSelect",
           "type": "type"
         },
         {
           "lines": [
-            1562,
-            1567
+            2262,
+            2267
           ],
           "name": "AgentCountOutputTypeDefaultArgs",
           "type": "type"
         },
         {
           "lines": [
-            1572,
-            1574
+            2272,
+            2274
           ],
           "name": "AgentCountOutputTypeCountChannelsArgs",
           "type": "type"
         },
         {
           "lines": [
-            1579,
-            1581
+            2279,
+            2281
           ],
           "name": "AgentCountOutputTypeCountActivitiesArgs",
           "type": "type"
         },
         {
           "lines": [
-            1586,
-            1588
+            2286,
+            2288
           ],
           "name": "AgentCountOutputTypeCountMetricsArgs",
           "type": "type"
         },
         {
           "lines": [
-            1593,
-            1595
+            2293,
+            2295
           ],
           "name": "AgentCountOutputTypeCountInstalledSkillsArgs",
           "type": "type"
         },
         {
           "lines": [
-            1600,
-            1602
+            2300,
+            2302
           ],
           "name": "AgentCountOutputTypeCountAuditLogsArgs",
           "type": "type"
         },
         {
           "lines": [
-            1605,
-            1630
+            2307,
+            2309
+          ],
+          "name": "AgentCountOutputTypeCountMessagesSentArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2314,
+            2316
+          ],
+          "name": "AgentCountOutputTypeCountMessagesReceivedArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2321,
+            2323
+          ],
+          "name": "AgentCountOutputTypeCountAllowlistOwnerArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2328,
+            2330
+          ],
+          "name": "AgentCountOutputTypeCountAllowlistTargetArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2333,
+            2362
           ],
           "name": "AgentSelect",
           "type": "type"
         },
         {
           "lines": [
-            1632,
-            1651
+            2364,
+            2383
           ],
           "name": "AgentSelectCreateManyAndReturn",
           "type": "type"
         },
         {
           "lines": [
-            1653,
-            1672
+            2385,
+            2404
           ],
           "name": "AgentSelectUpdateManyAndReturn",
           "type": "type"
         },
         {
           "lines": [
-            1674,
-            1692
+            2406,
+            2424
           ],
           "name": "AgentSelectScalar",
           "type": "type"
         },
         {
           "lines": [
-            1694,
-            1694
+            2426,
+            2426
           ],
           "name": "AgentOmit",
           "type": "type"
         },
         {
           "lines": [
-            1695,
-            1703
+            2427,
+            2439
           ],
           "name": "AgentInclude",
           "type": "type"
         },
         {
           "lines": [
-            1704,
-            1706
+            2440,
+            2442
           ],
           "name": "AgentIncludeCreateManyAndReturn",
           "type": "type"
         },
         {
           "lines": [
-            1707,
-            1709
+            2443,
+            2445
           ],
           "name": "AgentIncludeUpdateManyAndReturn",
           "type": "type"
         },
         {
           "lines": [
-            1711,
-            1741
+            2447,
+            2481
           ],
           "name": "$AgentPayload",
           "type": "type"
         },
         {
           "lines": [
-            1743,
-            1743
+            2483,
+            2483
           ],
           "name": "AgentGetPayload",
           "type": "type"
         },
         {
           "lines": [
-            1745,
-            1748
+            2485,
+            2488
           ],
           "name": "AgentCountArgs",
           "type": "type"
         },
         {
           "lines": [
-            1750,
-            2123
+            2490,
+            2863
           ],
           "name": "AgentDelegate",
           "type": "interface"
         },
         {
           "lines": [
-            2131,
-            2159
+            2871,
+            2903
           ],
           "name": "Prisma__AgentClient",
           "type": "interface"
         },
         {
           "lines": [
-            2167,
-            2185
+            2911,
+            2929
           ],
           "name": "AgentFieldRefs",
           "type": "interface"
         },
         {
           "lines": [
-            2192,
-            2209
+            2936,
+            2953
           ],
           "name": "AgentFindUniqueArgs",
           "type": "type"
         },
         {
           "lines": [
-            2214,
-            2231
+            2958,
+            2975
           ],
           "name": "AgentFindUniqueOrThrowArgs",
           "type": "type"
         },
         {
           "lines": [
-            2236,
-            2283
+            2980,
+            3027
           ],
           "name": "AgentFindFirstArgs",
           "type": "type"
         },
         {
           "lines": [
-            2288,
-            2335
+            3032,
+            3079
           ],
           "name": "AgentFindFirstOrThrowArgs",
           "type": "type"
         },
         {
           "lines": [
-            2340,
-            2382
+            3084,
+            3126
           ],
           "name": "AgentFindManyArgs",
           "type": "type"
         },
         {
           "lines": [
-            2387,
-            2404
+            3131,
+            3148
           ],
           "name": "AgentCreateArgs",
           "type": "type"
         },
         {
           "lines": [
-            2409,
-            2415
+            3153,
+            3159
           ],
           "name": "AgentCreateManyArgs",
           "type": "type"
         },
         {
           "lines": [
-            2420,
-            2438
+            3164,
+            3182
           ],
           "name": "AgentCreateManyAndReturnArgs",
           "type": "type"
         },
         {
           "lines": [
-            2443,
-            2464
+            3187,
+            3208
           ],
           "name": "AgentUpdateArgs",
           "type": "type"
         },
         {
           "lines": [
-            2469,
-            2482
+            3213,
+            3226
           ],
           "name": "AgentUpdateManyArgs",
           "type": "type"
         },
         {
           "lines": [
-            2487,
-            2512
+            3231,
+            3256
           ],
           "name": "AgentUpdateManyAndReturnArgs",
           "type": "type"
         },
         {
           "lines": [
-            2517,
-            2542
+            3261,
+            3286
           ],
           "name": "AgentUpsertArgs",
           "type": "type"
         },
         {
           "lines": [
-            2547,
-            2564
+            3291,
+            3308
           ],
           "name": "AgentDeleteArgs",
           "type": "type"
         },
         {
           "lines": [
-            2569,
-            2578
+            3313,
+            3322
           ],
           "name": "AgentDeleteManyArgs",
           "type": "type"
         },
         {
           "lines": [
-            2583,
-            2602
+            3327,
+            3346
           ],
           "name": "Agent$channelsArgs",
           "type": "type"
         },
         {
           "lines": [
-            2607,
-            2626
+            3351,
+            3370
           ],
           "name": "Agent$activitiesArgs",
           "type": "type"
         },
         {
           "lines": [
-            2631,
-            2650
+            3375,
+            3394
           ],
           "name": "Agent$metricsArgs",
           "type": "type"
         },
         {
           "lines": [
-            2655,
-            2674
+            3399,
+            3418
           ],
           "name": "Agent$installedSkillsArgs",
           "type": "type"
         },
         {
           "lines": [
-            2679,
-            2698
+            3423,
+            3442
           ],
           "name": "Agent$auditLogsArgs",
           "type": "type"
         },
         {
           "lines": [
-            2703,
-            2716
+            3447,
+            3466
+          ],
+          "name": "Agent$messagesSentArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            3471,
+            3490
+          ],
+          "name": "Agent$messagesReceivedArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            3495,
+            3514
+          ],
+          "name": "Agent$allowlistOwnerArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            3519,
+            3538
+          ],
+          "name": "Agent$allowlistTargetArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            3543,
+            3556
           ],
           "name": "AgentDefaultArgs",
           "type": "type"
@@ -1171,7 +1523,7 @@
     },
     "AgentActivity.ts": {
       "hash": "999717740c40",
-      "indexed_at": "2026-02-08T19:00:37.921221+00:00",
+      "indexed_at": "2026-02-08T21:27:42.191911+00:00",
       "language": "typescript",
       "lines": 1373,
       "symbols": [
@@ -1785,9 +2137,753 @@
         }
       ]
     },
+    "AgentAllowlist.ts": {
+      "hash": "7e8526fef74b",
+      "indexed_at": "2026-02-08T21:27:42.242419+00:00",
+      "language": "typescript",
+      "lines": 1511,
+      "symbols": [
+        {
+          "lines": [
+            19,
+            19
+          ],
+          "name": "AgentAllowlistModel",
+          "type": "type"
+        },
+        {
+          "lines": [
+            21,
+            25
+          ],
+          "name": "AggregateAgentAllowlist",
+          "type": "type"
+        },
+        {
+          "lines": [
+            27,
+            34
+          ],
+          "name": "AgentAllowlistMinAggregateOutputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            36,
+            43
+          ],
+          "name": "AgentAllowlistMaxAggregateOutputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            45,
+            53
+          ],
+          "name": "AgentAllowlistCountAggregateOutputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            56,
+            63
+          ],
+          "name": "AgentAllowlistMinAggregateInputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            65,
+            72
+          ],
+          "name": "AgentAllowlistMaxAggregateInputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            74,
+            82
+          ],
+          "name": "AgentAllowlistCountAggregateInputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            84,
+            131
+          ],
+          "name": "AgentAllowlistAggregateArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            133,
+            139
+          ],
+          "name": "GetAgentAllowlistAggregateType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            144,
+            154
+          ],
+          "name": "AgentAllowlistGroupByArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            156,
+            166
+          ],
+          "name": "AgentAllowlistGroupByOutputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            168,
+            179
+          ],
+          "name": "GetAgentAllowlistGroupByPayload",
+          "type": "type"
+        },
+        {
+          "lines": [
+            183,
+            195
+          ],
+          "name": "AgentAllowlistWhereInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            197,
+            206
+          ],
+          "name": "AgentAllowlistOrderByWithRelationInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            208,
+            221
+          ],
+          "name": "AgentAllowlistWhereUniqueInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            223,
+            233
+          ],
+          "name": "AgentAllowlistOrderByWithAggregationInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            235,
+            245
+          ],
+          "name": "AgentAllowlistScalarWhereWithAggregatesInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            247,
+            254
+          ],
+          "name": "AgentAllowlistCreateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            256,
+            263
+          ],
+          "name": "AgentAllowlistUncheckedCreateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            265,
+            272
+          ],
+          "name": "AgentAllowlistUpdateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            274,
+            281
+          ],
+          "name": "AgentAllowlistUncheckedUpdateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            283,
+            290
+          ],
+          "name": "AgentAllowlistCreateManyInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            292,
+            297
+          ],
+          "name": "AgentAllowlistUpdateManyMutationInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            299,
+            306
+          ],
+          "name": "AgentAllowlistUncheckedUpdateManyInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            308,
+            312
+          ],
+          "name": "AgentAllowlistListRelationFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            314,
+            316
+          ],
+          "name": "AgentAllowlistOrderByRelationAggregateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            318,
+            321
+          ],
+          "name": "AgentAllowlistAgentIdAllowedAgentIdCompoundUniqueInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            323,
+            330
+          ],
+          "name": "AgentAllowlistCountOrderByAggregateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            332,
+            339
+          ],
+          "name": "AgentAllowlistMaxOrderByAggregateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            341,
+            348
+          ],
+          "name": "AgentAllowlistMinOrderByAggregateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            350,
+            355
+          ],
+          "name": "AgentAllowlistCreateNestedManyWithoutAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            357,
+            362
+          ],
+          "name": "AgentAllowlistCreateNestedManyWithoutAllowedAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            364,
+            369
+          ],
+          "name": "AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            371,
+            376
+          ],
+          "name": "AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            378,
+            390
+          ],
+          "name": "AgentAllowlistUpdateManyWithoutAgentNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            392,
+            404
+          ],
+          "name": "AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            406,
+            418
+          ],
+          "name": "AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            420,
+            432
+          ],
+          "name": "AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            434,
+            436
+          ],
+          "name": "EnumAllowlistDirectionFieldUpdateOperationsInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            438,
+            444
+          ],
+          "name": "AgentAllowlistCreateWithoutAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            446,
+            452
+          ],
+          "name": "AgentAllowlistUncheckedCreateWithoutAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            454,
+            457
+          ],
+          "name": "AgentAllowlistCreateOrConnectWithoutAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            459,
+            462
+          ],
+          "name": "AgentAllowlistCreateManyAgentInputEnvelope",
+          "type": "type"
+        },
+        {
+          "lines": [
+            464,
+            470
+          ],
+          "name": "AgentAllowlistCreateWithoutAllowedAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            472,
+            478
+          ],
+          "name": "AgentAllowlistUncheckedCreateWithoutAllowedAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            480,
+            483
+          ],
+          "name": "AgentAllowlistCreateOrConnectWithoutAllowedAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            485,
+            488
+          ],
+          "name": "AgentAllowlistCreateManyAllowedAgentInputEnvelope",
+          "type": "type"
+        },
+        {
+          "lines": [
+            490,
+            494
+          ],
+          "name": "AgentAllowlistUpsertWithWhereUniqueWithoutAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            496,
+            499
+          ],
+          "name": "AgentAllowlistUpdateWithWhereUniqueWithoutAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            501,
+            504
+          ],
+          "name": "AgentAllowlistUpdateManyWithWhereWithoutAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            506,
+            516
+          ],
+          "name": "AgentAllowlistScalarWhereInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            518,
+            522
+          ],
+          "name": "AgentAllowlistUpsertWithWhereUniqueWithoutAllowedAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            524,
+            527
+          ],
+          "name": "AgentAllowlistUpdateWithWhereUniqueWithoutAllowedAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            529,
+            532
+          ],
+          "name": "AgentAllowlistUpdateManyWithWhereWithoutAllowedAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            534,
+            540
+          ],
+          "name": "AgentAllowlistCreateManyAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            542,
+            548
+          ],
+          "name": "AgentAllowlistCreateManyAllowedAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            550,
+            556
+          ],
+          "name": "AgentAllowlistUpdateWithoutAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            558,
+            564
+          ],
+          "name": "AgentAllowlistUncheckedUpdateWithoutAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            566,
+            572
+          ],
+          "name": "AgentAllowlistUncheckedUpdateManyWithoutAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            574,
+            580
+          ],
+          "name": "AgentAllowlistUpdateWithoutAllowedAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            582,
+            588
+          ],
+          "name": "AgentAllowlistUncheckedUpdateWithoutAllowedAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            590,
+            596
+          ],
+          "name": "AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            600,
+            609
+          ],
+          "name": "AgentAllowlistSelect",
+          "type": "type"
+        },
+        {
+          "lines": [
+            611,
+            620
+          ],
+          "name": "AgentAllowlistSelectCreateManyAndReturn",
+          "type": "type"
+        },
+        {
+          "lines": [
+            622,
+            631
+          ],
+          "name": "AgentAllowlistSelectUpdateManyAndReturn",
+          "type": "type"
+        },
+        {
+          "lines": [
+            633,
+            640
+          ],
+          "name": "AgentAllowlistSelectScalar",
+          "type": "type"
+        },
+        {
+          "lines": [
+            642,
+            642
+          ],
+          "name": "AgentAllowlistOmit",
+          "type": "type"
+        },
+        {
+          "lines": [
+            643,
+            646
+          ],
+          "name": "AgentAllowlistInclude",
+          "type": "type"
+        },
+        {
+          "lines": [
+            647,
+            650
+          ],
+          "name": "AgentAllowlistIncludeCreateManyAndReturn",
+          "type": "type"
+        },
+        {
+          "lines": [
+            651,
+            654
+          ],
+          "name": "AgentAllowlistIncludeUpdateManyAndReturn",
+          "type": "type"
+        },
+        {
+          "lines": [
+            656,
+            671
+          ],
+          "name": "$AgentAllowlistPayload",
+          "type": "type"
+        },
+        {
+          "lines": [
+            673,
+            673
+          ],
+          "name": "AgentAllowlistGetPayload",
+          "type": "type"
+        },
+        {
+          "lines": [
+            675,
+            678
+          ],
+          "name": "AgentAllowlistCountArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            680,
+            1053
+          ],
+          "name": "AgentAllowlistDelegate",
+          "type": "interface"
+        },
+        {
+          "lines": [
+            1061,
+            1085
+          ],
+          "name": "Prisma__AgentAllowlistClient",
+          "type": "interface"
+        },
+        {
+          "lines": [
+            1093,
+            1100
+          ],
+          "name": "AgentAllowlistFieldRefs",
+          "type": "interface"
+        },
+        {
+          "lines": [
+            1107,
+            1124
+          ],
+          "name": "AgentAllowlistFindUniqueArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1129,
+            1146
+          ],
+          "name": "AgentAllowlistFindUniqueOrThrowArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1151,
+            1198
+          ],
+          "name": "AgentAllowlistFindFirstArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1203,
+            1250
+          ],
+          "name": "AgentAllowlistFindFirstOrThrowArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1255,
+            1297
+          ],
+          "name": "AgentAllowlistFindManyArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1302,
+            1319
+          ],
+          "name": "AgentAllowlistCreateArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1324,
+            1330
+          ],
+          "name": "AgentAllowlistCreateManyArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1335,
+            1353
+          ],
+          "name": "AgentAllowlistCreateManyAndReturnArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1358,
+            1379
+          ],
+          "name": "AgentAllowlistUpdateArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1384,
+            1397
+          ],
+          "name": "AgentAllowlistUpdateManyArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1402,
+            1427
+          ],
+          "name": "AgentAllowlistUpdateManyAndReturnArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1432,
+            1457
+          ],
+          "name": "AgentAllowlistUpsertArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1462,
+            1479
+          ],
+          "name": "AgentAllowlistDeleteArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1484,
+            1493
+          ],
+          "name": "AgentAllowlistDeleteManyArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1498,
+            1511
+          ],
+          "name": "AgentAllowlistDefaultArgs",
+          "type": "type"
+        }
+      ]
+    },
     "AgentChannel.ts": {
       "hash": "632890886730",
-      "indexed_at": "2026-02-08T19:00:37.970644+00:00",
+      "indexed_at": "2026-02-08T21:27:42.408286+00:00",
       "language": "typescript",
       "lines": 1443,
       "symbols": [
@@ -2401,9 +3497,753 @@
         }
       ]
     },
+    "AgentMessage.ts": {
+      "hash": "98d495a0fd9b",
+      "indexed_at": "2026-02-08T21:27:42.577094+00:00",
+      "language": "typescript",
+      "lines": 1626,
+      "symbols": [
+        {
+          "lines": [
+            19,
+            19
+          ],
+          "name": "AgentMessageModel",
+          "type": "type"
+        },
+        {
+          "lines": [
+            21,
+            25
+          ],
+          "name": "AggregateAgentMessage",
+          "type": "type"
+        },
+        {
+          "lines": [
+            27,
+            36
+          ],
+          "name": "AgentMessageMinAggregateOutputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            38,
+            47
+          ],
+          "name": "AgentMessageMaxAggregateOutputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            49,
+            60
+          ],
+          "name": "AgentMessageCountAggregateOutputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            63,
+            72
+          ],
+          "name": "AgentMessageMinAggregateInputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            74,
+            83
+          ],
+          "name": "AgentMessageMaxAggregateInputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            85,
+            96
+          ],
+          "name": "AgentMessageCountAggregateInputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            98,
+            145
+          ],
+          "name": "AgentMessageAggregateArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            147,
+            153
+          ],
+          "name": "GetAgentMessageAggregateType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            158,
+            168
+          ],
+          "name": "AgentMessageGroupByArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            170,
+            183
+          ],
+          "name": "AgentMessageGroupByOutputType",
+          "type": "type"
+        },
+        {
+          "lines": [
+            185,
+            196
+          ],
+          "name": "GetAgentMessageGroupByPayload",
+          "type": "type"
+        },
+        {
+          "lines": [
+            200,
+            215
+          ],
+          "name": "AgentMessageWhereInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            217,
+            229
+          ],
+          "name": "AgentMessageOrderByWithRelationInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            231,
+            246
+          ],
+          "name": "AgentMessageWhereUniqueInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            248,
+            261
+          ],
+          "name": "AgentMessageOrderByWithAggregationInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            263,
+            276
+          ],
+          "name": "AgentMessageScalarWhereWithAggregatesInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            278,
+            288
+          ],
+          "name": "AgentMessageCreateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            290,
+            300
+          ],
+          "name": "AgentMessageUncheckedCreateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            302,
+            312
+          ],
+          "name": "AgentMessageUpdateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            314,
+            324
+          ],
+          "name": "AgentMessageUncheckedUpdateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            326,
+            336
+          ],
+          "name": "AgentMessageCreateManyInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            338,
+            346
+          ],
+          "name": "AgentMessageUpdateManyMutationInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            348,
+            358
+          ],
+          "name": "AgentMessageUncheckedUpdateManyInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            360,
+            364
+          ],
+          "name": "AgentMessageListRelationFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            366,
+            368
+          ],
+          "name": "AgentMessageOrderByRelationAggregateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            370,
+            380
+          ],
+          "name": "AgentMessageCountOrderByAggregateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            382,
+            391
+          ],
+          "name": "AgentMessageMaxOrderByAggregateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            393,
+            402
+          ],
+          "name": "AgentMessageMinOrderByAggregateInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            404,
+            409
+          ],
+          "name": "AgentMessageCreateNestedManyWithoutSenderInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            411,
+            416
+          ],
+          "name": "AgentMessageCreateNestedManyWithoutRecipientInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            418,
+            423
+          ],
+          "name": "AgentMessageUncheckedCreateNestedManyWithoutSenderInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            425,
+            430
+          ],
+          "name": "AgentMessageUncheckedCreateNestedManyWithoutRecipientInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            432,
+            444
+          ],
+          "name": "AgentMessageUpdateManyWithoutSenderNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            446,
+            458
+          ],
+          "name": "AgentMessageUpdateManyWithoutRecipientNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            460,
+            472
+          ],
+          "name": "AgentMessageUncheckedUpdateManyWithoutSenderNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            474,
+            486
+          ],
+          "name": "AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            488,
+            490
+          ],
+          "name": "EnumMessageTypeFieldUpdateOperationsInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            492,
+            494
+          ],
+          "name": "EnumMessageStatusFieldUpdateOperationsInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            496,
+            505
+          ],
+          "name": "AgentMessageCreateWithoutSenderInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            507,
+            516
+          ],
+          "name": "AgentMessageUncheckedCreateWithoutSenderInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            518,
+            521
+          ],
+          "name": "AgentMessageCreateOrConnectWithoutSenderInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            523,
+            526
+          ],
+          "name": "AgentMessageCreateManySenderInputEnvelope",
+          "type": "type"
+        },
+        {
+          "lines": [
+            528,
+            537
+          ],
+          "name": "AgentMessageCreateWithoutRecipientInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            539,
+            548
+          ],
+          "name": "AgentMessageUncheckedCreateWithoutRecipientInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            550,
+            553
+          ],
+          "name": "AgentMessageCreateOrConnectWithoutRecipientInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            555,
+            558
+          ],
+          "name": "AgentMessageCreateManyRecipientInputEnvelope",
+          "type": "type"
+        },
+        {
+          "lines": [
+            560,
+            564
+          ],
+          "name": "AgentMessageUpsertWithWhereUniqueWithoutSenderInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            566,
+            569
+          ],
+          "name": "AgentMessageUpdateWithWhereUniqueWithoutSenderInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            571,
+            574
+          ],
+          "name": "AgentMessageUpdateManyWithWhereWithoutSenderInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            576,
+            589
+          ],
+          "name": "AgentMessageScalarWhereInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            591,
+            595
+          ],
+          "name": "AgentMessageUpsertWithWhereUniqueWithoutRecipientInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            597,
+            600
+          ],
+          "name": "AgentMessageUpdateWithWhereUniqueWithoutRecipientInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            602,
+            605
+          ],
+          "name": "AgentMessageUpdateManyWithWhereWithoutRecipientInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            607,
+            616
+          ],
+          "name": "AgentMessageCreateManySenderInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            618,
+            627
+          ],
+          "name": "AgentMessageCreateManyRecipientInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            629,
+            638
+          ],
+          "name": "AgentMessageUpdateWithoutSenderInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            640,
+            649
+          ],
+          "name": "AgentMessageUncheckedUpdateWithoutSenderInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            651,
+            660
+          ],
+          "name": "AgentMessageUncheckedUpdateManyWithoutSenderInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            662,
+            671
+          ],
+          "name": "AgentMessageUpdateWithoutRecipientInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            673,
+            682
+          ],
+          "name": "AgentMessageUncheckedUpdateWithoutRecipientInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            684,
+            693
+          ],
+          "name": "AgentMessageUncheckedUpdateManyWithoutRecipientInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            697,
+            709
+          ],
+          "name": "AgentMessageSelect",
+          "type": "type"
+        },
+        {
+          "lines": [
+            711,
+            723
+          ],
+          "name": "AgentMessageSelectCreateManyAndReturn",
+          "type": "type"
+        },
+        {
+          "lines": [
+            725,
+            737
+          ],
+          "name": "AgentMessageSelectUpdateManyAndReturn",
+          "type": "type"
+        },
+        {
+          "lines": [
+            739,
+            749
+          ],
+          "name": "AgentMessageSelectScalar",
+          "type": "type"
+        },
+        {
+          "lines": [
+            751,
+            751
+          ],
+          "name": "AgentMessageOmit",
+          "type": "type"
+        },
+        {
+          "lines": [
+            752,
+            755
+          ],
+          "name": "AgentMessageInclude",
+          "type": "type"
+        },
+        {
+          "lines": [
+            756,
+            759
+          ],
+          "name": "AgentMessageIncludeCreateManyAndReturn",
+          "type": "type"
+        },
+        {
+          "lines": [
+            760,
+            763
+          ],
+          "name": "AgentMessageIncludeUpdateManyAndReturn",
+          "type": "type"
+        },
+        {
+          "lines": [
+            765,
+            783
+          ],
+          "name": "$AgentMessagePayload",
+          "type": "type"
+        },
+        {
+          "lines": [
+            785,
+            785
+          ],
+          "name": "AgentMessageGetPayload",
+          "type": "type"
+        },
+        {
+          "lines": [
+            787,
+            790
+          ],
+          "name": "AgentMessageCountArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            792,
+            1165
+          ],
+          "name": "AgentMessageDelegate",
+          "type": "interface"
+        },
+        {
+          "lines": [
+            1173,
+            1197
+          ],
+          "name": "Prisma__AgentMessageClient",
+          "type": "interface"
+        },
+        {
+          "lines": [
+            1205,
+            1215
+          ],
+          "name": "AgentMessageFieldRefs",
+          "type": "interface"
+        },
+        {
+          "lines": [
+            1222,
+            1239
+          ],
+          "name": "AgentMessageFindUniqueArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1244,
+            1261
+          ],
+          "name": "AgentMessageFindUniqueOrThrowArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1266,
+            1313
+          ],
+          "name": "AgentMessageFindFirstArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1318,
+            1365
+          ],
+          "name": "AgentMessageFindFirstOrThrowArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1370,
+            1412
+          ],
+          "name": "AgentMessageFindManyArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1417,
+            1434
+          ],
+          "name": "AgentMessageCreateArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1439,
+            1445
+          ],
+          "name": "AgentMessageCreateManyArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1450,
+            1468
+          ],
+          "name": "AgentMessageCreateManyAndReturnArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1473,
+            1494
+          ],
+          "name": "AgentMessageUpdateArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1499,
+            1512
+          ],
+          "name": "AgentMessageUpdateManyArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1517,
+            1542
+          ],
+          "name": "AgentMessageUpdateManyAndReturnArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1547,
+            1572
+          ],
+          "name": "AgentMessageUpsertArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1577,
+            1594
+          ],
+          "name": "AgentMessageDeleteArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1599,
+            1608
+          ],
+          "name": "AgentMessageDeleteManyArgs",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1613,
+            1626
+          ],
+          "name": "AgentMessageDefaultArgs",
+          "type": "type"
+        }
+      ]
+    },
     "AgentMetrics.ts": {
       "hash": "ce22f3ae19a7",
-      "indexed_at": "2026-02-08T19:00:38.018016+00:00",
+      "indexed_at": "2026-02-08T21:27:42.356931+00:00",
       "language": "typescript",
       "lines": 1550,
       "symbols": [
@@ -3067,7 +4907,7 @@
     },
     "AgentRoleConfig.ts": {
       "hash": "3f1867fb6ca6",
-      "indexed_at": "2026-02-08T19:00:38.061161+00:00",
+      "indexed_at": "2026-02-08T21:27:42.450417+00:00",
       "language": "typescript",
       "lines": 1339,
       "symbols": [
@@ -3579,7 +5419,7 @@
     },
     "Alert.ts": {
       "hash": "d95993d02cb0",
-      "indexed_at": "2026-02-08T19:00:38.106520+00:00",
+      "indexed_at": "2026-02-08T21:27:42.493974+00:00",
       "language": "typescript",
       "lines": 1503,
       "symbols": [
@@ -4203,7 +6043,7 @@
     },
     "ApiKey.ts": {
       "hash": "0d416d9e26ec",
-      "indexed_at": "2026-02-08T19:00:38.154499+00:00",
+      "indexed_at": "2026-02-08T21:27:42.739613+00:00",
       "language": "typescript",
       "lines": 1480,
       "symbols": [
@@ -4811,7 +6651,7 @@
     },
     "AuditLog.ts": {
       "hash": "f74773ebfc73",
-      "indexed_at": "2026-02-08T19:00:38.263151+00:00",
+      "indexed_at": "2026-02-08T21:27:42.624698+00:00",
       "language": "typescript",
       "lines": 2113,
       "symbols": [
@@ -5707,7 +7547,7 @@
     },
     "ContainerHealth.ts": {
       "hash": "aa7c6aa1a575",
-      "indexed_at": "2026-02-08T19:00:38.190122+00:00",
+      "indexed_at": "2026-02-08T21:27:42.690550+00:00",
       "language": "typescript",
       "lines": 1511,
       "symbols": [
@@ -6371,7 +8211,7 @@
     },
     "RefreshToken.ts": {
       "hash": "e5ef918a552f",
-      "indexed_at": "2026-02-08T19:00:38.311839+00:00",
+      "indexed_at": "2026-02-08T21:27:42.855650+00:00",
       "language": "typescript",
       "lines": 1445,
       "symbols": [
@@ -6979,7 +8819,7 @@
     },
     "Skill.ts": {
       "hash": "e6870530d7e7",
-      "indexed_at": "2026-02-08T19:00:38.386343+00:00",
+      "indexed_at": "2026-02-08T21:27:42.786062+00:00",
       "language": "typescript",
       "lines": 2306,
       "symbols": [
@@ -7795,7 +9635,7 @@
     },
     "SkillInstallation.ts": {
       "hash": "925b7e64a2f1",
-      "indexed_at": "2026-02-08T19:00:38.440104+00:00",
+      "indexed_at": "2026-02-08T21:27:42.909355+00:00",
       "language": "typescript",
       "lines": 1460,
       "symbols": [
@@ -8531,7 +10371,7 @@
     },
     "TeamInvite.ts": {
       "hash": "5833c08f97e5",
-      "indexed_at": "2026-02-08T19:00:38.480928+00:00",
+      "indexed_at": "2026-02-08T21:27:42.958081+00:00",
       "language": "typescript",
       "lines": 1554,
       "symbols": [
@@ -9147,7 +10987,7 @@
     },
     "TeamMember.ts": {
       "hash": "37d56620a26d",
-      "indexed_at": "2026-02-08T19:00:38.765653+00:00",
+      "indexed_at": "2026-02-08T21:27:43.000071+00:00",
       "language": "typescript",
       "lines": 1466,
       "symbols": [
@@ -9883,7 +11723,7 @@
     },
     "Tenant.ts": {
       "hash": "49fe1117cfd3",
-      "indexed_at": "2026-02-08T19:05:04.101615+00:00",
+      "indexed_at": "2026-02-08T21:27:43.108523+00:00",
       "language": "typescript",
       "lines": 3689,
       "symbols": [
@@ -11259,7 +13099,7 @@
     },
     "TenantConfigHistory.ts": {
       "hash": "2751f55f86e5",
-      "indexed_at": "2026-02-08T19:05:03.713136+00:00",
+      "indexed_at": "2026-02-08T21:27:43.045941+00:00",
       "language": "typescript",
       "lines": 1369,
       "symbols": [
@@ -11867,7 +13707,7 @@
     },
     "User.ts": {
       "hash": "9b96d2ff9f5f",
-      "indexed_at": "2026-02-08T19:00:38.885740+00:00",
+      "indexed_at": "2026-02-08T21:27:43.152509+00:00",
       "language": "typescript",
       "lines": 2319,
       "symbols": [
@@ -12930,6 +14770,6 @@
       ]
     }
   },
-  "generated_at": "2026-02-08T21:12:26.608344+00:00",
+  "generated_at": "2026-02-08T21:35:43.229891+00:00",
   "version": "1.0"
 }

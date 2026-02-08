@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import * as speakeasy from 'speakeasy';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
 import { JwtPayload } from '../common/interfaces/jwt-payload.interface';
 import { LoginDto } from './dto/login.dto';
 import { OAuthLoginDto } from './dto/oauth-login.dto';
@@ -26,6 +27,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly auditService: AuditService,
   ) {}
 
   // ==========================================================================
@@ -51,12 +53,32 @@ export class AuthService {
     });
 
     if (!user || !user.password) {
+      this.auditService.logAction({
+        actorType: 'system',
+        actorId: 'auth-service',
+        actorName: 'Authentication Service',
+        action: 'user_login_failed',
+        targetType: 'user',
+        targetId: email,
+        details: { reason: 'user_not_found' },
+        severity: 'warning',
+      });
       throw new UnauthorizedException('Invalid credentials');
     }
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      this.auditService.logAction({
+        actorType: 'system',
+        actorId: 'auth-service',
+        actorName: 'Authentication Service',
+        action: 'user_login_failed',
+        targetType: 'user',
+        targetId: email,
+        details: { reason: 'invalid_credentials' },
+        severity: 'warning',
+      });
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -81,6 +103,18 @@ export class AuthService {
     await this.prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
+    });
+
+    this.auditService.logAction({
+      actorType: 'user',
+      actorId: user.id,
+      actorName: user.email,
+      action: 'user_login',
+      targetType: 'user',
+      targetId: user.id,
+      details: { method: 'email_password', mfaRequired: false },
+      severity: 'info',
+      tenantId: user.tenantId || null,
     });
 
     return {
@@ -291,6 +325,16 @@ export class AuthService {
     });
 
     if (!isValid) {
+      this.auditService.logAction({
+        actorType: 'system',
+        actorId: 'auth-service',
+        actorName: 'Authentication Service',
+        action: 'mfa_verification_failed',
+        targetType: 'user',
+        targetId: email,
+        details: { reason: 'invalid_totp_code' },
+        severity: 'warning',
+      });
       throw new UnauthorizedException('Invalid MFA code');
     }
 
@@ -304,6 +348,18 @@ export class AuthService {
     await this.prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
+    });
+
+    this.auditService.logAction({
+      actorType: 'user',
+      actorId: user.id,
+      actorName: user.email,
+      action: 'mfa_verification_success',
+      targetType: 'user',
+      targetId: user.id,
+      details: { method: 'totp' },
+      severity: 'info',
+      tenantId: user.tenantId || null,
     });
 
     return {

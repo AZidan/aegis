@@ -133,8 +133,6 @@
     "src/prisma",
     "src/provisioning",
     "test",
-    "test/admin",
-    "test/admin/tenants",
     "test/auth",
     "test/common/guards",
     "test/dashboard/agents",
@@ -145,12 +143,12 @@
     "test/health",
     "test/provisioning"
   ],
-  "generated_at": "2026-02-08T21:12:26.631884+00:00",
+  "generated_at": "2026-02-08T21:35:43.249499+00:00",
   "root": "/Users/azidan/Work/Repos/AIProjects/ClawdBotSandbox/workspace/projects/ai-transformation/backend",
   "stats": {
-    "last_full_index": "2026-02-08T21:12:26.598632+00:00",
-    "total_files": 147,
-    "total_symbols": 2564
+    "last_full_index": "2026-02-08T21:35:43.219542+00:00",
+    "total_files": 135,
+    "total_symbols": 2737
   },
   "version": "1.0"
 }

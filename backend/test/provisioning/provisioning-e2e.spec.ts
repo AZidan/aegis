@@ -6,6 +6,7 @@ import { TenantsController } from '../../src/admin/tenants/tenants.controller';
 import { TenantsService } from '../../src/admin/tenants/tenants.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvisioningService } from '../../src/provisioning/provisioning.service';
+import { AuditService } from '../../src/audit/audit.service';
 import { JwtAuthGuard } from '../../src/auth/guards/jwt-auth.guard';
 import {
   PROVISIONING_QUEUE_NAME,
@@ -123,6 +124,7 @@ describe('Provisioning E2E (HTTP API)', () => {
         TenantsService,
         ProvisioningService,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: AuditService, useValue: { logAction: jest.fn() } },
         {
           provide: getQueueToken(PROVISIONING_QUEUE_NAME),
           useValue: mockProvisioningQueue,

@@ -160,3 +160,34 @@ export const InviteStatus = {
 } as const
 
 export type InviteStatus = (typeof InviteStatus)[keyof typeof InviteStatus]
+
+
+export const MessageType = {
+  task_handoff: 'task_handoff',
+  status_update: 'status_update',
+  data_request: 'data_request',
+  data_response: 'data_response',
+  escalation: 'escalation',
+  notification: 'notification'
+} as const
+
+export type MessageType = (typeof MessageType)[keyof typeof MessageType]
+
+
+export const MessageStatus = {
+  pending: 'pending',
+  delivered: 'delivered',
+  failed: 'failed',
+  read: 'read'
+} as const
+
+export type MessageStatus = (typeof MessageStatus)[keyof typeof MessageStatus]
+
+
+export const AllowlistDirection = {
+  both: 'both',
+  send_only: 'send_only',
+  receive_only: 'receive_only'
+} as const
+
+export type AllowlistDirection = (typeof AllowlistDirection)[keyof typeof AllowlistDirection]

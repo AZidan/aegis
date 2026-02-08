@@ -2,10 +2,10 @@
   "directory": "prisma/generated/internal",
   "files": {
     "class.ts": {
-      "hash": "d1c59c8a402d",
-      "indexed_at": "2026-02-08T19:05:03.928969+00:00",
+      "hash": "6f2b9aad1af2",
+      "indexed_at": "2026-02-08T21:27:41.986100+00:00",
       "language": "typescript",
-      "lines": 352,
+      "lines": 372,
       "symbols": [
         {
           "lines": [
@@ -35,15 +35,15 @@
         {
           "lines": [
             92,
-            348
+            368
           ],
           "name": "PrismaClient",
           "type": "interface"
         },
         {
           "lines": [
-            350,
-            352
+            370,
+            372
           ],
           "name": "getPrismaClientClass",
           "signature": "() : PrismaClientConstructor",
@@ -52,10 +52,10 @@
       ]
     },
     "prismaNamespace.ts": {
-      "hash": "e87664e2d083",
-      "indexed_at": "2026-02-08T19:05:03.976763+00:00",
+      "hash": "483a56a1e7f9",
+      "indexed_at": "2026-02-08T21:27:42.095981+00:00",
       "language": "typescript",
-      "lines": 2537,
+      "lines": 2758,
       "symbols": [
         {
           "lines": [
@@ -656,194 +656,98 @@
         },
         {
           "lines": [
-            406,
-            406
+            408,
+            408
           ],
           "name": "ModelName",
           "type": "type"
         },
         {
           "lines": [
-            410,
-            412
+            412,
+            414
           ],
           "name": "TypeMapCb",
           "type": "interface"
         },
         {
           "lines": [
-            414,
-            1704
+            416,
+            1854
           ],
           "name": "TypeMap",
           "type": "type"
         },
         {
           "lines": [
-            1717,
-            1717
+            1867,
+            1867
           ],
           "name": "TransactionIsolationLevel",
           "type": "type"
         },
         {
           "lines": [
-            1736,
-            1736
+            1886,
+            1886
           ],
           "name": "UserScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            1765,
-            1765
+            1915,
+            1915
           ],
           "name": "TenantScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            1777,
-            1777
+            1927,
+            1927
           ],
           "name": "TenantConfigHistoryScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            1800,
-            1800
+            1950,
+            1950
           ],
           "name": "AgentScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            1816,
-            1816
+            1966,
+            1966
           ],
           "name": "AgentRoleConfigScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            1847,
-            1847
+            1997,
+            1997
           ],
           "name": "SkillScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            1861,
-            1861
+            2011,
+            2011
           ],
           "name": "RefreshTokenScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            1876,
-            1876
+            2026,
+            2026
           ],
           "name": "ApiKeyScalarFieldEnum",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1887,
-            1887
-          ],
-          "name": "TeamMemberScalarFieldEnum",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1904,
-            1904
-          ],
-          "name": "TeamInviteScalarFieldEnum",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1918,
-            1918
-          ],
-          "name": "AgentChannelScalarFieldEnum",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1930,
-            1930
-          ],
-          "name": "AgentActivityScalarFieldEnum",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1945,
-            1945
-          ],
-          "name": "AgentMetricsScalarFieldEnum",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1956,
-            1956
-          ],
-          "name": "SkillInstallationScalarFieldEnum",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1970,
-            1970
-          ],
-          "name": "ContainerHealthScalarFieldEnum",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1985,
-            1985
-          ],
-          "name": "AlertScalarFieldEnum",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2006,
-            2006
-          ],
-          "name": "AuditLogScalarFieldEnum",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2014,
-            2014
-          ],
-          "name": "SortOrder",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2022,
-            2022
-          ],
-          "name": "NullableJsonNullValueInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2029,
-            2029
-          ],
-          "name": "JsonNullValueInput",
           "type": "type"
         },
         {
@@ -851,15 +755,7 @@
             2037,
             2037
           ],
-          "name": "QueryMode",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2045,
-            2045
-          ],
-          "name": "NullsOrder",
+          "name": "TeamMemberScalarFieldEnum",
           "type": "type"
         },
         {
@@ -867,23 +763,15 @@
             2054,
             2054
           ],
-          "name": "JsonNullValueFilter",
+          "name": "TeamInviteScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            2066,
-            2066
+            2068,
+            2068
           ],
-          "name": "StringFieldRefInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2073,
-            2073
-          ],
-          "name": "ListStringFieldRefInput",
+          "name": "AgentChannelScalarFieldEnum",
           "type": "type"
         },
         {
@@ -891,103 +779,47 @@
             2080,
             2080
           ],
-          "name": "EnumUserRoleFieldRefInput",
+          "name": "AgentActivityScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            2087,
-            2087
+            2095,
+            2095
           ],
-          "name": "ListEnumUserRoleFieldRefInput",
+          "name": "AgentMetricsScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            2094,
-            2094
+            2106,
+            2106
           ],
-          "name": "BooleanFieldRefInput",
+          "name": "SkillInstallationScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            2101,
-            2101
+            2120,
+            2120
           ],
-          "name": "DateTimeFieldRefInput",
+          "name": "ContainerHealthScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            2108,
-            2108
+            2135,
+            2135
           ],
-          "name": "ListDateTimeFieldRefInput",
+          "name": "AlertScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            2115,
-            2115
+            2156,
+            2156
           ],
-          "name": "EnumTenantStatusFieldRefInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2122,
-            2122
-          ],
-          "name": "ListEnumTenantStatusFieldRefInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2129,
-            2129
-          ],
-          "name": "EnumTenantPlanFieldRefInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2136,
-            2136
-          ],
-          "name": "ListEnumTenantPlanFieldRefInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2143,
-            2143
-          ],
-          "name": "IntFieldRefInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2150,
-            2150
-          ],
-          "name": "ListIntFieldRefInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2157,
-            2157
-          ],
-          "name": "JsonFieldRefInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2164,
-            2164
-          ],
-          "name": "EnumQueryModeFieldRefInput",
+          "name": "AuditLogScalarFieldEnum",
           "type": "type"
         },
         {
@@ -995,31 +827,23 @@
             2171,
             2171
           ],
-          "name": "EnumAgentStatusFieldRefInput",
+          "name": "AgentMessageScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            2178,
-            2178
+            2183,
+            2183
           ],
-          "name": "ListEnumAgentStatusFieldRefInput",
+          "name": "AgentAllowlistScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            2185,
-            2185
+            2191,
+            2191
           ],
-          "name": "EnumModelTierFieldRefInput",
-          "type": "type"
-        },
-        {
-          "lines": [
-            2192,
-            2192
-          ],
-          "name": "ListEnumModelTierFieldRefInput",
+          "name": "SortOrder",
           "type": "type"
         },
         {
@@ -1027,7 +851,7 @@
             2199,
             2199
           ],
-          "name": "EnumThinkingModeFieldRefInput",
+          "name": "NullableJsonNullValueInput",
           "type": "type"
         },
         {
@@ -1035,293 +859,533 @@
             2206,
             2206
           ],
+          "name": "JsonNullValueInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2214,
+            2214
+          ],
+          "name": "QueryMode",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2222,
+            2222
+          ],
+          "name": "NullsOrder",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2231,
+            2231
+          ],
+          "name": "JsonNullValueFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2243,
+            2243
+          ],
+          "name": "StringFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2250,
+            2250
+          ],
+          "name": "ListStringFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2257,
+            2257
+          ],
+          "name": "EnumUserRoleFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2264,
+            2264
+          ],
+          "name": "ListEnumUserRoleFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2271,
+            2271
+          ],
+          "name": "BooleanFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2278,
+            2278
+          ],
+          "name": "DateTimeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2285,
+            2285
+          ],
+          "name": "ListDateTimeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2292,
+            2292
+          ],
+          "name": "EnumTenantStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2299,
+            2299
+          ],
+          "name": "ListEnumTenantStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2306,
+            2306
+          ],
+          "name": "EnumTenantPlanFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2313,
+            2313
+          ],
+          "name": "ListEnumTenantPlanFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2320,
+            2320
+          ],
+          "name": "IntFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2327,
+            2327
+          ],
+          "name": "ListIntFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2334,
+            2334
+          ],
+          "name": "JsonFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2341,
+            2341
+          ],
+          "name": "EnumQueryModeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2348,
+            2348
+          ],
+          "name": "EnumAgentStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2355,
+            2355
+          ],
+          "name": "ListEnumAgentStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2362,
+            2362
+          ],
+          "name": "EnumModelTierFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2369,
+            2369
+          ],
+          "name": "ListEnumModelTierFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2376,
+            2376
+          ],
+          "name": "EnumThinkingModeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2383,
+            2383
+          ],
           "name": "ListEnumThinkingModeFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2213,
-            2213
+            2390,
+            2390
           ],
           "name": "FloatFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2220,
-            2220
+            2397,
+            2397
           ],
           "name": "ListFloatFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2227,
-            2227
+            2404,
+            2404
           ],
           "name": "EnumSkillCategoryFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2234,
-            2234
+            2411,
+            2411
           ],
           "name": "ListEnumSkillCategoryFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2241,
-            2241
+            2418,
+            2418
           ],
           "name": "EnumSkillStatusFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2248,
-            2248
+            2425,
+            2425
           ],
           "name": "ListEnumSkillStatusFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2255,
-            2255
+            2432,
+            2432
           ],
           "name": "EnumInviteStatusFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2262,
-            2262
+            2439,
+            2439
           ],
           "name": "ListEnumInviteStatusFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2269,
-            2269
+            2446,
+            2446
           ],
           "name": "EnumChannelTypeFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2276,
-            2276
+            2453,
+            2453
           ],
           "name": "ListEnumChannelTypeFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2283,
-            2283
+            2460,
+            2460
           ],
           "name": "EnumActivityTypeFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2290,
-            2290
+            2467,
+            2467
           ],
           "name": "ListEnumActivityTypeFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2297,
-            2297
+            2474,
+            2474
           ],
           "name": "EnumHealthStatusFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2304,
-            2304
+            2481,
+            2481
           ],
           "name": "ListEnumHealthStatusFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2311,
-            2311
+            2488,
+            2488
           ],
           "name": "EnumAlertSeverityFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2318,
-            2318
+            2495,
+            2495
           ],
           "name": "ListEnumAlertSeverityFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2325,
-            2325
+            2502,
+            2502
           ],
           "name": "EnumAuditActorTypeFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2332,
-            2332
+            2509,
+            2509
           ],
           "name": "ListEnumAuditActorTypeFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2339,
-            2339
+            2516,
+            2516
           ],
           "name": "EnumAuditTargetTypeFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2346,
-            2346
+            2523,
+            2523
           ],
           "name": "ListEnumAuditTargetTypeFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2353,
-            2353
+            2530,
+            2530
           ],
           "name": "EnumAuditSeverityFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2360,
-            2360
+            2537,
+            2537
           ],
           "name": "ListEnumAuditSeverityFieldRefInput",
           "type": "type"
         },
         {
           "lines": [
-            2366,
-            2368
+            2544,
+            2544
+          ],
+          "name": "EnumMessageTypeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2551,
+            2551
+          ],
+          "name": "ListEnumMessageTypeFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2558,
+            2558
+          ],
+          "name": "EnumMessageStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2565,
+            2565
+          ],
+          "name": "ListEnumMessageStatusFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2572,
+            2572
+          ],
+          "name": "EnumAllowlistDirectionFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2579,
+            2579
+          ],
+          "name": "ListEnumAllowlistDirectionFieldRefInput",
+          "type": "type"
+        },
+        {
+          "lines": [
+            2585,
+            2587
           ],
           "name": "BatchPayload",
           "type": "type"
         },
         {
           "lines": [
-            2371,
-            2371
+            2590,
+            2590
           ],
           "name": "DefaultPrismaClient",
           "type": "type"
         },
         {
           "lines": [
-            2372,
-            2372
+            2591,
+            2591
           ],
           "name": "ErrorFormat",
           "type": "type"
         },
         {
           "lines": [
-            2373,
-            2456
+            2592,
+            2675
           ],
           "name": "PrismaClientOptions",
           "type": "type"
         },
         {
           "lines": [
-            2457,
-            2475
+            2676,
+            2696
           ],
           "name": "GlobalOmitConfig",
           "type": "type"
         },
         {
           "lines": [
-            2478,
-            2478
+            2699,
+            2699
           ],
           "name": "LogLevel",
           "type": "type"
         },
         {
           "lines": [
-            2479,
-            2482
+            2700,
+            2703
           ],
           "name": "LogDefinition",
           "type": "type"
         },
         {
           "lines": [
-            2484,
-            2484
+            2705,
+            2705
           ],
           "name": "CheckIsLogLevel",
           "type": "type"
         },
         {
           "lines": [
-            2486,
-            2488
+            2707,
+            2709
           ],
           "name": "GetLogType",
           "type": "type"
         },
         {
           "lines": [
-            2490,
-            2492
+            2711,
+            2713
           ],
           "name": "GetEvents",
           "type": "type"
         },
         {
           "lines": [
-            2494,
-            2500
+            2715,
+            2721
           ],
           "name": "QueryEvent",
           "type": "type"
         },
         {
           "lines": [
-            2502,
-            2506
+            2723,
+            2727
           ],
           "name": "LogEvent",
           "type": "type"
         },
         {
           "lines": [
-            2510,
-            2531
+            2731,
+            2752
           ],
           "name": "PrismaAction",
           "type": "type"
         },
         {
           "lines": [
-            2536,
-            2536
+            2757,
+            2757
           ],
           "name": "TransactionClient",
           "type": "type"
@@ -1329,207 +1393,223 @@
       ]
     },
     "prismaNamespaceBrowser.ts": {
-      "hash": "5e5b5cb867bb",
-      "indexed_at": "2026-02-08T19:05:04.014183+00:00",
+      "hash": "2a610fab77e2",
+      "indexed_at": "2026-02-08T21:27:42.136753+00:00",
       "language": "typescript",
-      "lines": 424,
+      "lines": 453,
       "symbols": [
         {
           "lines": [
-            73,
-            73
+            75,
+            75
           ],
           "name": "ModelName",
           "type": "type"
         },
         {
           "lines": [
-            86,
-            86
+            88,
+            88
           ],
           "name": "TransactionIsolationLevel",
           "type": "type"
         },
         {
           "lines": [
-            105,
-            105
+            107,
+            107
           ],
           "name": "UserScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            134,
-            134
+            136,
+            136
           ],
           "name": "TenantScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            146,
-            146
+            148,
+            148
           ],
           "name": "TenantConfigHistoryScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            169,
-            169
+            171,
+            171
           ],
           "name": "AgentScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            185,
-            185
+            187,
+            187
           ],
           "name": "AgentRoleConfigScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            216,
-            216
+            218,
+            218
           ],
           "name": "SkillScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            230,
-            230
+            232,
+            232
           ],
           "name": "RefreshTokenScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            245,
-            245
+            247,
+            247
           ],
           "name": "ApiKeyScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            256,
-            256
+            258,
+            258
           ],
           "name": "TeamMemberScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            273,
-            273
+            275,
+            275
           ],
           "name": "TeamInviteScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            287,
-            287
+            289,
+            289
           ],
           "name": "AgentChannelScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            299,
-            299
+            301,
+            301
           ],
           "name": "AgentActivityScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            314,
-            314
+            316,
+            316
           ],
           "name": "AgentMetricsScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            325,
-            325
+            327,
+            327
           ],
           "name": "SkillInstallationScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            339,
-            339
+            341,
+            341
           ],
           "name": "ContainerHealthScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            354,
-            354
+            356,
+            356
           ],
           "name": "AlertScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            375,
-            375
+            377,
+            377
           ],
           "name": "AuditLogScalarFieldEnum",
           "type": "type"
         },
         {
           "lines": [
-            383,
-            383
+            392,
+            392
+          ],
+          "name": "AgentMessageScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            404,
+            404
+          ],
+          "name": "AgentAllowlistScalarFieldEnum",
+          "type": "type"
+        },
+        {
+          "lines": [
+            412,
+            412
           ],
           "name": "SortOrder",
           "type": "type"
         },
         {
           "lines": [
-            391,
-            391
+            420,
+            420
           ],
           "name": "NullableJsonNullValueInput",
           "type": "type"
         },
         {
           "lines": [
-            398,
-            398
+            427,
+            427
           ],
           "name": "JsonNullValueInput",
           "type": "type"
         },
         {
           "lines": [
-            406,
-            406
+            435,
+            435
           ],
           "name": "QueryMode",
           "type": "type"
         },
         {
           "lines": [
-            414,
-            414
+            443,
+            443
           ],
           "name": "NullsOrder",
           "type": "type"
         },
         {
           "lines": [
-            423,
-            423
+            452,
+            452
           ],
           "name": "JsonNullValueFilter",
           "type": "type"
@@ -1537,6 +1617,6 @@
       ]
     }
   },
-  "generated_at": "2026-02-08T21:12:26.603720+00:00",
+  "generated_at": "2026-02-08T21:35:43.225542+00:00",
   "version": "1.0"
 }

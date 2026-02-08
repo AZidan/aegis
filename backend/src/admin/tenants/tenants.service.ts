@@ -5,6 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuditService } from '../../audit/audit.service';
 import { ProvisioningService } from '../../provisioning/provisioning.service';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
@@ -85,6 +86,7 @@ export class TenantsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly provisioningService: ProvisioningService,
+    private readonly auditService: AuditService,
   ) {}
 
   // ==========================================================================
@@ -222,7 +224,7 @@ export class TenantsService {
   // POST /api/admin/tenants - Create Tenant
   // Contract: Section 3 - Create Tenant
   // ==========================================================================
-  async createTenant(dto: CreateTenantDto) {
+  async createTenant(dto: CreateTenantDto, userId?: string) {
     // Check for duplicate company name
     const existing = await this.prisma.tenant.findUnique({
       where: { companyName: dto.companyName },
@@ -272,6 +274,22 @@ export class TenantsService {
 
     // Start async provisioning via BullMQ
     await this.provisioningService.startProvisioning(tenant.id);
+
+    this.auditService.logAction({
+      actorType: 'user',
+      actorId: userId || 'system',
+      actorName: userId || 'system',
+      action: 'tenant_created',
+      targetType: 'tenant',
+      targetId: tenant.id,
+      details: {
+        companyName: tenant.companyName,
+        adminEmail: tenant.adminEmail,
+        plan: tenant.plan,
+      },
+      severity: 'info',
+      tenantId: tenant.id,
+    });
 
     // Contract response: { id, companyName, adminEmail, status, plan, inviteLink, createdAt }
     return {
@@ -461,6 +479,32 @@ export class TenantsService {
       data: updateData,
     });
 
+    this.auditService.logAction({
+      actorType: 'user',
+      actorId: userId || 'system',
+      actorName: userId || 'system',
+      action: 'tenant_config_updated',
+      targetType: 'tenant',
+      targetId: id,
+      details: {
+        changedFields: Object.keys(dto).filter(
+          (k) => (dto as Record<string, unknown>)[k] !== undefined,
+        ),
+        before: {
+          plan: tenant.plan,
+          resourceLimits: tenant.resourceLimits,
+          modelDefaults: tenant.modelDefaults,
+        },
+        after: {
+          plan: updated.plan,
+          resourceLimits: updated.resourceLimits,
+          modelDefaults: updated.modelDefaults,
+        },
+      },
+      severity: 'info',
+      tenantId: id,
+    });
+
     this.logger.log(`Tenant config updated: ${id}`);
 
     // Contract response
@@ -480,7 +524,7 @@ export class TenantsService {
   // NOTE: Contract specifies "pending_deletion" status but enum lacks it.
   //       Using "suspended" with metadata until enum is updated via migration.
   // ==========================================================================
-  async deleteTenant(id: string) {
+  async deleteTenant(id: string, userId?: string) {
     const tenant = await this.prisma.tenant.findUnique({
       where: { id },
     });
@@ -488,6 +532,23 @@ export class TenantsService {
     if (!tenant) {
       throw new NotFoundException('Tenant not found');
     }
+
+    this.auditService.logAction({
+      actorType: 'user',
+      actorId: userId || 'system',
+      actorName: userId || 'system',
+      action: 'tenant_deleted',
+      targetType: 'tenant',
+      targetId: id,
+      details: {
+        companyName: tenant.companyName,
+        adminEmail: tenant.adminEmail,
+        plan: tenant.plan,
+        status: tenant.status,
+      },
+      severity: 'warning',
+      tenantId: id,
+    });
 
     // Calculate grace period end date (7 days from now)
     const gracePeriodEnds = new Date();

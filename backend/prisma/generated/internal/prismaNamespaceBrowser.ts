@@ -67,7 +67,9 @@ export const ModelName = {
   SkillInstallation: 'SkillInstallation',
   ContainerHealth: 'ContainerHealth',
   Alert: 'Alert',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  AgentMessage: 'AgentMessage',
+  AgentAllowlist: 'AgentAllowlist'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -373,6 +375,33 @@ export const AuditLogScalarFieldEnum = {
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const AgentMessageScalarFieldEnum = {
+  id: 'id',
+  senderId: 'senderId',
+  recipientId: 'recipientId',
+  type: 'type',
+  payload: 'payload',
+  correlationId: 'correlationId',
+  status: 'status',
+  deliveredAt: 'deliveredAt',
+  createdAt: 'createdAt'
+} as const
+
+export type AgentMessageScalarFieldEnum = (typeof AgentMessageScalarFieldEnum)[keyof typeof AgentMessageScalarFieldEnum]
+
+
+export const AgentAllowlistScalarFieldEnum = {
+  id: 'id',
+  agentId: 'agentId',
+  allowedAgentId: 'allowedAgentId',
+  direction: 'direction',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgentAllowlistScalarFieldEnum = (typeof AgentAllowlistScalarFieldEnum)[keyof typeof AgentAllowlistScalarFieldEnum]
 
 
 export const SortOrder = {

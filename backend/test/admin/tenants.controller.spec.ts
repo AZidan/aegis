@@ -366,7 +366,7 @@ describe('TenantsController', () => {
       expect(result).toEqual(mockCreateTenantResponse);
       expect(result.status).toBe('provisioning');
       expect(result.inviteLink).toBeDefined();
-      expect(tenantsService.createTenant).toHaveBeenCalledWith(dto);
+      expect(tenantsService.createTenant).toHaveBeenCalledWith(dto, 'admin-uuid');
     });
 
     it('should pass optional fields to service when provided', async () => {
@@ -394,7 +394,7 @@ describe('TenantsController', () => {
       await controller.createTenant(mockPlatformAdmin, dto);
 
       // Assert
-      expect(tenantsService.createTenant).toHaveBeenCalledWith(dto);
+      expect(tenantsService.createTenant).toHaveBeenCalledWith(dto, 'admin-uuid');
     });
 
     it('should throw ForbiddenException for non-platform_admin role', async () => {
@@ -663,7 +663,7 @@ describe('TenantsController', () => {
       await controller.deleteTenant(mockPlatformAdmin, 'tenant-uuid-1');
 
       // Assert
-      expect(tenantsService.deleteTenant).toHaveBeenCalledWith('tenant-uuid-1');
+      expect(tenantsService.deleteTenant).toHaveBeenCalledWith('tenant-uuid-1', 'admin-uuid');
     });
   });
 

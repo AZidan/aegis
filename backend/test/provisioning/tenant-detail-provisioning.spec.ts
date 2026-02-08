@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TenantsService } from '../../src/admin/tenants/tenants.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvisioningService } from '../../src/provisioning/provisioning.service';
+import { AuditService } from '../../src/audit/audit.service';
 
 /**
  * Tenant Detail - Provisioning Info Tests
@@ -87,6 +88,7 @@ describe('TenantsService - getTenantDetail with provisioning', () => {
         TenantsService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: ProvisioningService, useValue: mockProvisioningService },
+        { provide: AuditService, useValue: { logAction: jest.fn() } },
       ],
     }).compile();
 

@@ -6,6 +6,7 @@ import {
 import { TenantsService } from '../../src/admin/tenants/tenants.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvisioningService } from '../../src/provisioning/provisioning.service';
+import { AuditService } from '../../src/audit/audit.service';
 
 // ---------------------------------------------------------------------------
 // Test Data Factories
@@ -141,6 +142,10 @@ describe('TenantsService', () => {
             startProvisioning: jest.fn().mockResolvedValue(undefined),
             getProvisioningStatus: jest.fn(),
           },
+        },
+        {
+          provide: AuditService,
+          useValue: { logAction: jest.fn().mockResolvedValue(undefined) },
         },
       ],
     }).compile();
