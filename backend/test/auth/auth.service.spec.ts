@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import * as speakeasy from 'speakeasy';
 import { AuthService } from '../../src/auth/auth.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
+import { AuditService } from '../../src/audit/audit.service';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -123,6 +124,10 @@ describe('AuthService', () => {
         { provide: PrismaService, useValue: prisma },
         { provide: JwtService, useValue: jwtService },
         { provide: ConfigService, useValue: configService },
+        {
+          provide: AuditService,
+          useValue: { logAction: jest.fn().mockResolvedValue(undefined) },
+        },
       ],
     }).compile();
 

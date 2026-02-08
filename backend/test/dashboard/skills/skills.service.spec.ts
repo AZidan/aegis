@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { SkillsService } from '../../../src/dashboard/skills/skills.service';
 import { PrismaService } from '../../../src/prisma/prisma.service';
+import { AuditService } from '../../../src/audit/audit.service';
 
 // ---------------------------------------------------------------------------
 // Test Data Factories
@@ -88,7 +89,7 @@ describe('SkillsService', () => {
         count: jest.fn(),
         findMany: jest.fn(),
         findFirst: jest.fn(),
-        findUnique: jest.fn().mockResolvedValue({ isCore: false }),
+        findUnique: jest.fn().mockResolvedValue({ isCore: false, name: 'Web Search Pro', version: '1.2.0' }),
         update: jest.fn(),
       },
       agent: {
@@ -107,6 +108,7 @@ describe('SkillsService', () => {
       providers: [
         SkillsService,
         { provide: PrismaService, useValue: prisma },
+        { provide: AuditService, useValue: { logAction: jest.fn() } },
       ],
     }).compile();
 

@@ -102,3 +102,13 @@ export type Alert = Prisma.AlertModel
  * AuditLogs - Comprehensive audit trail
  */
 export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model AgentMessage
+ * 
+ */
+export type AgentMessage = Prisma.AgentMessageModel
+/**
+ * Model AgentAllowlist
+ * 
+ */
+export type AgentAllowlist = Prisma.AgentAllowlistModel

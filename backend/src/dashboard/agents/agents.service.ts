@@ -5,6 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuditService } from '../../audit/audit.service';
 import { Prisma } from '../../../prisma/generated/client';
 import { CreateAgentDto } from './dto/create-agent.dto';
 import { UpdateAgentDto } from './dto/update-agent.dto';
@@ -45,7 +46,10 @@ const MODEL_DISPLAY_NAMES: Record<string, string> = {
 export class AgentsService {
   private readonly logger = new Logger(AgentsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditService: AuditService,
+  ) {}
 
   // ==========================================================================
   // GET /api/dashboard/agents - List Agents
@@ -286,6 +290,19 @@ export class AgentsService {
       `Agent created: ${agent.id} (${agent.name}) for tenant ${tenantId} - status: provisioning`,
     );
 
+    this.auditService.logAction({
+      actorType: 'system',
+      actorId: 'system',
+      actorName: 'system',
+      action: 'agent_created',
+      targetType: 'agent',
+      targetId: agent.id,
+      details: { name: agent.name, role: agent.role, modelTier: agent.modelTier },
+      severity: 'info',
+      tenantId,
+      agentId: agent.id,
+    });
+
     // Contract response (201)
     return {
       id: agent.id,
@@ -524,6 +541,19 @@ export class AgentsService {
 
     this.logger.log(`Agent updated: ${agentId} for tenant ${tenantId}`);
 
+    this.auditService.logAction({
+      actorType: 'system',
+      actorId: 'system',
+      actorName: 'system',
+      action: 'agent_updated',
+      targetType: 'agent',
+      targetId: agentId,
+      details: { changedFields: Object.keys(dto).filter((k) => (dto as any)[k] !== undefined) },
+      severity: 'info',
+      tenantId,
+      agentId,
+    });
+
     // Contract response
     return {
       id: updated.id,
@@ -554,6 +584,19 @@ export class AgentsService {
       where: { id: agentId },
     });
 
+    this.auditService.logAction({
+      actorType: 'system',
+      actorId: 'system',
+      actorName: 'system',
+      action: 'agent_deleted',
+      targetType: 'agent',
+      targetId: agentId,
+      details: { name: existing.name, role: existing.role },
+      severity: 'warning',
+      tenantId,
+      agentId,
+    });
+
     this.logger.log(`Agent deleted: ${agentId} for tenant ${tenantId}`);
   }
 
@@ -575,6 +618,19 @@ export class AgentsService {
     await this.prisma.agent.update({
       where: { id: agentId },
       data: { status: 'provisioning' },
+    });
+
+    this.auditService.logAction({
+      actorType: 'system',
+      actorId: 'system',
+      actorName: 'system',
+      action: 'agent_status_changed',
+      targetType: 'agent',
+      targetId: agentId,
+      details: { oldStatus: agent.status, newStatus: 'provisioning', trigger: 'restart' },
+      severity: 'info',
+      tenantId,
+      agentId,
     });
 
     this.logger.log(`Agent restart initiated: ${agentId} for tenant ${tenantId}`);
@@ -611,6 +667,19 @@ export class AgentsService {
       data: { status: 'paused' },
     });
 
+    this.auditService.logAction({
+      actorType: 'system',
+      actorId: 'system',
+      actorName: 'system',
+      action: 'agent_status_changed',
+      targetType: 'agent',
+      targetId: agentId,
+      details: { oldStatus: agent.status, newStatus: 'paused', trigger: 'pause' },
+      severity: 'info',
+      tenantId,
+      agentId,
+    });
+
     this.logger.log(`Agent paused: ${agentId} for tenant ${tenantId}`);
 
     // Contract response
@@ -644,6 +713,19 @@ export class AgentsService {
     await this.prisma.agent.update({
       where: { id: agentId },
       data: { status: 'active' },
+    });
+
+    this.auditService.logAction({
+      actorType: 'system',
+      actorId: 'system',
+      actorName: 'system',
+      action: 'agent_status_changed',
+      targetType: 'agent',
+      targetId: agentId,
+      details: { oldStatus: 'paused', newStatus: 'active', trigger: 'resume' },
+      severity: 'info',
+      tenantId,
+      agentId,
     });
 
     this.logger.log(`Agent resumed: ${agentId} for tenant ${tenantId}`);

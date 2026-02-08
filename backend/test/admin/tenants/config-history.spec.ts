@@ -3,6 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 import { TenantsService } from '../../../src/admin/tenants/tenants.service';
 import { PrismaService } from '../../../src/prisma/prisma.service';
 import { ProvisioningService } from '../../../src/provisioning/provisioning.service';
+import { AuditService } from '../../../src/audit/audit.service';
 
 // ---------------------------------------------------------------------------
 // Test Data Factories
@@ -80,6 +81,7 @@ describe('TenantsService - Config History & Rollback', () => {
         TenantsService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: ProvisioningService, useValue: mockProvisioningService },
+        { provide: AuditService, useValue: { logAction: jest.fn() } },
       ],
     }).compile();
 

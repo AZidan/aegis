@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { AgentsService } from '../../../src/dashboard/agents/agents.service';
 import { PrismaService } from '../../../src/prisma/prisma.service';
+import { AuditService } from '../../../src/audit/audit.service';
 import { TOOL_CATEGORIES } from '../../../src/dashboard/tools/tool-categories';
 import { ROLE_DEFAULT_POLICIES } from '../../../src/dashboard/tools/role-defaults';
 
@@ -108,6 +109,7 @@ describe('AgentsService - Tool Policy', () => {
       providers: [
         AgentsService,
         { provide: PrismaService, useValue: prisma },
+        { provide: AuditService, useValue: { logAction: jest.fn() } },
       ],
     }).compile();
 

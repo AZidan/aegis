@@ -125,6 +125,32 @@ enum InviteStatus {
 }
 
 // ============================================================================
+// INTER-AGENT MESSAGING (Sprint 6 — E7)
+// ============================================================================
+
+enum MessageType {
+  task_handoff
+  status_update
+  data_request
+  data_response
+  escalation
+  notification
+}
+
+enum MessageStatus {
+  pending
+  delivered
+  failed
+  read
+}
+
+enum AllowlistDirection {
+  both
+  send_only
+  receive_only
+}
+
+// ============================================================================
 // CORE MODELS
 // ============================================================================
 
@@ -284,6 +310,12 @@ model Agent {
   metrics         AgentMetrics[]
   installedSkills SkillInstallation[]
   auditLogs       AuditLog[]
+
+  // Inter-agent messaging (Sprint 6)
+  messagesSent     AgentMessage[]    @relation("MessagesSent")
+  messagesReceived AgentMessage[]    @relation("MessagesReceived")
+  allowlistOwner   AgentAllowlist[]  @relation("AllowlistOwner")
+  allowlistTarget  AgentAllowlist[]  @relation("AllowlistTarget")
 
   @@index([tenantId])
   @@index([status])
@@ -675,6 +707,45 @@ model AuditLog {
   @@index([timestamp])
   @@index([severity])
   @@map("audit_logs")
+}
+
+// ============================================================================
+// INTER-AGENT MESSAGING MODELS (Sprint 6 — E7)
+// ============================================================================
+
+model AgentMessage {
+  id            String        @id @default(uuid())
+  senderId      String
+  sender        Agent         @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+  recipientId   String
+  recipient     Agent         @relation("MessagesReceived", fields: [recipientId], references: [id], onDelete: Cascade)
+  type          MessageType
+  payload       Json
+  correlationId String?
+  status        MessageStatus @default(pending)
+  deliveredAt   DateTime?
+  createdAt     DateTime      @default(now())
+
+  @@index([senderId, createdAt])
+  @@index([recipientId, createdAt])
+  @@index([correlationId])
+  @@index([type])
+  @@map("agent_messages")
+}
+
+model AgentAllowlist {
+  id             String             @id @default(uuid())
+  agentId        String
+  agent          Agent              @relation("AllowlistOwner", fields: [agentId], references: [id], onDelete: Cascade)
+  allowedAgentId String
+  allowedAgent   Agent              @relation("AllowlistTarget", fields: [allowedAgentId], references: [id], onDelete: Cascade)
+  direction      AllowlistDirection @default(both)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@unique([agentId, allowedAgentId])
+  @@index([allowedAgentId])
+  @@map("agent_allowlists")
 }
 
 // ============================================================================

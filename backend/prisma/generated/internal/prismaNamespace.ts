@@ -400,7 +400,9 @@ export const ModelName = {
   SkillInstallation: 'SkillInstallation',
   ContainerHealth: 'ContainerHealth',
   Alert: 'Alert',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  AgentMessage: 'AgentMessage',
+  AgentAllowlist: 'AgentAllowlist'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -416,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "tenant" | "tenantConfigHistory" | "agent" | "agentRoleConfig" | "skill" | "refreshToken" | "apiKey" | "teamMember" | "teamInvite" | "agentChannel" | "agentActivity" | "agentMetrics" | "skillInstallation" | "containerHealth" | "alert" | "auditLog"
+    modelProps: "user" | "tenant" | "tenantConfigHistory" | "agent" | "agentRoleConfig" | "skill" | "refreshToken" | "apiKey" | "teamMember" | "teamInvite" | "agentChannel" | "agentActivity" | "agentMetrics" | "skillInstallation" | "containerHealth" | "alert" | "auditLog" | "agentMessage" | "agentAllowlist"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1678,6 +1680,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AgentMessage: {
+      payload: Prisma.$AgentMessagePayload<ExtArgs>
+      fields: Prisma.AgentMessageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgentMessageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMessagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgentMessageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMessagePayload>
+        }
+        findFirst: {
+          args: Prisma.AgentMessageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMessagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgentMessageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMessagePayload>
+        }
+        findMany: {
+          args: Prisma.AgentMessageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMessagePayload>[]
+        }
+        create: {
+          args: Prisma.AgentMessageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMessagePayload>
+        }
+        createMany: {
+          args: Prisma.AgentMessageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgentMessageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMessagePayload>[]
+        }
+        delete: {
+          args: Prisma.AgentMessageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMessagePayload>
+        }
+        update: {
+          args: Prisma.AgentMessageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMessagePayload>
+        }
+        deleteMany: {
+          args: Prisma.AgentMessageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgentMessageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgentMessageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMessagePayload>[]
+        }
+        upsert: {
+          args: Prisma.AgentMessageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentMessagePayload>
+        }
+        aggregate: {
+          args: Prisma.AgentMessageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgentMessage>
+        }
+        groupBy: {
+          args: Prisma.AgentMessageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentMessageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgentMessageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentMessageCountAggregateOutputType> | number
+        }
+      }
+    }
+    AgentAllowlist: {
+      payload: Prisma.$AgentAllowlistPayload<ExtArgs>
+      fields: Prisma.AgentAllowlistFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgentAllowlistFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentAllowlistPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgentAllowlistFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentAllowlistPayload>
+        }
+        findFirst: {
+          args: Prisma.AgentAllowlistFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentAllowlistPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgentAllowlistFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentAllowlistPayload>
+        }
+        findMany: {
+          args: Prisma.AgentAllowlistFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentAllowlistPayload>[]
+        }
+        create: {
+          args: Prisma.AgentAllowlistCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentAllowlistPayload>
+        }
+        createMany: {
+          args: Prisma.AgentAllowlistCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgentAllowlistCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentAllowlistPayload>[]
+        }
+        delete: {
+          args: Prisma.AgentAllowlistDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentAllowlistPayload>
+        }
+        update: {
+          args: Prisma.AgentAllowlistUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentAllowlistPayload>
+        }
+        deleteMany: {
+          args: Prisma.AgentAllowlistDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgentAllowlistUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgentAllowlistUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentAllowlistPayload>[]
+        }
+        upsert: {
+          args: Prisma.AgentAllowlistUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentAllowlistPayload>
+        }
+        aggregate: {
+          args: Prisma.AgentAllowlistAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgentAllowlist>
+        }
+        groupBy: {
+          args: Prisma.AgentAllowlistGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentAllowlistGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgentAllowlistCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentAllowlistCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2004,6 +2154,33 @@ export const AuditLogScalarFieldEnum = {
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const AgentMessageScalarFieldEnum = {
+  id: 'id',
+  senderId: 'senderId',
+  recipientId: 'recipientId',
+  type: 'type',
+  payload: 'payload',
+  correlationId: 'correlationId',
+  status: 'status',
+  deliveredAt: 'deliveredAt',
+  createdAt: 'createdAt'
+} as const
+
+export type AgentMessageScalarFieldEnum = (typeof AgentMessageScalarFieldEnum)[keyof typeof AgentMessageScalarFieldEnum]
+
+
+export const AgentAllowlistScalarFieldEnum = {
+  id: 'id',
+  agentId: 'agentId',
+  allowedAgentId: 'allowedAgentId',
+  direction: 'direction',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgentAllowlistScalarFieldEnum = (typeof AgentAllowlistScalarFieldEnum)[keyof typeof AgentAllowlistScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2360,6 +2537,48 @@ export type EnumAuditSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
 export type ListEnumAuditSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditSeverity[]'>
     
 
+
+/**
+ * Reference to a field of type 'MessageType'
+ */
+export type EnumMessageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageType'>
+    
+
+
+/**
+ * Reference to a field of type 'MessageType[]'
+ */
+export type ListEnumMessageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'MessageStatus'
+ */
+export type EnumMessageStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'MessageStatus[]'
+ */
+export type ListEnumMessageStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AllowlistDirection'
+ */
+export type EnumAllowlistDirectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AllowlistDirection'>
+    
+
+
+/**
+ * Reference to a field of type 'AllowlistDirection[]'
+ */
+export type ListEnumAllowlistDirectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AllowlistDirection[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2472,6 +2691,8 @@ export type GlobalOmitConfig = {
   containerHealth?: Prisma.ContainerHealthOmit
   alert?: Prisma.AlertOmit
   auditLog?: Prisma.AuditLogOmit
+  agentMessage?: Prisma.AgentMessageOmit
+  agentAllowlist?: Prisma.AgentAllowlistOmit
 }
 
 /* Types for Logging */

@@ -80,11 +80,11 @@ export class TenantsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createTenant(
-    @CurrentUser() user: { role: string },
+    @CurrentUser() user: { id: string; role: string },
     @Body(new ZodValidationPipe(createTenantSchema)) dto: CreateTenantDto,
   ) {
     this.assertPlatformAdmin(user);
-    return this.tenantsService.createTenant(dto);
+    return this.tenantsService.createTenant(dto, user.id);
   }
 
   // ==========================================================================
@@ -123,11 +123,11 @@ export class TenantsController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async deleteTenant(
-    @CurrentUser() user: { role: string },
+    @CurrentUser() user: { id: string; role: string },
     @Param('id') id: string,
   ) {
     this.assertPlatformAdmin(user);
-    return this.tenantsService.deleteTenant(id);
+    return this.tenantsService.deleteTenant(id, user.id);
   }
 
   // ==========================================================================

@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { AgentsService } from '../../../src/dashboard/agents/agents.service';
 import { PrismaService } from '../../../src/prisma/prisma.service';
+import { AuditService } from '../../../src/audit/audit.service';
 
 // ---------------------------------------------------------------------------
 // Test Data Factories
@@ -129,6 +130,7 @@ describe('AgentsService', () => {
       providers: [
         AgentsService,
         { provide: PrismaService, useValue: prisma },
+        { provide: AuditService, useValue: { logAction: jest.fn() } },
       ],
     }).compile();
 

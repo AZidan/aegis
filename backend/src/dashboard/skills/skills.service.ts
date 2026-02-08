@@ -6,6 +6,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuditService } from '../../audit/audit.service';
 import { Prisma } from '../../../prisma/generated/client';
 import { BrowseSkillsQueryDto } from './dto/browse-skills-query.dto';
 import { InstallSkillDto } from './dto/install-skill.dto';
@@ -27,7 +28,10 @@ import { InstallSkillDto } from './dto/install-skill.dto';
 export class SkillsService {
   private readonly logger = new Logger(SkillsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditService: AuditService,
+  ) {}
 
   // ==========================================================================
   // GET /api/dashboard/skills - Browse Skill Marketplace
@@ -240,6 +244,19 @@ export class SkillsService {
       data: { installCount: { increment: 1 } },
     });
 
+    this.auditService.logAction({
+      actorType: 'system',
+      actorId: 'system',
+      actorName: 'system',
+      action: 'skill_installed',
+      targetType: 'skill',
+      targetId: skillId,
+      details: { agentId: dto.agentId, skillName: skill.name, skillVersion: skill.version },
+      severity: 'info',
+      tenantId,
+      agentId: dto.agentId,
+    });
+
     this.logger.log(
       `Skill ${skill.name} (${skillId}) installed on agent ${dto.agentId} for tenant ${tenantId}`,
     );
@@ -288,7 +305,7 @@ export class SkillsService {
     // Prevent uninstallation of core skills
     const skill = await this.prisma.skill.findUnique({
       where: { id: skillId },
-      select: { isCore: true },
+      select: { isCore: true, name: true, version: true },
     });
 
     if (skill?.isCore === true) {
@@ -306,6 +323,19 @@ export class SkillsService {
       data: {
         installCount: { decrement: 1 },
       },
+    });
+
+    this.auditService.logAction({
+      actorType: 'system',
+      actorId: 'system',
+      actorName: 'system',
+      action: 'skill_uninstalled',
+      targetType: 'skill',
+      targetId: skillId,
+      details: { agentId, skillName: skill?.name, skillVersion: skill?.version },
+      severity: 'info',
+      tenantId,
+      agentId,
     });
 
     this.logger.log(
