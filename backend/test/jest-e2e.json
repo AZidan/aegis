@@ -4,8 +4,27 @@
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+    "^.+\\.(t|j)s$": [
+      "ts-jest",
+      {
+        "tsconfig": {
+          "module": "commonjs",
+          "target": "ES2021",
+          "esModuleInterop": true,
+          "allowSyntheticDefaultImports": true,
+          "experimentalDecorators": true,
+          "emitDecoratorMetadata": true,
+          "strict": false,
+          "skipLibCheck": true,
+          "resolveJsonModule": true,
+          "forceConsistentCasingInFileNames": true
+        }
+      }
+    ]
   },
+  "transformIgnorePatterns": [
+    "node_modules/(?!(uuid)/)"
+  ],
   "moduleNameMapper": {
     "^src/(.*)$": "<rootDir>/../src/$1"
   }
