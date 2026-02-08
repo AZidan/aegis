@@ -368,6 +368,7 @@ export type TenantWhereInput = {
   apiKeys?: Prisma.ApiKeyListRelationFilter
   containerHealth?: Prisma.ContainerHealthListRelationFilter
   alerts?: Prisma.AlertListRelationFilter
+  configHistory?: Prisma.TenantConfigHistoryListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -402,6 +403,7 @@ export type TenantOrderByWithRelationInput = {
   apiKeys?: Prisma.ApiKeyOrderByRelationAggregateInput
   containerHealth?: Prisma.ContainerHealthOrderByRelationAggregateInput
   alerts?: Prisma.AlertOrderByRelationAggregateInput
+  configHistory?: Prisma.TenantConfigHistoryOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
@@ -439,6 +441,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   apiKeys?: Prisma.ApiKeyListRelationFilter
   containerHealth?: Prisma.ContainerHealthListRelationFilter
   alerts?: Prisma.AlertListRelationFilter
+  configHistory?: Prisma.TenantConfigHistoryListRelationFilter
 }, "id" | "companyName">
 
 export type TenantOrderByWithAggregationInput = {
@@ -533,6 +536,7 @@ export type TenantCreateInput = {
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -567,6 +571,7 @@ export type TenantUncheckedCreateInput = {
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthUncheckedCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -601,6 +606,7 @@ export type TenantUpdateInput = {
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -635,6 +641,7 @@ export type TenantUncheckedUpdateInput = {
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUncheckedUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -851,6 +858,20 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type TenantCreateNestedOneWithoutConfigHistoryInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutConfigHistoryInput, Prisma.TenantUncheckedCreateWithoutConfigHistoryInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutConfigHistoryInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutConfigHistoryNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutConfigHistoryInput, Prisma.TenantUncheckedCreateWithoutConfigHistoryInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutConfigHistoryInput
+  upsert?: Prisma.TenantUpsertWithoutConfigHistoryInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutConfigHistoryInput, Prisma.TenantUpdateWithoutConfigHistoryInput>, Prisma.TenantUncheckedUpdateWithoutConfigHistoryInput>
+}
+
 export type TenantCreateNestedOneWithoutAgentsInput = {
   create?: Prisma.XOR<Prisma.TenantCreateWithoutAgentsInput, Prisma.TenantUncheckedCreateWithoutAgentsInput>
   connectOrCreate?: Prisma.TenantCreateOrConnectWithoutAgentsInput
@@ -984,6 +1005,7 @@ export type TenantCreateWithoutUsersInput = {
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutUsersInput = {
@@ -1017,6 +1039,7 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthUncheckedCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutUsersInput = {
@@ -1066,6 +1089,7 @@ export type TenantUpdateWithoutUsersInput = {
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutUsersInput = {
@@ -1092,6 +1116,159 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutTenantNestedInput
+  teamMembers?: Prisma.TeamMemberUncheckedUpdateManyWithoutTenantNestedInput
+  teamInvites?: Prisma.TeamInviteUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
+  containerHealth?: Prisma.ContainerHealthUncheckedUpdateManyWithoutTenantNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutConfigHistoryInput = {
+  id?: string
+  companyName: string
+  adminEmail: string
+  status?: $Enums.TenantStatus
+  plan?: $Enums.TenantPlan
+  industry?: string | null
+  expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: string | null
+  containerUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  agents?: Prisma.AgentCreateNestedManyWithoutTenantInput
+  teamMembers?: Prisma.TeamMemberCreateNestedManyWithoutTenantInput
+  teamInvites?: Prisma.TeamInviteCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
+  containerHealth?: Prisma.ContainerHealthCreateNestedManyWithoutTenantInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutConfigHistoryInput = {
+  id?: string
+  companyName: string
+  adminEmail: string
+  status?: $Enums.TenantStatus
+  plan?: $Enums.TenantPlan
+  industry?: string | null
+  expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: string | null
+  containerUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutTenantInput
+  teamMembers?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutTenantInput
+  teamInvites?: Prisma.TeamInviteUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
+  containerHealth?: Prisma.ContainerHealthUncheckedCreateNestedManyWithoutTenantInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutConfigHistoryInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutConfigHistoryInput, Prisma.TenantUncheckedCreateWithoutConfigHistoryInput>
+}
+
+export type TenantUpsertWithoutConfigHistoryInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutConfigHistoryInput, Prisma.TenantUncheckedUpdateWithoutConfigHistoryInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutConfigHistoryInput, Prisma.TenantUncheckedCreateWithoutConfigHistoryInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutConfigHistoryInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutConfigHistoryInput, Prisma.TenantUncheckedUpdateWithoutConfigHistoryInput>
+}
+
+export type TenantUpdateWithoutConfigHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  adminEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutTenantNestedInput
+  teamMembers?: Prisma.TeamMemberUpdateManyWithoutTenantNestedInput
+  teamInvites?: Prisma.TeamInviteUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
+  containerHealth?: Prisma.ContainerHealthUpdateManyWithoutTenantNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutConfigHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  adminEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutTenantNestedInput
   teamMembers?: Prisma.TeamMemberUncheckedUpdateManyWithoutTenantNestedInput
   teamInvites?: Prisma.TeamInviteUncheckedUpdateManyWithoutTenantNestedInput
@@ -1132,6 +1309,7 @@ export type TenantCreateWithoutAgentsInput = {
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAgentsInput = {
@@ -1165,6 +1343,7 @@ export type TenantUncheckedCreateWithoutAgentsInput = {
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthUncheckedCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAgentsInput = {
@@ -1214,6 +1393,7 @@ export type TenantUpdateWithoutAgentsInput = {
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAgentsInput = {
@@ -1247,6 +1427,7 @@ export type TenantUncheckedUpdateWithoutAgentsInput = {
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUncheckedUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutApiKeysInput = {
@@ -1280,6 +1461,7 @@ export type TenantCreateWithoutApiKeysInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutApiKeysInput = {
@@ -1313,6 +1495,7 @@ export type TenantUncheckedCreateWithoutApiKeysInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthUncheckedCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutApiKeysInput = {
@@ -1362,6 +1545,7 @@ export type TenantUpdateWithoutApiKeysInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutApiKeysInput = {
@@ -1395,6 +1579,7 @@ export type TenantUncheckedUpdateWithoutApiKeysInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUncheckedUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutTeamMembersInput = {
@@ -1428,6 +1613,7 @@ export type TenantCreateWithoutTeamMembersInput = {
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutTeamMembersInput = {
@@ -1461,6 +1647,7 @@ export type TenantUncheckedCreateWithoutTeamMembersInput = {
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthUncheckedCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutTeamMembersInput = {
@@ -1510,6 +1697,7 @@ export type TenantUpdateWithoutTeamMembersInput = {
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutTeamMembersInput = {
@@ -1543,6 +1731,7 @@ export type TenantUncheckedUpdateWithoutTeamMembersInput = {
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUncheckedUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutTeamInvitesInput = {
@@ -1576,6 +1765,7 @@ export type TenantCreateWithoutTeamInvitesInput = {
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutTeamInvitesInput = {
@@ -1609,6 +1799,7 @@ export type TenantUncheckedCreateWithoutTeamInvitesInput = {
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthUncheckedCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutTeamInvitesInput = {
@@ -1658,6 +1849,7 @@ export type TenantUpdateWithoutTeamInvitesInput = {
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutTeamInvitesInput = {
@@ -1691,6 +1883,7 @@ export type TenantUncheckedUpdateWithoutTeamInvitesInput = {
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUncheckedUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutContainerHealthInput = {
@@ -1724,6 +1917,7 @@ export type TenantCreateWithoutContainerHealthInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutContainerHealthInput = {
@@ -1757,6 +1951,7 @@ export type TenantUncheckedCreateWithoutContainerHealthInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutContainerHealthInput = {
@@ -1806,6 +2001,7 @@ export type TenantUpdateWithoutContainerHealthInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutContainerHealthInput = {
@@ -1839,6 +2035,7 @@ export type TenantUncheckedUpdateWithoutContainerHealthInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAlertsInput = {
@@ -1872,6 +2069,7 @@ export type TenantCreateWithoutAlertsInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAlertsInput = {
@@ -1905,6 +2103,7 @@ export type TenantUncheckedCreateWithoutAlertsInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthUncheckedCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAlertsInput = {
@@ -1954,6 +2153,7 @@ export type TenantUpdateWithoutAlertsInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAlertsInput = {
@@ -1987,6 +2187,7 @@ export type TenantUncheckedUpdateWithoutAlertsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUncheckedUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAuditLogsInput = {
@@ -2020,6 +2221,7 @@ export type TenantCreateWithoutAuditLogsInput = {
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAuditLogsInput = {
@@ -2053,6 +2255,7 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
   containerHealth?: Prisma.ContainerHealthUncheckedCreateNestedManyWithoutTenantInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAuditLogsInput = {
@@ -2102,6 +2305,7 @@ export type TenantUpdateWithoutAuditLogsInput = {
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAuditLogsInput = {
@@ -2135,6 +2339,7 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
   containerHealth?: Prisma.ContainerHealthUncheckedUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 
@@ -2151,6 +2356,7 @@ export type TenantCountOutputType = {
   apiKeys: number
   containerHealth: number
   alerts: number
+  configHistory: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2162,6 +2368,7 @@ export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   apiKeys?: boolean | TenantCountOutputTypeCountApiKeysArgs
   containerHealth?: boolean | TenantCountOutputTypeCountContainerHealthArgs
   alerts?: boolean | TenantCountOutputTypeCountAlertsArgs
+  configHistory?: boolean | TenantCountOutputTypeCountConfigHistoryArgs
 }
 
 /**
@@ -2230,6 +2437,13 @@ export type TenantCountOutputTypeCountAlertsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.AlertWhereInput
 }
 
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountConfigHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TenantConfigHistoryWhereInput
+}
+
 
 export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2263,6 +2477,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   apiKeys?: boolean | Prisma.Tenant$apiKeysArgs<ExtArgs>
   containerHealth?: boolean | Prisma.Tenant$containerHealthArgs<ExtArgs>
   alerts?: boolean | Prisma.Tenant$alertsArgs<ExtArgs>
+  configHistory?: boolean | Prisma.Tenant$configHistoryArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -2354,6 +2569,7 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   apiKeys?: boolean | Prisma.Tenant$apiKeysArgs<ExtArgs>
   containerHealth?: boolean | Prisma.Tenant$containerHealthArgs<ExtArgs>
   alerts?: boolean | Prisma.Tenant$alertsArgs<ExtArgs>
+  configHistory?: boolean | Prisma.Tenant$configHistoryArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2370,6 +2586,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     apiKeys: Prisma.$ApiKeyPayload<ExtArgs>[]
     containerHealth: Prisma.$ContainerHealthPayload<ExtArgs>[]
     alerts: Prisma.$AlertPayload<ExtArgs>[]
+    configHistory: Prisma.$TenantConfigHistoryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2797,6 +3014,7 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   apiKeys<T extends Prisma.Tenant$apiKeysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$apiKeysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   containerHealth<T extends Prisma.Tenant$containerHealthArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$containerHealthArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContainerHealthPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   alerts<T extends Prisma.Tenant$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  configHistory<T extends Prisma.Tenant$configHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$configHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TenantConfigHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3426,6 +3644,30 @@ export type Tenant$alertsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.AlertScalarFieldEnum | Prisma.AlertScalarFieldEnum[]
+}
+
+/**
+ * Tenant.configHistory
+ */
+export type Tenant$configHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TenantConfigHistory
+   */
+  select?: Prisma.TenantConfigHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TenantConfigHistory
+   */
+  omit?: Prisma.TenantConfigHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TenantConfigHistoryInclude<ExtArgs> | null
+  where?: Prisma.TenantConfigHistoryWhereInput
+  orderBy?: Prisma.TenantConfigHistoryOrderByWithRelationInput | Prisma.TenantConfigHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.TenantConfigHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TenantConfigHistoryScalarFieldEnum | Prisma.TenantConfigHistoryScalarFieldEnum[]
 }
 
 /**

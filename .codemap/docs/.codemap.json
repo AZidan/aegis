@@ -1,6 +1,2501 @@
 {
   "directory": "docs",
   "files": {
+    "api-contract.md": {
+      "hash": "b564d2b9f37f",
+      "indexed_at": "2026-02-08T08:24:58.987272+00:00",
+      "language": "markdown",
+      "lines": 2167,
+      "symbols": [
+        {
+          "docstring": "1. [Authentication & Authorization](#1-authentication--authorization) 2. [Platform Admin: Dashboard](#2-platform-admin-dashboard) 3. [Platform Admin:",
+          "lines": [
+            11,
+            27
+          ],
+          "name": "Table of Contents",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                30,
+                36
+              ],
+              "name": "Authentication Headers",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                37,
+                49
+              ],
+              "name": "Standard Pagination Response",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                50,
+                61
+              ],
+              "name": "Standard Error Response",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- `200` - Success - `201` - Created - `204` - No Content - `400` - Bad Request - `401` - Unauthorized - `403` - Forbidden - `404` - Not Found - `409`",
+              "lines": [
+                62,
+                77
+              ],
+              "name": "HTTP Status Codes",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            28,
+            77
+          ],
+          "name": "Global Standards",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: None (public endpoint) - **Body**:",
+                  "lines": [
+                    85,
+                    94
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    95,
+                    139
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/auth/login` - **Method**: `POST` - **Description**: Authenticate using email and password, returns JWT access and refresh tokens",
+              "lines": [
+                80,
+                139
+              ],
+              "name": "Login (Email + Password)",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Body**:",
+                  "lines": [
+                    145,
+                    154
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**: Same as email/password login",
+                  "lines": [
+                    155,
+                    170
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/auth/login/oauth` - **Method**: `POST` - **Description**: Authenticate using OAuth provider (Google/GitHub)",
+              "lines": [
+                140,
+                170
+              ],
+              "name": "OAuth Login",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Body**:",
+                  "lines": [
+                    176,
+                    183
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    184,
+                    205
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/auth/refresh` - **Method**: `POST` - **Description**: Obtain a new access token using refresh token",
+              "lines": [
+                171,
+                205
+              ],
+              "name": "Refresh Token",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` - **Body**:",
+                  "lines": [
+                    211,
+                    219
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (204)**: No content",
+                  "lines": [
+                    220,
+                    224
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/auth/logout` - **Method**: `POST` - **Description**: Invalidate refresh token and revoke access",
+              "lines": [
+                206,
+                224
+              ],
+              "name": "Logout",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Body**:",
+                  "lines": [
+                    230,
+                    238
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    239,
+                    268
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/auth/mfa/verify` - **Method**: `POST` - **Description**: Verify TOTP MFA code (required for platform admins)",
+              "lines": [
+                225,
+                268
+              ],
+              "name": "MFA Verification",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`",
+                  "lines": [
+                    274,
+                    276
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    277,
+                    292
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/auth/me` - **Method**: `GET` - **Description**: Get authenticated user profile",
+              "lines": [
+                269,
+                292
+              ],
+              "name": "Get Current User",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            78,
+            292
+          ],
+          "name": "1. Authentication & Authorization",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: - `Authorization: Bearer <access_token>` (role: platform_admin)",
+                  "lines": [
+                    300,
+                    303
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    304,
+                    342
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/dashboard/stats` - **Method**: `GET` - **Description**: Aggregate statistics for platform admin overview",
+              "lines": [
+                295,
+                342
+              ],
+              "name": "Get Dashboard Stats",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Query Params**: - `severity` (optional): `info` | `warning` | `critic",
+                  "lines": [
+                    348,
+                    353
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    354,
+                    372
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/dashboard/alerts` - **Method**: `GET` - **Description**: List active platform alerts",
+              "lines": [
+                343,
+                372
+              ],
+              "name": "Get Active Alerts",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            293,
+            372
+          ],
+          "name": "2. Platform Admin: Dashboard",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Query Params**: - `page` (optional): number, default 1 - `limit` (opt",
+                  "lines": [
+                    380,
+                    391
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    392,
+                    421
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/tenants` - **Method**: `GET` - **Description**: Paginated list of all tenants with filtering",
+              "lines": [
+                375,
+                421
+              ],
+              "name": "List Tenants",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Body**:",
+                  "lines": [
+                    427,
+                    453
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (201)**:",
+                  "lines": [
+                    454,
+                    487
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/tenants` - **Method**: `POST` - **Description**: Provision new tenant with isolated OpenClaw container (async operation)",
+              "lines": [
+                422,
+                487
+              ],
+              "name": "Create Tenant",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Path Params**: `id` - tenant UUID",
+                  "lines": [
+                    493,
+                    496
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    497,
+                    557
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/tenants/:id` - **Method**: `GET` - **Description**: Detailed tenant information including container health",
+              "lines": [
+                488,
+                557
+              ],
+              "name": "Get Tenant Detail",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Path Params**: `id` - tenant UUID - **Body**:",
+                  "lines": [
+                    563,
+                    582
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    583,
+                    602
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/tenants/:id` - **Method**: `PATCH` - **Description**: Update tenant configuration (plan, limits, model defaults)",
+              "lines": [
+                558,
+                602
+              ],
+              "name": "Update Tenant Config",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Path Params**: `id` - tenant UUID",
+                  "lines": [
+                    608,
+                    611
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    612,
+                    629
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/tenants/:id` - **Method**: `DELETE` - **Description**: Decommission tenant (soft delete with 7-day grace period)",
+              "lines": [
+                603,
+                629
+              ],
+              "name": "Delete Tenant",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Path Params**: `id` - tenant UUID",
+                  "lines": [
+                    635,
+                    638
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (202)**:",
+                  "lines": [
+                    639,
+                    655
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/tenants/:id/actions/restart` - **Method**: `POST` - **Description**: Restart tenant's OpenClaw container",
+              "lines": [
+                630,
+                655
+              ],
+              "name": "Restart Tenant Container",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Path Params**: `id` - tenant UUID",
+                  "lines": [
+                    661,
+                    664
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    665,
+                    692
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/tenants/:id/health` - **Method**: `GET` - **Description**: Detailed container health metrics (current + 24h history)",
+              "lines": [
+                656,
+                692
+              ],
+              "name": "Get Tenant Container Health",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Path Params**: `id` - tenant UUID",
+                  "lines": [
+                    698,
+                    701
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    702,
+                    719
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/tenants/:id/agents` - **Method**: `GET` - **Description**: List all agents within a tenant",
+              "lines": [
+                693,
+                719
+              ],
+              "name": "Get Tenant Agents",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            373,
+            719
+          ],
+          "name": "3. Platform Admin: Tenants",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Query Params**: - `status` (optional): `pending` | `approved` | `reje",
+                  "lines": [
+                    727,
+                    732
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    733,
+                    750
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/skills/review` - **Method**: `GET` - **Description**: List skills pending review",
+              "lines": [
+                722,
+                750
+              ],
+              "name": "Get Skill Review Queue",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Path Params**: `id` - skill submission UUID",
+                  "lines": [
+                    756,
+                    759
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    760,
+                    794
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/skills/review/:id` - **Method**: `GET` - **Description**: Detailed skill submission for review",
+              "lines": [
+                751,
+                794
+              ],
+              "name": "Get Skill Review Detail",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Path Params**: `id` - skill submission UUID - **Body**:",
+                  "lines": [
+                    800,
+                    810
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    811,
+                    829
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/skills/review/:id/approve` - **Method**: `POST` - **Description**: Approve and publish skill to marketplace",
+              "lines": [
+                795,
+                829
+              ],
+              "name": "Approve Skill",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Path Params**: `id` - skill submission UUID - **Body**:",
+                  "lines": [
+                    835,
+                    845
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    846,
+                    862
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/skills/review/:id/reject` - **Method**: `POST` - **Description**: Reject skill submission with feedback",
+              "lines": [
+                830,
+                862
+              ],
+              "name": "Reject Skill",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin) - **Query Params**: - `category` (optional): filter by category - `page`",
+                  "lines": [
+                    868,
+                    874
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    875,
+                    893
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/admin/skills` - **Method**: `GET` - **Description**: All published skills (admin view)",
+              "lines": [
+                863,
+                893
+              ],
+              "name": "List Published Skills",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            720,
+            893
+          ],
+          "name": "4. Platform Admin: Skills",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: - `Authorization: Bearer <access_token>` (role: tenant_admin | tenant_member) - `X-Tenant-Id: <tenant_uuid>` (auto-injected from JWT)",
+                  "lines": [
+                    901,
+                    905
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    906,
+                    934
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/stats` - **Method**: `GET` - **Description**: Tenant dashboard aggregate statistics",
+              "lines": [
+                896,
+                934
+              ],
+              "name": "Get Dashboard Stats",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: - `Authorization: Bearer <access_token>` (role: tenant_admin | tenant_member) - `X-Tenant-Id: <tenant_uuid>` (auto-injected from JWT)",
+                  "lines": [
+                    940,
+                    944
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    945,
+                    963
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/roles` - **Method**: `GET` - **Description**: List available agent role configurations (dynamic from DB)",
+              "lines": [
+                935,
+                963
+              ],
+              "name": "Get Agent Roles",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            894,
+            963
+          ],
+          "name": "5. Tenant: Dashboard",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Query Params**: - `status` (optional): `active` | `idle` | `error` - `role` (",
+                  "lines": [
+                    971,
+                    977
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    978,
+                    1008
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/agents` - **Method**: `GET` - **Description**: List all agents for current tenant",
+              "lines": [
+                966,
+                1008
+              ],
+              "name": "List Agents",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Body**:",
+                  "lines": [
+                    1014,
+                    1042
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (201)**:",
+                  "lines": [
+                    1043,
+                    1080
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/agents` - **Method**: `POST` - **Description**: Create new agent (5-step wizard data)",
+              "lines": [
+                1009,
+                1080
+              ],
+              "name": "Create Agent",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Path Params**: `id` - agent UUID",
+                  "lines": [
+                    1086,
+                    1089
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1090,
+                    1130
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/agents/:id` - **Method**: `GET` - **Description**: Detailed agent information",
+              "lines": [
+                1081,
+                1130
+              ],
+              "name": "Get Agent Detail",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Path Params**: `id` - agent UUID - **Body**:",
+                  "lines": [
+                    1136,
+                    1154
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1155,
+                    1168
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/agents/:id` - **Method**: `PATCH` - **Description**: Update agent configuration",
+              "lines": [
+                1131,
+                1168
+              ],
+              "name": "Update Agent",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Path Params**: `id` - agent UUID",
+                  "lines": [
+                    1174,
+                    1177
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (204)**: No content",
+                  "lines": [
+                    1178,
+                    1182
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/agents/:id` - **Method**: `DELETE` - **Description**: Remove agent",
+              "lines": [
+                1169,
+                1182
+              ],
+              "name": "Delete Agent",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Path Params**: `id` - agent UUID",
+                  "lines": [
+                    1188,
+                    1191
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (202)**:",
+                  "lines": [
+                    1192,
+                    1202
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/agents/:id/actions/restart` - **Method**: `POST` - **Description**: Restart agent process",
+              "lines": [
+                1183,
+                1202
+              ],
+              "name": "Restart Agent",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Path Params**: `id` - agent UUID",
+                  "lines": [
+                    1208,
+                    1211
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1212,
+                    1223
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/agents/:id/actions/pause` - **Method**: `POST` - **Description**: Pause agent (stop processing messages)",
+              "lines": [
+                1203,
+                1223
+              ],
+              "name": "Pause Agent",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Path Params**: `id` - agent UUID",
+                  "lines": [
+                    1229,
+                    1232
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1233,
+                    1244
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/agents/:id/actions/resume` - **Method**: `POST` - **Description**: Resume paused agent",
+              "lines": [
+                1224,
+                1244
+              ],
+              "name": "Resume Agent",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Path Params**: `id` - agent UUID - **Query Params**: - `page` (optional): num",
+                  "lines": [
+                    1250,
+                    1257
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1258,
+                    1278
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/agents/:id/activity` - **Method**: `GET` - **Description**: Paginated activity log for specific agent",
+              "lines": [
+                1245,
+                1278
+              ],
+              "name": "Get Agent Activity Feed",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Path Params**: `id` - agent UUID - **Query Params**: - `page` (optional): num",
+                  "lines": [
+                    1284,
+                    1292
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1293,
+                    1308
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/agents/:id/logs` - **Method**: `GET` - **Description**: Agent logs with filtering",
+              "lines": [
+                1279,
+                1308
+              ],
+              "name": "Get Agent Logs",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            964,
+            1308
+          ],
+          "name": "6. Tenant: Agents",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Query Params**: - `category` (optional): `productivity` | `analytics` | `engi",
+                  "lines": [
+                    1316,
+                    1325
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1326,
+                    1351
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/skills` - **Method**: `GET` - **Description**: Browse available skills with filtering",
+              "lines": [
+                1311,
+                1351
+              ],
+              "name": "Browse Skill Marketplace",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Path Params**: `id` - skill UUID",
+                  "lines": [
+                    1357,
+                    1360
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1361,
+                    1392
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/skills/:id` - **Method**: `GET` - **Description**: Detailed skill information",
+              "lines": [
+                1352,
+                1392
+              ],
+              "name": "Get Skill Detail",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Path Params**: `id` - skill UUID - **Body**:",
+                  "lines": [
+                    1398,
+                    1410
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (201)**:",
+                  "lines": [
+                    1411,
+                    1438
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/skills/:id/install` - **Method**: `POST` - **Description**: Install skill for tenant (to specific agent)",
+              "lines": [
+                1393,
+                1438
+              ],
+              "name": "Install Skill",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Path Params**: `id` - skill UUID - **Query Params**: - `agentId`: agent UUID",
+                  "lines": [
+                    1444,
+                    1449
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (204)**: No content",
+                  "lines": [
+                    1450,
+                    1454
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/skills/:id/uninstall` - **Method**: `DELETE` - **Description**: Remove skill from agent",
+              "lines": [
+                1439,
+                1454
+              ],
+              "name": "Uninstall Skill",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Query Params**: - `agentId` (optional): filter by specific agent",
+                  "lines": [
+                    1460,
+                    1464
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1465,
+                    1483
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/skills/installed` - **Method**: `GET` - **Description**: List all skills installed for tenant",
+              "lines": [
+                1455,
+                1483
+              ],
+              "name": "Get Installed Skills",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            1309,
+            1483
+          ],
+          "name": "7. Tenant: Skills",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id`",
+                  "lines": [
+                    1491,
+                    1493
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1494,
+                    1511
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/team` - **Method**: `GET` - **Description**: List all team members",
+              "lines": [
+                1486,
+                1511
+              ],
+              "name": "List Team Members",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Body**:",
+                  "lines": [
+                    1517,
+                    1527
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (201)**:",
+                  "lines": [
+                    1528,
+                    1553
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/team/invite` - **Method**: `POST` - **Description**: Invite new team member",
+              "lines": [
+                1512,
+                1553
+              ],
+              "name": "Send Team Invite",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Path Params**: `id` - member UUID",
+                  "lines": [
+                    1559,
+                    1562
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (204)**: No content",
+                  "lines": [
+                    1563,
+                    1578
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/team/:id` - **Method**: `DELETE` - **Description**: Remove team member",
+              "lines": [
+                1554,
+                1578
+              ],
+              "name": "Remove Team Member",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` (role: tenant_admin) - **Path Params**: `id` - member UUID - **Body**:",
+                  "lines": [
+                    1584,
+                    1593
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1594,
+                    1606
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/team/:id` - **Method**: `PATCH` - **Description**: Change member role",
+              "lines": [
+                1579,
+                1606
+              ],
+              "name": "Update Member Role",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: None (public endpoint) - **Path Params**: `token` - invite token from email link - **Body**:",
+                  "lines": [
+                    1612,
+                    1624
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1625,
+                    1653
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/team/invite/:token/accept` - **Method**: `POST` - **Description**: Accept team invitation",
+              "lines": [
+                1607,
+                1653
+              ],
+              "name": "Accept Invite",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            1484,
+            1653
+          ],
+          "name": "8. Tenant: Team Management",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Query Params**: - `page` (optional): number, default 1 - `limit` (optional):",
+                  "lines": [
+                    1661,
+                    1671
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1672,
+                    1706
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/audit` - **Method**: `GET` - **Description**: Tenant audit log with filtering",
+              "lines": [
+                1656,
+                1706
+              ],
+              "name": "Get Audit Logs",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` - **Query Params**: - `format`: `csv` | `json` - `dateFrom` (optional): ISO 8601",
+                  "lines": [
+                    1712,
+                    1719
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**: - Content-Type: `text/csv` or `application/json` - Content-Disposition: `attachment; filename=\"audit-log-{date}.{format}\"` - Body",
+                  "lines": [
+                    1720,
+                    1731
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/audit/export` - **Method**: `GET` - **Description**: Export audit log (CSV/JSON)",
+              "lines": [
+                1707,
+                1731
+              ],
+              "name": "Export Audit Log",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            1654,
+            1731
+          ],
+          "name": "9. Tenant: Audit",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id`",
+                  "lines": [
+                    1739,
+                    1741
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1742,
+                    1766
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/settings` - **Method**: `GET` - **Description**: Tenant configuration and profile",
+              "lines": [
+                1734,
+                1766
+              ],
+              "name": "Get Tenant Settings",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` (role: tenant_admin) - **Body**:",
+                  "lines": [
+                    1772,
+                    1784
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1785,
+                    1799
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/settings` - **Method**: `PATCH` - **Description**: Update tenant profile",
+              "lines": [
+                1767,
+                1799
+              ],
+              "name": "Update Tenant Settings",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id`",
+                  "lines": [
+                    1805,
+                    1807
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1808,
+                    1836
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/settings/usage` - **Method**: `GET` - **Description**: Current usage vs plan limits",
+              "lines": [
+                1800,
+                1836
+              ],
+              "name": "Get Usage Stats",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id`",
+                  "lines": [
+                    1842,
+                    1844
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (200)**:",
+                  "lines": [
+                    1845,
+                    1861
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/settings/api-keys` - **Method**: `GET` - **Description**: List all API keys for current tenant",
+              "lines": [
+                1837,
+                1861
+              ],
+              "name": "List API Keys",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` (role: tenant_admin) - **Body**:",
+                  "lines": [
+                    1867,
+                    1876
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (201)**:",
+                  "lines": [
+                    1877,
+                    1892
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/settings/api-keys` - **Method**: `POST` - **Description**: Generate new API key for tenant",
+              "lines": [
+                1862,
+                1892
+              ],
+              "name": "Generate API Key",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "- **Headers**: `Authorization: Bearer <access_token>`, `X-Tenant-Id` (role: tenant_admin) - **Path Params**: `id` - API key UUID",
+                  "lines": [
+                    1898,
+                    1901
+                  ],
+                  "name": "Request",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- **Success (204)**: No content",
+                  "lines": [
+                    1902,
+                    1906
+                  ],
+                  "name": "Response",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "- **Path**: `/api/dashboard/settings/api-keys/:id` - **Method**: `DELETE` - **Description**: Revoke API key",
+              "lines": [
+                1893,
+                1906
+              ],
+              "name": "Revoke API Key",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            1732,
+            1906
+          ],
+          "name": "10. Tenant: Settings",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "- **URL**: `wss://api.aegis.ai/ws` - **Auth**: Pass `?token=<access_token>` as query param",
+              "lines": [
+                1909,
+                1912
+              ],
+              "name": "Connection",
+              "type": "subsection"
+            },
+            {
+              "docstring": "After connection, send:",
+              "lines": [
+                1913,
+                1923
+              ],
+              "name": "Subscribe to Events",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                1924,
+                1938
+              ],
+              "name": "Event: Agent Status Changed",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                1939,
+                1957
+              ],
+              "name": "Event: Container Health Changed",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                1958,
+                1973
+              ],
+              "name": "Event: Provisioning Progress",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            1907,
+            1973
+          ],
+          "name": "11. WebSocket Events",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                1976,
+                1985
+              ],
+              "name": "PaginationMeta",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                1986,
+                2012
+              ],
+              "name": "Agent",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                2013,
+                2026
+              ],
+              "name": "Tenant",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                2027,
+                2047
+              ],
+              "name": "Skill",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            1974,
+            2047
+          ],
+          "name": "12. Global Types",
+          "type": "section"
+        },
+        {
+          "docstring": "| Endpoint Pattern | Limit | Window | |------------------|-------|--------| | `POST /api/auth/login` | 5 requests | 15 minutes | | `POST /api/auth/*`",
+          "lines": [
+            2048,
+            2080
+          ],
+          "name": "Rate Limits",
+          "type": "section"
+        },
+        {
+          "docstring": "| Endpoint | Cache Duration | Invalidation | |----------|---------------|--------------| | `GET /api/admin/dashboard/stats` | 30 seconds | On tenant s",
+          "lines": [
+            2081,
+            2099
+          ],
+          "name": "Caching Strategy",
+          "type": "section"
+        },
+        {
+          "docstring": "**Allowed Origins:** - `https://admin.aegis.ai` (Platform Admin Dashboard) - `https://app.aegis.ai` (Tenant Dashboard) - `http://localhost:3000` (Deve",
+          "lines": [
+            2100,
+            2117
+          ],
+          "name": "CORS Configuration",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                2120,
+                2132
+              ],
+              "name": "JWT Token Structure",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- **Access Token**: 15 minutes - **Refresh Token**: 7 days - **Invite Token**: 7 days",
+              "lines": [
+                2133,
+                2137
+              ],
+              "name": "Token Expiry",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- Minimum 12 characters - At least one uppercase letter - At least one lowercase letter - At least one number - At least one special character",
+              "lines": [
+                2138,
+                2144
+              ],
+              "name": "Password Requirements",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- TOTP (Time-based One-Time Password) - 6-digit code - 30-second window - Backup codes provided on setup",
+              "lines": [
+                2145,
+                2152
+              ],
+              "name": "MFA (Platform Admins Only)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            2118,
+            2152
+          ],
+          "name": "Security Notes",
+          "type": "section"
+        },
+        {
+          "docstring": "| Version | Date | Changes | |---------|------|---------| | 1.3.0 | 2026-02-07 | Dynamic roles (AgentRoleConfig), thinkingMode\u2192fast/standard/extended,",
+          "lines": [
+            2153,
+            2168
+          ],
+          "name": "Version History",
+          "type": "section"
+        }
+      ]
+    },
+    "channel-integration-architecture.md": {
+      "hash": "302a9287e801",
+      "indexed_at": "2026-02-08T20:27:38.378292+00:00",
+      "language": "markdown",
+      "lines": 542,
+      "symbols": [
+        {
+          "docstring": "Channel integration was deferred during Sprint 1-4 (MVP phase). The platform currently has no way for agents to communicate with users through their d",
+          "lines": [
+            11,
+            24
+          ],
+          "name": "1. Context & Motivation",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "| Platform | Market Position | Integration Method | Key Considerations | |----------|----------------|-------------------|-------------------| | **Sla",
+              "lines": [
+                27,
+                34
+              ],
+              "name": "Tier 1 -- Must Have (Day 1)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Platform | Market Position | Integration Method | |----------|----------------|-------------------| | **Google Chat** | Google Workspace orgs | Goog",
+              "lines": [
+                35,
+                42
+              ],
+              "name": "Tier 2 -- High Value (Future)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Platform | Market Position | Integration Method | |----------|----------------|-------------------| | **Lark/Feishu** | MENA, Asia-Pacific (ByteDanc",
+              "lines": [
+                43,
+                59
+              ],
+              "name": "Tier 3 -- Regional/Niche (Future)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            25,
+            59
+          ],
+          "name": "2. Enterprise Communication Landscape (Research)",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "- **Gateway**: WebSocket control plane handling sessions, presence, config, cron, webhooks - **Channels**: Inbound/outbound adapters connecting messag",
+              "lines": [
+                64,
+                70
+              ],
+              "name": "Architecture Components",
+              "type": "subsection"
+            },
+            {
+              "docstring": "Channels are configured declaratively via `channels.<channelId>` sections in `openclaw.json`, controlling authentication, allowlists, group policies,",
+              "lines": [
+                71,
+                74
+              ],
+              "name": "Configuration Pattern",
+              "type": "subsection"
+            },
+            {
+              "docstring": "OpenClaw exposes a webhook endpoint at `/hooks/<name>` for external triggers. Payloads include `message` (required), `sessionKey` (optional for multi-",
+              "lines": [
+                75,
+                78
+              ],
+              "name": "Webhook API",
+              "type": "subsection"
+            },
+            {
+              "docstring": "OpenClaw's plugin architecture supports custom channels as npm packages. Recent examples include an XMPP channel plugin (PR #9741) with full bidirecti",
+              "lines": [
+                79,
+                90
+              ],
+              "name": "Custom Channel Plugin Development",
+              "type": "subsection"
+            }
+          ],
+          "docstring": "OpenClaw already has a mature channel adapter architecture with support for Slack, Discord, MS Teams, Google Chat, Signal, Telegram, WhatsApp, iMessag",
+          "lines": [
+            60,
+            90
+          ],
+          "name": "3. OpenClaw Channel Capabilities",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "Each tenant's OpenClaw container connects directly to Slack/Teams/Discord using native channel adapters.",
+              "lines": [
+                93,
+                115
+              ],
+              "name": "Option A: OpenClaw Instance Per Tenant (Direct Channel Connection)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "Build all channel adapters as NestJS modules in Aegis. Use OpenClaw only as a skill/LLM execution engine via REST.",
+              "lines": [
+                116,
+                136
+              ],
+              "name": "Option B: Aegis Gateway Only (No OpenClaw Channels)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "Multiple tenants share a pool of stateless OpenClaw workers. Aegis routes messages to any available worker.",
+              "lines": [
+                137,
+                162
+              ],
+              "name": "Option C: Shared OpenClaw Pool (Multi-Tenant)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "A hybrid architecture where: 1. One Slack App / Teams App / Discord Bot (shared, multi-workspace capable) 2. Aegis Channel Proxy (NestJS) handles all",
+              "lines": [
+                163,
+                174
+              ],
+              "name": "Option D: Aegis Channel Proxy + Per-Tenant OpenClaw + Aegis Channel Plugin (APPROVED)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            91,
+            174
+          ],
+          "name": "4. Architectural Options Evaluated",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                177,
+                231
+              ],
+              "name": "5.1 High-Level Architecture",
+              "type": "subsection"
+            },
+            {
+              "docstring": "The critical bridge piece. A single custom OpenClaw channel plugin installed in every tenant container. It does NOT handle Slack/Teams/Discord directl",
+              "lines": [
+                232,
+                256
+              ],
+              "name": "5.2 The Aegis Channel Plugin (OpenClaw Side)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "Within each tenant's OpenClaw container, the multi-agent-plan.md 3-layer architecture applies:",
+              "lines": [
+                257,
+                307
+              ],
+              "name": "5.3 Multi-Agent Routing Within a Tenant",
+              "type": "subsection"
+            },
+            {
+              "docstring": "When a message arrives at the Aegis Channel Proxy, it resolves the target agent using three strategies in priority order:",
+              "lines": [
+                308,
+                327
+              ],
+              "name": "5.4 Routing Strategy (Proxy Side)",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                328,
+                348
+              ],
+              "name": "5.5 Message Flow: User-Initiated (Inbound)",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                349,
+                375
+              ],
+              "name": "5.6 Message Flow: Agent-Initiated (Outbound / Proactive)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            175,
+            375
+          ],
+          "name": "5. Approved Architecture: Detailed Design",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                378,
+                442
+              ],
+              "name": "New Prisma Models",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            376,
+            442
+          ],
+          "name": "6. Data Model",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "| Risk | Evidence | Impact | |------|----------|--------| | **Session context leakage** | Giskard Jan 2026: \"secrets loaded for one user became visibl",
+              "lines": [
+                445,
+                454
+              ],
+              "name": "Why Shared OpenClaw Is Unacceptable",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Control | Implementation | |---------|---------------| | **Container-per-company** | Each tenant gets isolated OpenClaw container (UVP #1) | | **No",
+              "lines": [
+                455,
+                468
+              ],
+              "name": "How Our Architecture Mitigates",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            443,
+            468
+          ],
+          "name": "7. Security Analysis",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                471,
+                513
+              ],
+              "name": "Settings > Channels Tab",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            469,
+            513
+          ],
+          "name": "8. Tenant Admin UX: Channel Configuration",
+          "type": "section"
+        },
+        {
+          "docstring": "| Decision | Choice | Rationale | |----------|--------|-----------| | **Architecture** | Aegis Channel Proxy + Per-Tenant OpenClaw + Aegis Channel Plu",
+          "lines": [
+            514,
+            528
+          ],
+          "name": "9. Key Decisions Summary",
+          "type": "section"
+        },
+        {
+          "docstring": "1. **OAuth flow UX**: How does the tenant admin connect their Slack workspace? (Likely OAuth2 \"Add to Slack\" button in tenant settings) 2. **Rate limi",
+          "lines": [
+            529,
+            543
+          ],
+          "name": "10. Open Items for Future Discussion",
+          "type": "section"
+        }
+      ]
+    },
+    "e11-channel-integration-epic.md": {
+      "hash": "e2cae32df764",
+      "indexed_at": "2026-02-08T20:29:50.748397+00:00",
+      "language": "markdown",
+      "lines": 540,
+      "symbols": [
+        {
+          "docstring": "Enable Aegis platform agents to communicate with users through enterprise messaging platforms (Slack, Microsoft Teams, Discord). Agents can respond to",
+          "lines": [
+            12,
+            19
+          ],
+          "name": "Epic Summary",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "docstring": "Create the Prisma data model for channel connections and routing rules. Build the custom OpenClaw \"aegis\" channel plugin that bridges tenant container",
+                  "lines": [
+                    28,
+                    31
+                  ],
+                  "name": "Description",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "**Backend (NestJS):** - Prisma schema: `ChannelConnection`, `ChannelRouting` models with enums - `ChannelModule` with `ChannelConnectionService` and `",
+                  "lines": [
+                    32,
+                    94
+                  ],
+                  "name": "Scope",
+                  "type": "subsubsection"
+                },
+                {
+                  "lines": [
+                    95,
+                    114
+                  ],
+                  "name": "API Endpoints",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- [ ] Prisma migration runs cleanly - [ ] CRUD operations for connections and routing rules work with tenant scoping - [ ] Aegis channel plugin sends",
+                  "lines": [
+                    115,
+                    125
+                  ],
+                  "name": "Acceptance Criteria",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "**Priority:** P0 (foundation for all other features) **Effort:** 1.5 weeks **Dependencies:** E8-F1 (Audit Service)",
+              "lines": [
+                22,
+                125
+              ],
+              "name": "E11-F1: Channel Data Model & Aegis Channel Plugin",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "Build the core Channel Proxy as a NestJS module: tenant resolution, agent routing engine, session management, and the outbound dispatcher. This is the",
+                  "lines": [
+                    132,
+                    135
+                  ],
+                  "name": "Description",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "**Inbound Pipeline:** 1. Receive platform event (Slack/Teams/Discord webhook or socket event) 2. Extract: workspace ID, user ID, channel ID, message t",
+                  "lines": [
+                    136,
+                    166
+                  ],
+                  "name": "Scope",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- [ ] Inbound pipeline correctly resolves tenant and agent from platform events - [ ] Outbound pipeline correctly dispatches to the right platform - [",
+                  "lines": [
+                    167,
+                    179
+                  ],
+                  "name": "Acceptance Criteria",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "**Priority:** P0 **Effort:** 2 weeks **Dependencies:** E11-F1",
+              "lines": [
+                126,
+                179
+              ],
+              "name": "E11-F2: Channel Proxy Core & Routing Engine",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "Build the Aegis Slack App: a multi-workspace distributable Slack application using Socket Mode and Events API. Handles OAuth2 installation flow, event",
+                  "lines": [
+                    186,
+                    189
+                  ],
+                  "name": "Description",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "**Slack App Configuration:** - App Manifest with required scopes: - `chat:write` - Send messages - `channels:history`, `groups:history`, `im:history`",
+                  "lines": [
+                    190,
+                    226
+                  ],
+                  "name": "Scope",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- [ ] OAuth2 \"Add to Slack\" flow creates connection and stores tokens - [ ] App receives and processes messages from channels, DMs, and mentions - [ ]",
+                  "lines": [
+                    227,
+                    239
+                  ],
+                  "name": "Acceptance Criteria",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "**Priority:** P0 **Effort:** 2 weeks **Dependencies:** E11-F2",
+              "lines": [
+                180,
+                239
+              ],
+              "name": "E11-F3: Slack App Integration",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "Build the Aegis Teams App using the M365 Agents SDK (successor to Bot Framework). Supports org-wide deployment via Teams Admin Center.",
+                  "lines": [
+                    246,
+                    249
+                  ],
+                  "name": "Description",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "**Teams App Package:** - App manifest (teams-app-manifest.json) - Bot registration via Azure Bot Service - Scopes: personal (1:1 chat), team (channel",
+                  "lines": [
+                    250,
+                    272
+                  ],
+                  "name": "Scope",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- [ ] Teams App installable via Admin Center - [ ] Personal chat and channel mentions processed correctly - [ ] Proactive messages delivered to users",
+                  "lines": [
+                    273,
+                    282
+                  ],
+                  "name": "Acceptance Criteria",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "**Priority:** P0 **Effort:** 2 weeks **Dependencies:** E11-F2",
+              "lines": [
+                240,
+                282
+              ],
+              "name": "E11-F4: Microsoft Teams App Integration",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "Build the Aegis Discord Bot: multi-guild capable with slash commands and message handling.",
+                  "lines": [
+                    289,
+                    292
+                  ],
+                  "name": "Description",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "**Bot Configuration:** - Discord Application with Bot user - Required intents: `GUILDS`, `GUILD_MESSAGES`, `DIRECT_MESSAGES`, `MESSAGE_CONTENT` - Slas",
+                  "lines": [
+                    293,
+                    314
+                  ],
+                  "name": "Scope",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- [ ] Bot installable to multiple guilds via OAuth2 - [ ] Slash commands registered and functional - [ ] Channel and DM messages routed to correct age",
+                  "lines": [
+                    315,
+                    324
+                  ],
+                  "name": "Acceptance Criteria",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "**Priority:** P0 **Effort:** 1.5 weeks **Dependencies:** E11-F2",
+              "lines": [
+                283,
+                324
+              ],
+              "name": "E11-F5: Discord Bot Integration",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "Build the tenant dashboard UI for managing channel connections and agent routing. New \"Channels\" tab in tenant settings.",
+                  "lines": [
+                    331,
+                    334
+                  ],
+                  "name": "Description",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "**Channel Connections Page:** - List connected platforms with status indicators - \"Connect\" buttons for each platform (triggers OAuth flow) - \"Disconn",
+                  "lines": [
+                    335,
+                    354
+                  ],
+                  "name": "Scope",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- [ ] Connect/disconnect flow for all three platforms - [ ] User \u2192 agent mapping CRUD with platform user picker - [ ] Channel \u2192 agent mapping CRUD wit",
+                  "lines": [
+                    355,
+                    365
+                  ],
+                  "name": "Acceptance Criteria",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "**Priority:** P1 **Effort:** 1.5 weeks **Dependencies:** E11-F1, E11-F3 (Slack at minimum)",
+              "lines": [
+                325,
+                365
+              ],
+              "name": "E11-F6: Channel Admin UI",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "Enable tenant admins to configure proactive agent behaviors (cron schedules, heartbeat intervals, monitoring prompts) through the Aegis UI. These sett",
+                  "lines": [
+                    372,
+                    375
+                  ],
+                  "name": "Description",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "**Agent Detail Page Enhancement:** - New \"Proactive Behaviors\" section in agent detail view - Cron job configuration: - Schedule (cron expression with",
+                  "lines": [
+                    376,
+                    394
+                  ],
+                  "name": "Scope",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- [ ] Tenant admin can add/edit/remove cron jobs per agent - [ ] Tenant admin can configure heartbeat interval and prompt per agent - [ ] Config chang",
+                  "lines": [
+                    395,
+                    404
+                  ],
+                  "name": "Acceptance Criteria",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "**Priority:** P1 **Effort:** 1 week **Dependencies:** E11-F6",
+              "lines": [
+                366,
+                404
+              ],
+              "name": "E11-F7: Proactive Agent Configuration UI",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            20,
+            404
+          ],
+          "name": "Feature Breakdown",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "| Feature | Tasks | Effort | |---------|-------|--------| | **E11-F1** | Prisma schema, migration, Channel module, CRUD services, aegis plugin skeleto",
+              "lines": [
+                407,
+                418
+              ],
+              "name": "Sprint 6 (Post E8): Foundation",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Feature | Tasks | Effort | |---------|-------|--------| | **E11-F2** (complete) | Outbound pipeline, session management, audit integration | 1 week",
+              "lines": [
+                419,
+                430
+              ],
+              "name": "Sprint 7: Slack + Proxy Complete",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Feature | Tasks | Effort | |---------|-------|--------| | **E11-F4** | Teams App: manifest, consent flow, message handling, proactive | 2 weeks | |",
+              "lines": [
+                431,
+                444
+              ],
+              "name": "Sprint 8: Teams + Discord + UI",
+              "type": "subsection"
+            },
+            {
+              "docstring": "| Feature | Tasks | Effort | |---------|-------|--------| | **E11-F6** (complete) | Routing UI for all platforms, status indicators | 0.5 weeks | | **",
+              "lines": [
+                445,
+                458
+              ],
+              "name": "Sprint 9: UI Complete + Polish",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            405,
+            458
+          ],
+          "name": "Sprint Plan",
+          "type": "section"
+        },
+        {
+          "docstring": "| Feature | Effort | Dependencies | |---------|--------|-------------| | E11-F1: Data Model & Aegis Plugin | 1.5 weeks | E8 | | E11-F2: Channel Proxy",
+          "lines": [
+            459,
+            474
+          ],
+          "name": "Effort Summary",
+          "type": "section"
+        },
+        {
+          "lines": [
+            475,
+            494
+          ],
+          "name": "Dependency Graph",
+          "type": "section"
+        },
+        {
+          "docstring": "| Risk | Likelihood | Impact | Mitigation | |------|-----------|--------|------------| | Slack App review delays | Medium | Medium | Submit early; use",
+          "lines": [
+            495,
+            507
+          ],
+          "name": "Risk Register",
+          "type": "section"
+        },
+        {
+          "docstring": "**Unit Tests:** - Routing engine: all priority resolution paths - Tenant resolver: cache hits, misses, invalid workspaces - Session key generation and",
+          "lines": [
+            508,
+            526
+          ],
+          "name": "Testing Strategy",
+          "type": "section"
+        },
+        {
+          "docstring": "| Metric | Target | Measurement | |--------|--------|-------------| | Slack message round-trip latency | < 3 seconds | Proxy instrumentation | | Proac",
+          "lines": [
+            527,
+            541
+          ],
+          "name": "Success Metrics",
+          "type": "section"
+        }
+      ]
+    },
     "gap-analysis-report.md": {
       "hash": "020b75c7dd66",
       "indexed_at": "2026-02-06T11:12:56.152849+00:00",
@@ -784,6 +3279,299 @@
         }
       ]
     },
+    "phase-3-context.md": {
+      "hash": "32b5820aab0a",
+      "indexed_at": "2026-02-06T23:36:40.926458+00:00",
+      "language": "markdown",
+      "lines": 573,
+      "symbols": [
+        {
+          "children": [
+            {
+              "docstring": "- **Platform Admin**: Manages tenants, provisions containers, reviews marketplace skills - **Tenant Admin**: Creates agents, manages team, installs sk",
+              "lines": [
+                14,
+                18
+              ],
+              "name": "Business Model",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- **Container Isolation**: Each company gets dedicated OpenClaw container - **Role-Based Agents**: Agents assist specific people in specific roles - *",
+              "lines": [
+                19,
+                26
+              ],
+              "name": "Key Differentiator",
+              "type": "subsection"
+            }
+          ],
+          "docstring": "**Aegis Platform** is a multi-tenant AI Multi-Agent SaaS that provides OpenClaw-per-Company isolation. Each tenant gets their own containerized OpenCl",
+          "lines": [
+            10,
+            26
+          ],
+          "name": "Project Overview",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "- **Framework**: Next.js 15+ App Router - **Language**: TypeScript (strict mode) - **Styling**: Tailwind CSS 3.4+ - **Components**: Radix UI + shadcn/",
+              "lines": [
+                29,
+                37
+              ],
+              "name": "Frontend",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- **Framework**: NestJS 10+ - **Language**: TypeScript - **Database**: MySQL 8.0 (main data) + Redis 7+ (sessions, cache) - **ORM**: Prisma 5+ - **Aut",
+              "lines": [
+                38,
+                46
+              ],
+              "name": "Backend",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- **Container Runtime**: Docker + Kubernetes - **CI/CD**: GitHub Actions - **Monitoring**: Prometheus + Grafana - **Logging**: ELK Stack (Elasticsearc",
+              "lines": [
+                47,
+                52
+              ],
+              "name": "Infrastructure",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- **Primary Color**: Deep Indigo (#6366f1) - **Fonts**: Inter (UI) + JetBrains Mono (code) - **Aesthetic**: Linear/Vercel - clean, minimal, high contr",
+              "lines": [
+                53,
+                60
+              ],
+              "name": "Design System",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            27,
+            60
+          ],
+          "name": "Tech Stack",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "- `project-context.md` - Business strategy, personas, KPIs - `roadmap.yaml` - Feature roadmap, sprint planning - `docs/multi-agent-plan.md` - 3-layer",
+              "lines": [
+                63,
+                68
+              ],
+              "name": "Phase 1: Strategy & Planning \u2705",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- `design-artifacts/user-flows.md` - 10 user flows, 37 screens - `design-artifacts/theme.yaml` - Complete design system - `design-artifacts/styled-dsl",
+              "lines": [
+                69,
+                73
+              ],
+              "name": "Phase 2: Design \u2705",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- `docs/api-contract.md` - **67 endpoints, v1.1.0** (SINGLE SOURCE OF TRUTH) - `design-artifacts/screens/` - 18 HTML screen prototypes - `design-artif",
+              "lines": [
+                74,
+                82
+              ],
+              "name": "Phase 2.5: API Architecture \u2705",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            61,
+            82
+          ],
+          "name": "Completed Deliverables (Phases 1-2.5)",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**THE API CONTRACT IS SACRED**",
+              "lines": [
+                85,
+                108
+              ],
+              "name": "\ud83d\udea8 API Contract Compliance (ZERO TOLERANCE)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**CRITICAL: ALL agents MUST use CodeMap for file operations in Phase 3**",
+              "lines": [
+                109,
+                212
+              ],
+              "name": "\ud83d\uddfa\ufe0f MANDATORY: CodeMap Usage (Token Efficiency)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Code Quality:** - ESLint + Prettier (enforce strict rules) - TypeScript strict mode (no `any` types) - 80%+ test coverage (unit + integration) - Zod",
+              "lines": [
+                213,
+                244
+              ],
+              "name": "\u26a1 Development Standards",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            83,
+            244
+          ],
+          "name": "Critical Phase 3 Rules",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "**Priority 1: Authentication & Authorization** - Implement JWT auth system - OAuth2 providers (Google, GitHub) - MFA for platform admins (TOTP) - Role",
+              "lines": [
+                247,
+                281
+              ],
+              "name": "Sprint 1: Backend Foundation (Weeks 1-2)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Priority 1: Tenant CRUD** - `GET /api/admin/tenants` (with pagination, filters, sorting) - `POST /api/admin/tenants` (async provisioning) - `GET /ap",
+              "lines": [
+                282,
+                308
+              ],
+              "name": "Sprint 2: Tenant Management (Weeks 3-4)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Priority 1: Agent CRUD** - `GET /api/dashboard/agents` - `POST /api/dashboard/agents` (with assistedUser fields) - `GET /api/dashboard/agents/:id` -",
+              "lines": [
+                309,
+                334
+              ],
+              "name": "Sprint 3: Agent Management (Weeks 5-6)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Priority 1: Skill Review (Admin)** - `GET /api/admin/skills/review` - `GET /api/admin/skills/review/:id` - `POST /api/admin/skills/review/:id/approv",
+              "lines": [
+                335,
+                357
+              ],
+              "name": "Sprint 4: Skills & Marketplace (Weeks 7-8)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Priority 1: Team Management** - `GET /api/dashboard/team` - `POST /api/dashboard/team/invite` - `DELETE /api/dashboard/team/:id` - `PATCH /api/dashb",
+              "lines": [
+                358,
+                383
+              ],
+              "name": "Sprint 5: Team & Settings (Weeks 9-10)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Priority 1: Audit Logs** - `GET /api/dashboard/audit` - `GET /api/dashboard/audit/export` - Audit logging middleware (all actions)",
+              "lines": [
+                384,
+                406
+              ],
+              "name": "Sprint 6: Audit & Dashboard (Weeks 11-12)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Priority 1: Core Screens (Admin)** - Platform Admin Login (with MFA) - Admin Dashboard - Tenant List (with filters, sorting) - Tenant Provisioning W",
+              "lines": [
+                407,
+                440
+              ],
+              "name": "Sprint 7-8: Frontend Implementation (Weeks 13-16)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "**Priority 1: End-to-End Flows** - Complete tenant onboarding flow - Complete agent creation and management flow - Complete skill installation flow -",
+              "lines": [
+                441,
+                468
+              ],
+              "name": "Sprint 9: Integration & Polish (Weeks 17-18)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            245,
+            468
+          ],
+          "name": "Phase 3 Implementation Plan",
+          "type": "section"
+        },
+        {
+          "docstring": "**Always reference these files during implementation:**",
+          "lines": [
+            469,
+            482
+          ],
+          "name": "Key Reference Documents",
+          "type": "section"
+        },
+        {
+          "docstring": "Use specialized agents for specific tasks:",
+          "lines": [
+            483,
+            508
+          ],
+          "name": "Agent Selection for Phase 3",
+          "type": "section"
+        },
+        {
+          "docstring": "Phase 3 is complete when:",
+          "lines": [
+            509,
+            523
+          ],
+          "name": "Success Criteria",
+          "type": "section"
+        },
+        {
+          "docstring": "\u274c **Don't:** Deviate from API contract \u2705 **Do:** Follow contract exactly, request changes if needed",
+          "lines": [
+            524,
+            548
+          ],
+          "name": "Common Pitfalls to Avoid",
+          "type": "section"
+        },
+        {
+          "docstring": "1. **Read this entire document** 2. **Review `docs/api-contract.md`** - understand the API 3. **Review `design-artifacts/styled-dsl.yaml`** - understa",
+          "lines": [
+            549,
+            561
+          ],
+          "name": "Getting Started",
+          "type": "section"
+        },
+        {
+          "docstring": "- **Phase 1:** \u2705 Complete - **Phase 2:** \u2705 Complete - **Phase 2.5:** \u2705 Complete - **Phase 3:** \ud83d\ude80 **READY TO START**",
+          "lines": [
+            562,
+            574
+          ],
+          "name": "Current Status",
+          "type": "section"
+        }
+      ]
+    },
     "security-whitepaper.md": {
       "hash": "f5ce9aae6980",
       "indexed_at": "2026-02-05T21:07:47.499975+00:00",
@@ -1199,6 +3987,314 @@
         }
       ]
     },
+    "sprint-5-prompt.md": {
+      "hash": "3cbeb8b39f0f",
+      "indexed_at": "2026-02-08T21:04:59.780052+00:00",
+      "language": "markdown",
+      "lines": 593,
+      "symbols": [
+        {
+          "docstring": "Implement comprehensive audit logging infrastructure \u2014 the NestJS AuditModule, global interceptor for automatic capture, admin/agent action logging, a",
+          "lines": [
+            11,
+            16
+          ],
+          "name": "Goal",
+          "type": "section"
+        },
+        {
+          "docstring": "- Read `docs/api-contract.md` Section 9 (Tenant: Audit) for the exact API shapes - Read `docs/phase-2-sprint-plan.yaml` for full acceptance criteria -",
+          "lines": [
+            17,
+            26
+          ],
+          "name": "Prerequisites",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "lines": [
+                    35,
+                    50
+                  ],
+                  "name": "Files to Create",
+                  "type": "subsubsection"
+                },
+                {
+                  "lines": [
+                    51,
+                    60
+                  ],
+                  "name": "AuditModule (`audit.module.ts`)",
+                  "type": "subsubsection"
+                },
+                {
+                  "lines": [
+                    61,
+                    83
+                  ],
+                  "name": "AuditService (`audit.service.ts`)",
+                  "type": "subsubsection"
+                },
+                {
+                  "lines": [
+                    84,
+                    98
+                  ],
+                  "name": "AuditProcessor (`audit.processor.ts`)",
+                  "type": "subsubsection"
+                },
+                {
+                  "lines": [
+                    99,
+                    145
+                  ],
+                  "name": "AuditInterceptor (`audit.interceptor.ts`)",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "Register the interceptor globally in `audit.module.ts` using `APP_INTERCEPTOR`:",
+                  "lines": [
+                    146,
+                    158
+                  ],
+                  "name": "Registration",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- [ ] AuditModule registered globally in AppModule - [ ] AuditService.logAction() enqueues to BullMQ without awaiting DB write - [ ] AuditProcessor wr",
+                  "lines": [
+                    159,
+                    172
+                  ],
+                  "name": "Acceptance Criteria",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "**Branch**: `sprint-5/audit-trail/1-audit-service`",
+              "lines": [
+                29,
+                172
+              ],
+              "name": "Story 1: E8-F1 \u2014 Audit Service & Global Interceptor (8 pts)",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "**`auth.service.ts`** \u2014 Add explicit audit calls:",
+                  "lines": [
+                    180,
+                    251
+                  ],
+                  "name": "Integration Points",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- [ ] Login success logged with method, MFA status, IP, user agent - [ ] Login failure logged with severity `warning`, failed email, IP - [ ] Logout l",
+                  "lines": [
+                    252,
+                    280
+                  ],
+                  "name": "Acceptance Criteria",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "**Branch**: `sprint-5/audit-trail/2-admin-audit` **Depends on**: Story 1",
+              "lines": [
+                173,
+                280
+              ],
+              "name": "Story 2: E8-F2 \u2014 Admin Operation Audit Logging (5 pts)",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "docstring": "**`dashboard/agents/agents.service.ts`**:",
+                  "lines": [
+                    288,
+                    317
+                  ],
+                  "name": "Integration Points",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- [ ] Agent CRUD operations logged (create, update, delete) - [ ] Agent status transitions logged with old \u2192 new status - [ ] Skill install/uninstall",
+                  "lines": [
+                    318,
+                    328
+                  ],
+                  "name": "Acceptance Criteria",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "**Branch**: `sprint-5/audit-trail/3-agent-audit` **Depends on**: Story 1",
+              "lines": [
+                281,
+                328
+              ],
+              "name": "Story 3: E8-F1b \u2014 Agent Action Audit Logging (5 pts)",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "lines": [
+                    336,
+                    410
+                  ],
+                  "name": "Schema Additions to `backend/prisma/schema.prisma`",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "1. Add models + enums to `schema.prisma` 2. Add relations to `Agent` model 3. Run `npx prisma generate` to regenerate client 4. Run `npx prisma migrat",
+                  "lines": [
+                    411,
+                    419
+                  ],
+                  "name": "Steps",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "- [ ] AgentMessage model created with all fields and indexes - [ ] AgentAllowlist model created with unique constraint and indexes - [ ] New enums (Me",
+                  "lines": [
+                    420,
+                    430
+                  ],
+                  "name": "Acceptance Criteria",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "**Branch**: `sprint-5/audit-trail/4-s6-db-prep` **Depends on**: None (can run in parallel with Stories 2-3)",
+              "lines": [
+                329,
+                430
+              ],
+              "name": "Story 4: Database Migration Prep for S6 (3 pts)",
+              "type": "subsection"
+            },
+            {
+              "children": [
+                {
+                  "lines": [
+                    438,
+                    447
+                  ],
+                  "name": "Test Files to Create",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "**AuditService tests** (`audit.service.spec.ts`, ~15 tests): - `logAction()` enqueues a job to BullMQ queue - `logAction()` sanitizes details before e",
+                  "lines": [
+                    448,
+                    498
+                  ],
+                  "name": "Test Coverage Requirements",
+                  "type": "subsubsection"
+                },
+                {
+                  "docstring": "Follow existing test patterns in `backend/test/`: - Use `PrismaService` mock for unit tests - Use `Test.createTestingModule()` for integration tests -",
+                  "lines": [
+                    499,
+                    508
+                  ],
+                  "name": "Test Patterns",
+                  "type": "subsubsection"
+                }
+              ],
+              "docstring": "**Branch**: `sprint-5/audit-trail/5-testing` **Depends on**: Stories 1-4",
+              "lines": [
+                431,
+                508
+              ],
+              "name": "Story 5: Testing (5 pts)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            27,
+            508
+          ],
+          "name": "Stories (5 stories, implement sequentially)",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "docstring": "| Pattern | Reference File | What to Copy | |---------|---------------|--------------| | BullMQ module setup | `provisioning/provisioning.module.ts` |",
+              "lines": [
+                511,
+                521
+              ],
+              "name": "Existing Codebase Patterns to Follow",
+              "type": "subsection"
+            },
+            {
+              "docstring": "The following already exist in `backend/prisma/schema.prisma`:",
+              "lines": [
+                522,
+                534
+              ],
+              "name": "Prisma Schema (Already Exists \u2014 DO NOT recreate)",
+              "type": "subsection"
+            },
+            {
+              "docstring": "1. **Async writes only**: AuditInterceptor NEVER awaits the DB write. It enqueues to BullMQ and returns immediately. The processor handles the write a",
+              "lines": [
+                535,
+                548
+              ],
+              "name": "Key Architecture Decisions",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                549,
+                558
+              ],
+              "name": "Import Path for PrismaClient",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                559,
+                567
+              ],
+              "name": "BullMQ Queue Name",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            509,
+            567
+          ],
+          "name": "Technical Reference",
+          "type": "section"
+        },
+        {
+          "docstring": "- [ ] All 5 stories implemented and merged to `sprint-5/audit-trail` - [ ] 60+ tests passing - [ ] All existing tests still pass (no regressions) - [",
+          "lines": [
+            568,
+            584
+          ],
+          "name": "Sprint 5 DoD (Definition of Done)",
+          "type": "section"
+        },
+        {
+          "docstring": "Sprint 5 completion enables: - **E7-F1**: Inter-agent messaging (uses AgentMessage/AgentAllowlist models + audit logging) - **E8-F3**: Audit log viewe",
+          "lines": [
+            585,
+            594
+          ],
+          "name": "What This Unlocks (Sprint 6)",
+          "type": "section"
+        }
+      ]
+    },
     "unused-api-endpoints.md": {
       "hash": "089cd6106c92",
       "indexed_at": "2026-02-06T11:25:28.508833+00:00",
@@ -1511,8 +4607,204 @@
           "type": "section"
         }
       ]
+    },
+    "workflow.md": {
+      "hash": "b3eef502d43a",
+      "indexed_at": "2026-02-08T08:25:01.017991+00:00",
+      "language": "markdown",
+      "lines": 244,
+      "symbols": [
+        {
+          "lines": [
+            5,
+            27
+          ],
+          "name": "Branch Structure",
+          "type": "section"
+        },
+        {
+          "lines": [
+            28,
+            39
+          ],
+          "name": "Starting a New Feature",
+          "type": "section"
+        },
+        {
+          "lines": [
+            40,
+            51
+          ],
+          "name": "Starting a New Task (within a Feature)",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                54,
+                60
+              ],
+              "name": "Step 1: Create subtask branch from task branch",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- Make code changes as specified in the subtask requirements - Follow existing code patterns and styling conventions",
+              "lines": [
+                61,
+                64
+              ],
+              "name": "Step 2: Implement changes",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                65,
+                76
+              ],
+              "name": "Step 3: Build and test locally",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                77,
+                83
+              ],
+              "name": "Step 4: Commit and push",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- **CRITICAL**: Do NOT merge until user EXPLICITLY approves - Push subtask branch and wait for user to test - User will test the changes - Address any",
+              "lines": [
+                84,
+                90
+              ],
+              "name": "Step 5: Wait for EXPLICIT user approval",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                91,
+                98
+              ],
+              "name": "Step 6: After EXPLICIT approval, merge subtask to task branch",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                99,
+                104
+              ],
+              "name": "Step 7: Clean up subtask branch",
+              "type": "subsection"
+            },
+            {
+              "docstring": "- Mark subtask as \"Complete\" - Move to next subtask",
+              "lines": [
+                105,
+                110
+              ],
+              "name": "Step 8: Update tracking documentation",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            52,
+            110
+          ],
+          "name": "For Each Subtask",
+          "type": "section"
+        },
+        {
+          "docstring": "After ALL subtasks in a task are complete and approved:",
+          "lines": [
+            111,
+            133
+          ],
+          "name": "Completing a Task",
+          "type": "section"
+        },
+        {
+          "docstring": "After ALL tasks in a feature are complete and approved:",
+          "lines": [
+            134,
+            151
+          ],
+          "name": "Completing a Feature",
+          "type": "section"
+        },
+        {
+          "docstring": "Before requesting user review: - [ ] Build succeeds without errors - [ ] App runs correctly - [ ] Feature works as specified in requirements - [ ] Res",
+          "lines": [
+            152,
+            165
+          ],
+          "name": "Testing Checklist",
+          "type": "section"
+        },
+        {
+          "docstring": "| Level | Pattern | Example | |-------|---------|---------| | Feature | `[feature-name]` | `user-auth`, `payment-flow` | | Task | `[feature]/[task-nam",
+          "lines": [
+            166,
+            175
+          ],
+          "name": "Branch Naming Conventions",
+          "type": "section"
+        },
+        {
+          "lines": [
+            176,
+            199
+          ],
+          "name": "Commit Message Conventions",
+          "type": "section"
+        },
+        {
+          "children": [
+            {
+              "lines": [
+                202,
+                208
+              ],
+              "name": "Create Subtask Branch",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                209,
+                217
+              ],
+              "name": "Merge Subtask (after approval)",
+              "type": "subsection"
+            },
+            {
+              "lines": [
+                218,
+                228
+              ],
+              "name": "Merge Task (after all subtasks complete)",
+              "type": "subsection"
+            }
+          ],
+          "lines": [
+            200,
+            228
+          ],
+          "name": "Quick Reference",
+          "type": "section"
+        },
+        {
+          "docstring": "Replace these placeholders with your actual values:",
+          "lines": [
+            229,
+            245
+          ],
+          "name": "Template Variables",
+          "type": "section"
+        }
+      ]
     }
   },
-  "generated_at": "2026-02-06T11:35:32.330318+00:00",
+  "generated_at": "2026-02-08T21:12:26.728440+00:00",
   "version": "1.0"
 }

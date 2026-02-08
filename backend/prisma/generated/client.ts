@@ -48,6 +48,11 @@ export type User = Prisma.UserModel
  */
 export type Tenant = Prisma.TenantModel
 /**
+ * Model TenantConfigHistory
+ * TenantConfigHistory - Versioned snapshots of tenant configuration changes
+ */
+export type TenantConfigHistory = Prisma.TenantConfigHistoryModel
+/**
  * Model Agent
  * Agents - AI agents deployed for tenants
  */

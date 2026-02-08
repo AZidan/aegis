@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Tenant: 'Tenant',
+  TenantConfigHistory: 'TenantConfigHistory',
   Agent: 'Agent',
   AgentRoleConfig: 'AgentRoleConfig',
   Skill: 'Skill',
@@ -131,6 +132,18 @@ export const TenantScalarFieldEnum = {
 } as const
 
 export type TenantScalarFieldEnum = (typeof TenantScalarFieldEnum)[keyof typeof TenantScalarFieldEnum]
+
+
+export const TenantConfigHistoryScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  config: 'config',
+  changedBy: 'changedBy',
+  changeDescription: 'changeDescription',
+  createdAt: 'createdAt'
+} as const
+
+export type TenantConfigHistoryScalarFieldEnum = (typeof TenantConfigHistoryScalarFieldEnum)[keyof typeof TenantConfigHistoryScalarFieldEnum]
 
 
 export const AgentScalarFieldEnum = {

@@ -2,10 +2,10 @@
   "directory": "prisma/generated",
   "files": {
     "browser.ts": {
-      "hash": "f148e90811ed",
-      "indexed_at": "2026-02-06T18:54:41.591875+00:00",
+      "hash": "1b15f37b9330",
+      "indexed_at": "2026-02-08T19:05:03.770658+00:00",
       "language": "typescript",
-      "lines": 94,
+      "lines": 104,
       "symbols": [
         {
           "lines": [
@@ -28,7 +28,7 @@
             34,
             34
           ],
-          "name": "Agent",
+          "name": "TenantConfigHistory",
           "type": "type"
         },
         {
@@ -36,7 +36,7 @@
             39,
             39
           ],
-          "name": "Skill",
+          "name": "Agent",
           "type": "type"
         },
         {
@@ -44,7 +44,7 @@
             44,
             44
           ],
-          "name": "RefreshToken",
+          "name": "AgentRoleConfig",
           "type": "type"
         },
         {
@@ -52,7 +52,7 @@
             49,
             49
           ],
-          "name": "ApiKey",
+          "name": "Skill",
           "type": "type"
         },
         {
@@ -60,7 +60,7 @@
             54,
             54
           ],
-          "name": "TeamMember",
+          "name": "RefreshToken",
           "type": "type"
         },
         {
@@ -68,7 +68,7 @@
             59,
             59
           ],
-          "name": "TeamInvite",
+          "name": "ApiKey",
           "type": "type"
         },
         {
@@ -76,7 +76,7 @@
             64,
             64
           ],
-          "name": "AgentChannel",
+          "name": "TeamMember",
           "type": "type"
         },
         {
@@ -84,7 +84,7 @@
             69,
             69
           ],
-          "name": "AgentActivity",
+          "name": "TeamInvite",
           "type": "type"
         },
         {
@@ -92,7 +92,7 @@
             74,
             74
           ],
-          "name": "AgentMetrics",
+          "name": "AgentChannel",
           "type": "type"
         },
         {
@@ -100,7 +100,7 @@
             79,
             79
           ],
-          "name": "SkillInstallation",
+          "name": "AgentActivity",
           "type": "type"
         },
         {
@@ -108,7 +108,7 @@
             84,
             84
           ],
-          "name": "ContainerHealth",
+          "name": "AgentMetrics",
           "type": "type"
         },
         {
@@ -116,7 +116,7 @@
             89,
             89
           ],
-          "name": "Alert",
+          "name": "SkillInstallation",
           "type": "type"
         },
         {
@@ -124,16 +124,32 @@
             94,
             94
           ],
+          "name": "ContainerHealth",
+          "type": "type"
+        },
+        {
+          "lines": [
+            99,
+            99
+          ],
+          "name": "Alert",
+          "type": "type"
+        },
+        {
+          "lines": [
+            104,
+            104
+          ],
           "name": "AuditLog",
           "type": "type"
         }
       ]
     },
     "client.ts": {
-      "hash": "1d76ecdd4248",
-      "indexed_at": "2026-02-06T18:54:41.726447+00:00",
+      "hash": "32bf914a64da",
+      "indexed_at": "2026-02-08T19:05:03.821021+00:00",
       "language": "typescript",
-      "lines": 114,
+      "lines": 124,
       "symbols": [
         {
           "lines": [
@@ -164,7 +180,7 @@
             54,
             54
           ],
-          "name": "Agent",
+          "name": "TenantConfigHistory",
           "type": "type"
         },
         {
@@ -172,7 +188,7 @@
             59,
             59
           ],
-          "name": "Skill",
+          "name": "Agent",
           "type": "type"
         },
         {
@@ -180,7 +196,7 @@
             64,
             64
           ],
-          "name": "RefreshToken",
+          "name": "AgentRoleConfig",
           "type": "type"
         },
         {
@@ -188,7 +204,7 @@
             69,
             69
           ],
-          "name": "ApiKey",
+          "name": "Skill",
           "type": "type"
         },
         {
@@ -196,7 +212,7 @@
             74,
             74
           ],
-          "name": "TeamMember",
+          "name": "RefreshToken",
           "type": "type"
         },
         {
@@ -204,7 +220,7 @@
             79,
             79
           ],
-          "name": "TeamInvite",
+          "name": "ApiKey",
           "type": "type"
         },
         {
@@ -212,7 +228,7 @@
             84,
             84
           ],
-          "name": "AgentChannel",
+          "name": "TeamMember",
           "type": "type"
         },
         {
@@ -220,7 +236,7 @@
             89,
             89
           ],
-          "name": "AgentActivity",
+          "name": "TeamInvite",
           "type": "type"
         },
         {
@@ -228,7 +244,7 @@
             94,
             94
           ],
-          "name": "AgentMetrics",
+          "name": "AgentChannel",
           "type": "type"
         },
         {
@@ -236,7 +252,7 @@
             99,
             99
           ],
-          "name": "SkillInstallation",
+          "name": "AgentActivity",
           "type": "type"
         },
         {
@@ -244,7 +260,7 @@
             104,
             104
           ],
-          "name": "ContainerHealth",
+          "name": "AgentMetrics",
           "type": "type"
         },
         {
@@ -252,7 +268,7 @@
             109,
             109
           ],
-          "name": "Alert",
+          "name": "SkillInstallation",
           "type": "type"
         },
         {
@@ -260,16 +276,32 @@
             114,
             114
           ],
+          "name": "ContainerHealth",
+          "type": "type"
+        },
+        {
+          "lines": [
+            119,
+            119
+          ],
+          "name": "Alert",
+          "type": "type"
+        },
+        {
+          "lines": [
+            124,
+            124
+          ],
           "name": "AuditLog",
           "type": "type"
         }
       ]
     },
     "commonInputTypes.ts": {
-      "hash": "07801dfea9d4",
-      "indexed_at": "2026-02-06T18:54:41.699470+00:00",
+      "hash": "21fdd399a6c4",
+      "indexed_at": "2026-02-08T19:05:03.871096+00:00",
       "language": "typescript",
-      "lines": 1220,
+      "lines": 1186,
       "symbols": [
         {
           "lines": [
@@ -402,57 +434,57 @@
         {
           "lines": [
             193,
-            198
+            202
+          ],
+          "name": "IntFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            204,
+            209
           ],
           "name": "JsonNullableFilter",
           "type": "type"
         },
         {
           "lines": [
-            200,
-            215
+            211,
+            226
           ],
           "name": "JsonNullableFilterBase",
           "type": "type"
         },
         {
           "lines": [
-            217,
-            225
+            228,
+            236
           ],
           "name": "EnumTenantStatusWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            227,
-            235
+            238,
+            246
           ],
           "name": "EnumTenantPlanWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            237,
-            251
+            248,
+            262
           ],
           "name": "IntNullableWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            253,
-            258
-          ],
-          "name": "JsonNullableWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            260,
+            264,
             278
           ],
-          "name": "JsonNullableWithAggregatesFilterBase",
+          "name": "IntWithAggregatesFilter",
           "type": "type"
         },
         {
@@ -460,79 +492,63 @@
             280,
             285
           ],
-          "name": "EnumAgentRoleFilter",
+          "name": "JsonNullableWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
             287,
-            292
+            305
           ],
-          "name": "EnumAgentStatusFilter",
+          "name": "JsonNullableWithAggregatesFilterBase",
           "type": "type"
         },
         {
           "lines": [
-            294,
-            299
-          ],
-          "name": "EnumModelTierFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            301,
-            306
-          ],
-          "name": "EnumThinkingModeFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            308,
-            313
+            307,
+            312
           ],
           "name": "JsonFilter",
           "type": "type"
         },
         {
           "lines": [
-            315,
-            330
+            314,
+            329
           ],
           "name": "JsonFilterBase",
           "type": "type"
         },
         {
           "lines": [
-            332,
-            340
+            331,
+            336
           ],
-          "name": "EnumAgentRoleWithAggregatesFilter",
+          "name": "JsonWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            342,
-            350
+            338,
+            356
           ],
-          "name": "EnumAgentStatusWithAggregatesFilter",
+          "name": "JsonWithAggregatesFilterBase",
           "type": "type"
         },
         {
           "lines": [
-            352,
-            360
+            358,
+            363
           ],
-          "name": "EnumModelTierWithAggregatesFilter",
+          "name": "EnumAgentStatusFilter",
           "type": "type"
         },
         {
           "lines": [
-            362,
+            365,
             370
           ],
-          "name": "EnumThinkingModeWithAggregatesFilter",
+          "name": "EnumModelTierFilter",
           "type": "type"
         },
         {
@@ -540,79 +556,95 @@
             372,
             377
           ],
-          "name": "JsonWithAggregatesFilter",
+          "name": "EnumThinkingModeFilter",
           "type": "type"
         },
         {
           "lines": [
             379,
-            397
-          ],
-          "name": "JsonWithAggregatesFilterBase",
-          "type": "type"
-        },
-        {
-          "lines": [
-            399,
-            404
-          ],
-          "name": "EnumSkillCategoryFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            406,
-            411
-          ],
-          "name": "EnumSkillStatusFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            413,
-            422
+            388
           ],
           "name": "FloatFilter",
           "type": "type"
         },
         {
           "lines": [
-            424,
-            433
+            390,
+            398
           ],
-          "name": "IntFilter",
+          "name": "EnumAgentStatusWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            435,
-            443
+            400,
+            408
           ],
-          "name": "EnumSkillCategoryWithAggregatesFilter",
+          "name": "EnumModelTierWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            445,
-            453
+            410,
+            418
           ],
-          "name": "EnumSkillStatusWithAggregatesFilter",
+          "name": "EnumThinkingModeWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            455,
-            469
+            420,
+            434
           ],
           "name": "FloatWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            471,
+            436,
+            441
+          ],
+          "name": "EnumSkillCategoryFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            443,
+            448
+          ],
+          "name": "EnumSkillStatusFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            450,
+            458
+          ],
+          "name": "EnumSkillCategoryWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            460,
+            468
+          ],
+          "name": "EnumSkillStatusWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            470,
+            475
+          ],
+          "name": "EnumInviteStatusFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            477,
             485
           ],
-          "name": "IntWithAggregatesFilter",
+          "name": "EnumInviteStatusWithAggregatesFilter",
           "type": "type"
         },
         {
@@ -620,7 +652,7 @@
             487,
             492
           ],
-          "name": "EnumInviteStatusFilter",
+          "name": "EnumChannelTypeFilter",
           "type": "type"
         },
         {
@@ -628,7 +660,7 @@
             494,
             502
           ],
-          "name": "EnumInviteStatusWithAggregatesFilter",
+          "name": "EnumChannelTypeWithAggregatesFilter",
           "type": "type"
         },
         {
@@ -636,7 +668,7 @@
             504,
             509
           ],
-          "name": "EnumChannelTypeFilter",
+          "name": "EnumActivityTypeFilter",
           "type": "type"
         },
         {
@@ -644,39 +676,39 @@
             511,
             519
           ],
-          "name": "EnumChannelTypeWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            521,
-            526
-          ],
-          "name": "EnumActivityTypeFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            528,
-            536
-          ],
           "name": "EnumActivityTypeWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            538,
-            547
+            521,
+            530
           ],
           "name": "FloatNullableFilter",
           "type": "type"
         },
         {
           "lines": [
-            549,
-            563
+            532,
+            546
           ],
           "name": "FloatNullableWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            548,
+            553
+          ],
+          "name": "EnumHealthStatusFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            555,
+            563
+          ],
+          "name": "EnumHealthStatusWithAggregatesFilter",
           "type": "type"
         },
         {
@@ -684,7 +716,7 @@
             565,
             570
           ],
-          "name": "EnumHealthStatusFilter",
+          "name": "EnumAlertSeverityFilter",
           "type": "type"
         },
         {
@@ -692,7 +724,7 @@
             572,
             580
           ],
-          "name": "EnumHealthStatusWithAggregatesFilter",
+          "name": "EnumAlertSeverityWithAggregatesFilter",
           "type": "type"
         },
         {
@@ -700,375 +732,375 @@
             582,
             587
           ],
-          "name": "EnumAlertSeverityFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            589,
-            597
-          ],
-          "name": "EnumAlertSeverityWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            599,
-            604
-          ],
           "name": "EnumAuditActorTypeFilter",
           "type": "type"
         },
         {
           "lines": [
-            606,
-            611
+            589,
+            594
           ],
           "name": "EnumAuditTargetTypeFilter",
           "type": "type"
         },
         {
           "lines": [
-            613,
-            618
+            596,
+            601
           ],
           "name": "EnumAuditSeverityFilter",
           "type": "type"
         },
         {
           "lines": [
-            620,
-            628
+            603,
+            611
           ],
           "name": "EnumAuditActorTypeWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            630,
-            638
+            613,
+            621
           ],
           "name": "EnumAuditTargetTypeWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            640,
-            648
+            623,
+            631
           ],
           "name": "EnumAuditSeverityWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            650,
-            662
+            633,
+            645
           ],
           "name": "NestedStringFilter",
           "type": "type"
         },
         {
           "lines": [
-            664,
-            676
+            647,
+            659
           ],
           "name": "NestedStringNullableFilter",
           "type": "type"
         },
         {
           "lines": [
-            678,
-            683
+            661,
+            666
           ],
           "name": "NestedEnumUserRoleFilter",
           "type": "type"
         },
         {
           "lines": [
-            685,
-            688
+            668,
+            671
           ],
           "name": "NestedBoolFilter",
           "type": "type"
         },
         {
           "lines": [
-            690,
-            699
+            673,
+            682
           ],
           "name": "NestedDateTimeFilter",
           "type": "type"
         },
         {
           "lines": [
-            701,
-            710
+            684,
+            693
           ],
           "name": "NestedDateTimeNullableFilter",
           "type": "type"
         },
         {
           "lines": [
-            712,
-            727
+            695,
+            710
           ],
           "name": "NestedStringWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            729,
-            738
+            712,
+            721
           ],
           "name": "NestedIntFilter",
           "type": "type"
         },
         {
           "lines": [
-            740,
-            755
+            723,
+            738
           ],
           "name": "NestedStringNullableWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            757,
-            766
+            740,
+            749
           ],
           "name": "NestedIntNullableFilter",
           "type": "type"
         },
         {
           "lines": [
-            768,
-            776
+            751,
+            759
           ],
           "name": "NestedEnumUserRoleWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            778,
-            784
+            761,
+            767
           ],
           "name": "NestedBoolWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            786,
-            798
+            769,
+            781
           ],
           "name": "NestedDateTimeWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            800,
-            812
+            783,
+            795
           ],
           "name": "NestedDateTimeNullableWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            814,
-            819
+            797,
+            802
           ],
           "name": "NestedEnumTenantStatusFilter",
           "type": "type"
         },
         {
           "lines": [
-            821,
-            826
+            804,
+            809
           ],
           "name": "NestedEnumTenantPlanFilter",
           "type": "type"
         },
         {
           "lines": [
-            828,
-            836
+            811,
+            819
           ],
           "name": "NestedEnumTenantStatusWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            838,
-            846
+            821,
+            829
           ],
           "name": "NestedEnumTenantPlanWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            848,
-            862
+            831,
+            845
           ],
           "name": "NestedIntNullableWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            864,
-            873
+            847,
+            856
           ],
           "name": "NestedFloatNullableFilter",
           "type": "type"
         },
         {
           "lines": [
-            875,
-            880
+            858,
+            872
           ],
-          "name": "NestedJsonNullableFilter",
+          "name": "NestedIntWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            882,
-            897
-          ],
-          "name": "NestedJsonNullableFilterBase",
-          "type": "type"
-        },
-        {
-          "lines": [
-            899,
-            904
-          ],
-          "name": "NestedEnumAgentRoleFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            906,
-            911
-          ],
-          "name": "NestedEnumAgentStatusFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            913,
-            918
-          ],
-          "name": "NestedEnumModelTierFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            920,
-            925
-          ],
-          "name": "NestedEnumThinkingModeFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            927,
-            935
-          ],
-          "name": "NestedEnumAgentRoleWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            937,
-            945
-          ],
-          "name": "NestedEnumAgentStatusWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            947,
-            955
-          ],
-          "name": "NestedEnumModelTierWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            957,
-            965
-          ],
-          "name": "NestedEnumThinkingModeWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            967,
-            972
-          ],
-          "name": "NestedJsonFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            974,
-            989
-          ],
-          "name": "NestedJsonFilterBase",
-          "type": "type"
-        },
-        {
-          "lines": [
-            991,
-            996
-          ],
-          "name": "NestedEnumSkillCategoryFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            998,
-            1003
-          ],
-          "name": "NestedEnumSkillStatusFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1005,
-            1014
+            874,
+            883
           ],
           "name": "NestedFloatFilter",
           "type": "type"
         },
         {
           "lines": [
-            1016,
-            1024
+            885,
+            890
           ],
-          "name": "NestedEnumSkillCategoryWithAggregatesFilter",
+          "name": "NestedJsonNullableFilter",
           "type": "type"
         },
         {
           "lines": [
-            1026,
-            1034
+            892,
+            907
           ],
-          "name": "NestedEnumSkillStatusWithAggregatesFilter",
+          "name": "NestedJsonNullableFilterBase",
           "type": "type"
         },
         {
           "lines": [
-            1036,
-            1050
+            909,
+            914
+          ],
+          "name": "NestedJsonFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            916,
+            931
+          ],
+          "name": "NestedJsonFilterBase",
+          "type": "type"
+        },
+        {
+          "lines": [
+            933,
+            938
+          ],
+          "name": "NestedEnumAgentStatusFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            940,
+            945
+          ],
+          "name": "NestedEnumModelTierFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            947,
+            952
+          ],
+          "name": "NestedEnumThinkingModeFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            954,
+            962
+          ],
+          "name": "NestedEnumAgentStatusWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            964,
+            972
+          ],
+          "name": "NestedEnumModelTierWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            974,
+            982
+          ],
+          "name": "NestedEnumThinkingModeWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            984,
+            998
           ],
           "name": "NestedFloatWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            1052,
+            1000,
+            1005
+          ],
+          "name": "NestedEnumSkillCategoryFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1007,
+            1012
+          ],
+          "name": "NestedEnumSkillStatusFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1014,
+            1022
+          ],
+          "name": "NestedEnumSkillCategoryWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1024,
+            1032
+          ],
+          "name": "NestedEnumSkillStatusWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1034,
+            1039
+          ],
+          "name": "NestedEnumInviteStatusFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1041,
+            1049
+          ],
+          "name": "NestedEnumInviteStatusWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1051,
+            1056
+          ],
+          "name": "NestedEnumChannelTypeFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1058,
             1066
           ],
-          "name": "NestedIntWithAggregatesFilter",
+          "name": "NestedEnumChannelTypeWithAggregatesFilter",
           "type": "type"
         },
         {
@@ -1076,7 +1108,7 @@
             1068,
             1073
           ],
-          "name": "NestedEnumInviteStatusFilter",
+          "name": "NestedEnumActivityTypeFilter",
           "type": "type"
         },
         {
@@ -1084,47 +1116,47 @@
             1075,
             1083
           ],
-          "name": "NestedEnumInviteStatusWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1085,
-            1090
-          ],
-          "name": "NestedEnumChannelTypeFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1092,
-            1100
-          ],
-          "name": "NestedEnumChannelTypeWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1102,
-            1107
-          ],
-          "name": "NestedEnumActivityTypeFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1109,
-            1117
-          ],
           "name": "NestedEnumActivityTypeWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            1119,
-            1133
+            1085,
+            1099
           ],
           "name": "NestedFloatNullableWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1101,
+            1106
+          ],
+          "name": "NestedEnumHealthStatusFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1108,
+            1116
+          ],
+          "name": "NestedEnumHealthStatusWithAggregatesFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1118,
+            1123
+          ],
+          "name": "NestedEnumAlertSeverityFilter",
+          "type": "type"
+        },
+        {
+          "lines": [
+            1125,
+            1133
+          ],
+          "name": "NestedEnumAlertSeverityWithAggregatesFilter",
           "type": "type"
         },
         {
@@ -1132,77 +1164,45 @@
             1135,
             1140
           ],
-          "name": "NestedEnumHealthStatusFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1142,
-            1150
-          ],
-          "name": "NestedEnumHealthStatusWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1152,
-            1157
-          ],
-          "name": "NestedEnumAlertSeverityFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1159,
-            1167
-          ],
-          "name": "NestedEnumAlertSeverityWithAggregatesFilter",
-          "type": "type"
-        },
-        {
-          "lines": [
-            1169,
-            1174
-          ],
           "name": "NestedEnumAuditActorTypeFilter",
           "type": "type"
         },
         {
           "lines": [
-            1176,
-            1181
+            1142,
+            1147
           ],
           "name": "NestedEnumAuditTargetTypeFilter",
           "type": "type"
         },
         {
           "lines": [
-            1183,
-            1188
+            1149,
+            1154
           ],
           "name": "NestedEnumAuditSeverityFilter",
           "type": "type"
         },
         {
           "lines": [
-            1190,
-            1198
+            1156,
+            1164
           ],
           "name": "NestedEnumAuditActorTypeWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            1200,
-            1208
+            1166,
+            1174
           ],
           "name": "NestedEnumAuditTargetTypeWithAggregatesFilter",
           "type": "type"
         },
         {
           "lines": [
-            1210,
-            1218
+            1176,
+            1184
           ],
           "name": "NestedEnumAuditSeverityWithAggregatesFilter",
           "type": "type"
@@ -1210,10 +1210,10 @@
       ]
     },
     "enums.ts": {
-      "hash": "a3145088f001",
-      "indexed_at": "2026-02-06T18:54:41.612698+00:00",
+      "hash": "be10caebab21",
+      "indexed_at": "2026-02-08T19:00:37.352430+00:00",
       "language": "typescript",
-      "lines": 172,
+      "lines": 162,
       "symbols": [
         {
           "lines": [
@@ -1241,26 +1241,26 @@
         },
         {
           "lines": [
-            47,
-            47
-          ],
-          "name": "AgentRole",
-          "type": "type"
-        },
-        {
-          "lines": [
-            58,
-            58
+            48,
+            48
           ],
           "name": "AgentStatus",
           "type": "type"
         },
         {
           "lines": [
-            67,
-            67
+            57,
+            57
           ],
           "name": "ModelTier",
+          "type": "type"
+        },
+        {
+          "lines": [
+            66,
+            66
+          ],
+          "name": "ThinkingMode",
           "type": "type"
         },
         {
@@ -1268,7 +1268,7 @@
             76,
             76
           ],
-          "name": "ThinkingMode",
+          "name": "SkillCategory",
           "type": "type"
         },
         {
@@ -1276,63 +1276,63 @@
             86,
             86
           ],
-          "name": "SkillCategory",
-          "type": "type"
-        },
-        {
-          "lines": [
-            96,
-            96
-          ],
           "name": "SkillStatus",
           "type": "type"
         },
         {
           "lines": [
-            105,
-            105
+            95,
+            95
           ],
           "name": "ChannelType",
           "type": "type"
         },
         {
           "lines": [
-            114,
-            114
+            104,
+            104
           ],
           "name": "ActivityType",
           "type": "type"
         },
         {
           "lines": [
-            123,
-            123
+            113,
+            113
           ],
           "name": "AuditActorType",
           "type": "type"
         },
         {
           "lines": [
-            135,
-            135
+            125,
+            125
           ],
           "name": "AuditTargetType",
           "type": "type"
         },
         {
           "lines": [
-            144,
-            144
+            134,
+            134
           ],
           "name": "AuditSeverity",
           "type": "type"
         },
         {
           "lines": [
-            153,
-            153
+            143,
+            143
           ],
           "name": "AlertSeverity",
+          "type": "type"
+        },
+        {
+          "lines": [
+            152,
+            152
+          ],
+          "name": "HealthStatus",
           "type": "type"
         },
         {
@@ -1340,27 +1340,19 @@
             162,
             162
           ],
-          "name": "HealthStatus",
-          "type": "type"
-        },
-        {
-          "lines": [
-            172,
-            172
-          ],
           "name": "InviteStatus",
           "type": "type"
         }
       ]
     },
     "models.ts": {
-      "hash": "bb33970c517a",
-      "indexed_at": "2026-02-06T18:54:41.752667+00:00",
+      "hash": "8c24955121ab",
+      "indexed_at": "2026-02-08T19:05:04.052234+00:00",
       "language": "typescript",
-      "lines": 26,
+      "lines": 28,
       "symbols": []
     }
   },
-  "generated_at": "2026-02-06T23:51:42.642177+00:00",
+  "generated_at": "2026-02-08T21:12:26.598655+00:00",
   "version": "1.0"
 }

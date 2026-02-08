@@ -5,7 +5,7 @@
 # tenant management, skill marketplace) -- NOT the agents themselves.
 # Agents run on OpenClaw; we build the management/orchestration layer around them.
 #
-# Last Updated: 2026-02-05
+# Last Updated: 2026-02-08
 # Document Owner: Strategy & Product Team
 # =============================================================================
 
@@ -1510,8 +1510,8 @@ sprint_plan:
   methodology: "2-week sprints with sprint review and retrospective"
   team_assumption: "2 backend engineers, 1 frontend engineer, 1 full-stack/DevOps"
   notes: >
-    Sprint plan covers MVP phase only. Phase 2-4 sprint plans will be created
-    during Phase 1 retrospective based on actual velocity.
+    MVP sprint plan (S1-S4) completed 2026-02-08. Phase 2 sprint plan (S5-S8)
+    added based on MVP retrospective and actual velocity analysis.
 
   sprints:
     - id: S1
@@ -1633,6 +1633,129 @@ sprint_plan:
         - "E2E test suite covering happy path"
         - "MVP demo-ready"
 
+    # -------------------------------------------------------------------------
+    # Phase 2 Sprints (S5-S8) -- Coordination & Security
+    # -------------------------------------------------------------------------
+    # Added: 2026-02-08 (post-MVP retrospective)
+    # Full details: docs/phase-2-sprint-plan.yaml
+    # -------------------------------------------------------------------------
+
+    - id: S5
+      name: "Sprint 5: Audit Trail Foundation"
+      duration: "2 weeks"
+      dates: "Weeks 9-10"
+      goal: "Audit service, global interceptor, admin/agent action logging, DB prep for messaging"
+      stories:
+        - feature: "E8-F1"
+          description: "Audit service, global interceptor, async BullMQ writer"
+          points: 8
+        - feature: "E8-F2"
+          description: "Admin operation audit logging (login, config, tenant ops)"
+          points: 5
+        - feature: "E8-F1b"
+          description: "Agent action audit logging (tool invocations, status, skills)"
+          points: 5
+        - feature: "Database"
+          description: "Prisma migration for AgentMessage, AgentAllowlist models"
+          points: 3
+        - feature: "Testing"
+          description: "Audit module unit tests, interceptor integration tests"
+          points: 5
+      total_points: 26
+      deliverables:
+        - "AuditModule with AuditService and global interceptor"
+        - "Async audit write pipeline via BullMQ"
+        - "Admin and agent operations logged with sanitized details"
+        - "Database migration for inter-agent messaging tables"
+        - "60+ unit/integration tests for audit module"
+
+    - id: S6
+      name: "Sprint 6: Inter-Agent Messaging & Audit UI"
+      duration: "2 weeks"
+      dates: "Weeks 11-12"
+      goal: "Inter-agent messaging API, WebSocket feed, audit log viewer, security alerting"
+      stories:
+        - feature: "E7-F1"
+          description: "Structured inter-agent messaging API with allowlist enforcement"
+          points: 13
+        - feature: "E7-F5"
+          description: "WebSocket real-time message feed"
+          points: 5
+        - feature: "E8-F3"
+          description: "Audit log query API and viewer UI (tenant + admin)"
+          points: 8
+        - feature: "E8-F4"
+          description: "Security event alerting (rules engine + webhooks)"
+          points: 5
+        - feature: "E8-F5"
+          description: "Audit log retention and archival job"
+          points: 3
+      total_points: 34
+      deliverables:
+        - "Inter-agent messaging API with allowlist enforcement"
+        - "WebSocket /ws/messages for real-time streaming"
+        - "Audit log viewer in both dashboards"
+        - "Security alert rules engine with webhook delivery"
+        - "Daily audit archival job"
+
+    - id: S7
+      name: "Sprint 7: Communication Dashboard & Security Hardening"
+      duration: "2 weeks"
+      dates: "Weeks 13-14"
+      goal: "Message dashboard, communication graph editor, permission manifests, workflow templates"
+      stories:
+        - feature: "E7-F4"
+          description: "Agent communication allowlist graph editor"
+          points: 8
+        - feature: "E7-F3"
+          description: "Inter-agent message dashboard (timeline + filters + export)"
+          points: 8
+        - feature: "E9-F1"
+          description: "Skill permission manifests with validation and runtime logging"
+          points: 8
+        - feature: "E7-F2"
+          description: "Coordination workflow templates (3 templates, manual trigger)"
+          points: 5
+      total_points: 29
+      deliverables:
+        - "Interactive agent communication graph"
+        - "Message timeline dashboard with real-time updates"
+        - "Permission manifest validation pipeline"
+        - "3 workflow templates with trigger API"
+
+    - id: S8
+      name: "Sprint 8: Custom Skills SDK & Network Security"
+      duration: "2 weeks"
+      dates: "Weeks 15-16"
+      goal: "Skill SDK, private registry, network policy enforcement, Phase 2 E2E testing"
+      stories:
+        - feature: "E10-F1"
+          description: "Skill development SDK (npm package + CLI scaffold)"
+          points: 8
+        - feature: "E10-F2"
+          description: "Private skill registry (tenant-scoped custom skills)"
+          points: 8
+        - feature: "E9-F2"
+          description: "Network policy enforcement (derive from manifests)"
+          points: 8
+        - feature: "E10-F3"
+          description: "Skill validation and dry-run (static analysis)"
+          points: 5
+        - feature: "E9-F5"
+          description: "Security posture dashboard (admin)"
+          points: 5
+        - feature: "E2E-Phase2"
+          description: "Phase 2 E2E tests: audit, messaging, skills, security"
+          points: 5
+      total_points: 39
+      deliverables:
+        - "@aegis/skill-sdk npm package with CLI"
+        - "Private skill registry with versioning"
+        - "Network policy generation from manifests"
+        - "Security posture dashboard"
+        - "Phase 2 E2E test suite"
+      notes: "E9-F5 and E10-F3 are P2 -- deferrable if velocity drops (saves 10pts)"
+
 # =============================================================================
 # PHASE SUMMARY
 # =============================================================================
@@ -1640,8 +1763,16 @@ sprint_plan:
 phases:
   - id: mvp
     name: "MVP (Phase 1)"
+    status: "completed"
+    completed_at: "2026-02-08"
     timeline: "Weeks 1-8 (8 weeks)"
     epics: ["E1", "E2", "E3", "E4", "E5", "E6"]
+    actual_metrics:
+      total_story_points: 129
+      sprints_completed: 4
+      tests_written: "500+ unit/integration + 18 E2E"
+      backend_modules: 8
+      frontend_pages: 12
     goal: >
       Deliver a functional multi-tenant platform that can onboard 5-10 early
       customers. Platform admins can provision tenants, tenant admins can manage
@@ -1658,16 +1789,29 @@ phases:
     name: "Phase 2: Coordination & Security"
     timeline: "Weeks 9-16 (8 weeks)"
     epics: ["E7", "E8", "E9", "E10"]
+    sprint_plan: "docs/phase-2-sprint-plan.yaml"
+    priority_analysis: "docs/phase-2-priority-analysis.md"
+    risk_register: "docs/phase-2-risk-register.md"
+    exit_criteria_doc: "docs/phase-2-exit-criteria.md"
     goal: >
       Enable multi-agent coordination (the key differentiator), harden security
-      with permission manifests and network policies, and build comprehensive
-      audit trails for compliance. Enables enterprise security review conversations.
+      with permission manifests and network policies, build comprehensive audit
+      trails for enterprise compliance, and deliver custom skill SDK for tenant
+      extensibility. Transforms Aegis from "managed agent platform" into
+      "enterprise multi-agent coordination platform."
     exit_criteria:
-      - "Inter-agent messaging visible in dashboard"
-      - "All agent actions captured in audit trail"
-      - "Skill permission manifests enforced (soft)"
-      - "Custom skill SDK published and documented"
-      - "Penetration test completed with zero critical findings"
+      - "100% of API mutations captured in audit trail with sanitized details"
+      - "Audit log query returns results within 3 seconds for 30-day span"
+      - "Inter-agent messaging functional with allowlist enforcement"
+      - "Message delivery P95 latency under 2 seconds"
+      - "Real-time message dashboard with WebSocket feed"
+      - "100% of marketplace skills have valid permission manifests"
+      - "Network policy violations logged and alerted"
+      - "@aegis/skill-sdk published to npm with working scaffold CLI"
+      - "Private skill registry stores tenant-scoped custom skills"
+      - "Phase 2 E2E test suite passes in CI/CD"
+      - "Zero P0/P1 bugs open in Phase 2 features"
+      - "Breadfast pilot upgraded to Phase 2 features"
 
   - id: phase_3
     name: "Phase 3: Scale & Monetize"
@@ -1774,6 +1918,28 @@ dependency_map:
     - from: "E14"
       to: "E17"
       reason: "Delegated admin relies on SSO role mapping"
+    # Phase 2 intra-phase dependencies (added 2026-02-08)
+    - from: "E8-F1"
+      to: "E7-F1"
+      reason: "Inter-agent messaging requires audit interceptor for compliance logging"
+    - from: "E7-F1"
+      to: "E7-F3"
+      reason: "Message dashboard requires messaging API and data"
+    - from: "E7-F1"
+      to: "E7-F4"
+      reason: "Allowlist editor requires messaging infrastructure"
+    - from: "E8-F1"
+      to: "E8-F4"
+      reason: "Security alerting consumes audit events"
+    - from: "E9-F1"
+      to: "E9-F2"
+      reason: "Network policies derived from skill permission manifests"
+    - from: "E9-F1"
+      to: "E10-F1"
+      reason: "SDK must enforce manifest format defined by E9-F1"
+    - from: "E10-F1"
+      to: "E10-F2"
+      reason: "Private registry stores skills built with SDK"
 
 # =============================================================================
 # RISK REGISTER
@@ -1828,3 +1994,46 @@ risks:
     probability: "Medium"
     impact: "Medium"
     mitigation: "Automated security scanning in review pipeline; community ratings; revocation process"
+
+  # Phase 2 risks (added 2026-02-08) -- full details in docs/phase-2-risk-register.md
+  - id: R8
+    category: "Technical"
+    risk: "Audit interceptor adds latency to API responses"
+    probability: "Medium"
+    impact: "High"
+    mitigation: "Async audit writes via BullMQ; interceptor enqueues only, never awaits DB write"
+
+  - id: R9
+    category: "Technical"
+    risk: "Audit log table grows to millions of rows, causing slow queries"
+    probability: "High"
+    impact: "Medium"
+    mitigation: "PostgreSQL table partitioning by month; cursor-based pagination; daily archival of 90+ day logs"
+
+  - id: R10
+    category: "Technical"
+    risk: "Inter-agent message delivery latency exceeds 2-second target"
+    probability: "Low"
+    impact: "High"
+    mitigation: "BullMQ priority queues; Redis-cached allowlist lookups; load testing before sprint sign-off"
+
+  - id: R16
+    category: "Planning"
+    risk: "Sprint 8 overloaded at 39 story points"
+    probability: "High"
+    impact: "Medium"
+    mitigation: "E9-F5 and E10-F3 (P2, 10pts combined) explicitly deferrable to Phase 3"
+
+  - id: R17
+    category: "Market"
+    risk: "Anthropic Cowork adds multi-agent features during Phase 2"
+    probability: "Low"
+    impact: "High"
+    mitigation: "Focus on enterprise differentiation: audit trails, allowlist control, custom skill SDK"
+
+  - id: R18
+    category: "Business"
+    risk: "Breadfast pilot churn during Phase 2 development"
+    probability: "Medium"
+    impact: "High"
+    mitigation: "Weekly check-ins; early access to S5 audit features; share roadmap"
