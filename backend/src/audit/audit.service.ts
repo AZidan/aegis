@@ -148,7 +148,8 @@ export class AuditService {
     if (filters.tenantId) where.tenantId = filters.tenantId;
     if (filters.agentId) where.agentId = filters.agentId;
     if (filters.userId) where.userId = filters.userId;
-    if (filters.action) where.action = filters.action;
+    if (filters.action)
+      where.action = { startsWith: filters.action, mode: 'insensitive' };
     if (filters.targetType) where.targetType = filters.targetType;
     if (filters.severity) where.severity = filters.severity;
 
