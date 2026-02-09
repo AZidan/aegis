@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Bot,
+  Network,
   Puzzle,
   Users,
   FileText,
@@ -64,6 +65,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { label: 'Dashboard', href: ROUTES.DASHBOARD, icon: LayoutDashboard },
       { label: 'Agents', href: ROUTES.AGENTS, icon: Bot },
+      { label: 'Communication', href: ROUTES.ALLOWLIST, icon: Network },
       { label: 'Skill Marketplace', href: ROUTES.SKILLS, icon: Puzzle },
     ],
   },

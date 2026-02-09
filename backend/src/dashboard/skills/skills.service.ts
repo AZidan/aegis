@@ -10,6 +10,7 @@ import { AuditService } from '../../audit/audit.service';
 import { Prisma } from '../../../prisma/generated/client';
 import { BrowseSkillsQueryDto } from './dto/browse-skills-query.dto';
 import { InstallSkillDto } from './dto/install-skill.dto';
+import { PermissionService } from './permission.service';
 
 /**
  * Skills Service - Tenant: Skills
@@ -31,6 +32,7 @@ export class SkillsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
+    private readonly permissionService: PermissionService,
   ) {}
 
   // ==========================================================================
@@ -118,11 +120,7 @@ export class SkillsService {
         version: skill.version,
         rating: skill.rating,
         installCount: skill.installCount,
-        permissions: (skill.permissions as {
-          network: string[];
-          files: string[];
-          env: string[];
-        }) ?? { network: [], files: [], env: [] },
+        permissions: this.permissionService.normalizePermissions(skill.permissions),
         installed: installedSkillIds.has(skill.id),
       })),
       meta: {
@@ -175,11 +173,7 @@ export class SkillsService {
       version: skill.version,
       rating: skill.rating,
       installCount: skill.installCount,
-      permissions: (skill.permissions as {
-        network: string[];
-        files: string[];
-        env: string[];
-      }) ?? { network: [], files: [], env: [] },
+      permissions: this.permissionService.normalizePermissions(skill.permissions),
       documentation: skill.documentation ?? '',
       changelog: skill.changelog ?? '',
       reviews: [], // Reviews not yet implemented - placeholder per contract
@@ -207,6 +201,7 @@ export class SkillsService {
     // Verify agent belongs to tenant
     const agent = await this.prisma.agent.findFirst({
       where: { id: dto.agentId, tenantId },
+      select: { id: true, tenantId: true, toolPolicy: true },
     });
 
     if (!agent) {
@@ -225,6 +220,18 @@ export class SkillsService {
 
     if (existing) {
       throw new ConflictException('Skill is already installed on this agent');
+    }
+
+    // Validate permission manifest
+    const manifest = this.permissionService.normalizePermissions(skill.permissions);
+
+    // Check compatibility with agent's tool policy
+    const toolPolicy = (agent.toolPolicy as { allow: string[] }) ?? { allow: [] };
+    const { compatible, violations } = this.permissionService.checkPolicyCompatibility(manifest, toolPolicy);
+    if (!compatible) {
+      throw new ConflictException(
+        `Skill requires permissions denied by agent tool policy: ${violations.join('; ')}`,
+      );
     }
 
     // Create installation

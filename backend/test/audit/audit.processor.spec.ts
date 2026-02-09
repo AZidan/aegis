@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getQueueToken } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { AuditProcessor } from '../../src/audit/audit.processor';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { AuditEventPayload } from '../../src/audit/interfaces/audit-event.interface';
+import { ALERT_QUEUE_NAME } from '../../src/alert/alert.constants';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -12,6 +14,10 @@ const mockPrismaService = {
   auditLog: {
     create: jest.fn().mockResolvedValue({}),
   },
+};
+
+const mockAlertQueue = {
+  add: jest.fn().mockResolvedValue({}),
 };
 
 const createMockPayload = (
@@ -51,6 +57,7 @@ describe('AuditProcessor', () => {
       providers: [
         AuditProcessor,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: getQueueToken(ALERT_QUEUE_NAME), useValue: mockAlertQueue },
       ],
     }).compile();
 

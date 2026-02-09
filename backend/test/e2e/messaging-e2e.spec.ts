@@ -50,46 +50,49 @@ beforeAll(async () => {
 
   await app.init();
   prisma = moduleFixture.get<PrismaService>(PrismaService);
+
+  // Clean up stale E2E agents from previous failed runs to avoid plan-limit errors.
+  // The audit_logs immutability trigger blocks cascading SET NULL, so we must
+  // temporarily disable it, null out FKs, then delete the agents.
+  const staleAgents = await prisma.agent.findMany({
+    where: { name: { startsWith: 'E2E ' } },
+    select: { id: true },
+  });
+  if (staleAgents.length > 0) {
+    const ids = staleAgents.map((a) => a.id);
+    // Disable the immutability trigger so we can null out audit_log references
+    await prisma.$executeRawUnsafe(`ALTER TABLE audit_logs DISABLE TRIGGER ALL`);
+    for (const id of ids) {
+      await prisma.$executeRawUnsafe(`UPDATE audit_logs SET "agentId" = NULL WHERE "agentId" = $1`, id);
+      await prisma.agentAllowlist.deleteMany({ where: { OR: [{ agentId: id }, { allowedAgentId: id }] } }).catch(() => {});
+      await prisma.agentMessage.deleteMany({ where: { OR: [{ senderId: id }, { recipientId: id }] } }).catch(() => {});
+      await prisma.skillInstallation.deleteMany({ where: { agentId: id } }).catch(() => {});
+      await prisma.channelRouting.deleteMany({ where: { agentId: id } }).catch(() => {});
+      await prisma.agent.delete({ where: { id } }).catch(() => {});
+    }
+    await prisma.$executeRawUnsafe(`ALTER TABLE audit_logs ENABLE TRIGGER ALL`);
+  }
 }, 30000);
 
 afterAll(async () => {
-  // Clean up test data in reverse dependency order
+  // Clean up test data — disable audit_logs immutability trigger to allow cascading
   try {
-    if (sentMessageId) {
-      await prisma.agentMessage
-        .delete({ where: { id: sentMessageId } })
-        .catch(() => {});
+    await prisma.$executeRawUnsafe(`ALTER TABLE audit_logs DISABLE TRIGGER ALL`);
+
+    const idsToClean = [agentAId, agentBId].filter(Boolean) as string[];
+    for (const id of idsToClean) {
+      await prisma.$executeRawUnsafe(`UPDATE audit_logs SET "agentId" = NULL WHERE "agentId" = $1`, id);
+      await prisma.agentAllowlist.deleteMany({ where: { OR: [{ agentId: id }, { allowedAgentId: id }] } }).catch(() => {});
+      await prisma.agentMessage.deleteMany({ where: { OR: [{ senderId: id }, { recipientId: id }] } }).catch(() => {});
+      await prisma.skillInstallation.deleteMany({ where: { agentId: id } }).catch(() => {});
+      await prisma.channelRouting.deleteMany({ where: { agentId: id } }).catch(() => {});
+      await prisma.agent.delete({ where: { id } }).catch(() => {});
     }
-    if (agentAId) {
-      await prisma.agentAllowlist
-        .deleteMany({ where: { agentId: agentAId } })
-        .catch(() => {});
-      await prisma.agentMessage
-        .deleteMany({
-          where: { OR: [{ senderId: agentAId }, { recipientId: agentAId }] },
-        })
-        .catch(() => {});
-      await prisma.skillInstallation
-        .deleteMany({ where: { agentId: agentAId } })
-        .catch(() => {});
-      await prisma.agent.delete({ where: { id: agentAId } }).catch(() => {});
-    }
-    if (agentBId) {
-      await prisma.agentAllowlist
-        .deleteMany({ where: { agentId: agentBId } })
-        .catch(() => {});
-      await prisma.agentMessage
-        .deleteMany({
-          where: { OR: [{ senderId: agentBId }, { recipientId: agentBId }] },
-        })
-        .catch(() => {});
-      await prisma.skillInstallation
-        .deleteMany({ where: { agentId: agentBId } })
-        .catch(() => {});
-      await prisma.agent.delete({ where: { id: agentBId } }).catch(() => {});
-    }
+
+    await prisma.$executeRawUnsafe(`ALTER TABLE audit_logs ENABLE TRIGGER ALL`);
   } catch {
-    // Swallow cleanup errors
+    // Swallow cleanup errors — re-enable trigger on failure
+    await prisma.$executeRawUnsafe(`ALTER TABLE audit_logs ENABLE TRIGGER ALL`).catch(() => {});
   }
 
   await app.close();

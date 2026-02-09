@@ -12,6 +12,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuditService } from '../../src/audit/audit.service';
 import { AgentsService } from '../../src/dashboard/agents/agents.service';
 import { SkillsService } from '../../src/dashboard/skills/skills.service';
+import { PermissionService } from '../../src/dashboard/skills/permission.service';
 import { TenantsService } from '../../src/admin/tenants/tenants.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvisioningService } from '../../src/provisioning/provisioning.service';
@@ -290,6 +291,7 @@ describe('SkillsService audit integration', () => {
         SkillsService,
         { provide: PrismaService, useValue: prisma },
         { provide: AuditService, useValue: auditService },
+        { provide: PermissionService, useValue: { normalizePermissions: jest.fn((p: any) => p), checkPolicyCompatibility: jest.fn().mockReturnValue({ compatible: true, violations: [] }) } },
       ],
     }).compile();
 
@@ -540,6 +542,7 @@ describe('Cross-cutting audit integration', () => {
         SkillsService,
         { provide: PrismaService, useValue: skillsPrisma },
         { provide: AuditService, useValue: skillsAudit },
+        { provide: PermissionService, useValue: { normalizePermissions: jest.fn((p: any) => p), checkPolicyCompatibility: jest.fn().mockReturnValue({ compatible: true, violations: [] }) } },
       ],
     }).compile();
     skillsService = skillsModule.get<SkillsService>(SkillsService);

@@ -6,6 +6,7 @@ import {
 import { SkillsService } from '../../../src/dashboard/skills/skills.service';
 import { PrismaService } from '../../../src/prisma/prisma.service';
 import { AuditService } from '../../../src/audit/audit.service';
+import { PermissionService } from '../../../src/dashboard/skills/permission.service';
 
 // ---------------------------------------------------------------------------
 // Test Data
@@ -81,6 +82,7 @@ describe('SkillsService - Core Skill Uninstall Guard', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SkillsService,
+        PermissionService,
         { provide: PrismaService, useValue: prisma },
         { provide: AuditService, useValue: { logAction: jest.fn() } },
       ],

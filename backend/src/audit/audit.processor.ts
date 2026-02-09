@@ -1,9 +1,10 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { Processor, WorkerHost, InjectQueue } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
-import { Job } from 'bullmq';
+import { Job, Queue } from 'bullmq';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditEventPayload } from './interfaces/audit-event.interface';
 import { AUDIT_QUEUE_NAME } from './audit.constants';
+import { ALERT_QUEUE_NAME } from '../alert/alert.constants';
 
 /**
  * AuditProcessor
@@ -18,7 +19,10 @@ import { AUDIT_QUEUE_NAME } from './audit.constants';
 export class AuditProcessor extends WorkerHost {
   private readonly logger = new Logger(AuditProcessor.name);
 
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    @InjectQueue(ALERT_QUEUE_NAME) private readonly alertQueue: Queue,
+  ) {
     super();
   }
 
@@ -47,6 +51,20 @@ export class AuditProcessor extends WorkerHost {
       this.logger.debug(
         `Audit log written: ${event.action} by ${event.actorName} (${event.actorType})`,
       );
+
+      // Fire-and-forget: enqueue event for alert evaluation
+      try {
+        await this.alertQueue.add(
+          'evaluate-event',
+          { event },
+          { removeOnComplete: true, removeOnFail: 100 },
+        );
+      } catch (alertError) {
+        // Alert queue failures must not affect audit processing
+        this.logger.warn(
+          `Failed to enqueue alert evaluation: ${alertError instanceof Error ? alertError.message : String(alertError)}`,
+        );
+      }
     } catch (error) {
       // Audit failures must never crash the app — log and continue
       this.logger.error(

@@ -180,6 +180,7 @@ export const ROUTES = {
   // Tenant routes
   DASHBOARD: '/dashboard',
   AGENTS: '/dashboard/agents',
+  ALLOWLIST: '/dashboard/agents/allowlist',
   AGENT_DETAIL: (id: string) => `/dashboard/agents/${id}`,
   AGENT_CREATE: '/dashboard/agents/create',
   SKILLS: '/dashboard/skills',

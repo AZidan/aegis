@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SkillsController } from './skills.controller';
 import { SkillsService } from './skills.service';
+import { PermissionService } from './permission.service';
 
 /**
  * Skills Module - Tenant: Skills
@@ -11,7 +12,7 @@ import { SkillsService } from './skills.service';
  */
 @Module({
   controllers: [SkillsController],
-  providers: [SkillsService],
-  exports: [SkillsService],
+  providers: [SkillsService, PermissionService],
+  exports: [SkillsService, PermissionService],
 })
 export class SkillsModule {}
