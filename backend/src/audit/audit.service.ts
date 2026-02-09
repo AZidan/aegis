@@ -11,6 +11,7 @@ import {
   REDACTED_VALUE,
   AUDIT_PAGE_SIZE_DEFAULT,
   AUDIT_PAGE_SIZE_MAX,
+  AUDIT_EXPORT_MAX_ROWS,
 } from './audit.constants';
 
 /**
@@ -19,6 +20,7 @@ import {
  * Core service for the audit subsystem. Provides:
  * - logAction(): enqueues an audit event to BullMQ (fire-and-forget, zero latency impact)
  * - queryLogs(): cursor-based paginated queries against the audit_logs table
+ * - exportLogs(): bulk fetch for CSV/JSON export (max 10,000 rows, no cursor)
  *
  * Sensitive fields (passwords, tokens, secrets) are sanitized BEFORE enqueuing,
  * ensuring they never enter the queue or database.
@@ -79,21 +81,7 @@ export class AuditService {
       AUDIT_PAGE_SIZE_MAX,
     );
 
-    const where: Record<string, unknown> = {};
-
-    if (filters.tenantId) where.tenantId = filters.tenantId;
-    if (filters.agentId) where.agentId = filters.agentId;
-    if (filters.userId) where.userId = filters.userId;
-    if (filters.action) where.action = filters.action;
-    if (filters.targetType) where.targetType = filters.targetType;
-    if (filters.severity) where.severity = filters.severity;
-
-    if (filters.dateFrom || filters.dateTo) {
-      const timestamp: Record<string, Date> = {};
-      if (filters.dateFrom) timestamp.gte = filters.dateFrom;
-      if (filters.dateTo) timestamp.lte = filters.dateTo;
-      where.timestamp = timestamp;
-    }
+    const where = this.buildWhereClause(filters);
 
     const queryArgs: Record<string, unknown> = {
       where,
@@ -120,6 +108,65 @@ export class AuditService {
         nextCursor,
       },
     };
+  }
+
+  /**
+   * Export audit logs without cursor pagination.
+   *
+   * Returns a flat array of audit log records, ordered by timestamp DESC,
+   * limited to `maxRows` (default 10,000). Used by the export endpoint
+   * for CSV/JSON streaming.
+   */
+  async exportLogs(
+    filters: QueryAuditLogDto & { maxRows?: number },
+  ): Promise<any[]> {
+    const limit = Math.min(
+      filters.maxRows || AUDIT_EXPORT_MAX_ROWS,
+      AUDIT_EXPORT_MAX_ROWS,
+    );
+
+    const where = this.buildWhereClause(filters);
+
+    const results = await this.prisma.auditLog.findMany({
+      where,
+      orderBy: { timestamp: 'desc' as const },
+      take: limit,
+    } as any);
+
+    return results;
+  }
+
+  /**
+   * Build the Prisma where clause from filter parameters.
+   * Shared by queryLogs() and exportLogs().
+   */
+  private buildWhereClause(
+    filters: QueryAuditLogDto,
+  ): Record<string, unknown> {
+    const where: Record<string, unknown> = {};
+
+    if (filters.tenantId) where.tenantId = filters.tenantId;
+    if (filters.agentId) where.agentId = filters.agentId;
+    if (filters.userId) where.userId = filters.userId;
+    if (filters.action) where.action = filters.action;
+    if (filters.targetType) where.targetType = filters.targetType;
+    if (filters.severity) where.severity = filters.severity;
+
+    if (filters.dateFrom || filters.dateTo) {
+      const timestamp: Record<string, Date> = {};
+      if (filters.dateFrom) timestamp.gte = filters.dateFrom;
+      if (filters.dateTo) timestamp.lte = filters.dateTo;
+      where.timestamp = timestamp;
+    }
+
+    if (filters.search) {
+      where.OR = [
+        { action: { contains: filters.search, mode: 'insensitive' } },
+        { actorName: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+
+    return where;
   }
 
   /**
