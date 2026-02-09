@@ -23,3 +23,30 @@ export const REDACTED_VALUE = '[REDACTED]';
  */
 export const AUDIT_PAGE_SIZE_DEFAULT = 50;
 export const AUDIT_PAGE_SIZE_MAX = 100;
+
+/**
+ * Maximum number of rows for audit log exports.
+ * Prevents excessive memory/CPU usage for bulk exports.
+ */
+export const AUDIT_EXPORT_MAX_ROWS = 10_000;
+
+/**
+ * CSV column headers for audit log exports.
+ */
+export const AUDIT_CSV_HEADERS = [
+  'id',
+  'timestamp',
+  'actorType',
+  'actorId',
+  'actorName',
+  'action',
+  'targetType',
+  'targetId',
+  'severity',
+  'tenantId',
+  'userId',
+  'agentId',
+  'ipAddress',
+  'userAgent',
+  'details',
+] as const;

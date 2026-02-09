@@ -4,6 +4,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuditService } from './audit.service';
 import { AuditProcessor } from './audit.processor';
 import { AuditInterceptor } from './audit.interceptor';
+import { AuditController } from './audit.controller';
+import { AuditAdminController } from './audit-admin.controller';
 import { AUDIT_QUEUE_NAME } from './audit.constants';
 
 /**
@@ -12,9 +14,11 @@ import { AUDIT_QUEUE_NAME } from './audit.constants';
  * Global module providing comprehensive audit logging infrastructure.
  *
  * Features:
- * - AuditService: fire-and-forget logAction() + cursor-paginated queryLogs()
+ * - AuditService: fire-and-forget logAction() + cursor-paginated queryLogs() + exportLogs()
  * - AuditProcessor: BullMQ worker that writes audit events to DB asynchronously
  * - AuditInterceptor: global interceptor capturing all POST/PUT/PATCH/DELETE requests
+ * - AuditController: tenant dashboard audit endpoints (GET /api/dashboard/audit)
+ * - AuditAdminController: platform admin audit endpoints (GET /api/admin/audit-logs)
  *
  * The module is marked @Global() so AuditService can be injected from any module
  * without explicit imports.
@@ -26,6 +30,7 @@ import { AUDIT_QUEUE_NAME } from './audit.constants';
 @Global()
 @Module({
   imports: [BullModule.registerQueue({ name: AUDIT_QUEUE_NAME })],
+  controllers: [AuditController, AuditAdminController],
   providers: [
     AuditService,
     AuditProcessor,
