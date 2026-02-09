@@ -97,6 +97,7 @@ enum AuditTargetType {
   user
   team_member
   api_key
+  channel
 }
 
 enum AuditSeverity {
@@ -122,6 +123,34 @@ enum InviteStatus {
   accepted
   expired
   cancelled
+}
+
+// ============================================================================
+// CHANNEL INTEGRATION (Sprint 6 — E11)
+// ============================================================================
+
+enum ChannelPlatform {
+  SLACK
+  TEAMS
+  DISCORD
+  GOOGLE_CHAT
+  @@map("channel_platform")
+}
+
+enum ConnectionStatus {
+  pending
+  active
+  disconnected
+  error
+  @@map("connection_status")
+}
+
+enum RouteType {
+  slash_command
+  channel_mapping
+  user_mapping
+  tenant_default
+  @@map("route_type")
 }
 
 // ============================================================================
@@ -240,7 +269,9 @@ model Tenant {
   containerHealth ContainerHealth[]
   alerts          Alert[]
 
-  configHistory   TenantConfigHistory[]
+  configHistory      TenantConfigHistory[]
+  channelConnections ChannelConnection[]
+
   @@index([companyName])
   @@index([status])
   @@index([plan])
@@ -316,6 +347,9 @@ model Agent {
   messagesReceived AgentMessage[]    @relation("MessagesReceived")
   allowlistOwner   AgentAllowlist[]  @relation("AllowlistOwner")
   allowlistTarget  AgentAllowlist[]  @relation("AllowlistTarget")
+
+  // Channel integration (Sprint 6 — E11)
+  channelRouting   ChannelRouting[]  @relation("ChannelRouting")
 
   @@index([tenantId])
   @@index([status])
@@ -746,6 +780,52 @@ model AgentAllowlist {
   @@unique([agentId, allowedAgentId])
   @@index([allowedAgentId])
   @@map("agent_allowlists")
+}
+
+// ============================================================================
+// CHANNEL INTEGRATION MODELS (Sprint 6 — E11)
+// ============================================================================
+
+/// ChannelConnection - Platform connections (Slack, Teams, Discord, Google Chat) per tenant
+model ChannelConnection {
+  id              String           @id @default(uuid())
+  tenantId        String
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  platform        ChannelPlatform
+  workspaceId     String
+  workspaceName   String
+  credentials     Json
+  status          ConnectionStatus @default(pending)
+  connectedAt     DateTime?
+  lastHealthCheck DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  routingRules    ChannelRouting[]
+
+  @@unique([tenantId, platform, workspaceId])
+  @@index([tenantId])
+  @@index([platform])
+  @@map("channel_connections")
+}
+
+/// ChannelRouting - Routing rules that map platform events to agents
+model ChannelRouting {
+  id               String            @id @default(uuid())
+  connectionId     String
+  connection       ChannelConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  routeType        RouteType
+  sourceIdentifier String
+  agentId          String
+  agent            Agent             @relation("ChannelRouting", fields: [agentId], references: [id], onDelete: Cascade)
+  priority         Int               @default(0)
+  isActive         Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@unique([connectionId, routeType, sourceIdentifier])
+  @@index([connectionId])
+  @@index([agentId])
+  @@map("channel_routing")
 }
 
 // ============================================================================
