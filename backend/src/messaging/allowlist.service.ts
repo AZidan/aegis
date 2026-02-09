@@ -101,6 +101,12 @@ export class AllowlistService {
       }
     }
 
+    // Fetch old entries for cache invalidation
+    const oldEntries = await this.prisma.agentAllowlist.findMany({
+      where: { agentId },
+      select: { allowedAgentId: true },
+    });
+
     // Transaction: delete all existing entries, then create new ones
     await this.prisma.$transaction(async (tx) => {
       await tx.agentAllowlist.deleteMany({ where: { agentId } });
@@ -115,10 +121,14 @@ export class AllowlistService {
       }
     });
 
-    // Invalidate cache for all affected agents
-    await this.invalidateCache(agentId);
-    for (const entry of entries) {
-      await this.invalidateCache(entry.allowedAgentId);
+    // Invalidate cache for old and new entry pairs (both directions)
+    const allTargetIds = new Set([
+      ...oldEntries.map((e) => e.allowedAgentId),
+      ...entries.map((e) => e.allowedAgentId),
+    ]);
+    for (const targetId of allTargetIds) {
+      await this.cache.del(`allowlist:${agentId}:${targetId}`);
+      await this.cache.del(`allowlist:${targetId}:${agentId}`);
     }
 
     // Audit log (fire-and-forget — no await)
@@ -234,15 +244,4 @@ export class AllowlistService {
     };
   }
 
-  /**
-   * Invalidate cached allowlist entries for an agent.
-   * With basic cache-manager we cannot enumerate keys by prefix,
-   * so we rely on TTL expiry. With 60s TTL this is acceptable for
-   * the consistency/performance trade-off.
-   */
-  private async invalidateCache(_agentId: string): Promise<void> {
-    // We can't enumerate all cache keys for a prefix with basic cache-manager,
-    // so we rely on TTL expiry. For targeted invalidation, we'd need the specific key.
-    // In practice, with 60s TTL this is acceptable.
-  }
 }

@@ -48,7 +48,7 @@ const MOCK_ALLOWLIST_ENTRY = {
 describe('AllowlistService', () => {
   let service: AllowlistService;
   let mockAuditService: { logAction: jest.Mock };
-  let mockCache: { get: jest.Mock; set: jest.Mock };
+  let mockCache: { get: jest.Mock; set: jest.Mock; del: jest.Mock };
   let prisma: {
     agent: { findFirst: jest.Mock; findMany: jest.Mock };
     agentAllowlist: {
@@ -65,6 +65,7 @@ describe('AllowlistService', () => {
     mockCache = {
       get: jest.fn(),
       set: jest.fn().mockResolvedValue(undefined),
+      del: jest.fn().mockResolvedValue(undefined),
     };
     prisma = {
       agent: { findFirst: jest.fn(), findMany: jest.fn() },
@@ -144,6 +145,7 @@ describe('AllowlistService', () => {
     it('should delete existing and create new entries in a transaction', async () => {
       prisma.agent.findFirst.mockResolvedValue(MOCK_AGENT_1);
       prisma.agent.findMany.mockResolvedValue([{ id: 'agent-2' }]);
+      prisma.agentAllowlist.findMany.mockResolvedValue([]); // no old entries
 
       const txDeleteMany = jest.fn().mockResolvedValue({ count: 1 });
       const txCreateMany = jest.fn().mockResolvedValue({ count: 1 });
@@ -186,6 +188,7 @@ describe('AllowlistService', () => {
         { id: 'agent-2' },
         { id: 'agent-3' },
       ]);
+      prisma.agentAllowlist.findMany.mockResolvedValue([]); // no old entries
       prisma.$transaction.mockImplementation(async (cb) => {
         await cb({
           agentAllowlist: {
@@ -228,6 +231,7 @@ describe('AllowlistService', () => {
     it('should call auditService.logAction with allowlist_updated', async () => {
       prisma.agent.findFirst.mockResolvedValue(MOCK_AGENT_1);
       prisma.agent.findMany.mockResolvedValue([{ id: 'agent-2' }]);
+      prisma.agentAllowlist.findMany.mockResolvedValue([]); // no old entries
       prisma.$transaction.mockImplementation(async (cb) => {
         await cb({
           agentAllowlist: {
