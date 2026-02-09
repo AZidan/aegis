@@ -9,6 +9,7 @@ import { Queue } from 'bullmq';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { AllowlistService } from './allowlist.service';
+import { MessagingGateway } from './messaging.gateway';
 import { MessageEventPayload } from './interfaces/message-event.interface';
 import { SendMessageDto } from './dto/send-message.dto';
 import { QueryMessagesDto } from './dto/query-messages.dto';
@@ -40,6 +41,7 @@ export class MessagingService {
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
     private readonly allowlistService: AllowlistService,
+    private readonly gateway: MessagingGateway,
   ) {}
 
   /**
@@ -129,6 +131,21 @@ export class MessagingService {
       tenantId,
       agentId: senderId,
       userId,
+    });
+
+    // Emit WebSocket event to tenant room (fire-and-forget)
+    this.gateway.emitMessageEvent(tenantId, {
+      type: 'message_sent',
+      data: {
+        messageId: message.id,
+        senderId,
+        senderName: sender.name,
+        recipientId: dto.recipientId,
+        recipientName: recipient.name,
+        type: dto.type,
+        timestamp: message.createdAt.toISOString(),
+        correlationId: dto.correlationId ?? null,
+      },
     });
 
     return {

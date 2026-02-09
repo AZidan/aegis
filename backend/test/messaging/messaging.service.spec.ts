@@ -11,6 +11,7 @@ import {
 } from '../../src/messaging/messaging.constants';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { SendMessageDto } from '../../src/messaging/dto/send-message.dto';
+import { MessagingGateway } from '../../src/messaging/messaging.gateway';
 
 // ---------------------------------------------------------------------------
 // Test Data Factories
@@ -101,6 +102,7 @@ describe('MessagingService', () => {
         { provide: PrismaService, useValue: prisma },
         { provide: AuditService, useValue: mockAuditService },
         { provide: AllowlistService, useValue: mockAllowlistService },
+        { provide: MessagingGateway, useValue: { emitMessageEvent: jest.fn() } },
       ],
     }).compile();
 
