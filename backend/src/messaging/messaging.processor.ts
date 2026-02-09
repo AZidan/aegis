@@ -3,6 +3,7 @@ import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { PrismaService } from '../prisma/prisma.service';
 import { MessageEventPayload } from './interfaces/message-event.interface';
+import { MessagingGateway } from './messaging.gateway';
 import { MESSAGING_QUEUE_NAME } from './messaging.constants';
 
 /**
@@ -23,7 +24,10 @@ import { MESSAGING_QUEUE_NAME } from './messaging.constants';
 export class MessagingProcessor extends WorkerHost {
   private readonly logger = new Logger(MessagingProcessor.name);
 
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly gateway: MessagingGateway,
+  ) {
     super();
   }
 
@@ -31,13 +35,35 @@ export class MessagingProcessor extends WorkerHost {
     try {
       const { messageId } = job.data;
 
-      await this.prisma.agentMessage.update({
+      const message = await this.prisma.agentMessage.update({
         where: { id: messageId },
         data: {
           status: 'delivered',
           deliveredAt: new Date(),
         },
+        include: {
+          sender: { select: { id: true, name: true, tenantId: true } },
+          recipient: { select: { id: true, name: true } },
+        },
       });
+
+      // Emit WebSocket event to tenant room (fire-and-forget)
+      const tenantId = (message.sender as any)?.tenantId;
+      if (tenantId) {
+        this.gateway.emitMessageEvent(tenantId, {
+          type: 'message_delivered',
+          data: {
+            messageId: message.id,
+            senderId: message.senderId,
+            senderName: (message.sender as any)?.name ?? 'Unknown',
+            recipientId: message.recipientId,
+            recipientName: (message.recipient as any)?.name ?? 'Unknown',
+            type: message.type,
+            timestamp: new Date().toISOString(),
+            correlationId: message.correlationId,
+          },
+        });
+      }
 
       this.logger.debug(
         `Message delivered: ${messageId} from ${job.data.senderId} to ${job.data.recipientId}`,
@@ -45,10 +71,32 @@ export class MessagingProcessor extends WorkerHost {
     } catch (error) {
       // On error, mark as failed but never re-throw
       try {
-        await this.prisma.agentMessage.update({
+        const failed = await this.prisma.agentMessage.update({
           where: { id: job.data.messageId },
           data: { status: 'failed' },
+          include: {
+            sender: { select: { id: true, name: true, tenantId: true } },
+            recipient: { select: { id: true, name: true } },
+          },
         });
+
+        // Emit failure event to tenant room
+        const tenantId = (failed.sender as any)?.tenantId;
+        if (tenantId) {
+          this.gateway.emitMessageEvent(tenantId, {
+            type: 'message_failed',
+            data: {
+              messageId: failed.id,
+              senderId: failed.senderId,
+              senderName: (failed.sender as any)?.name ?? 'Unknown',
+              recipientId: failed.recipientId,
+              recipientName: (failed.recipient as any)?.name ?? 'Unknown',
+              type: failed.type,
+              timestamp: new Date().toISOString(),
+              correlationId: failed.correlationId,
+            },
+          });
+        }
       } catch (updateError) {
         // If even the status update fails, just log it
         this.logger.error(

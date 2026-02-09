@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Job } from 'bullmq';
 import { MessagingProcessor } from '../../src/messaging/messaging.processor';
 import { PrismaService } from '../../src/prisma/prisma.service';
+import { MessagingGateway } from '../../src/messaging/messaging.gateway';
 import { MessageEventPayload } from '../../src/messaging/interfaces/message-event.interface';
 
 // ---------------------------------------------------------------------------
@@ -10,8 +11,21 @@ import { MessageEventPayload } from '../../src/messaging/interfaces/message-even
 
 const mockPrismaService = {
   agentMessage: {
-    update: jest.fn().mockResolvedValue({}),
+    update: jest.fn().mockResolvedValue({
+      id: 'msg-1',
+      senderId: 'agent-1',
+      recipientId: 'agent-2',
+      type: 'task_handoff',
+      status: 'delivered',
+      correlationId: null,
+      sender: { id: 'agent-1', name: 'Sender', tenantId: 'tenant-1' },
+      recipient: { id: 'agent-2', name: 'Recipient' },
+    }),
   },
+};
+
+const mockGateway = {
+  emitMessageEvent: jest.fn(),
 };
 
 const createMockPayload = (
@@ -44,6 +58,7 @@ describe('MessagingProcessor', () => {
       providers: [
         MessagingProcessor,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: MessagingGateway, useValue: mockGateway },
       ],
     }).compile();
 
@@ -105,7 +120,16 @@ describe('MessagingProcessor', () => {
     it('should mark message as failed when delivery fails', async () => {
       mockPrismaService.agentMessage.update
         .mockRejectedValueOnce(new Error('Database connection lost'))
-        .mockResolvedValueOnce({});
+        .mockResolvedValueOnce({
+          id: 'msg-1',
+          senderId: 'agent-1',
+          recipientId: 'agent-2',
+          type: 'task_handoff',
+          status: 'failed',
+          correlationId: null,
+          sender: { id: 'agent-1', name: 'Sender', tenantId: 'tenant-1' },
+          recipient: { id: 'agent-2', name: 'Recipient' },
+        });
 
       const payload = createMockPayload();
       const job = createMockJob(payload);
@@ -113,10 +137,13 @@ describe('MessagingProcessor', () => {
       await processor.process(job);
 
       expect(mockPrismaService.agentMessage.update).toHaveBeenCalledTimes(2);
-      expect(mockPrismaService.agentMessage.update).toHaveBeenNthCalledWith(2, {
-        where: { id: 'msg-1' },
-        data: { status: 'failed' },
-      });
+      expect(mockPrismaService.agentMessage.update).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          where: { id: 'msg-1' },
+          data: { status: 'failed' },
+        }),
+      );
     });
 
     it('should not throw when delivery fails (error is caught)', async () => {
@@ -144,7 +171,16 @@ describe('MessagingProcessor', () => {
 
       mockPrismaService.agentMessage.update
         .mockRejectedValueOnce(new Error('Unique constraint violation'))
-        .mockResolvedValueOnce({});
+        .mockResolvedValueOnce({
+          id: 'msg-1',
+          senderId: 'agent-1',
+          recipientId: 'agent-2',
+          type: 'task_handoff',
+          status: 'failed',
+          correlationId: null,
+          sender: { id: 'agent-1', name: 'Sender', tenantId: 'tenant-1' },
+          recipient: { id: 'agent-2', name: 'Recipient' },
+        });
 
       const payload = createMockPayload();
       const job = createMockJob(payload);
