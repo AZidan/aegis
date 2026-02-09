@@ -6,7 +6,7 @@ export interface AuditEventPayload {
   actorId: string;
   actorName: string;
   action: string;
-  targetType: 'agent' | 'skill' | 'tenant' | 'user' | 'team_member' | 'api_key';
+  targetType: 'agent' | 'skill' | 'tenant' | 'user' | 'team_member' | 'api_key' | 'channel';
   targetId: string;
   details?: Record<string, unknown> | null;
   severity: 'info' | 'warning' | 'error';

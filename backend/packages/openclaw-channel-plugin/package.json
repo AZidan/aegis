@@ -1,0 +1,26 @@
+{
+  "name": "@aegis/openclaw-channel-plugin",
+  "version": "0.1.0",
+  "description": "OpenClaw plugin for Aegis channel integration — bridges platform messages (Slack, Teams, Discord, Google Chat) to the Aegis proxy and back.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "aegis",
+    "openclaw",
+    "channel",
+    "plugin",
+    "slack",
+    "teams",
+    "discord"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

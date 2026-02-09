@@ -5,6 +5,7 @@ import { StatsModule } from './stats/stats.module';
 import { RolesModule } from './roles/roles.module';
 import { SkillsModule } from './skills/skills.module';
 import { MessagingModule } from '../messaging/messaging.module';
+import { ChannelsModule } from '../channels/channels.module';
 
 /**
  * Dashboard Module - Parent module for all tenant-facing routes at /api/dashboard/*
@@ -16,8 +17,9 @@ import { MessagingModule } from '../messaging/messaging.module';
  * - RolesModule: Agent role configuration (dynamic from DB)
  * - SkillsModule: Skill marketplace, installation, and management
  * - MessagingModule: Inter-agent messaging and allowlist management
+ * - ChannelsModule: Channel platform connections and routing rules
  */
 @Module({
-  imports: [AgentsModule, ToolsModule, StatsModule, RolesModule, SkillsModule, MessagingModule],
+  imports: [AgentsModule, ToolsModule, StatsModule, RolesModule, SkillsModule, MessagingModule, ChannelsModule],
 })
 export class DashboardModule {}
