@@ -115,6 +115,23 @@ describe('KubernetesOrchestratorService', () => {
     expect(appsApiMock.createNamespacedDeployment).toHaveBeenCalled();
     expect(coreApiMock.createNamespacedService).toHaveBeenCalled();
     expect(networkingApiMock.createNamespacedNetworkPolicy).toHaveBeenCalled();
+    expect(appsApiMock.createNamespacedDeployment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({
+          spec: expect.objectContaining({
+            template: expect.objectContaining({
+              spec: expect.objectContaining({
+                volumes: expect.arrayContaining([
+                  expect.objectContaining({
+                    name: 'openclaw-config',
+                  }),
+                ]),
+              }),
+            }),
+          }),
+        }),
+      }),
+    );
   });
 
   it('getStatus should return healthy when replicas are ready', async () => {
