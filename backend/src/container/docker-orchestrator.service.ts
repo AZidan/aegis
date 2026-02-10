@@ -1,9 +1,7 @@
-import { execFile } from 'node:child_process';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { once } from 'node:events';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import Docker from 'dockerode';
 import { ContainerOrchestrator } from './interfaces/container-orchestrator.interface';
 import {
   ContainerConfigUpdate,
@@ -21,9 +19,11 @@ import {
 @Injectable()
 export class DockerOrchestratorService implements ContainerOrchestrator {
   private readonly logger = new Logger(DockerOrchestratorService.name);
-  private readonly commandTimeoutMs = 15_000;
+  private readonly docker: Docker;
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) {
+    this.docker = this.createDockerClient();
+  }
 
   async create(options: ContainerCreateOptions): Promise<ContainerHandle> {
     const hostPort =
@@ -49,79 +49,67 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
 
     await this.ensureNetwork(networkName);
 
-    const args: string[] = [
-      'run',
-      '-d',
-      '--name',
+    const env = Object.entries(options.environment ?? {}).map(
+      ([key, value]) => `${key}=${value}`,
+    );
+    const memoryBytes = options.resourceLimits?.memoryMb
+      ? options.resourceLimits.memoryMb * 1024 * 1024
+      : undefined;
+    const nanoCpus = options.resourceLimits?.cpu
+      ? Math.round(Number(options.resourceLimits.cpu) * 1_000_000_000)
+      : undefined;
+
+    const container = await this.docker.createContainer({
+      Image: image,
       name,
-      '--network',
-      networkName,
-      '--label',
-      `aegis.tenantId=${options.tenantId}`,
-      '-p',
-      `${hostPort}:${containerPort}`,
-    ];
-
-    if (options.resourceLimits?.cpu) {
-      args.push('--cpus', options.resourceLimits.cpu);
-    }
-    if (options.resourceLimits?.memoryMb) {
-      args.push('--memory', `${options.resourceLimits.memoryMb}m`);
-    }
-
-    if (options.environment) {
-      for (const [key, value] of Object.entries(options.environment)) {
-        args.push('-e', `${key}=${value}`);
-      }
-    }
-
-    args.push(image);
-
-    const { stdout } = await this.runDocker(args);
-    const containerId = stdout.trim();
-    if (!containerId) {
-      throw new Error('Docker did not return a container id');
-    }
+      Env: env.length > 0 ? env : undefined,
+      ExposedPorts: {
+        [`${containerPort}/tcp`]: {},
+      },
+      Labels: {
+        'aegis.tenantId': options.tenantId,
+      },
+      HostConfig: {
+        NetworkMode: networkName,
+        PortBindings: {
+          [`${containerPort}/tcp`]: [{ HostPort: String(hostPort) }],
+        },
+        Memory: memoryBytes,
+        NanoCpus:
+          nanoCpus && Number.isFinite(nanoCpus) && nanoCpus > 0
+            ? nanoCpus
+            : undefined,
+        ReadonlyRootfs: true,
+        CapDrop: ['ALL'],
+        Tmpfs: {
+          '/run/secrets/openclaw': 'rw,noexec,nosuid,size=65536',
+        },
+      },
+    });
+    await container.start();
 
     return {
-      id: containerId,
+      id: container.id,
       url: `http://localhost:${hostPort}`,
       hostPort,
     };
   }
 
   async delete(containerId: string): Promise<void> {
-    await this.runDocker(['rm', '-f', containerId]);
+    await this.docker.getContainer(containerId).remove({ force: true });
   }
 
   async restart(containerId: string): Promise<void> {
-    await this.runDocker(['restart', containerId]);
+    await this.docker.getContainer(containerId).restart();
   }
 
   async stop(containerId: string): Promise<void> {
-    await this.runDocker(['stop', containerId]);
+    await this.docker.getContainer(containerId).stop();
   }
 
   async getStatus(containerId: string): Promise<ContainerStatus> {
-    const { stdout } = await this.runDocker([
-      'inspect',
-      '--format',
-      '{{json .State}}',
-      containerId,
-    ]);
-
-    let statePayload: {
-      Status?: string;
-      Running?: boolean;
-      StartedAt?: string;
-      Health?: { Status?: string };
-    };
-
-    try {
-      statePayload = JSON.parse(stdout);
-    } catch {
-      return { state: 'unknown', health: 'unknown' };
-    }
+    const inspectPayload = await this.docker.getContainer(containerId).inspect();
+    const statePayload = inspectPayload.State;
 
     const mappedState = this.mapState(statePayload.Status, statePayload.Running);
     const mappedHealth = this.mapHealth(
@@ -141,17 +129,14 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
     containerId: string,
     options?: ContainerLogOptions,
   ): Promise<string> {
-    const args = ['logs'];
-    if (options?.tailLines) {
-      args.push('--tail', String(options.tailLines));
-    }
-    if (options?.sinceSeconds) {
-      args.push('--since', `${options.sinceSeconds}s`);
-    }
-    args.push(containerId);
-
-    const { stdout, stderr } = await this.runDocker(args);
-    return [stdout, stderr].filter(Boolean).join('\n').trim();
+    const logs = await this.docker.getContainer(containerId).logs({
+      stdout: true,
+      stderr: true,
+      tail: options?.tailLines,
+      since: options?.sinceSeconds,
+      follow: false,
+    });
+    return (await this.renderLogOutput(logs as Buffer | NodeJS.ReadableStream)).trim();
   }
 
   async updateConfig(
@@ -172,71 +157,127 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
       return;
     }
 
-    const tempDir = await mkdtemp(join(tmpdir(), 'aegis-openclaw-'));
-    const localConfigPath = join(tempDir, 'openclaw.json');
-    try {
-      const payload = JSON.stringify(update.openclawConfig, null, 2);
-      await writeFile(localConfigPath, payload, 'utf8');
+    const payload = JSON.stringify(update.openclawConfig, null, 2);
+    const encoded = Buffer.from(payload, 'utf8').toString('base64');
 
-      await this.runDocker([
-        'cp',
-        localConfigPath,
-        `${containerId}:/home/node/.openclaw/openclaw.json`,
-      ]);
-      await this.runDocker([
-        'exec',
-        containerId,
-        'sh',
-        '-lc',
-        'chmod 600 /home/node/.openclaw/openclaw.json || true',
-      ]);
+    await this.runContainerCommand(
+      containerId,
+      `mkdir -p /home/node/.openclaw && echo '${encoded}' | base64 -d > /home/node/.openclaw/openclaw.json && chmod 600 /home/node/.openclaw/openclaw.json`,
+    );
 
-      // OpenClaw runtime reload strategy for now is controlled restart.
-      await this.restart(containerId);
-    } finally {
-      await rm(tempDir, { recursive: true, force: true });
-    }
+    // OpenClaw runtime reload strategy for now is controlled restart.
+    await this.restart(containerId);
   }
 
   private async ensureNetwork(networkName: string): Promise<void> {
-    const { stdout } = await this.runDocker([
-      'network',
-      'ls',
-      '--filter',
-      `name=^${networkName}$`,
-      '--format',
-      '{{.Name}}',
-    ]);
+    const networks = await this.docker.listNetworks({
+      filters: {
+        name: [networkName],
+      },
+    });
 
-    if (stdout.trim() === networkName) {
+    if (
+      networks.some((network) =>
+        (network.Name ?? '').localeCompare(networkName) === 0,
+      )
+    ) {
       return;
     }
 
-    await this.runDocker(['network', 'create', networkName]);
+    await this.docker.createNetwork({ Name: networkName });
   }
 
-  private runDocker(args: string[]): Promise<{ stdout: string; stderr: string }> {
+  private createDockerClient(): Docker {
     const dockerHost = this.configService.get<string>('container.dockerHost');
-    const env = dockerHost
-      ? { ...process.env, DOCKER_HOST: dockerHost }
-      : process.env;
+    if (!dockerHost) {
+      return new Docker();
+    }
 
-    return new Promise((resolve, reject) => {
-      execFile(
-        'docker',
-        args,
-        { env, timeout: this.commandTimeoutMs, maxBuffer: 1024 * 1024 * 10 },
-        (error, stdout, stderr) => {
-          if (error) {
-            const message = stderr?.trim() || error.message;
-            reject(new Error(`docker ${args.join(' ')} failed: ${message}`));
-            return;
-          }
+    if (dockerHost.startsWith('unix://')) {
+      return new Docker({ socketPath: dockerHost.replace('unix://', '') });
+    }
 
-          resolve({ stdout, stderr });
-        },
+    const normalized = dockerHost.startsWith('tcp://')
+      ? dockerHost.replace('tcp://', 'http://')
+      : dockerHost;
+    try {
+      const endpoint = new URL(normalized);
+      return new Docker({
+        protocol: endpoint.protocol.replace(':', '') as 'http' | 'https' | 'ssh',
+        host: endpoint.hostname,
+        port: endpoint.port ? Number(endpoint.port) : 2375,
+      });
+    } catch {
+      this.logger.warn(
+        `Invalid CONTAINER_DOCKER_HOST format "${dockerHost}". Falling back to default docker socket discovery.`,
       );
+      return new Docker();
+    }
+  }
+
+  private async runContainerCommand(
+    containerId: string,
+    command: string,
+  ): Promise<void> {
+    const container = this.docker.getContainer(containerId);
+    const exec = await container.exec({
+      Cmd: ['sh', '-lc', command],
+      AttachStdout: true,
+      AttachStderr: true,
     });
+    const stream = await exec.start({});
+    let timeoutHandle: NodeJS.Timeout | undefined;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutHandle = setTimeout(
+        () => reject(new Error('Container exec timed out')),
+        10_000,
+      );
+      timeoutHandle.unref();
+    });
+    try {
+      await Promise.race([
+        once(stream, 'end'),
+        once(stream, 'close'),
+        once(stream, 'finish'),
+        once(stream, 'error').then(([error]) => {
+          throw error;
+        }),
+        timeoutPromise,
+      ]);
+    } finally {
+      if (timeoutHandle) {
+        clearTimeout(timeoutHandle);
+      }
+    }
+    const result = await exec.inspect();
+    if ((result.ExitCode ?? 1) !== 0) {
+      throw new Error(
+        `Container exec failed for ${containerId} with exit code ${result.ExitCode ?? -1}`,
+      );
+    }
+  }
+
+  private async renderLogOutput(
+    logs: Buffer | NodeJS.ReadableStream | string,
+  ): Promise<string> {
+    if (Buffer.isBuffer(logs) || typeof logs === 'string') {
+      return logs.toString();
+    }
+
+    const chunks: Buffer[] = [];
+    logs.on('data', (chunk: Buffer | string) =>
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)),
+    );
+    const completion = Promise.race([
+      once(logs, 'end'),
+      once(logs, 'finish'),
+      once(logs, 'close'),
+      once(logs, 'error').then(([error]) => {
+        throw error;
+      }),
+    ]);
+    await completion;
+    return Buffer.concat(chunks).toString('utf8');
   }
 
   private mapState(

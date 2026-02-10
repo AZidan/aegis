@@ -1,7 +1,7 @@
-import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as k8s from '@kubernetes/client-node';
 import { ContainerOrchestrator } from './interfaces/container-orchestrator.interface';
 import {
   ContainerConfigUpdate,
@@ -19,9 +19,13 @@ import {
 @Injectable()
 export class KubernetesOrchestratorService implements ContainerOrchestrator {
   private readonly logger = new Logger(KubernetesOrchestratorService.name);
-  private readonly commandTimeoutMs = 15_000;
+  private kubeConfig?: k8s.KubeConfig;
+  private appsApi?: k8s.AppsV1Api;
+  private coreApi?: k8s.CoreV1Api;
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) {
+    this.initializeClient();
+  }
 
   async create(options: ContainerCreateOptions): Promise<ContainerHandle> {
     this.assertEnabled();
@@ -36,92 +40,8 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
     const containerPort = options.containerPort ?? DEFAULT_CONTAINER_PORT;
 
     await this.ensureNamespace(namespace);
-
-    await this.runKubectl([
-      '-n',
-      namespace,
-      'create',
-      'deployment',
-      name,
-      '--image',
-      image,
-      '--dry-run=client',
-      '-o',
-      'yaml',
-    ]);
-    await this.runKubectl(['-n', namespace, 'apply', '-f', '-'], {
-      stdin: [
-        'apiVersion: apps/v1',
-        'kind: Deployment',
-        'metadata:',
-        `  name: ${name}`,
-        'spec:',
-        '  replicas: 1',
-        '  selector:',
-        '    matchLabels:',
-        `      app: ${name}`,
-        '  template:',
-        '    metadata:',
-        '      labels:',
-        `        app: ${name}`,
-        '    spec:',
-        '      containers:',
-        '      - name: openclaw',
-        `        image: ${image}`,
-        '        ports:',
-        `        - containerPort: ${containerPort}`,
-      ].join('\n'),
-    });
-
-    if (options.environment && Object.keys(options.environment).length > 0) {
-      const envArgs = ['-n', namespace, 'set', 'env', `deployment/${name}`];
-      for (const [key, value] of Object.entries(options.environment)) {
-        envArgs.push(`${key}=${value}`);
-      }
-      await this.runKubectl(envArgs);
-    }
-
-    if (options.resourceLimits?.cpu || options.resourceLimits?.memoryMb) {
-      const limits: string[] = [];
-      if (options.resourceLimits.cpu) {
-        limits.push(`cpu=${options.resourceLimits.cpu}`);
-      }
-      if (options.resourceLimits.memoryMb) {
-        limits.push(`memory=${options.resourceLimits.memoryMb}Mi`);
-      }
-      await this.runKubectl([
-        '-n',
-        namespace,
-        'set',
-        'resources',
-        `deployment/${name}`,
-        '--limits',
-        limits.join(','),
-      ]);
-    }
-
-    await this.runKubectl([
-      '-n',
-      namespace,
-      'apply',
-      '-f',
-      '-',
-    ], {
-      stdin: [
-        'apiVersion: v1',
-        'kind: Service',
-        'metadata:',
-        `  name: ${name}`,
-        'spec:',
-        '  selector:',
-        `    app: ${name}`,
-        '  ports:',
-        '  - protocol: TCP',
-        `    port: ${containerPort}`,
-        `    targetPort: ${containerPort}`,
-        '  type: ClusterIP',
-      ].join('\n'),
-    });
+    await this.upsertDeployment(namespace, name, image, containerPort, options);
+    await this.upsertService(namespace, name, containerPort);
 
     const serviceDomain = this.configService.get<string>(
       'container.kubernetes.serviceDomain',
@@ -138,76 +58,62 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
   async delete(containerId: string): Promise<void> {
     this.assertEnabled();
     const { namespace, name } = this.parseContainerId(containerId);
-    await this.runKubectl([
-      '-n',
-      namespace,
-      'delete',
-      'deployment',
-      name,
-      '--ignore-not-found=true',
-    ]);
-    await this.runKubectl([
-      '-n',
-      namespace,
-      'delete',
-      'service',
-      name,
-      '--ignore-not-found=true',
-    ]);
+    await this.tryDeleteDeployment(namespace, name);
+    await this.tryDeleteService(namespace, name);
   }
 
   async restart(containerId: string): Promise<void> {
     this.assertEnabled();
     const { namespace, name } = this.parseContainerId(containerId);
-    await this.runKubectl([
-      '-n',
+    const deployment = await this.appsApi!.readNamespacedDeployment({
+      name,
       namespace,
-      'rollout',
-      'restart',
-      `deployment/${name}`,
-    ]);
+    });
+    if (!deployment.spec?.template) {
+      throw new Error(`Deployment ${namespace}/${name} has no pod template`);
+    }
+    deployment.spec.template.metadata = deployment.spec.template.metadata ?? {};
+    deployment.spec.template.metadata.annotations =
+      deployment.spec.template.metadata.annotations ?? {};
+    deployment.spec.template.metadata.annotations[
+      'kubectl.kubernetes.io/restartedAt'
+    ] = new Date().toISOString();
+    await this.appsApi!.replaceNamespacedDeployment({
+      name,
+      namespace,
+      body: deployment,
+    });
   }
 
   async stop(containerId: string): Promise<void> {
     this.assertEnabled();
     const { namespace, name } = this.parseContainerId(containerId);
-    await this.runKubectl([
-      '-n',
+    const deployment = await this.appsApi!.readNamespacedDeployment({
+      name,
       namespace,
-      'scale',
-      `deployment/${name}`,
-      '--replicas=0',
-    ]);
+    });
+    if (!deployment.spec) {
+      throw new Error(`Deployment ${namespace}/${name} has no spec`);
+    }
+    deployment.spec.replicas = 0;
+    await this.appsApi!.replaceNamespacedDeployment({
+      name,
+      namespace,
+      body: deployment,
+    });
   }
 
   async getStatus(containerId: string): Promise<ContainerStatus> {
     this.assertEnabled();
     const { namespace, name } = this.parseContainerId(containerId);
-    const { stdout } = await this.runKubectl([
-      '-n',
-      namespace,
-      'get',
-      'deployment',
+    const deployment = await this.appsApi!.readNamespacedDeployment({
       name,
-      '-o',
-      'json',
-    ]);
+      namespace,
+    });
 
-    let payload: {
-      metadata?: { creationTimestamp?: string };
-      spec?: { replicas?: number };
-      status?: { availableReplicas?: number; readyReplicas?: number };
-    };
-
-    try {
-      payload = JSON.parse(stdout);
-    } catch {
-      return { state: 'unknown', health: 'unknown' };
-    }
-
-    const desiredReplicas = payload.spec?.replicas ?? 0;
-    const availableReplicas = payload.status?.availableReplicas ?? 0;
-    const readyReplicas = payload.status?.readyReplicas ?? 0;
+    const desiredReplicas = deployment.spec?.replicas ?? 0;
+    const availableReplicas = deployment.status?.availableReplicas ?? 0;
+    const readyReplicas = deployment.status?.readyReplicas ?? 0;
 
     if (desiredReplicas === 0) {
       return { state: 'stopped', health: 'down', uptimeSeconds: 0 };
@@ -216,9 +122,9 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
       return {
         state: 'running',
         health: 'healthy',
-        startedAt: this.parseDate(payload.metadata?.creationTimestamp),
+        startedAt: this.parseDate(deployment.metadata?.creationTimestamp),
         uptimeSeconds: this.calculateUptimeSeconds(
-          payload.metadata?.creationTimestamp,
+          deployment.metadata?.creationTimestamp,
         ),
       };
     }
@@ -226,9 +132,9 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
       return {
         state: 'running',
         health: 'degraded',
-        startedAt: this.parseDate(payload.metadata?.creationTimestamp),
+        startedAt: this.parseDate(deployment.metadata?.creationTimestamp),
         uptimeSeconds: this.calculateUptimeSeconds(
-          payload.metadata?.creationTimestamp,
+          deployment.metadata?.creationTimestamp,
         ),
       };
     }
@@ -236,9 +142,9 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
     return {
       state: 'creating',
       health: 'unknown',
-      startedAt: this.parseDate(payload.metadata?.creationTimestamp),
+      startedAt: this.parseDate(deployment.metadata?.creationTimestamp),
       uptimeSeconds: this.calculateUptimeSeconds(
-        payload.metadata?.creationTimestamp,
+        deployment.metadata?.creationTimestamp,
       ),
     };
   }
@@ -249,17 +155,25 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
   ): Promise<string> {
     this.assertEnabled();
     const { namespace, name } = this.parseContainerId(containerId);
-
-    const args = ['-n', namespace, 'logs', `deployment/${name}`];
-    if (options?.tailLines) {
-      args.push('--tail', String(options.tailLines));
+    const pods = await this.coreApi!.listNamespacedPod({
+      namespace,
+      labelSelector: `app=${name}`,
+      limit: 1,
+    });
+    const podName = pods.items[0]?.metadata?.name;
+    if (!podName) {
+      return '';
     }
-    if (options?.sinceSeconds) {
-      args.push('--since', `${options.sinceSeconds}s`);
-    }
 
-    const { stdout, stderr } = await this.runKubectl(args);
-    return [stdout, stderr].filter(Boolean).join('\n').trim();
+    return this.coreApi!.readNamespacedPodLog({
+      name: podName,
+      namespace,
+      follow: false,
+      previous: false,
+      sinceSeconds: options?.sinceSeconds,
+      tailLines: options?.tailLines,
+      timestamps: false,
+    });
   }
 
   async updateConfig(
@@ -269,50 +183,23 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
     this.assertEnabled();
     const { namespace, name } = this.parseContainerId(containerId);
 
-    if (update.environment && Object.keys(update.environment).length > 0) {
-      const envArgs = ['-n', namespace, 'set', 'env', `deployment/${name}`];
-      for (const [key, value] of Object.entries(update.environment)) {
-        envArgs.push(`${key}=${value}`);
-      }
-      await this.runKubectl(envArgs);
-    }
-
+    let hash: string | undefined;
     if (update.openclawConfig) {
       const configPayload = JSON.stringify(update.openclawConfig, null, 2);
-      const hash = this.hashConfig(configPayload);
-      const configMapName = `${name}-openclaw-config`;
-      const indentedConfig = configPayload
-        .split('\n')
-        .map((line) => `    ${line}`)
-        .join('\n');
-
-      await this.runKubectl(['-n', namespace, 'apply', '-f', '-'], {
-        stdin: [
-          'apiVersion: v1',
-          'kind: ConfigMap',
-          'metadata:',
-          `  name: ${configMapName}`,
-          'data:',
-          '  openclaw.json: |',
-          indentedConfig,
-        ].join('\n'),
+      hash = this.hashConfig(configPayload);
+      await this.upsertConfigMap(namespace, `${name}-openclaw-config`, {
+        'openclaw.json': configPayload,
       });
+    }
 
-      await this.runKubectl([
-        '-n',
-        namespace,
-        'set',
-        'env',
-        `deployment/${name}`,
-        `AEGIS_OPENCLAW_CONFIG_HASH=${hash}`,
-        `AEGIS_OPENCLAW_CONFIGMAP=${configMapName}`,
-      ]);
+    if (update.environment || hash) {
+      await this.patchDeploymentEnvironment(namespace, name, update, hash);
     }
 
     await this.restart(containerId);
   }
 
-  private assertEnabled(): void {
+  private initializeClient(): void {
     const enabledFromConfig = this.configService.get<boolean>(
       'container.kubernetes.enabled',
       false,
@@ -320,11 +207,38 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
     const hasKubeEnvironment = Boolean(
       process.env.KUBECONFIG || process.env.KUBERNETES_SERVICE_HOST,
     );
-
-    if (enabledFromConfig || hasKubeEnvironment) {
+    if (!enabledFromConfig && !hasKubeEnvironment) {
       return;
     }
 
+    this.kubeConfig = new k8s.KubeConfig();
+    try {
+      this.kubeConfig.loadFromDefault();
+    } catch (error) {
+      this.logger.error(
+        `Failed to load Kubernetes configuration: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      throw new ServiceUnavailableException(
+        'Kubernetes runtime enabled but kubeconfig is unavailable.',
+      );
+    }
+
+    const context = this.configService.get<string>(
+      'container.kubernetes.context',
+      '',
+    );
+    if (context) {
+      this.kubeConfig.setCurrentContext(context);
+    }
+
+    this.appsApi = this.kubeConfig.makeApiClient(k8s.AppsV1Api);
+    this.coreApi = this.kubeConfig.makeApiClient(k8s.CoreV1Api);
+  }
+
+  private assertEnabled(): void {
+    if (this.appsApi && this.coreApi) {
+      return;
+    }
     throw new ServiceUnavailableException(
       'Kubernetes runtime is not enabled. Set CONTAINER_K8S_ENABLED=true or provide KUBECONFIG/KUBERNETES_SERVICE_HOST.',
     );
@@ -350,49 +264,232 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
 
   private async ensureNamespace(namespace: string): Promise<void> {
     try {
-      await this.runKubectl(['get', 'namespace', namespace]);
-    } catch {
-      await this.runKubectl(['create', 'namespace', namespace]);
+      await this.coreApi!.readNamespace({ name: namespace });
+    } catch (error) {
+      if (!this.isNotFound(error)) {
+        throw error;
+      }
+      await this.coreApi!.createNamespace({
+        body: {
+          metadata: {
+            name: namespace,
+          },
+        },
+      });
     }
   }
 
-  private runKubectl(
-    args: string[],
-    options?: { stdin?: string },
-  ): Promise<{ stdout: string; stderr: string }> {
-    const context = this.configService.get<string>(
-      'container.kubernetes.context',
-      '',
+  private async upsertDeployment(
+    namespace: string,
+    name: string,
+    image: string,
+    containerPort: number,
+    options: ContainerCreateOptions,
+  ): Promise<void> {
+    const deployment = this.buildDeployment(
+      name,
+      image,
+      containerPort,
+      options.environment,
+      options.resourceLimits?.cpu,
+      options.resourceLimits?.memoryMb,
     );
-    const finalArgs = [...(context ? ['--context', context] : []), ...args];
 
-    return new Promise((resolve, reject) => {
-      const child = execFile(
-        'kubectl',
-        finalArgs,
-        {
-          env: process.env,
-          timeout: this.commandTimeoutMs,
-          maxBuffer: 1024 * 1024 * 10,
-        },
-        (error, stdout, stderr) => {
-          if (error) {
-            const message = stderr?.trim() || error.message;
-            reject(new Error(`kubectl ${finalArgs.join(' ')} failed: ${message}`));
-            return;
-          }
-          resolve({ stdout, stderr });
-        },
-      );
-
-      if (options?.stdin && child?.stdin) {
-        child.stdin.write(options.stdin);
-        child.stdin.end();
+    try {
+      await this.appsApi!.createNamespacedDeployment({
+        namespace,
+        body: deployment,
+      });
+    } catch (error) {
+      if (!this.isAlreadyExists(error)) {
+        throw error;
       }
+      await this.appsApi!.replaceNamespacedDeployment({
+        name,
+        namespace,
+        body: deployment,
+      });
+    }
+  }
+
+  private async upsertService(
+    namespace: string,
+    name: string,
+    containerPort: number,
+  ): Promise<void> {
+    const service: k8s.V1Service = {
+      metadata: { name },
+      spec: {
+        selector: { app: name },
+        ports: [{ protocol: 'TCP', port: containerPort, targetPort: containerPort }],
+        type: 'ClusterIP',
+      },
+    };
+
+    try {
+      await this.coreApi!.createNamespacedService({
+        namespace,
+        body: service,
+      });
+    } catch (error) {
+      if (!this.isAlreadyExists(error)) {
+        throw error;
+      }
+      await this.coreApi!.replaceNamespacedService({
+        name,
+        namespace,
+        body: service,
+      });
+    }
+  }
+
+  private async upsertConfigMap(
+    namespace: string,
+    name: string,
+    data: Record<string, string>,
+  ): Promise<void> {
+    const configMap: k8s.V1ConfigMap = {
+      metadata: { name },
+      data,
+    };
+    try {
+      await this.coreApi!.createNamespacedConfigMap({
+        namespace,
+        body: configMap,
+      });
+    } catch (error) {
+      if (!this.isAlreadyExists(error)) {
+        throw error;
+      }
+      await this.coreApi!.replaceNamespacedConfigMap({
+        name,
+        namespace,
+        body: configMap,
+      });
+    }
+  }
+
+  private async patchDeploymentEnvironment(
+    namespace: string,
+    name: string,
+    update: ContainerConfigUpdate,
+    hash?: string,
+  ): Promise<void> {
+    const deployment = await this.appsApi!.readNamespacedDeployment({
+      name,
+      namespace,
+    });
+    const container = deployment.spec?.template?.spec?.containers?.[0];
+    if (!container) {
+      throw new Error(`Deployment ${namespace}/${name} has no containers`);
+    }
+
+    const envMap = new Map<string, string>();
+    for (const entry of container.env ?? []) {
+      if (entry.name && entry.value !== undefined) {
+        envMap.set(entry.name, entry.value);
+      }
+    }
+
+    for (const [key, value] of Object.entries(update.environment ?? {})) {
+      envMap.set(key, value);
+    }
+
+    if (hash) {
+      envMap.set('AEGIS_OPENCLAW_CONFIG_HASH', hash);
+      envMap.set('AEGIS_OPENCLAW_CONFIGMAP', `${name}-openclaw-config`);
+    }
+
+    container.env = Array.from(envMap.entries()).map(([key, value]) => ({
+      name: key,
+      value,
+    }));
+
+    await this.appsApi!.replaceNamespacedDeployment({
+      name,
+      namespace,
+      body: deployment,
     });
   }
 
-  private parseDate(value?: string): Date | undefined {
+  private async tryDeleteDeployment(
+    namespace: string,
+    name: string,
+  ): Promise<void> {
+    try {
+      await this.appsApi!.deleteNamespacedDeployment({
+        name,
+        namespace,
+      });
+    } catch (error) {
+      if (!this.isNotFound(error)) {
+        throw error;
+      }
+    }
+  }
+
+  private async tryDeleteService(namespace: string, name: string): Promise<void> {
+    try {
+      await this.coreApi!.deleteNamespacedService({
+        name,
+        namespace,
+      });
+    } catch (error) {
+      if (!this.isNotFound(error)) {
+        throw error;
+      }
+    }
+  }
+
+  private buildDeployment(
+    name: string,
+    image: string,
+    containerPort: number,
+    environment?: Record<string, string>,
+    cpu?: string,
+    memoryMb?: number,
+  ): k8s.V1Deployment {
+    const env = Object.entries(environment ?? {}).map(([key, value]) => ({
+      name: key,
+      value,
+    }));
+
+    return {
+      metadata: { name },
+      spec: {
+        replicas: 1,
+        selector: {
+          matchLabels: { app: name },
+        },
+        template: {
+          metadata: {
+            labels: { app: name },
+          },
+          spec: {
+            containers: [
+              {
+                name: 'openclaw',
+                image,
+                ports: [{ containerPort }],
+                env: env.length > 0 ? env : undefined,
+                resources:
+                  cpu || memoryMb
+                    ? {
+                        limits: {
+                          ...(cpu ? { cpu } : {}),
+                          ...(memoryMb ? { memory: `${memoryMb}Mi` } : {}),
+                        },
+                      }
+                    : undefined,
+              },
+            ],
+          },
+        },
+      },
+    };
+  }
+
+  private parseDate(value?: string | Date): Date | undefined {
     if (!value) {
       return undefined;
     }
@@ -400,7 +497,7 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
     return Number.isNaN(parsed.getTime()) ? undefined : parsed;
   }
 
-  private calculateUptimeSeconds(startedAt?: string): number | undefined {
+  private calculateUptimeSeconds(startedAt?: string | Date): number | undefined {
     const started = this.parseDate(startedAt);
     if (!started) {
       return undefined;
@@ -410,5 +507,22 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
 
   private hashConfig(payload: string): string {
     return createHash('sha256').update(payload).digest('hex').slice(0, 12);
+  }
+
+  private isAlreadyExists(error: unknown): boolean {
+    return this.extractStatusCode(error) === 409;
+  }
+
+  private isNotFound(error: unknown): boolean {
+    return this.extractStatusCode(error) === 404;
+  }
+
+  private extractStatusCode(error: unknown): number | undefined {
+    const maybe = error as {
+      code?: number;
+      response?: { statusCode?: number; status?: number };
+      body?: { code?: number };
+    };
+    return maybe.code ?? maybe.response?.statusCode ?? maybe.response?.status ?? maybe.body?.code;
   }
 }
