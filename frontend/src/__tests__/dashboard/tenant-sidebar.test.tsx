@@ -69,6 +69,9 @@ jest.mock('lucide-react', () => ({
   LogOut: ({ className }: { className?: string }) => (
     <svg data-testid="icon-logout" className={className} />
   ),
+  Network: ({ className }: { className?: string }) => (
+    <svg data-testid="icon-network" className={className} />
+  ),
   Layers: ({ className }: { className?: string }) => (
     <svg data-testid="icon-layers" className={className} />
   ),

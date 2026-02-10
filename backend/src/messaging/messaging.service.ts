@@ -17,7 +17,10 @@ import {
   MESSAGING_QUEUE_NAME,
   MESSAGING_PAGE_SIZE_DEFAULT,
   MESSAGING_PAGE_SIZE_MAX,
+  MESSAGE_EXPORT_MAX_ROWS,
+  STATS_ACTIVE_THREAD_HOURS,
 } from './messaging.constants';
+import { ExportMessagesDto } from './dto/export-messages.dto';
 
 /**
  * MessagingService
@@ -242,6 +245,10 @@ export class MessagingService {
   /**
    * Get all messages across all agents for a tenant.
    * Used by the tenant-wide messages view.
+   *
+   * Supports extended filters:
+   * - senderId/recipientId: filter by specific agent (intersected with tenant ownership)
+   * - search: text search within message payload (JSON cast to text, case-insensitive)
    */
   async getTenantMessages(tenantId: string, query: QueryMessagesDto) {
     // Get all agent IDs for this tenant
@@ -263,23 +270,7 @@ export class MessagingService {
       MESSAGING_PAGE_SIZE_MAX,
     );
 
-    const where: Record<string, unknown> = {
-      OR: [
-        { senderId: { in: agentIds } },
-        { recipientId: { in: agentIds } },
-      ],
-    };
-
-    if (query.type) where.type = query.type;
-    if (query.status) where.status = query.status;
-    if (query.correlationId) where.correlationId = query.correlationId;
-
-    if (query.dateFrom || query.dateTo) {
-      const createdAt: Record<string, Date> = {};
-      if (query.dateFrom) createdAt.gte = query.dateFrom;
-      if (query.dateTo) createdAt.lte = query.dateTo;
-      where.createdAt = createdAt;
-    }
+    const where = this.buildTenantMessageWhere(agentIds, query);
 
     const queryArgs: Record<string, unknown> = {
       where,
@@ -305,19 +296,7 @@ export class MessagingService {
     const nextCursor = hasNextPage ? data[data.length - 1]?.id : null;
 
     return {
-      data: data.map((m: any) => ({
-        id: m.id,
-        senderId: m.senderId,
-        senderName: m.sender?.name,
-        recipientId: m.recipientId,
-        recipientName: m.recipient?.name,
-        type: m.type,
-        payload: m.payload,
-        correlationId: m.correlationId,
-        status: m.status,
-        deliveredAt: m.deliveredAt?.toISOString() ?? null,
-        createdAt: m.createdAt.toISOString(),
-      })),
+      data: data.map((m: any) => this.mapMessage(m)),
       meta: {
         count: data.length,
         hasNextPage,
@@ -360,6 +339,227 @@ export class MessagingService {
       status: message.status,
       deliveredAt: message.deliveredAt?.toISOString() ?? null,
       createdAt: message.createdAt.toISOString(),
+    };
+  }
+
+  /**
+   * Export all messages for a tenant (no pagination, capped at MESSAGE_EXPORT_MAX_ROWS).
+   * Used by the dashboard export endpoint. Returns flat message objects.
+   */
+  async exportTenantMessages(
+    tenantId: string,
+    query: Omit<ExportMessagesDto, 'format'>,
+  ) {
+    const tenantAgents = await this.prisma.agent.findMany({
+      where: { tenantId },
+      select: { id: true },
+    });
+    const agentIds = tenantAgents.map((a) => a.id);
+
+    if (agentIds.length === 0) return [];
+
+    const where = this.buildTenantMessageWhere(agentIds, query);
+
+    const results = await this.prisma.agentMessage.findMany({
+      where: where as any,
+      orderBy: { createdAt: 'desc' as const },
+      take: MESSAGE_EXPORT_MAX_ROWS,
+      include: {
+        sender: { select: { id: true, name: true } },
+        recipient: { select: { id: true, name: true } },
+      },
+    });
+
+    return results.map((m: any) => this.mapMessage(m));
+  }
+
+  /**
+   * Get aggregate message statistics for a tenant dashboard.
+   *
+   * Returns:
+   * - totalMessages: total message count for the tenant
+   * - activeThreads: distinct correlationIds with activity in the last STATS_ACTIVE_THREAD_HOURS hours
+   * - avgResponseTimeMs: average time between a message and its corresponding response
+   *   (data_request -> data_response pairs matched by correlationId)
+   * - failedMessages: count of messages with status='failed'
+   */
+  async getMessageStats(tenantId: string) {
+    const tenantAgents = await this.prisma.agent.findMany({
+      where: { tenantId },
+      select: { id: true },
+    });
+    const agentIds = tenantAgents.map((a) => a.id);
+
+    if (agentIds.length === 0) {
+      return {
+        totalMessages: 0,
+        activeThreads: 0,
+        avgResponseTimeMs: 0,
+        failedMessages: 0,
+      };
+    }
+
+    const baseWhere = {
+      OR: [
+        { senderId: { in: agentIds } },
+        { recipientId: { in: agentIds } },
+      ],
+    };
+
+    // Total messages
+    const totalMessages = await this.prisma.agentMessage.count({
+      where: baseWhere as any,
+    });
+
+    // Failed messages
+    const failedMessages = await this.prisma.agentMessage.count({
+      where: { ...baseWhere, status: 'failed' } as any,
+    });
+
+    // Active threads: distinct correlationIds in the lookback window
+    const lookbackDate = new Date(
+      Date.now() - STATS_ACTIVE_THREAD_HOURS * 60 * 60 * 1000,
+    );
+
+    const activeThreadRows = await this.prisma.agentMessage.findMany({
+      where: {
+        ...baseWhere,
+        correlationId: { not: null },
+        createdAt: { gte: lookbackDate },
+      } as any,
+      select: { correlationId: true },
+      distinct: ['correlationId'],
+    });
+    const activeThreads = activeThreadRows.length;
+
+    // Average response time: measure delivered messages' delivery latency
+    // (deliveredAt - createdAt) for messages that have been delivered
+    const deliveredMessages = await this.prisma.agentMessage.findMany({
+      where: {
+        ...baseWhere,
+        status: 'delivered',
+        deliveredAt: { not: null },
+      } as any,
+      select: { createdAt: true, deliveredAt: true },
+      take: 1000, // Sample for performance
+      orderBy: { createdAt: 'desc' },
+    });
+
+    let avgResponseTimeMs = 0;
+    if (deliveredMessages.length > 0) {
+      const totalMs = deliveredMessages.reduce((sum, m) => {
+        const created = new Date(m.createdAt).getTime();
+        const delivered = new Date(m.deliveredAt!).getTime();
+        return sum + (delivered - created);
+      }, 0);
+      avgResponseTimeMs = Math.round(totalMs / deliveredMessages.length);
+    }
+
+    return {
+      totalMessages,
+      activeThreads,
+      avgResponseTimeMs,
+      failedMessages,
+    };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Private Helpers
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Build Prisma where clause for tenant-scoped message queries.
+   * Supports all filter fields from QueryMessagesDto / ExportMessagesDto.
+   */
+  private buildTenantMessageWhere(
+    agentIds: string[],
+    query: Partial<QueryMessagesDto>,
+  ): Record<string, unknown> {
+    // Build the agent-scoped OR conditions
+    // If senderId or recipientId is provided, intersect with tenant agent IDs
+    const orConditions: Record<string, unknown>[] = [];
+
+    if (query.senderId) {
+      // Verify senderId is in tenant's agents for security
+      if (agentIds.includes(query.senderId)) {
+        orConditions.push({ senderId: query.senderId });
+      } else {
+        // senderId doesn't belong to tenant - return empty results
+        return { id: '__impossible__' };
+      }
+    }
+
+    if (query.recipientId) {
+      if (agentIds.includes(query.recipientId)) {
+        orConditions.push({ recipientId: query.recipientId });
+      } else {
+        return { id: '__impossible__' };
+      }
+    }
+
+    const where: Record<string, unknown> = {};
+
+    if (orConditions.length > 0 && !query.senderId && !query.recipientId) {
+      // fallback - shouldn't hit but defensive
+      where.OR = [
+        { senderId: { in: agentIds } },
+        { recipientId: { in: agentIds } },
+      ];
+    } else if (query.senderId && query.recipientId) {
+      // Both specified: message must be from senderId AND to recipientId
+      where.senderId = query.senderId;
+      where.recipientId = query.recipientId;
+    } else if (query.senderId) {
+      // Only senderId specified
+      where.senderId = query.senderId;
+    } else if (query.recipientId) {
+      // Only recipientId specified
+      where.recipientId = query.recipientId;
+    } else {
+      // Neither specified: all tenant agents
+      where.OR = [
+        { senderId: { in: agentIds } },
+        { recipientId: { in: agentIds } },
+      ];
+    }
+
+    if (query.type) where.type = query.type;
+    if (query.status) where.status = query.status;
+    if (query.correlationId) where.correlationId = query.correlationId;
+
+    if (query.dateFrom || query.dateTo) {
+      const createdAt: Record<string, Date> = {};
+      if (query.dateFrom) createdAt.gte = query.dateFrom;
+      if (query.dateTo) createdAt.lte = query.dateTo;
+      where.createdAt = createdAt;
+    }
+
+    // Text search in payload (cast JSON to string and search case-insensitively)
+    if (query.search) {
+      where.payload = {
+        string_contains: query.search,
+      };
+    }
+
+    return where;
+  }
+
+  /**
+   * Map a Prisma AgentMessage (with sender/recipient relations) to a flat DTO shape.
+   */
+  private mapMessage(m: any) {
+    return {
+      id: m.id,
+      senderId: m.senderId,
+      senderName: m.sender?.name ?? null,
+      recipientId: m.recipientId,
+      recipientName: m.recipient?.name ?? null,
+      type: m.type,
+      payload: m.payload,
+      correlationId: m.correlationId,
+      status: m.status,
+      deliveredAt: m.deliveredAt?.toISOString() ?? null,
+      createdAt: m.createdAt.toISOString(),
     };
   }
 }

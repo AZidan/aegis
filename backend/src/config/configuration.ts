@@ -49,6 +49,17 @@ export default () => ({
         process.env.CONTAINER_K8S_SERVICE_DOMAIN || 'svc.cluster.local',
     },
   },
+
+  slack: {
+    clientId: process.env.SLACK_CLIENT_ID || '',
+    clientSecret: process.env.SLACK_CLIENT_SECRET || '',
+    signingSecret: process.env.SLACK_SIGNING_SECRET || '',
+    appToken: process.env.SLACK_APP_TOKEN || '',
+    redirectUri:
+      process.env.SLACK_REDIRECT_URI ||
+      `${process.env.APP_URL || 'http://localhost:3000'}/api/integrations/slack/callback`,
+  },
+
   cors: {
     origins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
   },

@@ -46,6 +46,7 @@ export type SkillMinAggregateOutputType = {
   isCore: boolean | null
   authorId: string | null
   submittedAt: Date | null
+  tenantId: string | null
   repositoryUrl: string | null
   mainFile: string | null
   sourceCode: string | null
@@ -70,6 +71,7 @@ export type SkillMaxAggregateOutputType = {
   isCore: boolean | null
   authorId: string | null
   submittedAt: Date | null
+  tenantId: string | null
   repositoryUrl: string | null
   mainFile: string | null
   sourceCode: string | null
@@ -94,6 +96,7 @@ export type SkillCountAggregateOutputType = {
   isCore: number
   authorId: number
   submittedAt: number
+  tenantId: number
   compatibleRoles: number
   repositoryUrl: number
   mainFile: number
@@ -134,6 +137,7 @@ export type SkillMinAggregateInputType = {
   isCore?: true
   authorId?: true
   submittedAt?: true
+  tenantId?: true
   repositoryUrl?: true
   mainFile?: true
   sourceCode?: true
@@ -158,6 +162,7 @@ export type SkillMaxAggregateInputType = {
   isCore?: true
   authorId?: true
   submittedAt?: true
+  tenantId?: true
   repositoryUrl?: true
   mainFile?: true
   sourceCode?: true
@@ -182,6 +187,7 @@ export type SkillCountAggregateInputType = {
   isCore?: true
   authorId?: true
   submittedAt?: true
+  tenantId?: true
   compatibleRoles?: true
   repositoryUrl?: true
   mainFile?: true
@@ -297,6 +303,7 @@ export type SkillGroupByOutputType = {
   isCore: boolean
   authorId: string
   submittedAt: Date
+  tenantId: string | null
   compatibleRoles: string[]
   repositoryUrl: string | null
   mainFile: string | null
@@ -348,6 +355,7 @@ export type SkillWhereInput = {
   isCore?: Prisma.BoolFilter<"Skill"> | boolean
   authorId?: Prisma.StringFilter<"Skill"> | string
   submittedAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
+  tenantId?: Prisma.StringNullableFilter<"Skill"> | string | null
   compatibleRoles?: Prisma.StringNullableListFilter<"Skill">
   repositoryUrl?: Prisma.StringNullableFilter<"Skill"> | string | null
   mainFile?: Prisma.StringNullableFilter<"Skill"> | string | null
@@ -365,6 +373,7 @@ export type SkillWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  tenant?: Prisma.XOR<Prisma.TenantNullableScalarRelationFilter, Prisma.TenantWhereInput> | null
   installations?: Prisma.SkillInstallationListRelationFilter
 }
 
@@ -378,6 +387,7 @@ export type SkillOrderByWithRelationInput = {
   isCore?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrderInput | Prisma.SortOrder
   compatibleRoles?: Prisma.SortOrder
   repositoryUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   mainFile?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -395,12 +405,13 @@ export type SkillOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   author?: Prisma.UserOrderByWithRelationInput
+  tenant?: Prisma.TenantOrderByWithRelationInput
   installations?: Prisma.SkillInstallationOrderByRelationAggregateInput
 }
 
 export type SkillWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  name_version?: Prisma.SkillNameVersionCompoundUniqueInput
+  name_version_tenantId?: Prisma.SkillNameVersionTenantIdCompoundUniqueInput
   AND?: Prisma.SkillWhereInput | Prisma.SkillWhereInput[]
   OR?: Prisma.SkillWhereInput[]
   NOT?: Prisma.SkillWhereInput | Prisma.SkillWhereInput[]
@@ -412,6 +423,7 @@ export type SkillWhereUniqueInput = Prisma.AtLeast<{
   isCore?: Prisma.BoolFilter<"Skill"> | boolean
   authorId?: Prisma.StringFilter<"Skill"> | string
   submittedAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
+  tenantId?: Prisma.StringNullableFilter<"Skill"> | string | null
   compatibleRoles?: Prisma.StringNullableListFilter<"Skill">
   repositoryUrl?: Prisma.StringNullableFilter<"Skill"> | string | null
   mainFile?: Prisma.StringNullableFilter<"Skill"> | string | null
@@ -429,8 +441,9 @@ export type SkillWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  tenant?: Prisma.XOR<Prisma.TenantNullableScalarRelationFilter, Prisma.TenantWhereInput> | null
   installations?: Prisma.SkillInstallationListRelationFilter
-}, "id" | "name_version">
+}, "id" | "name_version_tenantId">
 
 export type SkillOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -442,6 +455,7 @@ export type SkillOrderByWithAggregationInput = {
   isCore?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrderInput | Prisma.SortOrder
   compatibleRoles?: Prisma.SortOrder
   repositoryUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   mainFile?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -478,6 +492,7 @@ export type SkillScalarWhereWithAggregatesInput = {
   isCore?: Prisma.BoolWithAggregatesFilter<"Skill"> | boolean
   authorId?: Prisma.StringWithAggregatesFilter<"Skill"> | string
   submittedAt?: Prisma.DateTimeWithAggregatesFilter<"Skill"> | Date | string
+  tenantId?: Prisma.StringNullableWithAggregatesFilter<"Skill"> | string | null
   compatibleRoles?: Prisma.StringNullableListFilter<"Skill">
   repositoryUrl?: Prisma.StringNullableWithAggregatesFilter<"Skill"> | string | null
   mainFile?: Prisma.StringNullableWithAggregatesFilter<"Skill"> | string | null
@@ -522,6 +537,7 @@ export type SkillCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   author: Prisma.UserCreateNestedOneWithoutSkillsAuthoredInput
+  tenant?: Prisma.TenantCreateNestedOneWithoutSkillsInput
   installations?: Prisma.SkillInstallationCreateNestedManyWithoutSkillInput
 }
 
@@ -535,6 +551,7 @@ export type SkillUncheckedCreateInput = {
   isCore?: boolean
   authorId: string
   submittedAt?: Date | string
+  tenantId?: string | null
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
   repositoryUrl?: string | null
   mainFile?: string | null
@@ -580,6 +597,7 @@ export type SkillUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.UserUpdateOneRequiredWithoutSkillsAuthoredNestedInput
+  tenant?: Prisma.TenantUpdateOneWithoutSkillsNestedInput
   installations?: Prisma.SkillInstallationUpdateManyWithoutSkillNestedInput
 }
 
@@ -593,6 +611,7 @@ export type SkillUncheckedUpdateInput = {
   isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
   repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mainFile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -622,6 +641,7 @@ export type SkillCreateManyInput = {
   isCore?: boolean
   authorId: string
   submittedAt?: Date | string
+  tenantId?: string | null
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
   repositoryUrl?: string | null
   mainFile?: string | null
@@ -677,6 +697,7 @@ export type SkillUncheckedUpdateManyInput = {
   isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
   repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mainFile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -705,9 +726,10 @@ export type SkillOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type SkillNameVersionCompoundUniqueInput = {
+export type SkillNameVersionTenantIdCompoundUniqueInput = {
   name: string
   version: string
+  tenantId: string
 }
 
 export type SkillCountOrderByAggregateInput = {
@@ -720,6 +742,7 @@ export type SkillCountOrderByAggregateInput = {
   isCore?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
   compatibleRoles?: Prisma.SortOrder
   repositoryUrl?: Prisma.SortOrder
   mainFile?: Prisma.SortOrder
@@ -753,6 +776,7 @@ export type SkillMaxOrderByAggregateInput = {
   isCore?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
   repositoryUrl?: Prisma.SortOrder
   mainFile?: Prisma.SortOrder
   sourceCode?: Prisma.SortOrder
@@ -777,6 +801,7 @@ export type SkillMinOrderByAggregateInput = {
   isCore?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
   repositoryUrl?: Prisma.SortOrder
   mainFile?: Prisma.SortOrder
   sourceCode?: Prisma.SortOrder
@@ -843,6 +868,48 @@ export type SkillUncheckedUpdateManyWithoutAuthorNestedInput = {
   deleteMany?: Prisma.SkillScalarWhereInput | Prisma.SkillScalarWhereInput[]
 }
 
+export type SkillCreateNestedManyWithoutTenantInput = {
+  create?: Prisma.XOR<Prisma.SkillCreateWithoutTenantInput, Prisma.SkillUncheckedCreateWithoutTenantInput> | Prisma.SkillCreateWithoutTenantInput[] | Prisma.SkillUncheckedCreateWithoutTenantInput[]
+  connectOrCreate?: Prisma.SkillCreateOrConnectWithoutTenantInput | Prisma.SkillCreateOrConnectWithoutTenantInput[]
+  createMany?: Prisma.SkillCreateManyTenantInputEnvelope
+  connect?: Prisma.SkillWhereUniqueInput | Prisma.SkillWhereUniqueInput[]
+}
+
+export type SkillUncheckedCreateNestedManyWithoutTenantInput = {
+  create?: Prisma.XOR<Prisma.SkillCreateWithoutTenantInput, Prisma.SkillUncheckedCreateWithoutTenantInput> | Prisma.SkillCreateWithoutTenantInput[] | Prisma.SkillUncheckedCreateWithoutTenantInput[]
+  connectOrCreate?: Prisma.SkillCreateOrConnectWithoutTenantInput | Prisma.SkillCreateOrConnectWithoutTenantInput[]
+  createMany?: Prisma.SkillCreateManyTenantInputEnvelope
+  connect?: Prisma.SkillWhereUniqueInput | Prisma.SkillWhereUniqueInput[]
+}
+
+export type SkillUpdateManyWithoutTenantNestedInput = {
+  create?: Prisma.XOR<Prisma.SkillCreateWithoutTenantInput, Prisma.SkillUncheckedCreateWithoutTenantInput> | Prisma.SkillCreateWithoutTenantInput[] | Prisma.SkillUncheckedCreateWithoutTenantInput[]
+  connectOrCreate?: Prisma.SkillCreateOrConnectWithoutTenantInput | Prisma.SkillCreateOrConnectWithoutTenantInput[]
+  upsert?: Prisma.SkillUpsertWithWhereUniqueWithoutTenantInput | Prisma.SkillUpsertWithWhereUniqueWithoutTenantInput[]
+  createMany?: Prisma.SkillCreateManyTenantInputEnvelope
+  set?: Prisma.SkillWhereUniqueInput | Prisma.SkillWhereUniqueInput[]
+  disconnect?: Prisma.SkillWhereUniqueInput | Prisma.SkillWhereUniqueInput[]
+  delete?: Prisma.SkillWhereUniqueInput | Prisma.SkillWhereUniqueInput[]
+  connect?: Prisma.SkillWhereUniqueInput | Prisma.SkillWhereUniqueInput[]
+  update?: Prisma.SkillUpdateWithWhereUniqueWithoutTenantInput | Prisma.SkillUpdateWithWhereUniqueWithoutTenantInput[]
+  updateMany?: Prisma.SkillUpdateManyWithWhereWithoutTenantInput | Prisma.SkillUpdateManyWithWhereWithoutTenantInput[]
+  deleteMany?: Prisma.SkillScalarWhereInput | Prisma.SkillScalarWhereInput[]
+}
+
+export type SkillUncheckedUpdateManyWithoutTenantNestedInput = {
+  create?: Prisma.XOR<Prisma.SkillCreateWithoutTenantInput, Prisma.SkillUncheckedCreateWithoutTenantInput> | Prisma.SkillCreateWithoutTenantInput[] | Prisma.SkillUncheckedCreateWithoutTenantInput[]
+  connectOrCreate?: Prisma.SkillCreateOrConnectWithoutTenantInput | Prisma.SkillCreateOrConnectWithoutTenantInput[]
+  upsert?: Prisma.SkillUpsertWithWhereUniqueWithoutTenantInput | Prisma.SkillUpsertWithWhereUniqueWithoutTenantInput[]
+  createMany?: Prisma.SkillCreateManyTenantInputEnvelope
+  set?: Prisma.SkillWhereUniqueInput | Prisma.SkillWhereUniqueInput[]
+  disconnect?: Prisma.SkillWhereUniqueInput | Prisma.SkillWhereUniqueInput[]
+  delete?: Prisma.SkillWhereUniqueInput | Prisma.SkillWhereUniqueInput[]
+  connect?: Prisma.SkillWhereUniqueInput | Prisma.SkillWhereUniqueInput[]
+  update?: Prisma.SkillUpdateWithWhereUniqueWithoutTenantInput | Prisma.SkillUpdateWithWhereUniqueWithoutTenantInput[]
+  updateMany?: Prisma.SkillUpdateManyWithWhereWithoutTenantInput | Prisma.SkillUpdateManyWithWhereWithoutTenantInput[]
+  deleteMany?: Prisma.SkillScalarWhereInput | Prisma.SkillScalarWhereInput[]
+}
+
 export type SkillCreatecompatibleRolesInput = {
   set: string[]
 }
@@ -899,6 +966,7 @@ export type SkillCreateWithoutAuthorInput = {
   installCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  tenant?: Prisma.TenantCreateNestedOneWithoutSkillsInput
   installations?: Prisma.SkillInstallationCreateNestedManyWithoutSkillInput
 }
 
@@ -911,6 +979,7 @@ export type SkillUncheckedCreateWithoutAuthorInput = {
   status?: $Enums.SkillStatus
   isCore?: boolean
   submittedAt?: Date | string
+  tenantId?: string | null
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
   repositoryUrl?: string | null
   mainFile?: string | null
@@ -969,6 +1038,7 @@ export type SkillScalarWhereInput = {
   isCore?: Prisma.BoolFilter<"Skill"> | boolean
   authorId?: Prisma.StringFilter<"Skill"> | string
   submittedAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
+  tenantId?: Prisma.StringNullableFilter<"Skill"> | string | null
   compatibleRoles?: Prisma.StringNullableListFilter<"Skill">
   repositoryUrl?: Prisma.StringNullableFilter<"Skill"> | string | null
   mainFile?: Prisma.StringNullableFilter<"Skill"> | string | null
@@ -985,6 +1055,90 @@ export type SkillScalarWhereInput = {
   installCount?: Prisma.IntFilter<"Skill"> | number
   createdAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
+}
+
+export type SkillCreateWithoutTenantInput = {
+  id?: string
+  name: string
+  version: string
+  description: string
+  category: $Enums.SkillCategory
+  status?: $Enums.SkillStatus
+  isCore?: boolean
+  submittedAt?: Date | string
+  compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
+  repositoryUrl?: string | null
+  mainFile?: string | null
+  sourceCode?: string | null
+  capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  documentation?: string | null
+  changelog?: string | null
+  reviewNotes?: string | null
+  reviewedAt?: Date | string | null
+  reviewedBy?: string | null
+  rating?: number
+  installCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  author: Prisma.UserCreateNestedOneWithoutSkillsAuthoredInput
+  installations?: Prisma.SkillInstallationCreateNestedManyWithoutSkillInput
+}
+
+export type SkillUncheckedCreateWithoutTenantInput = {
+  id?: string
+  name: string
+  version: string
+  description: string
+  category: $Enums.SkillCategory
+  status?: $Enums.SkillStatus
+  isCore?: boolean
+  authorId: string
+  submittedAt?: Date | string
+  compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
+  repositoryUrl?: string | null
+  mainFile?: string | null
+  sourceCode?: string | null
+  capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  documentation?: string | null
+  changelog?: string | null
+  reviewNotes?: string | null
+  reviewedAt?: Date | string | null
+  reviewedBy?: string | null
+  rating?: number
+  installCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  installations?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutSkillInput
+}
+
+export type SkillCreateOrConnectWithoutTenantInput = {
+  where: Prisma.SkillWhereUniqueInput
+  create: Prisma.XOR<Prisma.SkillCreateWithoutTenantInput, Prisma.SkillUncheckedCreateWithoutTenantInput>
+}
+
+export type SkillCreateManyTenantInputEnvelope = {
+  data: Prisma.SkillCreateManyTenantInput | Prisma.SkillCreateManyTenantInput[]
+  skipDuplicates?: boolean
+}
+
+export type SkillUpsertWithWhereUniqueWithoutTenantInput = {
+  where: Prisma.SkillWhereUniqueInput
+  update: Prisma.XOR<Prisma.SkillUpdateWithoutTenantInput, Prisma.SkillUncheckedUpdateWithoutTenantInput>
+  create: Prisma.XOR<Prisma.SkillCreateWithoutTenantInput, Prisma.SkillUncheckedCreateWithoutTenantInput>
+}
+
+export type SkillUpdateWithWhereUniqueWithoutTenantInput = {
+  where: Prisma.SkillWhereUniqueInput
+  data: Prisma.XOR<Prisma.SkillUpdateWithoutTenantInput, Prisma.SkillUncheckedUpdateWithoutTenantInput>
+}
+
+export type SkillUpdateManyWithWhereWithoutTenantInput = {
+  where: Prisma.SkillScalarWhereInput
+  data: Prisma.XOR<Prisma.SkillUpdateManyMutationInput, Prisma.SkillUncheckedUpdateManyWithoutTenantInput>
 }
 
 export type SkillCreateWithoutInstallationsInput = {
@@ -1013,6 +1167,7 @@ export type SkillCreateWithoutInstallationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   author: Prisma.UserCreateNestedOneWithoutSkillsAuthoredInput
+  tenant?: Prisma.TenantCreateNestedOneWithoutSkillsInput
 }
 
 export type SkillUncheckedCreateWithoutInstallationsInput = {
@@ -1025,6 +1180,7 @@ export type SkillUncheckedCreateWithoutInstallationsInput = {
   isCore?: boolean
   authorId: string
   submittedAt?: Date | string
+  tenantId?: string | null
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
   repositoryUrl?: string | null
   mainFile?: string | null
@@ -1085,6 +1241,7 @@ export type SkillUpdateWithoutInstallationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.UserUpdateOneRequiredWithoutSkillsAuthoredNestedInput
+  tenant?: Prisma.TenantUpdateOneWithoutSkillsNestedInput
 }
 
 export type SkillUncheckedUpdateWithoutInstallationsInput = {
@@ -1097,6 +1254,7 @@ export type SkillUncheckedUpdateWithoutInstallationsInput = {
   isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
   repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mainFile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1124,6 +1282,7 @@ export type SkillCreateManyAuthorInput = {
   status?: $Enums.SkillStatus
   isCore?: boolean
   submittedAt?: Date | string
+  tenantId?: string | null
   compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
   repositoryUrl?: string | null
   mainFile?: string | null
@@ -1167,6 +1326,7 @@ export type SkillUpdateWithoutAuthorInput = {
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneWithoutSkillsNestedInput
   installations?: Prisma.SkillInstallationUpdateManyWithoutSkillNestedInput
 }
 
@@ -1179,6 +1339,7 @@ export type SkillUncheckedUpdateWithoutAuthorInput = {
   status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
   isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
   repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mainFile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1206,6 +1367,121 @@ export type SkillUncheckedUpdateManyWithoutAuthorInput = {
   category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
   status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
   isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
+  repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mainFile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  installCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SkillCreateManyTenantInput = {
+  id?: string
+  name: string
+  version: string
+  description: string
+  category: $Enums.SkillCategory
+  status?: $Enums.SkillStatus
+  isCore?: boolean
+  authorId: string
+  submittedAt?: Date | string
+  compatibleRoles?: Prisma.SkillCreatecompatibleRolesInput | string[]
+  repositoryUrl?: string | null
+  mainFile?: string | null
+  sourceCode?: string | null
+  capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  documentation?: string | null
+  changelog?: string | null
+  reviewNotes?: string | null
+  reviewedAt?: Date | string | null
+  reviewedBy?: string | null
+  rating?: number
+  installCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type SkillUpdateWithoutTenantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
+  status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
+  isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
+  repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mainFile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  installCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  author?: Prisma.UserUpdateOneRequiredWithoutSkillsAuthoredNestedInput
+  installations?: Prisma.SkillInstallationUpdateManyWithoutSkillNestedInput
+}
+
+export type SkillUncheckedUpdateWithoutTenantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
+  status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
+  isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
+  repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mainFile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  installCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  installations?: Prisma.SkillInstallationUncheckedUpdateManyWithoutSkillNestedInput
+}
+
+export type SkillUncheckedUpdateManyWithoutTenantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  version?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumSkillCategoryFieldUpdateOperationsInput | $Enums.SkillCategory
+  status?: Prisma.EnumSkillStatusFieldUpdateOperationsInput | $Enums.SkillStatus
+  isCore?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   compatibleRoles?: Prisma.SkillUpdatecompatibleRolesInput | string[]
   repositoryUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1266,6 +1542,7 @@ export type SkillSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   isCore?: boolean
   authorId?: boolean
   submittedAt?: boolean
+  tenantId?: boolean
   compatibleRoles?: boolean
   repositoryUrl?: boolean
   mainFile?: boolean
@@ -1283,6 +1560,7 @@ export type SkillSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   createdAt?: boolean
   updatedAt?: boolean
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tenant?: boolean | Prisma.Skill$tenantArgs<ExtArgs>
   installations?: boolean | Prisma.Skill$installationsArgs<ExtArgs>
   _count?: boolean | Prisma.SkillCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["skill"]>
@@ -1297,6 +1575,7 @@ export type SkillSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isCore?: boolean
   authorId?: boolean
   submittedAt?: boolean
+  tenantId?: boolean
   compatibleRoles?: boolean
   repositoryUrl?: boolean
   mainFile?: boolean
@@ -1314,6 +1593,7 @@ export type SkillSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   createdAt?: boolean
   updatedAt?: boolean
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tenant?: boolean | Prisma.Skill$tenantArgs<ExtArgs>
 }, ExtArgs["result"]["skill"]>
 
 export type SkillSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1326,6 +1606,7 @@ export type SkillSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isCore?: boolean
   authorId?: boolean
   submittedAt?: boolean
+  tenantId?: boolean
   compatibleRoles?: boolean
   repositoryUrl?: boolean
   mainFile?: boolean
@@ -1343,6 +1624,7 @@ export type SkillSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   createdAt?: boolean
   updatedAt?: boolean
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tenant?: boolean | Prisma.Skill$tenantArgs<ExtArgs>
 }, ExtArgs["result"]["skill"]>
 
 export type SkillSelectScalar = {
@@ -1355,6 +1637,7 @@ export type SkillSelectScalar = {
   isCore?: boolean
   authorId?: boolean
   submittedAt?: boolean
+  tenantId?: boolean
   compatibleRoles?: boolean
   repositoryUrl?: boolean
   mainFile?: boolean
@@ -1373,23 +1656,27 @@ export type SkillSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SkillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "version" | "description" | "category" | "status" | "isCore" | "authorId" | "submittedAt" | "compatibleRoles" | "repositoryUrl" | "mainFile" | "sourceCode" | "capabilities" | "configuration" | "permissions" | "documentation" | "changelog" | "reviewNotes" | "reviewedAt" | "reviewedBy" | "rating" | "installCount" | "createdAt" | "updatedAt", ExtArgs["result"]["skill"]>
+export type SkillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "version" | "description" | "category" | "status" | "isCore" | "authorId" | "submittedAt" | "tenantId" | "compatibleRoles" | "repositoryUrl" | "mainFile" | "sourceCode" | "capabilities" | "configuration" | "permissions" | "documentation" | "changelog" | "reviewNotes" | "reviewedAt" | "reviewedBy" | "rating" | "installCount" | "createdAt" | "updatedAt", ExtArgs["result"]["skill"]>
 export type SkillInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tenant?: boolean | Prisma.Skill$tenantArgs<ExtArgs>
   installations?: boolean | Prisma.Skill$installationsArgs<ExtArgs>
   _count?: boolean | Prisma.SkillCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SkillIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tenant?: boolean | Prisma.Skill$tenantArgs<ExtArgs>
 }
 export type SkillIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tenant?: boolean | Prisma.Skill$tenantArgs<ExtArgs>
 }
 
 export type $SkillPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Skill"
   objects: {
     author: Prisma.$UserPayload<ExtArgs>
+    tenant: Prisma.$TenantPayload<ExtArgs> | null
     installations: Prisma.$SkillInstallationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1402,6 +1689,7 @@ export type $SkillPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     isCore: boolean
     authorId: string
     submittedAt: Date
+    tenantId: string | null
     compatibleRoles: string[]
     repositoryUrl: string | null
     mainFile: string | null
@@ -1813,6 +2101,7 @@ readonly fields: SkillFieldRefs;
 export interface Prisma__SkillClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   author<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  tenant<T extends Prisma.Skill$tenantArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Skill$tenantArgs<ExtArgs>>): Prisma.Prisma__TenantClient<runtime.Types.Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   installations<T extends Prisma.Skill$installationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Skill$installationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SkillInstallationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1852,6 +2141,7 @@ export interface SkillFieldRefs {
   readonly isCore: Prisma.FieldRef<"Skill", 'Boolean'>
   readonly authorId: Prisma.FieldRef<"Skill", 'String'>
   readonly submittedAt: Prisma.FieldRef<"Skill", 'DateTime'>
+  readonly tenantId: Prisma.FieldRef<"Skill", 'String'>
   readonly compatibleRoles: Prisma.FieldRef<"Skill", 'String[]'>
   readonly repositoryUrl: Prisma.FieldRef<"Skill", 'String'>
   readonly mainFile: Prisma.FieldRef<"Skill", 'String'>
@@ -2261,6 +2551,25 @@ export type SkillDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many Skills to delete.
    */
   limit?: number
+}
+
+/**
+ * Skill.tenant
+ */
+export type Skill$tenantArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Tenant
+   */
+  select?: Prisma.TenantSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Tenant
+   */
+  omit?: Prisma.TenantOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TenantInclude<ExtArgs> | null
+  where?: Prisma.TenantWhereInput
 }
 
 /**

@@ -6,12 +6,14 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Bot,
+  Network,
   Puzzle,
   Users,
   FileText,
   Settings,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   LogOut,
   Layers,
 } from 'lucide-react';
@@ -47,6 +49,7 @@ interface NavItem {
   label: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
+  children?: NavItem[];
 }
 
 interface NavSection {
@@ -63,7 +66,14 @@ const NAV_SECTIONS: NavSection[] = [
     title: 'WORKSPACE',
     items: [
       { label: 'Dashboard', href: ROUTES.DASHBOARD, icon: LayoutDashboard },
-      { label: 'Agents', href: ROUTES.AGENTS, icon: Bot },
+      {
+        label: 'Agents',
+        href: ROUTES.AGENTS,
+        icon: Bot,
+        children: [
+          { label: 'Communication', href: ROUTES.ALLOWLIST, icon: Network },
+        ],
+      },
       { label: 'Skill Marketplace', href: ROUTES.SKILLS, icon: Puzzle },
     ],
   },
@@ -78,36 +88,143 @@ const NAV_SECTIONS: NavSection[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// Helper: check if a route or any of its children are active
+// ---------------------------------------------------------------------------
+
+function isRouteActive(pathname: string, href: string): boolean {
+  if (pathname === href) return true;
+  // For dashboard, exact match only
+  if (href === ROUTES.DASHBOARD) return false;
+  return pathname.startsWith(href + '/');
+}
+
+// ---------------------------------------------------------------------------
 // Sidebar nav item (expanded)
 // ---------------------------------------------------------------------------
 
 function SidebarNavItem({
   item,
   isActive,
+  pathname,
 }: {
   item: NavItem;
   isActive: boolean;
+  pathname: string;
 }) {
   const Icon = item.icon;
+  const hasChildren = item.children && item.children.length > 0;
+
+  // Auto-expand if current path matches this item or any child
+  const isChildActive = hasChildren
+    ? item.children!.some((child) => isRouteActive(pathname, child.href))
+    : false;
+
+  const [expanded, setExpanded] = React.useState(isActive || isChildActive);
+
+  // Keep in sync if navigation changes
+  React.useEffect(() => {
+    if (isActive || isChildActive) {
+      setExpanded(true);
+    }
+  }, [isActive, isChildActive]);
+
+  if (!hasChildren) {
+    return (
+      <Link
+        href={item.href}
+        className={cn(
+          'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+          isActive
+            ? 'bg-primary-50 text-primary-600 font-semibold'
+            : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+        )}
+      >
+        <Icon
+          className={cn(
+            'h-[18px] w-[18px] shrink-0',
+            isActive ? 'text-primary-600' : 'text-neutral-400'
+          )}
+        />
+        <span>{item.label}</span>
+      </Link>
+    );
+  }
+
+  // Parent with children — renders as expandable group
+  const parentHighlight = isActive && !isChildActive;
 
   return (
-    <Link
-      href={item.href}
-      className={cn(
-        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-        isActive
-          ? 'bg-primary-50 text-primary-600 font-semibold'
-          : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
-      )}
-    >
-      <Icon
+    <div>
+      <div className="flex items-center">
+        <Link
+          href={item.href}
+          className={cn(
+            'flex flex-1 items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+            parentHighlight
+              ? 'bg-primary-50 text-primary-600 font-semibold'
+              : isActive || isChildActive
+                ? 'text-primary-600 font-medium'
+                : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+          )}
+        >
+          <Icon
+            className={cn(
+              'h-[18px] w-[18px] shrink-0',
+              isActive || isChildActive ? 'text-primary-600' : 'text-neutral-400'
+            )}
+          />
+          <span className="flex-1">{item.label}</span>
+        </Link>
+        <button
+          type="button"
+          onClick={() => setExpanded((prev) => !prev)}
+          className="mr-1 rounded p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 transition-colors"
+          aria-label={expanded ? 'Collapse submenu' : 'Expand submenu'}
+        >
+          <ChevronDown
+            className={cn(
+              'h-3.5 w-3.5 transition-transform duration-200',
+              expanded ? 'rotate-0' : '-rotate-90'
+            )}
+          />
+        </button>
+      </div>
+
+      {/* Children */}
+      <div
         className={cn(
-          'h-[18px] w-[18px] shrink-0',
-          isActive ? 'text-primary-600' : 'text-neutral-400'
+          'overflow-hidden transition-all duration-200',
+          expanded ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
         )}
-      />
-      <span>{item.label}</span>
-    </Link>
+      >
+        <div className="ml-5 mt-0.5 space-y-0.5 border-l border-neutral-200 pl-3">
+          {item.children!.map((child) => {
+            const childActive = isRouteActive(pathname, child.href);
+            const ChildIcon = child.icon;
+            return (
+              <Link
+                key={child.href}
+                href={child.href}
+                className={cn(
+                  'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] transition-colors',
+                  childActive
+                    ? 'bg-primary-50 text-primary-600 font-semibold'
+                    : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800'
+                )}
+              >
+                <ChildIcon
+                  className={cn(
+                    'h-4 w-4 shrink-0',
+                    childActive ? 'text-primary-500' : 'text-neutral-400'
+                  )}
+                />
+                <span>{child.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -118,11 +235,19 @@ function SidebarNavItem({
 function SidebarNavItemCollapsed({
   item,
   isActive,
+  pathname,
 }: {
   item: NavItem;
   isActive: boolean;
+  pathname: string;
 }) {
   const Icon = item.icon;
+  const hasChildren = item.children && item.children.length > 0;
+  const isChildActive = hasChildren
+    ? item.children!.some((child) => isRouteActive(pathname, child.href))
+    : false;
+
+  const highlight = isActive || isChildActive;
 
   return (
     <Tooltip>
@@ -131,7 +256,7 @@ function SidebarNavItemCollapsed({
           href={item.href}
           className={cn(
             'flex items-center justify-center rounded-lg p-2 transition-colors',
-            isActive
+            highlight
               ? 'bg-primary-50 text-primary-600'
               : 'text-neutral-400 hover:bg-neutral-50 hover:text-neutral-900'
           )}
@@ -191,12 +316,7 @@ export function TenantSidebar() {
   }, [router]);
 
   const isActive = React.useCallback(
-    (href: string) => {
-      if (href === ROUTES.DASHBOARD) {
-        return pathname === href;
-      }
-      return pathname === href || pathname.startsWith(href + '/');
-    },
+    (href: string) => isRouteActive(pathname, href),
     [pathname]
   );
 
@@ -241,12 +361,14 @@ export function TenantSidebar() {
                       key={item.href}
                       item={item}
                       isActive={isActive(item.href)}
+                      pathname={pathname}
                     />
                   ) : (
                     <SidebarNavItem
                       key={item.href}
                       item={item}
                       isActive={isActive(item.href)}
+                      pathname={pathname}
                     />
                   )
                 )}

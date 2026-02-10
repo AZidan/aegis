@@ -314,6 +314,7 @@ export type AgentWhereInput = {
   messagesReceived?: Prisma.AgentMessageListRelationFilter
   allowlistOwner?: Prisma.AgentAllowlistListRelationFilter
   allowlistTarget?: Prisma.AgentAllowlistListRelationFilter
+  channelRouting?: Prisma.ChannelRoutingListRelationFilter
 }
 
 export type AgentOrderByWithRelationInput = {
@@ -344,6 +345,7 @@ export type AgentOrderByWithRelationInput = {
   messagesReceived?: Prisma.AgentMessageOrderByRelationAggregateInput
   allowlistOwner?: Prisma.AgentAllowlistOrderByRelationAggregateInput
   allowlistTarget?: Prisma.AgentAllowlistOrderByRelationAggregateInput
+  channelRouting?: Prisma.ChannelRoutingOrderByRelationAggregateInput
 }
 
 export type AgentWhereUniqueInput = Prisma.AtLeast<{
@@ -377,6 +379,7 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   messagesReceived?: Prisma.AgentMessageListRelationFilter
   allowlistOwner?: Prisma.AgentAllowlistListRelationFilter
   allowlistTarget?: Prisma.AgentAllowlistListRelationFilter
+  channelRouting?: Prisma.ChannelRoutingListRelationFilter
 }, "id">
 
 export type AgentOrderByWithAggregationInput = {
@@ -454,6 +457,7 @@ export type AgentCreateInput = {
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateInput = {
@@ -483,6 +487,7 @@ export type AgentUncheckedCreateInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUpdateInput = {
@@ -512,6 +517,7 @@ export type AgentUpdateInput = {
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateInput = {
@@ -541,6 +547,7 @@ export type AgentUncheckedUpdateInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateManyInput = {
@@ -876,6 +883,20 @@ export type AgentUpdateOneRequiredWithoutAllowlistTargetNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AgentUpdateToOneWithWhereWithoutAllowlistTargetInput, Prisma.AgentUpdateWithoutAllowlistTargetInput>, Prisma.AgentUncheckedUpdateWithoutAllowlistTargetInput>
 }
 
+export type AgentCreateNestedOneWithoutChannelRoutingInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutChannelRoutingInput, Prisma.AgentUncheckedCreateWithoutChannelRoutingInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutChannelRoutingInput
+  connect?: Prisma.AgentWhereUniqueInput
+}
+
+export type AgentUpdateOneRequiredWithoutChannelRoutingNestedInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutChannelRoutingInput, Prisma.AgentUncheckedCreateWithoutChannelRoutingInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutChannelRoutingInput
+  upsert?: Prisma.AgentUpsertWithoutChannelRoutingInput
+  connect?: Prisma.AgentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AgentUpdateToOneWithWhereWithoutChannelRoutingInput, Prisma.AgentUpdateWithoutChannelRoutingInput>, Prisma.AgentUncheckedUpdateWithoutChannelRoutingInput>
+}
+
 export type AgentCreateWithoutTenantInput = {
   id?: string
   name: string
@@ -902,6 +923,7 @@ export type AgentCreateWithoutTenantInput = {
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutTenantInput = {
@@ -930,6 +952,7 @@ export type AgentUncheckedCreateWithoutTenantInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutTenantInput = {
@@ -1007,6 +1030,7 @@ export type AgentCreateWithoutChannelsInput = {
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutChannelsInput = {
@@ -1035,6 +1059,7 @@ export type AgentUncheckedCreateWithoutChannelsInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutChannelsInput = {
@@ -1079,6 +1104,7 @@ export type AgentUpdateWithoutChannelsInput = {
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutChannelsInput = {
@@ -1107,6 +1133,7 @@ export type AgentUncheckedUpdateWithoutChannelsInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutActivitiesInput = {
@@ -1135,6 +1162,7 @@ export type AgentCreateWithoutActivitiesInput = {
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutActivitiesInput = {
@@ -1163,6 +1191,7 @@ export type AgentUncheckedCreateWithoutActivitiesInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutActivitiesInput = {
@@ -1207,6 +1236,7 @@ export type AgentUpdateWithoutActivitiesInput = {
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutActivitiesInput = {
@@ -1235,6 +1265,7 @@ export type AgentUncheckedUpdateWithoutActivitiesInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutMetricsInput = {
@@ -1263,6 +1294,7 @@ export type AgentCreateWithoutMetricsInput = {
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutMetricsInput = {
@@ -1291,6 +1323,7 @@ export type AgentUncheckedCreateWithoutMetricsInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutMetricsInput = {
@@ -1335,6 +1368,7 @@ export type AgentUpdateWithoutMetricsInput = {
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutMetricsInput = {
@@ -1363,6 +1397,7 @@ export type AgentUncheckedUpdateWithoutMetricsInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutInstalledSkillsInput = {
@@ -1391,6 +1426,7 @@ export type AgentCreateWithoutInstalledSkillsInput = {
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutInstalledSkillsInput = {
@@ -1419,6 +1455,7 @@ export type AgentUncheckedCreateWithoutInstalledSkillsInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutInstalledSkillsInput = {
@@ -1463,6 +1500,7 @@ export type AgentUpdateWithoutInstalledSkillsInput = {
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutInstalledSkillsInput = {
@@ -1491,6 +1529,7 @@ export type AgentUncheckedUpdateWithoutInstalledSkillsInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutAuditLogsInput = {
@@ -1519,6 +1558,7 @@ export type AgentCreateWithoutAuditLogsInput = {
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutAuditLogsInput = {
@@ -1547,6 +1587,7 @@ export type AgentUncheckedCreateWithoutAuditLogsInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutAuditLogsInput = {
@@ -1591,6 +1632,7 @@ export type AgentUpdateWithoutAuditLogsInput = {
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutAuditLogsInput = {
@@ -1619,6 +1661,7 @@ export type AgentUncheckedUpdateWithoutAuditLogsInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutMessagesSentInput = {
@@ -1647,6 +1690,7 @@ export type AgentCreateWithoutMessagesSentInput = {
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutMessagesSentInput = {
@@ -1675,6 +1719,7 @@ export type AgentUncheckedCreateWithoutMessagesSentInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutMessagesSentInput = {
@@ -1708,6 +1753,7 @@ export type AgentCreateWithoutMessagesReceivedInput = {
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutMessagesReceivedInput = {
@@ -1736,6 +1782,7 @@ export type AgentUncheckedCreateWithoutMessagesReceivedInput = {
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutMessagesReceivedInput = {
@@ -1780,6 +1827,7 @@ export type AgentUpdateWithoutMessagesSentInput = {
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutMessagesSentInput = {
@@ -1808,6 +1856,7 @@ export type AgentUncheckedUpdateWithoutMessagesSentInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUpsertWithoutMessagesReceivedInput = {
@@ -1847,6 +1896,7 @@ export type AgentUpdateWithoutMessagesReceivedInput = {
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutMessagesReceivedInput = {
@@ -1875,6 +1925,7 @@ export type AgentUncheckedUpdateWithoutMessagesReceivedInput = {
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutAllowlistOwnerInput = {
@@ -1903,6 +1954,7 @@ export type AgentCreateWithoutAllowlistOwnerInput = {
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutAllowlistOwnerInput = {
@@ -1931,6 +1983,7 @@ export type AgentUncheckedCreateWithoutAllowlistOwnerInput = {
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutAllowlistOwnerInput = {
@@ -1964,6 +2017,7 @@ export type AgentCreateWithoutAllowlistTargetInput = {
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
+  channelRouting?: Prisma.ChannelRoutingCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutAllowlistTargetInput = {
@@ -1992,6 +2046,7 @@ export type AgentUncheckedCreateWithoutAllowlistTargetInput = {
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutAllowlistTargetInput = {
@@ -2036,6 +2091,7 @@ export type AgentUpdateWithoutAllowlistOwnerInput = {
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutAllowlistOwnerInput = {
@@ -2064,6 +2120,7 @@ export type AgentUncheckedUpdateWithoutAllowlistOwnerInput = {
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUpsertWithoutAllowlistTargetInput = {
@@ -2103,6 +2160,7 @@ export type AgentUpdateWithoutAllowlistTargetInput = {
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutAllowlistTargetInput = {
@@ -2131,6 +2189,139 @@ export type AgentUncheckedUpdateWithoutAllowlistTargetInput = {
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentCreateWithoutChannelRoutingInput = {
+  id?: string
+  name: string
+  description?: string | null
+  role: string
+  status?: $Enums.AgentStatus
+  modelTier: $Enums.ModelTier
+  thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
+  toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  openclawAgentId?: string | null
+  lastActive?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutAgentsInput
+  channels?: Prisma.AgentChannelCreateNestedManyWithoutAgentInput
+  activities?: Prisma.AgentActivityCreateNestedManyWithoutAgentInput
+  metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
+  installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
+  messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
+  allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
+  allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
+}
+
+export type AgentUncheckedCreateWithoutChannelRoutingInput = {
+  id?: string
+  name: string
+  description?: string | null
+  role: string
+  status?: $Enums.AgentStatus
+  tenantId: string
+  modelTier: $Enums.ModelTier
+  thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
+  toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  openclawAgentId?: string | null
+  lastActive?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  channels?: Prisma.AgentChannelUncheckedCreateNestedManyWithoutAgentInput
+  activities?: Prisma.AgentActivityUncheckedCreateNestedManyWithoutAgentInput
+  metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
+  installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
+  allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
+  allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
+}
+
+export type AgentCreateOrConnectWithoutChannelRoutingInput = {
+  where: Prisma.AgentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgentCreateWithoutChannelRoutingInput, Prisma.AgentUncheckedCreateWithoutChannelRoutingInput>
+}
+
+export type AgentUpsertWithoutChannelRoutingInput = {
+  update: Prisma.XOR<Prisma.AgentUpdateWithoutChannelRoutingInput, Prisma.AgentUncheckedUpdateWithoutChannelRoutingInput>
+  create: Prisma.XOR<Prisma.AgentCreateWithoutChannelRoutingInput, Prisma.AgentUncheckedCreateWithoutChannelRoutingInput>
+  where?: Prisma.AgentWhereInput
+}
+
+export type AgentUpdateToOneWithWhereWithoutChannelRoutingInput = {
+  where?: Prisma.AgentWhereInput
+  data: Prisma.XOR<Prisma.AgentUpdateWithoutChannelRoutingInput, Prisma.AgentUncheckedUpdateWithoutChannelRoutingInput>
+}
+
+export type AgentUpdateWithoutChannelRoutingInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
+  modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
+  thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutAgentsNestedInput
+  channels?: Prisma.AgentChannelUpdateManyWithoutAgentNestedInput
+  activities?: Prisma.AgentActivityUpdateManyWithoutAgentNestedInput
+  metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
+  installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
+  messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
+  allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
+  allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
+}
+
+export type AgentUncheckedUpdateWithoutChannelRoutingInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
+  thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  channels?: Prisma.AgentChannelUncheckedUpdateManyWithoutAgentNestedInput
+  activities?: Prisma.AgentActivityUncheckedUpdateManyWithoutAgentNestedInput
+  metrics?: Prisma.AgentMetricsUncheckedUpdateManyWithoutAgentNestedInput
+  installedSkills?: Prisma.SkillInstallationUncheckedUpdateManyWithoutAgentNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutAgentNestedInput
+  messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
+  allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
+  allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
 }
 
 export type AgentCreateManyTenantInput = {
@@ -2178,6 +2369,7 @@ export type AgentUpdateWithoutTenantInput = {
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutTenantInput = {
@@ -2206,6 +2398,7 @@ export type AgentUncheckedUpdateWithoutTenantInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateManyWithoutTenantInput = {
@@ -2242,6 +2435,7 @@ export type AgentCountOutputType = {
   messagesReceived: number
   allowlistOwner: number
   allowlistTarget: number
+  channelRouting: number
 }
 
 export type AgentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2254,6 +2448,7 @@ export type AgentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   messagesReceived?: boolean | AgentCountOutputTypeCountMessagesReceivedArgs
   allowlistOwner?: boolean | AgentCountOutputTypeCountAllowlistOwnerArgs
   allowlistTarget?: boolean | AgentCountOutputTypeCountAllowlistTargetArgs
+  channelRouting?: boolean | AgentCountOutputTypeCountChannelRoutingArgs
 }
 
 /**
@@ -2329,6 +2524,13 @@ export type AgentCountOutputTypeCountAllowlistTargetArgs<ExtArgs extends runtime
   where?: Prisma.AgentAllowlistWhereInput
 }
 
+/**
+ * AgentCountOutputType without action
+ */
+export type AgentCountOutputTypeCountChannelRoutingArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ChannelRoutingWhereInput
+}
+
 
 export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2358,6 +2560,7 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   messagesReceived?: boolean | Prisma.Agent$messagesReceivedArgs<ExtArgs>
   allowlistOwner?: boolean | Prisma.Agent$allowlistOwnerArgs<ExtArgs>
   allowlistTarget?: boolean | Prisma.Agent$allowlistTargetArgs<ExtArgs>
+  channelRouting?: boolean | Prisma.Agent$channelRoutingArgs<ExtArgs>
   _count?: boolean | Prisma.AgentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agent"]>
 
@@ -2435,6 +2638,7 @@ export type AgentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   messagesReceived?: boolean | Prisma.Agent$messagesReceivedArgs<ExtArgs>
   allowlistOwner?: boolean | Prisma.Agent$allowlistOwnerArgs<ExtArgs>
   allowlistTarget?: boolean | Prisma.Agent$allowlistTargetArgs<ExtArgs>
+  channelRouting?: boolean | Prisma.Agent$channelRoutingArgs<ExtArgs>
   _count?: boolean | Prisma.AgentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AgentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2457,6 +2661,7 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     messagesReceived: Prisma.$AgentMessagePayload<ExtArgs>[]
     allowlistOwner: Prisma.$AgentAllowlistPayload<ExtArgs>[]
     allowlistTarget: Prisma.$AgentAllowlistPayload<ExtArgs>[]
+    channelRouting: Prisma.$ChannelRoutingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2880,6 +3085,7 @@ export interface Prisma__AgentClient<T, Null = never, ExtArgs extends runtime.Ty
   messagesReceived<T extends Prisma.Agent$messagesReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$messagesReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   allowlistOwner<T extends Prisma.Agent$allowlistOwnerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$allowlistOwnerArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentAllowlistPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   allowlistTarget<T extends Prisma.Agent$allowlistTargetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$allowlistTargetArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentAllowlistPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  channelRouting<T extends Prisma.Agent$channelRoutingArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$channelRoutingArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChannelRoutingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3535,6 +3741,30 @@ export type Agent$allowlistTargetArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.AgentAllowlistScalarFieldEnum | Prisma.AgentAllowlistScalarFieldEnum[]
+}
+
+/**
+ * Agent.channelRouting
+ */
+export type Agent$channelRoutingArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ChannelRouting
+   */
+  select?: Prisma.ChannelRoutingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ChannelRouting
+   */
+  omit?: Prisma.ChannelRoutingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChannelRoutingInclude<ExtArgs> | null
+  where?: Prisma.ChannelRoutingWhereInput
+  orderBy?: Prisma.ChannelRoutingOrderByWithRelationInput | Prisma.ChannelRoutingOrderByWithRelationInput[]
+  cursor?: Prisma.ChannelRoutingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ChannelRoutingScalarFieldEnum | Prisma.ChannelRoutingScalarFieldEnum[]
 }
 
 /**

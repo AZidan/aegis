@@ -132,3 +132,13 @@ export type AgentMessage = Prisma.AgentMessageModel
  * 
  */
 export type AgentAllowlist = Prisma.AgentAllowlistModel
+/**
+ * Model ChannelConnection
+ * ChannelConnection - Platform connections (Slack, Teams, Discord, Google Chat) per tenant
+ */
+export type ChannelConnection = Prisma.ChannelConnectionModel
+/**
+ * Model ChannelRouting
+ * ChannelRouting - Routing rules that map platform events to agents
+ */
+export type ChannelRouting = Prisma.ChannelRoutingModel

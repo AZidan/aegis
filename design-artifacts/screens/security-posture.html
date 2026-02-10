@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security Posture - Aegis Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            primary: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            },
+            neutral: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              700: '#334155',
+              800: '#1e293b',
+              900: '#0f172a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+
+    /* Smooth transitions */
+    .nav-item { transition: all 0.15s ease; }
+    .card-hover { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card-hover:hover { transform: translateY(-1px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04); }
+
+    /* Pulse animation for notification dot */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.15); }
+    }
+    .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+    /* Bar chart entry animation */
+    @keyframes bar-grow {
+      from { width: 0; }
+    }
+    .bar-animate { animation: bar-grow 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+    /* Number count-up animation */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fade-up 0.5s ease-out forwards; }
+    .fade-up-d1 { animation-delay: 0.05s; }
+    .fade-up-d2 { animation-delay: 0.1s; }
+    .fade-up-d3 { animation-delay: 0.15s; }
+    .fade-up-d4 { animation-delay: 0.2s; }
+
+    /* SVG area chart path animation */
+    @keyframes draw-line {
+      from { stroke-dashoffset: 1000; }
+      to { stroke-dashoffset: 0; }
+    }
+    .chart-line { stroke-dasharray: 1000; animation: draw-line 1.2s ease-in-out forwards; }
+
+    /* Metric card gradient top bar */
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      border-radius: 12px 12px 0 0;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .metric-card:hover::before { opacity: 1; }
+    .metric-card-indigo::before { background: linear-gradient(90deg, #6366f1, #818cf8); }
+    .metric-card-amber::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .metric-card-rose::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .metric-card-teal::before { background: linear-gradient(90deg, #14b8a6, #2dd4bf); }
+
+    /* Compliance progress bar animation */
+    @keyframes progress-fill {
+      from { width: 0; }
+    }
+    .progress-animate { animation: progress-fill 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+    /* SVG progress ring animation */
+    @keyframes ring-fill {
+      from { stroke-dashoffset: 251.2; }
+    }
+    .ring-animate { animation: ring-fill 1s ease-out forwards; }
+
+    /* Active pill style */
+    .pill-active {
+      background-color: #6366f1 !important;
+      color: white !important;
+      box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Table row hover */
+    .compliance-row:hover td { background-color: #eef2ff; }
+  </style>
+</head>
+<body class="h-full bg-[#f8fafc] font-sans text-neutral-900 antialiased">
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside id="sidebar" class="fixed left-0 top-0 h-full bg-white border-r border-neutral-200 flex flex-col transition-all duration-300 z-30" style="width: 256px">
+    <!-- Logo -->
+    <div class="flex items-center gap-3 px-5 py-5 border-b border-neutral-100">
+      <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center flex-shrink-0">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      </div>
+      <span class="sidebar-label font-bold text-neutral-900 text-lg tracking-tight">Aegis Admin</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <!-- OVERVIEW section -->
+      <div>
+        <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Overview</p>
+        <a href="/admin" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="sidebar-label">Dashboard</span>
+        </a>
+        <a href="/admin/tenants" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18"/><path d="M6 12H4a2 2 0 00-2 2v6a2 2 0 002 2h2"/><path d="M18 9h2a2 2 0 012 2v9a2 2 0 01-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+          <span class="sidebar-label">Tenants</span>
+        </a>
+      </div>
+
+      <!-- SECURITY section -->
+      <div>
+        <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Security</p>
+        <a href="/admin/dashboard/security-posture" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-primary-50 text-primary-600 font-semibold">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+          <span class="sidebar-label">Security Posture</span>
+        </a>
+        <a href="/admin/dashboard/alerts" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="sidebar-label">Alerts</span>
+          <span class="sidebar-label ml-auto bg-red-100 text-red-700 text-xs font-semibold px-2 py-0.5 rounded-full">8</span>
+        </a>
+        <a href="/admin/audit" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span class="sidebar-label">Audit Logs</span>
+        </a>
+      </div>
+
+      <!-- MARKETPLACE section -->
+      <div>
+        <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Marketplace</p>
+        <a href="/admin/skills/review" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 16l2 2 4-4"/><path d="M21 10V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l2-1.14"/><path d="M16.5 9.4L7.55 4.24"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+          <span class="sidebar-label">Skill Review</span>
+          <span class="sidebar-label ml-auto bg-amber-100 text-amber-700 text-xs font-semibold px-2 py-0.5 rounded-full">5</span>
+        </a>
+      </div>
+
+      <!-- SYSTEM section -->
+      <div>
+        <p class="sidebar-label px-3 mb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">System</p>
+        <a href="/admin/settings" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span class="sidebar-label">Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Footer: Collapse toggle + User -->
+    <div class="border-t border-neutral-100 px-3 py-3 space-y-2">
+      <button onclick="toggleSidebar()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 w-full">
+        <svg id="collapse-icon" class="w-5 h-5 flex-shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+        <span class="sidebar-label">Collapse</span>
+      </button>
+      <div class="flex items-center gap-3 px-3 py-2">
+        <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+          <span class="text-sm font-semibold text-primary-600">SA</span>
+        </div>
+        <div class="sidebar-label">
+          <p class="text-sm font-medium text-neutral-900">Super Admin</p>
+          <p class="text-xs text-neutral-500">admin@aegis.io</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div id="main-content" class="flex-1 flex flex-col min-w-0 overflow-hidden" style="margin-left: 256px">
+
+    <!-- Header bar -->
+    <header class="flex items-center justify-between h-16 px-6 lg:px-8 border-b border-neutral-200/80 bg-white/70 backdrop-blur-sm shrink-0">
+      <div class="flex items-center gap-4">
+        <!-- Mobile hamburger -->
+        <button onclick="toggleSidebar()" class="lg:hidden -ml-1 p-1.5 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+          </svg>
+        </button>
+        <div>
+          <h1 class="text-lg font-semibold text-neutral-900 tracking-tight">Security Posture</h1>
+          <p class="text-[12px] text-neutral-400 font-medium mt-0.5">
+            Platform security overview, alert analysis, and compliance status.
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <!-- Time Period Selector -->
+        <div class="flex items-center bg-neutral-100 rounded-lg p-1 gap-0.5">
+          <button onclick="setTimePeriod(this, '24h')" class="time-pill px-3 py-1.5 rounded-md text-[13px] font-medium text-neutral-600 hover:text-neutral-900 transition-colors">24h</button>
+          <button onclick="setTimePeriod(this, '7d')" class="time-pill pill-active px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors">7d</button>
+          <button onclick="setTimePeriod(this, '30d')" class="time-pill px-3 py-1.5 rounded-md text-[13px] font-medium text-neutral-600 hover:text-neutral-900 transition-colors">30d</button>
+        </div>
+        <!-- View All Alerts -->
+        <a href="/admin/dashboard/alerts" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors">
+          View All Alerts
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+          </svg>
+        </a>
+      </div>
+    </header>
+
+    <!-- Scrollable main area -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="px-6 lg:px-8 py-6 max-w-[1440px]">
+
+        <!-- ==================== METRIC CARDS ==================== -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+
+          <!-- Total Alerts -->
+          <div class="metric-card metric-card-indigo relative bg-white rounded-xl border border-neutral-200/60 p-5 card-hover overflow-hidden cursor-pointer" onclick="window.location='/admin/dashboard/alerts'">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-[12px] font-medium text-neutral-400 uppercase tracking-wider">Total Alerts</p>
+                <p class="text-[28px] font-bold text-neutral-900 mt-1 tracking-tight fade-up">47</p>
+                <div class="flex items-center gap-1.5 mt-2">
+                  <span class="inline-flex items-center gap-0.5 text-[12px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 4.5l-15 15m0 0h11.25m-11.25 0V8.25"/>
+                    </svg>
+                    -12%
+                  </span>
+                  <span class="text-[11px] text-neutral-400">vs prev period</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Unresolved Alerts -->
+          <div class="metric-card metric-card-amber relative bg-white rounded-xl border border-neutral-200/60 border-l-4 border-l-amber-400 p-5 card-hover overflow-hidden cursor-pointer" onclick="window.location='/admin/dashboard/alerts?filter=unresolved'">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-[12px] font-medium text-neutral-400 uppercase tracking-wider">Unresolved</p>
+                <p class="text-[28px] font-bold text-amber-600 mt-1 tracking-tight fade-up fade-up-d1">8</p>
+                <div class="flex items-center gap-1.5 mt-2">
+                  <span class="relative flex h-2 w-2">
+                    <span class="pulse-dot absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                  </span>
+                  <span class="text-[11px] text-neutral-400">Needs attention</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Critical Alerts -->
+          <div class="metric-card metric-card-rose relative bg-white rounded-xl border border-neutral-200/60 border-l-4 border-l-red-400 p-5 card-hover overflow-hidden cursor-pointer" onclick="window.location='/admin/dashboard/alerts?filter=critical'">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-[12px] font-medium text-neutral-400 uppercase tracking-wider">Critical</p>
+                <p class="text-[28px] font-bold text-red-600 mt-1 tracking-tight fade-up fade-up-d2">3</p>
+                <div class="flex items-center gap-1.5 mt-2">
+                  <span class="inline-flex items-center gap-0.5 text-[12px] font-semibold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-md">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/>
+                    </svg>
+                    +1
+                  </span>
+                  <span class="text-[11px] text-neutral-400">vs prev period</span>
+                </div>
+              </div>
+              <div class="relative w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/>
+                </svg>
+                <!-- Pulse dot -->
+                <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+                  <span class="pulse-dot absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-white"></span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Compliance Score -->
+          <div class="metric-card metric-card-teal relative bg-white rounded-xl border border-neutral-200/60 p-5 card-hover overflow-hidden cursor-pointer" onclick="document.getElementById('compliance-section').scrollIntoView({behavior:'smooth'})">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-[12px] font-medium text-neutral-400 uppercase tracking-wider">Compliance Score</p>
+                <p class="text-[28px] font-bold text-neutral-900 mt-1 tracking-tight fade-up fade-up-d3">82%</p>
+                <div class="flex items-center gap-1.5 mt-2">
+                  <span class="text-[11px] text-neutral-500">41 of 50 tenants compliant</span>
+                </div>
+              </div>
+              <!-- Circular Progress Ring -->
+              <div class="relative w-14 h-14 flex items-center justify-center">
+                <svg class="w-14 h-14 -rotate-90" viewBox="0 0 88 88">
+                  <circle cx="44" cy="44" r="40" fill="none" stroke="#e2e8f0" stroke-width="6"/>
+                  <circle cx="44" cy="44" r="40" fill="none" stroke="#6366f1" stroke-width="6" stroke-linecap="round"
+                    stroke-dasharray="251.2" stroke-dashoffset="45.2" class="ring-animate"/>
+                </svg>
+                <span class="absolute text-[13px] font-bold text-primary-600">82%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== TWO-COLUMN CHARTS ==================== -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+          <!-- Alerts by Rule Card -->
+          <div class="bg-white rounded-xl border border-neutral-200/60 shadow-sm overflow-hidden">
+            <div class="p-6 pb-4 flex items-center justify-between">
+              <div>
+                <h2 class="text-[15px] font-semibold text-neutral-900">Alerts by Rule</h2>
+                <p class="text-[12px] text-neutral-400 mt-0.5">Distribution of security alerts by rule type</p>
+              </div>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-neutral-100 text-neutral-600">47 total</span>
+            </div>
+            <div class="px-6 pb-6 space-y-4">
+
+              <!-- Failed Login Spike -->
+              <div class="group">
+                <div class="flex items-center justify-between mb-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-400 flex-shrink-0"></span>
+                    <span class="text-[13px] font-medium text-neutral-700">Failed Login Spike</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="text-[13px] font-mono font-bold text-neutral-900">15</span>
+                    <span class="text-[10px] text-neutral-400 font-mono">2h ago</span>
+                  </div>
+                </div>
+                <div class="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-red-400 rounded-full bar-animate group-hover:bg-red-500 transition-colors" style="width: 100%"></div>
+                </div>
+              </div>
+
+              <!-- Agent Error Spike -->
+              <div class="group">
+                <div class="flex items-center justify-between mb-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-violet-400 flex-shrink-0"></span>
+                    <span class="text-[13px] font-medium text-neutral-700">Agent Error Spike</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="text-[13px] font-mono font-bold text-neutral-900">12</span>
+                    <span class="text-[10px] text-neutral-400 font-mono">5h ago</span>
+                  </div>
+                </div>
+                <div class="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-violet-400 rounded-full bar-animate group-hover:bg-violet-500 transition-colors" style="width: 80%; animation-delay: 0.05s;"></div>
+                </div>
+              </div>
+
+              <!-- Tool Policy Violation -->
+              <div class="group">
+                <div class="flex items-center justify-between mb-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-primary-400 flex-shrink-0"></span>
+                    <span class="text-[13px] font-medium text-neutral-700">Tool Policy Violation</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="text-[13px] font-mono font-bold text-neutral-900">9</span>
+                    <span class="text-[10px] text-neutral-400 font-mono">1d ago</span>
+                  </div>
+                </div>
+                <div class="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-primary-400 rounded-full bar-animate group-hover:bg-primary-500 transition-colors" style="width: 60%; animation-delay: 0.1s;"></div>
+                </div>
+              </div>
+
+              <!-- Network Policy Violation -->
+              <div class="group">
+                <div class="flex items-center justify-between mb-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 flex-shrink-0"></span>
+                    <span class="text-[13px] font-medium text-neutral-700">Network Policy Violation</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="text-[13px] font-mono font-bold text-neutral-900">7</span>
+                    <span class="text-[10px] text-neutral-400 font-mono">3h ago</span>
+                  </div>
+                </div>
+                <div class="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-cyan-400 rounded-full bar-animate group-hover:bg-cyan-500 transition-colors" style="width: 47%; animation-delay: 0.15s;"></div>
+                </div>
+              </div>
+
+              <!-- Cross-Tenant Access -->
+              <div class="group">
+                <div class="flex items-center justify-between mb-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400 flex-shrink-0"></span>
+                    <span class="text-[13px] font-medium text-neutral-700">Cross-Tenant Access</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="text-[13px] font-mono font-bold text-neutral-900">4</span>
+                    <span class="text-[10px] text-neutral-400 font-mono">6h ago</span>
+                  </div>
+                </div>
+                <div class="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-amber-400 rounded-full bar-animate group-hover:bg-amber-500 transition-colors" style="width: 27%; animation-delay: 0.2s;"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Permission Violations Trend Card -->
+          <div class="bg-white rounded-xl border border-neutral-200/60 shadow-sm overflow-hidden">
+            <div class="p-6 pb-4 flex items-center justify-between">
+              <div>
+                <h2 class="text-[15px] font-semibold text-neutral-900">Permission Violations</h2>
+                <p class="text-[12px] text-neutral-400 mt-0.5">Violation trend over selected time period</p>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-100 text-neutral-600">
+                <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+                Stable
+              </span>
+            </div>
+
+            <!-- SVG Area Chart -->
+            <div class="px-6 pb-2">
+              <svg viewBox="0 0 500 200" class="w-full h-auto" preserveAspectRatio="xMidYMid meet">
+                <!-- Grid lines -->
+                <line x1="40" y1="20" x2="480" y2="20" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="4"/>
+                <line x1="40" y1="65" x2="480" y2="65" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="4"/>
+                <line x1="40" y1="110" x2="480" y2="110" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="4"/>
+                <line x1="40" y1="155" x2="480" y2="155" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="4"/>
+
+                <!-- Y-axis labels -->
+                <text x="32" y="24" text-anchor="end" class="fill-neutral-400" style="font-size:10px; font-family:'JetBrains Mono',monospace">8</text>
+                <text x="32" y="69" text-anchor="end" class="fill-neutral-400" style="font-size:10px; font-family:'JetBrains Mono',monospace">6</text>
+                <text x="32" y="114" text-anchor="end" class="fill-neutral-400" style="font-size:10px; font-family:'JetBrains Mono',monospace">4</text>
+                <text x="32" y="159" text-anchor="end" class="fill-neutral-400" style="font-size:10px; font-family:'JetBrains Mono',monospace">2</text>
+
+                <!-- X-axis labels -->
+                <text x="55" y="185" text-anchor="middle" class="fill-neutral-400" style="font-size:10px; font-family:'JetBrains Mono',monospace">Feb 3</text>
+                <text x="165" y="185" text-anchor="middle" class="fill-neutral-400" style="font-size:10px; font-family:'JetBrains Mono',monospace">Feb 5</text>
+                <text x="275" y="185" text-anchor="middle" class="fill-neutral-400" style="font-size:10px; font-family:'JetBrains Mono',monospace">Feb 7</text>
+                <text x="385" y="185" text-anchor="middle" class="fill-neutral-400" style="font-size:10px; font-family:'JetBrains Mono',monospace">Feb 9</text>
+                <text x="465" y="185" text-anchor="middle" class="fill-neutral-400" style="font-size:10px; font-family:'JetBrains Mono',monospace">Feb 10</text>
+
+                <!-- Area fill gradient -->
+                <defs>
+                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#6366f1" stop-opacity="0.2"/>
+                    <stop offset="100%" stop-color="#6366f1" stop-opacity="0.02"/>
+                  </linearGradient>
+                </defs>
+
+                <!-- Area path -->
+                <path d="M55,110 L100,88 L145,132 L195,65 L240,88 L290,110 L335,88 L385,132 L430,110 L465,120 L465,170 L55,170 Z"
+                  fill="url(#areaGrad)"/>
+
+                <!-- Line path -->
+                <path d="M55,110 L100,88 L145,132 L195,65 L240,88 L290,110 L335,88 L385,132 L430,110 L465,120"
+                  fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chart-line"/>
+
+                <!-- Data dots -->
+                <circle cx="55" cy="110" r="3.5" fill="white" stroke="#6366f1" stroke-width="2"/>
+                <circle cx="100" cy="88" r="3.5" fill="white" stroke="#6366f1" stroke-width="2"/>
+                <circle cx="145" cy="132" r="3.5" fill="white" stroke="#6366f1" stroke-width="2"/>
+                <circle cx="195" cy="65" r="3.5" fill="white" stroke="#6366f1" stroke-width="2"/>
+                <circle cx="240" cy="88" r="3.5" fill="white" stroke="#6366f1" stroke-width="2"/>
+                <circle cx="290" cy="110" r="3.5" fill="white" stroke="#6366f1" stroke-width="2"/>
+                <circle cx="335" cy="88" r="3.5" fill="white" stroke="#6366f1" stroke-width="2"/>
+                <circle cx="385" cy="132" r="3.5" fill="white" stroke="#6366f1" stroke-width="2"/>
+                <circle cx="430" cy="110" r="3.5" fill="white" stroke="#6366f1" stroke-width="2"/>
+                <circle cx="465" cy="120" r="3.5" fill="white" stroke="#6366f1" stroke-width="2"/>
+              </svg>
+            </div>
+
+            <!-- Trend stats row -->
+            <div class="px-6 pb-6 pt-2 border-t border-neutral-100 mx-6">
+              <div class="flex items-center gap-6 pt-4">
+                <div class="flex items-center gap-2">
+                  <span class="text-[12px] text-neutral-400 font-medium">Last 24h:</span>
+                  <span class="text-[13px] font-mono font-semibold text-neutral-900">2</span>
+                </div>
+                <div class="w-px h-4 bg-neutral-200"></div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[12px] text-neutral-400 font-medium">Last 7d:</span>
+                  <span class="text-[13px] font-mono font-semibold text-neutral-900">8</span>
+                </div>
+                <div class="w-px h-4 bg-neutral-200"></div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[12px] text-neutral-400 font-medium">Last 30d:</span>
+                  <span class="text-[13px] font-mono font-semibold text-neutral-900">23</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== POLICY COMPLIANCE ==================== -->
+        <div id="compliance-section" class="bg-white rounded-xl border border-neutral-200/60 shadow-sm overflow-hidden">
+          <!-- Header -->
+          <div class="p-6 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h2 class="text-[15px] font-semibold text-neutral-900">Network Policy Compliance</h2>
+              <p class="text-[12px] text-neutral-400 mt-0.5">Tenants with active network security policies configured</p>
+            </div>
+            <span class="text-[13px] font-mono text-neutral-500">41 / 50 tenants</span>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="px-6 pb-4">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="flex-1 h-3 bg-neutral-100 rounded-full overflow-hidden">
+                <div class="h-full bg-primary-500 rounded-full progress-animate" style="width: 82%"></div>
+              </div>
+              <span class="text-[13px] font-mono font-bold text-primary-600">82%</span>
+            </div>
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-emerald-600 font-medium">41 with active network policy</span>
+              <span class="text-red-600 font-medium">9 without network policy</span>
+            </div>
+          </div>
+
+          <!-- Non-compliant Tenants Table -->
+          <div class="border-t border-neutral-100">
+            <div class="px-6 py-3 bg-neutral-50/80">
+              <h3 class="text-[12px] font-semibold text-neutral-500 uppercase tracking-wider">Tenants Without Network Policy</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[700px]">
+                <thead>
+                  <tr class="border-b border-neutral-200 bg-neutral-50/50">
+                    <th class="px-6 py-3 text-left"><span class="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Tenant</span></th>
+                    <th class="px-4 py-3 text-left"><span class="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Plan</span></th>
+                    <th class="px-4 py-3 text-left"><span class="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Agents</span></th>
+                    <th class="px-4 py-3 text-left"><span class="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Skills Installed</span></th>
+                    <th class="px-4 py-3 text-left"><span class="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Status</span></th>
+                    <th class="px-4 py-3 text-right"><span class="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Action</span></th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-neutral-100">
+                  <!-- Row 1 -->
+                  <tr class="compliance-row cursor-pointer transition-colors">
+                    <td class="px-6 py-3.5">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">VR</div>
+                        <div>
+                          <p class="text-[13px] font-medium text-neutral-900">Vertex AI Labs</p>
+                          <p class="text-[10px] font-mono text-neutral-400">TEN-007</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3.5">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-100 text-blue-700">Pro</span>
+                    </td>
+                    <td class="px-4 py-3.5"><span class="text-[13px] text-neutral-700">5</span></td>
+                    <td class="px-4 py-3.5">
+                      <div class="flex items-center gap-2">
+                        <span class="text-[13px] text-neutral-700">8</span>
+                        <div class="w-16 h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                          <div class="h-full bg-amber-400 rounded-full" style="width: 40%"></div>
+                        </div>
+                        <span class="text-[10px] font-mono text-neutral-400">3/8 manifest</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3.5">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-red-50 text-red-700 border border-red-200">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Non-compliant
+                      </span>
+                    </td>
+                    <td class="px-4 py-3.5 text-right">
+                      <a href="/admin/tenants/TEN-007/network-policy" class="text-[12px] font-medium text-primary-600 hover:text-primary-700 hover:underline transition-colors">Configure</a>
+                    </td>
+                  </tr>
+
+                  <!-- Row 2 -->
+                  <tr class="compliance-row cursor-pointer transition-colors">
+                    <td class="px-6 py-3.5">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">SP</div>
+                        <div>
+                          <p class="text-[13px] font-medium text-neutral-900">Spark Digital</p>
+                          <p class="text-[10px] font-mono text-neutral-400">TEN-023</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3.5">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-neutral-100 text-neutral-600">Starter</span>
+                    </td>
+                    <td class="px-4 py-3.5"><span class="text-[13px] text-neutral-700">3</span></td>
+                    <td class="px-4 py-3.5">
+                      <div class="flex items-center gap-2">
+                        <span class="text-[13px] text-neutral-700">4</span>
+                        <div class="w-16 h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                          <div class="h-full bg-amber-400 rounded-full" style="width: 25%"></div>
+                        </div>
+                        <span class="text-[10px] font-mono text-neutral-400">1/4 manifest</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3.5">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-red-50 text-red-700 border border-red-200">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Non-compliant
+                      </span>
+                    </td>
+                    <td class="px-4 py-3.5 text-right">
+                      <a href="/admin/tenants/TEN-023/network-policy" class="text-[12px] font-medium text-primary-600 hover:text-primary-700 hover:underline transition-colors">Configure</a>
+                    </td>
+                  </tr>
+
+                  <!-- Row 3 -->
+                  <tr class="compliance-row cursor-pointer transition-colors">
+                    <td class="px-6 py-3.5">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">NV</div>
+                        <div>
+                          <p class="text-[13px] font-medium text-neutral-900">Nova Insights</p>
+                          <p class="text-[10px] font-mono text-neutral-400">TEN-038</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3.5">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-violet-100 text-violet-700">Enterprise</span>
+                    </td>
+                    <td class="px-4 py-3.5"><span class="text-[13px] text-neutral-700">14</span></td>
+                    <td class="px-4 py-3.5">
+                      <div class="flex items-center gap-2">
+                        <span class="text-[13px] text-neutral-700">12</span>
+                        <div class="w-16 h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                          <div class="h-full bg-amber-400 rounded-full" style="width: 58%"></div>
+                        </div>
+                        <span class="text-[10px] font-mono text-neutral-400">7/12 manifest</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3.5">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                        Partial
+                      </span>
+                    </td>
+                    <td class="px-4 py-3.5 text-right">
+                      <a href="/admin/tenants/TEN-038/network-policy" class="text-[12px] font-medium text-primary-600 hover:text-primary-700 hover:underline transition-colors">Configure</a>
+                    </td>
+                  </tr>
+
+                  <!-- Row 4 -->
+                  <tr class="compliance-row cursor-pointer transition-colors">
+                    <td class="px-6 py-3.5">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">BF</div>
+                        <div>
+                          <p class="text-[13px] font-medium text-neutral-900">BrightFlow</p>
+                          <p class="text-[10px] font-mono text-neutral-400">TEN-041</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3.5">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-neutral-100 text-neutral-600">Starter</span>
+                    </td>
+                    <td class="px-4 py-3.5"><span class="text-[13px] text-neutral-700">2</span></td>
+                    <td class="px-4 py-3.5">
+                      <div class="flex items-center gap-2">
+                        <span class="text-[13px] text-neutral-700">3</span>
+                        <div class="w-16 h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                          <div class="h-full bg-red-400 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <span class="text-[10px] font-mono text-neutral-400">0/3 manifest</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3.5">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-red-50 text-red-700 border border-red-200">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Non-compliant
+                      </span>
+                    </td>
+                    <td class="px-4 py-3.5 text-right">
+                      <a href="/admin/tenants/TEN-041/network-policy" class="text-[12px] font-medium text-primary-600 hover:text-primary-700 hover:underline transition-colors">Configure</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    // Sidebar collapse toggle
+    let sidebarCollapsed = false;
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+
+      if (sidebarCollapsed) {
+        sidebar.style.width = '64px';
+        mainContent.style.marginLeft = '64px';
+        labels.forEach(el => el.style.display = 'none');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.style.width = '256px';
+        mainContent.style.marginLeft = '256px';
+        labels.forEach(el => el.style.display = '');
+        collapseIcon.style.transform = '';
+      }
+    }
+
+    // Time period pill switching
+    function setTimePeriod(el, period) {
+      document.querySelectorAll('.time-pill').forEach(pill => {
+        pill.classList.remove('pill-active');
+        pill.classList.add('text-neutral-600');
+      });
+      el.classList.add('pill-active');
+      el.classList.remove('text-neutral-600');
+    }
+
+    // Metric card click highlight
+    document.querySelectorAll('.metric-card').forEach(card => {
+      card.addEventListener('click', function() {
+        document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('ring-2', 'ring-primary-300'));
+        this.classList.add('ring-2', 'ring-primary-300');
+        setTimeout(() => this.classList.remove('ring-2', 'ring-primary-300'), 1500);
+      });
+    });
+
+    // Prototype Navigation Bridge
+    if (window.parent !== window) {
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href^="/"]');
+        if (link) {
+          const href = link.getAttribute('href');
+          window.parent.postMessage({
+            type: 'navigate',
+            href: href
+          }, '*');
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+    }
+  </script>
+</body>
+</html>

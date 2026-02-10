@@ -69,7 +69,9 @@ export const ModelName = {
   Alert: 'Alert',
   AuditLog: 'AuditLog',
   AgentMessage: 'AgentMessage',
-  AgentAllowlist: 'AgentAllowlist'
+  AgentAllowlist: 'AgentAllowlist',
+  ChannelConnection: 'ChannelConnection',
+  ChannelRouting: 'ChannelRouting'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -197,6 +199,7 @@ export const SkillScalarFieldEnum = {
   isCore: 'isCore',
   authorId: 'authorId',
   submittedAt: 'submittedAt',
+  tenantId: 'tenantId',
   compatibleRoles: 'compatibleRoles',
   repositoryUrl: 'repositoryUrl',
   mainFile: 'mainFile',
@@ -402,6 +405,38 @@ export const AgentAllowlistScalarFieldEnum = {
 } as const
 
 export type AgentAllowlistScalarFieldEnum = (typeof AgentAllowlistScalarFieldEnum)[keyof typeof AgentAllowlistScalarFieldEnum]
+
+
+export const ChannelConnectionScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  platform: 'platform',
+  workspaceId: 'workspaceId',
+  workspaceName: 'workspaceName',
+  credentials: 'credentials',
+  status: 'status',
+  connectedAt: 'connectedAt',
+  lastHealthCheck: 'lastHealthCheck',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChannelConnectionScalarFieldEnum = (typeof ChannelConnectionScalarFieldEnum)[keyof typeof ChannelConnectionScalarFieldEnum]
+
+
+export const ChannelRoutingScalarFieldEnum = {
+  id: 'id',
+  connectionId: 'connectionId',
+  routeType: 'routeType',
+  sourceIdentifier: 'sourceIdentifier',
+  agentId: 'agentId',
+  priority: 'priority',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChannelRoutingScalarFieldEnum = (typeof ChannelRoutingScalarFieldEnum)[keyof typeof ChannelRoutingScalarFieldEnum]
 
 
 export const SortOrder = {

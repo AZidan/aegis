@@ -9,7 +9,7 @@ import { z } from 'zod';
  */
 export const browseSkillsQuerySchema = z.object({
   category: z
-    .enum(['productivity', 'analytics', 'engineering', 'communication'])
+    .enum(['productivity', 'analytics', 'engineering', 'communication', 'security', 'integration', 'custom'])
     .optional(),
   role: z.string().optional(),
   search: z.string().optional(),

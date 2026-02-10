@@ -7,6 +7,7 @@ import { AuditInterceptor } from './audit.interceptor';
 import { AuditController } from './audit.controller';
 import { AuditAdminController } from './audit-admin.controller';
 import { AUDIT_QUEUE_NAME } from './audit.constants';
+import { ALERT_QUEUE_NAME } from '../alert/alert.constants';
 
 /**
  * AuditModule
@@ -29,7 +30,10 @@ import { AUDIT_QUEUE_NAME } from './audit.constants';
  */
 @Global()
 @Module({
-  imports: [BullModule.registerQueue({ name: AUDIT_QUEUE_NAME })],
+  imports: [
+    BullModule.registerQueue({ name: AUDIT_QUEUE_NAME }),
+    BullModule.registerQueue({ name: ALERT_QUEUE_NAME }),
+  ],
   controllers: [AuditController, AuditAdminController],
   providers: [
     AuditService,

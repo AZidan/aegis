@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Private Skills - Aegis Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            primary: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            },
+            neutral: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              700: '#334155',
+              800: '#1e293b',
+              900: '#0f172a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+
+    /* Sidebar link hover */
+    .sidebar-link { transition: background-color 0.15s ease, color 0.15s ease; }
+
+    /* Table row hover */
+    .table-row { transition: background-color 0.15s ease-out; }
+    .table-row:hover { background-color: rgba(99, 102, 241, 0.04); }
+
+    /* Button transitions */
+    .btn-primary { transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease; }
+    .btn-primary:hover { transform: scale(1.02); }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-secondary { transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease; }
+    .btn-secondary:active { transform: scale(0.98); }
+
+    .btn-ghost { transition: background-color 0.15s ease, color 0.15s ease; }
+
+    /* Tab transitions */
+    .filter-tab { transition: all 0.15s ease-out; }
+
+    /* Chevron rotation */
+    .chevron-rotate { transition: transform 0.2s ease-out; }
+    .chevron-rotate.expanded { transform: rotate(90deg); }
+
+    /* Expand panel */
+    .version-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+      opacity: 0;
+    }
+    .version-panel.open {
+      max-height: 500px;
+      opacity: 1;
+    }
+
+    /* Modal transitions */
+    .modal-overlay {
+      opacity: 0;
+      transition: opacity 0.2s ease-out;
+      pointer-events: none;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-container {
+      transform: translateY(16px) scale(0.98);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease-out;
+      opacity: 0;
+    }
+    .modal-overlay.active .modal-container {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    /* Dropdown */
+    .dropdown-menu {
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+    }
+    .dropdown-menu.open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Tag input */
+    .tag-chip { transition: opacity 0.15s ease, transform 0.15s ease; }
+    .tag-chip:hover { opacity: 0.85; }
+
+    /* Code editor line numbers */
+    .line-numbers {
+      counter-reset: line;
+    }
+    .line-numbers > span {
+      counter-increment: line;
+    }
+    .line-numbers > span::before {
+      content: counter(line);
+      display: inline-block;
+      width: 2em;
+      text-align: right;
+      margin-right: 1em;
+      color: #475569;
+      user-select: none;
+    }
+
+    /* Gradient icon circles */
+    .icon-gradient-1 { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+    .icon-gradient-2 { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+    .icon-gradient-3 { background: linear-gradient(135deg, #10b981, #14b8a6); }
+    .icon-gradient-4 { background: linear-gradient(135deg, #f59e0b, #f97316); }
+    .icon-gradient-5 { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+    .icon-gradient-6 { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
+  </style>
+</head>
+<body class="h-full bg-[#f8fafc] font-sans text-neutral-900 antialiased">
+  <div class="flex h-full min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR (Tenant Admin) ===== -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full z-50 flex flex-col bg-white border-r border-neutral-200 transition-all duration-300" style="width: 256px;">
+      <!-- Logo -->
+      <div class="flex items-center gap-2.5 px-5 h-16 border-b border-neutral-100">
+        <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="sidebar-label text-sm font-bold text-neutral-900 tracking-tight">Acme Corp</span>
+      </div>
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <div class="sidebar-label px-3 pb-2 pt-1 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">Workspace</div>
+        <a href="/dashboard" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="sidebar-label">Dashboard</span>
+        </a>
+        <a href="/dashboard/agents" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+          <span class="sidebar-label">Agents</span>
+        </a>
+
+        <!-- Skills group (expanded) -->
+        <div>
+          <a href="/dashboard/skills" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-primary-600 bg-primary-50">
+            <svg class="w-[18px] h-[18px] text-primary-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 01-.837.276c-.47-.07-.802-.48-.968-.925a2.501 2.501 0 10-3.214 3.214c.446.166.855.497.925.968a.979.979 0 01-.276.837l-1.61 1.61a2.404 2.404 0 01-1.705.707 2.402 2.402 0 01-1.704-.706l-1.568-1.568a1.026 1.026 0 00-.877-.29c-.493.074-.84.504-1.02.968a2.5 2.5 0 11-3.237-3.237c.464-.18.894-.527.967-1.02a1.026 1.026 0 00-.289-.877l-1.568-1.568A2.402 2.402 0 011.998 12c0-.617.236-1.234.706-1.704L4.23 8.77c.24-.24.581-.353.917-.303.515.077.877.528 1.073 1.01a2.5 2.5 0 103.259-3.259c-.482-.196-.933-.558-1.01-1.073-.05-.336.062-.676.303-.917l1.525-1.525A2.402 2.402 0 0112 2c.617 0 1.234.236 1.704.706l1.568 1.568c.23.23.556.338.877.29.493-.074.84-.504 1.02-.969a2.5 2.5 0 113.237 3.237c-.464.18-.894.527-.967 1.02z"/></svg>
+            <span class="sidebar-label font-semibold">Skills</span>
+          </a>
+          <!-- Sub-items -->
+          <div class="ml-9 mt-1 space-y-0.5">
+            <a href="/dashboard/skills" class="sidebar-link flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50">
+              <span class="sidebar-label">Marketplace</span>
+            </a>
+            <a href="/dashboard/skills/private" class="sidebar-link flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] text-primary-600 font-semibold bg-primary-50/60">
+              <span class="sidebar-label">Private Skills</span>
+            </a>
+          </div>
+        </div>
+
+        <a href="/dashboard/messages" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <span class="sidebar-label">Messages</span>
+        </a>
+
+        <div class="sidebar-label px-3 pb-2 pt-5 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">Management</div>
+        <a href="/dashboard/settings" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span class="sidebar-label">Settings</span>
+        </a>
+      </nav>
+      <!-- Footer -->
+      <div class="border-t border-neutral-100 px-3 py-3 space-y-2">
+        <button onclick="toggleSidebar()" class="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 transition-colors">
+          <svg id="collapse-icon" class="w-[18px] h-[18px] transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+          <span class="sidebar-label text-sm">Collapse</span>
+        </button>
+        <div class="flex items-center gap-2.5 px-3 py-2">
+          <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-semibold text-xs flex-shrink-0">JD</div>
+          <div class="sidebar-label flex-1 min-w-0">
+            <div class="text-sm font-medium text-neutral-900 truncate">Jane Doe</div>
+            <div class="text-xs text-neutral-500 truncate">Tenant Admin</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main id="main-content" class="flex-1 overflow-y-auto" style="margin-left: 256px;">
+      <div class="max-w-6xl mx-auto px-6 lg:px-8 py-6 lg:py-8">
+
+        <!-- Page Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h1 class="text-2xl font-bold text-neutral-900 tracking-tight">Private Skills</h1>
+            <p class="mt-1 text-sm text-neutral-500">Manage custom skills developed for your organization.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button class="btn-secondary inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 hover:border-neutral-300 shadow-sm">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Export</span>
+            </button>
+            <button onclick="openModal()" class="btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-500 rounded-lg hover:bg-primary-600 shadow-sm shadow-primary-200">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Submit New Skill</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="bg-white rounded-xl border border-neutral-200 shadow-sm p-4 mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <!-- Status Filter Tabs -->
+            <div class="flex items-center gap-1.5">
+              <button onclick="setFilter(this, 'all')" class="filter-tab active-tab px-4 py-1.5 rounded-full text-xs font-medium bg-primary-500 text-white shadow-sm">All</button>
+              <button onclick="setFilter(this, 'pending')" class="filter-tab px-4 py-1.5 rounded-full text-xs font-medium bg-neutral-50 text-neutral-600 border border-neutral-200 hover:border-primary-300 hover:text-primary-600">Pending <span class="text-amber-600 font-semibold ml-0.5">3</span></button>
+              <button onclick="setFilter(this, 'approved')" class="filter-tab px-4 py-1.5 rounded-full text-xs font-medium bg-neutral-50 text-neutral-600 border border-neutral-200 hover:border-primary-300 hover:text-primary-600">Approved <span class="text-emerald-600 font-semibold ml-0.5">2</span></button>
+              <button onclick="setFilter(this, 'rejected')" class="filter-tab px-4 py-1.5 rounded-full text-xs font-medium bg-neutral-50 text-neutral-600 border border-neutral-200 hover:border-primary-300 hover:text-primary-600">Rejected <span class="text-red-600 font-semibold ml-0.5">1</span></button>
+            </div>
+            <div class="flex-1"></div>
+            <!-- Search -->
+            <div class="relative max-w-xs w-full">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="Search skills..." class="w-full pl-10 pr-4 py-2 text-sm bg-white border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 placeholder-neutral-400 transition-all" />
+            </div>
+            <span class="text-sm font-mono text-neutral-500 hidden sm:inline">6 skills</span>
+          </div>
+        </div>
+
+        <!-- Skills Table Card -->
+        <div class="bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden mb-6">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-neutral-50 border-b border-neutral-200">
+                <th class="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider w-8"></th>
+                <th class="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Skill Name</th>
+                <th class="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Version</th>
+                <th class="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Category</th>
+                <th class="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Status</th>
+                <th class="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Submitted</th>
+                <th class="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Validation</th>
+                <th class="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider w-12"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-100">
+
+              <!-- Row 1: Approved -->
+              <tr class="table-row cursor-pointer" data-row="1">
+                <td class="px-4 py-3">
+                  <button onclick="toggleVersionPanel(1, event)" class="p-0.5 rounded hover:bg-neutral-100">
+                    <svg id="chevron-1" class="w-4 h-4 text-neutral-400 chevron-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg icon-gradient-1 flex items-center justify-center flex-shrink-0">
+                      <span class="text-white font-bold text-xs">CS</span>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-neutral-900">Customer Sentiment Analyzer</div>
+                      <div class="text-xs text-neutral-400">Analyzes customer messages for sentiment and urgency</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3"><span class="font-mono text-sm text-neutral-700">2.1.0</span></td>
+                <td class="px-4 py-3"><span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600">Analytics</span></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Approved
+                  </span>
+                </td>
+                <td class="px-4 py-3"><span class="font-mono text-xs text-neutral-500">2 days ago</span></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Passed
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="relative">
+                    <button onclick="toggleDropdown(1, event)" class="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                    </button>
+                    <div id="dropdown-1" class="dropdown-menu absolute right-0 top-full mt-1 w-44 bg-white rounded-lg shadow-lg border border-neutral-200 py-1 z-20">
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        View Details
+                      </button>
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                        Version History
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <!-- Version History Panel for Row 1 -->
+              <tr>
+                <td colspan="8" class="p-0">
+                  <div id="panel-1" class="version-panel">
+                    <div class="bg-neutral-50 border-t border-neutral-200 px-6 py-4">
+                      <h4 class="text-sm font-semibold text-neutral-800 mb-3">Version History</h4>
+                      <div class="space-y-2">
+                        <div class="flex items-center justify-between bg-white rounded-lg border border-neutral-200 px-4 py-2.5">
+                          <div class="flex items-center gap-4">
+                            <span class="font-mono text-sm font-semibold text-primary-600">v2.1.0</span>
+                            <span class="font-mono text-xs text-neutral-400">2 days ago</span>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Approved</span>
+                            <span class="text-xs text-neutral-400 italic">Current</span>
+                          </div>
+                          <button disabled class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-neutral-300 cursor-not-allowed">
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                            Rollback
+                          </button>
+                        </div>
+                        <div class="flex items-center justify-between bg-white rounded-lg border border-neutral-200 px-4 py-2.5">
+                          <div class="flex items-center gap-4">
+                            <span class="font-mono text-sm font-semibold text-primary-600">v2.0.0</span>
+                            <span class="font-mono text-xs text-neutral-400">1 week ago</span>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Approved</span>
+                          </div>
+                          <button class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-primary-500 hover:text-primary-700 hover:bg-primary-50 rounded-md transition-colors">
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                            Rollback
+                          </button>
+                        </div>
+                        <div class="flex items-center justify-between bg-white rounded-lg border border-neutral-200 px-4 py-2.5">
+                          <div class="flex items-center gap-4">
+                            <span class="font-mono text-sm font-semibold text-primary-600">v1.0.0</span>
+                            <span class="font-mono text-xs text-neutral-400">3 weeks ago</span>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Approved</span>
+                          </div>
+                          <button class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-primary-500 hover:text-primary-700 hover:bg-primary-50 rounded-md transition-colors">
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                            Rollback
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2: Pending -->
+              <tr class="table-row cursor-pointer" data-row="2">
+                <td class="px-4 py-3">
+                  <button onclick="toggleVersionPanel(2, event)" class="p-0.5 rounded hover:bg-neutral-100">
+                    <svg id="chevron-2" class="w-4 h-4 text-neutral-400 chevron-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg icon-gradient-2 flex items-center justify-center flex-shrink-0">
+                      <span class="text-white font-bold text-xs">IR</span>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-neutral-900">Internal Report Generator</div>
+                      <div class="text-xs text-neutral-400">Generates weekly performance reports from metrics</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3"><span class="font-mono text-sm text-neutral-700">1.0.0</span></td>
+                <td class="px-4 py-3"><span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600">Productivity</span></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    Pending
+                  </span>
+                </td>
+                <td class="px-4 py-3"><span class="font-mono text-xs text-neutral-500">5 hours ago</span></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Passed
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="relative">
+                    <button onclick="toggleDropdown(2, event)" class="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                    </button>
+                    <div id="dropdown-2" class="dropdown-menu absolute right-0 top-full mt-1 w-44 bg-white rounded-lg shadow-lg border border-neutral-200 py-1 z-20">
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        View Details
+                      </button>
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Edit
+                      </button>
+                      <hr class="my-1 border-neutral-100" />
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr><td colspan="8" class="p-0"><div id="panel-2" class="version-panel"><div class="bg-neutral-50 border-t border-neutral-200 px-6 py-4"><h4 class="text-sm font-semibold text-neutral-800 mb-3">Version History</h4><div class="space-y-2"><div class="flex items-center justify-between bg-white rounded-lg border border-neutral-200 px-4 py-2.5"><div class="flex items-center gap-4"><span class="font-mono text-sm font-semibold text-primary-600">v1.0.0</span><span class="font-mono text-xs text-neutral-400">5 hours ago</span><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Pending</span><span class="text-xs text-neutral-400 italic">Current</span></div><button disabled class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-neutral-300 cursor-not-allowed"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Rollback</button></div></div></div></div></td></tr>
+
+              <!-- Row 3: Pending -->
+              <tr class="table-row cursor-pointer" data-row="3">
+                <td class="px-4 py-3">
+                  <button onclick="toggleVersionPanel(3, event)" class="p-0.5 rounded hover:bg-neutral-100">
+                    <svg id="chevron-3" class="w-4 h-4 text-neutral-400 chevron-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg icon-gradient-3 flex items-center justify-center flex-shrink-0">
+                      <span class="text-white font-bold text-xs">DC</span>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-neutral-900">Data Cleanup Pipeline</div>
+                      <div class="text-xs text-neutral-400">Normalizes and deduplicates CRM records</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3"><span class="font-mono text-sm text-neutral-700">1.2.0</span></td>
+                <td class="px-4 py-3"><span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600">Engineering</span></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    Pending
+                  </span>
+                </td>
+                <td class="px-4 py-3"><span class="font-mono text-xs text-neutral-500">1 day ago</span></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1 text-xs text-amber-600 font-medium">
+                    <svg class="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>
+                    Running...
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="relative">
+                    <button onclick="toggleDropdown(3, event)" class="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                    </button>
+                    <div id="dropdown-3" class="dropdown-menu absolute right-0 top-full mt-1 w-44 bg-white rounded-lg shadow-lg border border-neutral-200 py-1 z-20">
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        View Details
+                      </button>
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Edit
+                      </button>
+                      <hr class="my-1 border-neutral-100" />
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr><td colspan="8" class="p-0"><div id="panel-3" class="version-panel"><div class="bg-neutral-50 border-t border-neutral-200 px-6 py-4"><h4 class="text-sm font-semibold text-neutral-800 mb-3">Version History</h4><div class="space-y-2"><div class="flex items-center justify-between bg-white rounded-lg border border-neutral-200 px-4 py-2.5"><div class="flex items-center gap-4"><span class="font-mono text-sm font-semibold text-primary-600">v1.2.0</span><span class="font-mono text-xs text-neutral-400">1 day ago</span><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Pending</span><span class="text-xs text-neutral-400 italic">Current</span></div><button disabled class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-neutral-300 cursor-not-allowed"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Rollback</button></div><div class="flex items-center justify-between bg-white rounded-lg border border-neutral-200 px-4 py-2.5"><div class="flex items-center gap-4"><span class="font-mono text-sm font-semibold text-primary-600">v1.1.0</span><span class="font-mono text-xs text-neutral-400">2 weeks ago</span><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Approved</span></div><button class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-primary-500 hover:text-primary-700 hover:bg-primary-50 rounded-md transition-colors"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Rollback</button></div></div></div></div></td></tr>
+
+              <!-- Row 4: Rejected -->
+              <tr class="table-row cursor-pointer" data-row="4">
+                <td class="px-4 py-3">
+                  <button onclick="toggleVersionPanel(4, event)" class="p-0.5 rounded hover:bg-neutral-100">
+                    <svg id="chevron-4" class="w-4 h-4 text-neutral-400 chevron-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg icon-gradient-5 flex items-center justify-center flex-shrink-0">
+                      <span class="text-white font-bold text-xs">ES</span>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-neutral-900">Email Scraper Tool</div>
+                      <div class="text-xs text-neutral-400">Extracts contact emails from web pages</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3"><span class="font-mono text-sm text-neutral-700">1.0.0</span></td>
+                <td class="px-4 py-3"><span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600">Integration</span></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    Rejected
+                  </span>
+                </td>
+                <td class="px-4 py-3"><span class="font-mono text-xs text-neutral-500">3 days ago</span></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1 text-xs text-red-600 font-medium">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                    3 issues
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="relative">
+                    <button onclick="toggleDropdown(4, event)" class="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                    </button>
+                    <div id="dropdown-4" class="dropdown-menu absolute right-0 top-full mt-1 w-44 bg-white rounded-lg shadow-lg border border-neutral-200 py-1 z-20">
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        View Details
+                      </button>
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Edit & Resubmit
+                      </button>
+                      <hr class="my-1 border-neutral-100" />
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr><td colspan="8" class="p-0"><div id="panel-4" class="version-panel"><div class="bg-neutral-50 border-t border-neutral-200 px-6 py-4"><h4 class="text-sm font-semibold text-neutral-800 mb-3">Version History</h4><div class="space-y-2"><div class="flex items-center justify-between bg-white rounded-lg border border-neutral-200 px-4 py-2.5"><div class="flex items-center gap-4"><span class="font-mono text-sm font-semibold text-primary-600">v1.0.0</span><span class="font-mono text-xs text-neutral-400">3 days ago</span><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">Rejected</span><span class="text-xs text-neutral-400 italic">Current</span></div><button disabled class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-neutral-300 cursor-not-allowed"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Rollback</button></div></div></div></div></td></tr>
+
+              <!-- Row 5: Approved -->
+              <tr class="table-row cursor-pointer" data-row="5">
+                <td class="px-4 py-3">
+                  <button onclick="toggleVersionPanel(5, event)" class="p-0.5 rounded hover:bg-neutral-100">
+                    <svg id="chevron-5" class="w-4 h-4 text-neutral-400 chevron-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg icon-gradient-4 flex items-center justify-center flex-shrink-0">
+                      <span class="text-white font-bold text-xs">TN</span>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-neutral-900">Ticket Notifier</div>
+                      <div class="text-xs text-neutral-400">Sends Slack alerts when high-priority tickets arrive</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3"><span class="font-mono text-sm text-neutral-700">1.3.0</span></td>
+                <td class="px-4 py-3"><span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600">Communication</span></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Approved
+                  </span>
+                </td>
+                <td class="px-4 py-3"><span class="font-mono text-xs text-neutral-500">1 week ago</span></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Passed
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="relative">
+                    <button onclick="toggleDropdown(5, event)" class="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                    </button>
+                    <div id="dropdown-5" class="dropdown-menu absolute right-0 top-full mt-1 w-44 bg-white rounded-lg shadow-lg border border-neutral-200 py-1 z-20">
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        View Details
+                      </button>
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                        Version History
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr><td colspan="8" class="p-0"><div id="panel-5" class="version-panel"><div class="bg-neutral-50 border-t border-neutral-200 px-6 py-4"><h4 class="text-sm font-semibold text-neutral-800 mb-3">Version History</h4><div class="space-y-2"><div class="flex items-center justify-between bg-white rounded-lg border border-neutral-200 px-4 py-2.5"><div class="flex items-center gap-4"><span class="font-mono text-sm font-semibold text-primary-600">v1.3.0</span><span class="font-mono text-xs text-neutral-400">1 week ago</span><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Approved</span><span class="text-xs text-neutral-400 italic">Current</span></div><button disabled class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-neutral-300 cursor-not-allowed"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Rollback</button></div><div class="flex items-center justify-between bg-white rounded-lg border border-neutral-200 px-4 py-2.5"><div class="flex items-center gap-4"><span class="font-mono text-sm font-semibold text-primary-600">v1.2.0</span><span class="font-mono text-xs text-neutral-400">3 weeks ago</span><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Approved</span></div><button class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-primary-500 hover:text-primary-700 hover:bg-primary-50 rounded-md transition-colors"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Rollback</button></div></div></div></div></td></tr>
+
+              <!-- Row 6: Pending -->
+              <tr class="table-row cursor-pointer" data-row="6">
+                <td class="px-4 py-3">
+                  <button onclick="toggleVersionPanel(6, event)" class="p-0.5 rounded hover:bg-neutral-100">
+                    <svg id="chevron-6" class="w-4 h-4 text-neutral-400 chevron-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg icon-gradient-6 flex items-center justify-center flex-shrink-0">
+                      <span class="text-white font-bold text-xs">QA</span>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-neutral-900">QA Test Runner</div>
+                      <div class="text-xs text-neutral-400">Executes automated test suites against staging</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3"><span class="font-mono text-sm text-neutral-700">0.9.0</span></td>
+                <td class="px-4 py-3"><span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600">Engineering</span></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    Pending
+                  </span>
+                </td>
+                <td class="px-4 py-3"><span class="font-mono text-xs text-neutral-500">Just now</span></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Passed
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="relative">
+                    <button onclick="toggleDropdown(6, event)" class="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                    </button>
+                    <div id="dropdown-6" class="dropdown-menu absolute right-0 top-full mt-1 w-44 bg-white rounded-lg shadow-lg border border-neutral-200 py-1 z-20">
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        View Details
+                      </button>
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Edit
+                      </button>
+                      <hr class="my-1 border-neutral-100" />
+                      <button class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr><td colspan="8" class="p-0"><div id="panel-6" class="version-panel"><div class="bg-neutral-50 border-t border-neutral-200 px-6 py-4"><h4 class="text-sm font-semibold text-neutral-800 mb-3">Version History</h4><div class="space-y-2"><div class="flex items-center justify-between bg-white rounded-lg border border-neutral-200 px-4 py-2.5"><div class="flex items-center gap-4"><span class="font-mono text-sm font-semibold text-primary-600">v0.9.0</span><span class="font-mono text-xs text-neutral-400">Just now</span><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Pending</span><span class="text-xs text-neutral-400 italic">Current</span></div><button disabled class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-neutral-300 cursor-not-allowed"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Rollback</button></div></div></div></div></td></tr>
+
+            </tbody>
+          </table>
+
+          <!-- Pagination -->
+          <div class="flex items-center justify-between px-4 py-3 border-t border-neutral-100 bg-neutral-50/50">
+            <p class="text-sm text-neutral-500">Showing <span class="font-medium text-neutral-700">6</span> of <span class="font-medium text-neutral-700">6</span> skills</p>
+            <div class="flex items-center gap-1">
+              <button disabled class="px-3 py-1.5 text-sm font-medium text-neutral-300 bg-white border border-neutral-200 rounded-lg cursor-not-allowed">Previous</button>
+              <button class="px-3 py-1.5 text-sm font-medium text-white bg-primary-500 rounded-lg">1</button>
+              <button disabled class="px-3 py-1.5 text-sm font-medium text-neutral-300 bg-white border border-neutral-200 rounded-lg cursor-not-allowed">Next</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Validation Results Panel (simulated post-submit state) -->
+        <div id="validation-results" class="bg-white rounded-xl border border-neutral-200 shadow-sm p-6 mb-6" style="display: none;">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <h3 class="text-xl font-semibold text-neutral-900">Validation Results</h3>
+              <span id="validation-badge" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold"></span>
+            </div>
+            <button onclick="hideValidation()" class="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div id="validation-issues" class="space-y-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ===== SUBMIT SKILL MODAL ===== -->
+  <div id="submit-modal" class="modal-overlay fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
+    <!-- Modal Container -->
+    <div class="modal-container relative bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-neutral-100">
+        <h2 class="text-xl font-semibold text-neutral-900">Submit New Skill</h2>
+        <button onclick="closeModal()" class="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Body (scrollable) -->
+      <div class="flex-1 overflow-y-auto px-6 py-6 space-y-5">
+
+        <!-- Section: Basic Info -->
+        <h3 class="text-base font-medium text-neutral-800">Basic Information</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-neutral-700 mb-1.5">Skill Name <span class="text-red-500">*</span></label>
+            <input type="text" placeholder="e.g., Customer Sentiment Analyzer" class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 placeholder-neutral-400" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1.5">Version <span class="text-red-500">*</span></label>
+            <input type="text" placeholder="1.0.0" class="w-full px-3 py-2 text-sm font-mono border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 placeholder-neutral-400" />
+            <p class="text-xs text-neutral-400 mt-1">Semantic versioning (e.g., 1.0.0)</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-1.5">Description <span class="text-red-500">*</span></label>
+          <textarea rows="3" placeholder="Describe what this skill does and when agents should use it..." class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 placeholder-neutral-400 resize-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1.5">Category <span class="text-red-500">*</span></label>
+            <select class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 text-neutral-700 bg-white">
+              <option value="" disabled selected>Select category</option>
+              <option value="productivity">Productivity</option>
+              <option value="analytics">Analytics</option>
+              <option value="engineering">Engineering</option>
+              <option value="communication">Communication</option>
+              <option value="security">Security</option>
+              <option value="integration">Integration</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1.5">Compatible Roles</label>
+            <div class="flex flex-wrap gap-3 mt-2">
+              <label class="inline-flex items-center gap-2 text-sm text-neutral-700 cursor-pointer">
+                <input type="checkbox" class="w-4 h-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500/20" checked />
+                Coordinator
+              </label>
+              <label class="inline-flex items-center gap-2 text-sm text-neutral-700 cursor-pointer">
+                <input type="checkbox" class="w-4 h-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500/20" checked />
+                Executor
+              </label>
+              <label class="inline-flex items-center gap-2 text-sm text-neutral-700 cursor-pointer">
+                <input type="checkbox" class="w-4 h-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500/20" />
+                Analyst
+              </label>
+              <label class="inline-flex items-center gap-2 text-sm text-neutral-700 cursor-pointer">
+                <input type="checkbox" class="w-4 h-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500/20" />
+                Monitor
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <hr class="border-neutral-200" />
+
+        <!-- Section: Source Code -->
+        <h3 class="text-base font-medium text-neutral-800">Source Code</h3>
+        <div class="rounded-lg overflow-hidden border border-neutral-200">
+          <!-- Editor header -->
+          <div class="flex items-center justify-between bg-neutral-900 px-4 py-2">
+            <span class="font-mono text-xs text-neutral-400">skill.ts</span>
+            <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-medium bg-primary-900/50 text-primary-300">TypeScript</span>
+          </div>
+          <!-- Editor body -->
+          <div class="bg-primary-950 p-4 font-mono text-sm text-primary-200 min-h-[200px] max-h-[400px] overflow-auto leading-6">
+            <div class="flex">
+              <div class="text-neutral-600 text-right pr-4 select-none border-r border-neutral-800 mr-4" style="min-width: 2em;">
+                <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div>
+              </div>
+              <div class="flex-1">
+                <div><span class="text-primary-400">import</span> { <span class="text-amber-300">Skill</span>, <span class="text-amber-300">SkillContext</span> } <span class="text-primary-400">from</span> <span class="text-emerald-300">'@aegis/skill-sdk'</span>;</div>
+                <div>&nbsp;</div>
+                <div><span class="text-primary-400">export default</span> <span class="text-primary-400">class</span> <span class="text-amber-300">MySkill</span> <span class="text-primary-400">extends</span> <span class="text-amber-300">Skill</span> {</div>
+                <div>  <span class="text-primary-400">readonly</span> name = <span class="text-emerald-300">'my-skill'</span>;</div>
+                <div>  <span class="text-primary-400">readonly</span> version = <span class="text-emerald-300">'1.0.0'</span>;</div>
+                <div>&nbsp;</div>
+                <div>  <span class="text-primary-400">async</span> <span class="text-blue-300">execute</span>(ctx: <span class="text-amber-300">SkillContext</span>) {</div>
+                <div>    <span class="text-neutral-500">// Your skill logic here</span></div>
+                <div>    <span class="text-primary-400">const</span> result = <span class="text-primary-400">await</span> ctx.<span class="text-blue-300">fetch</span>(</div>
+                <div>      <span class="text-emerald-300">'https://api.example.com/data'</span></div>
+                <div>    );</div>
+                <div>&nbsp;</div>
+                <div>    <span class="text-primary-400">return</span> {</div>
+                <div>      success: <span class="text-amber-300">true</span>,</div>
+                <div>      data: result</div>
+                <div>    };</div>
+                <div>  }</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <hr class="border-neutral-200" />
+
+        <!-- Section: Permissions -->
+        <h3 class="text-base font-medium text-neutral-800">Permissions</h3>
+        <p class="text-xs text-neutral-500 -mt-3">Declare the resources this skill requires access to.</p>
+
+        <!-- Network Domains -->
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-1.5">Network Domains</label>
+          <div class="flex flex-wrap items-center gap-2 p-2 min-h-[40px] border border-neutral-200 rounded-lg bg-white focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-400">
+            <span class="tag-chip inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700">
+              api.example.com
+              <button onclick="this.parentElement.remove()" class="ml-0.5 hover:text-primary-900">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </span>
+            <span class="tag-chip inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700">
+              hooks.slack.com
+              <button onclick="this.parentElement.remove()" class="ml-0.5 hover:text-primary-900">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </span>
+            <input type="text" placeholder="Add domain..." class="flex-1 min-w-[120px] text-sm border-none outline-none bg-transparent placeholder-neutral-400 py-0.5" onkeydown="handleTagInput(event, this)" />
+          </div>
+          <p class="text-xs text-neutral-400 mt-1">Domains this skill needs to reach. Press Enter to add.</p>
+        </div>
+
+        <!-- File Paths -->
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-1.5">File Paths</label>
+          <div class="flex flex-wrap items-center gap-2 p-2 min-h-[40px] border border-neutral-200 rounded-lg bg-white focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-400">
+            <span class="tag-chip inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700">
+              /workspace/data
+              <button onclick="this.parentElement.remove()" class="ml-0.5 hover:text-primary-900">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </span>
+            <input type="text" placeholder="Add path..." class="flex-1 min-w-[120px] text-sm border-none outline-none bg-transparent placeholder-neutral-400 py-0.5" onkeydown="handleTagInput(event, this)" />
+          </div>
+          <p class="text-xs text-neutral-400 mt-1">File system paths required by this skill.</p>
+        </div>
+
+        <!-- Environment Variables -->
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-1.5">Environment Variables</label>
+          <div class="flex flex-wrap items-center gap-2 p-2 min-h-[40px] border border-neutral-200 rounded-lg bg-white focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-400">
+            <span class="tag-chip inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700">
+              SLACK_WEBHOOK_URL
+              <button onclick="this.parentElement.remove()" class="ml-0.5 hover:text-primary-900">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </span>
+            <input type="text" placeholder="Add variable..." class="flex-1 min-w-[120px] text-sm border-none outline-none bg-transparent placeholder-neutral-400 py-0.5" onkeydown="handleTagInput(event, this)" />
+          </div>
+          <p class="text-xs text-neutral-400 mt-1">Environment variables this skill needs to read.</p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex items-center justify-between px-6 py-4 border-t border-neutral-100 bg-neutral-50/50">
+        <div class="flex items-center gap-2 text-xs text-neutral-500">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Validation will run on submit
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="closeModal()" class="btn-ghost px-4 py-2 text-sm font-medium text-neutral-600 rounded-lg hover:bg-neutral-100">Cancel</button>
+          <button onclick="submitSkill()" class="btn-primary px-4 py-2 text-sm font-semibold text-white bg-primary-500 rounded-lg hover:bg-primary-600 shadow-sm shadow-primary-200">
+            Validate & Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Sidebar collapse/expand ──
+    let sidebarCollapsed = false;
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+      if (sidebarCollapsed) {
+        sidebar.style.width = '64px';
+        mainContent.style.marginLeft = '64px';
+        labels.forEach(el => el.style.display = 'none');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.style.width = '256px';
+        mainContent.style.marginLeft = '256px';
+        labels.forEach(el => el.style.display = '');
+        collapseIcon.style.transform = '';
+      }
+    }
+
+    // ── Status filter tabs ──
+    function setFilter(el, status) {
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.remove('bg-primary-500', 'text-white', 'shadow-sm', 'active-tab');
+        tab.classList.add('bg-neutral-50', 'text-neutral-600', 'border', 'border-neutral-200');
+      });
+      el.classList.remove('bg-neutral-50', 'text-neutral-600', 'border', 'border-neutral-200');
+      el.classList.add('bg-primary-500', 'text-white', 'shadow-sm', 'active-tab');
+
+      // Filter table rows
+      const rows = document.querySelectorAll('tr[data-row]');
+      rows.forEach(row => {
+        const nextRow = row.nextElementSibling;
+        if (status === 'all') {
+          row.style.display = '';
+          if (nextRow) nextRow.style.display = '';
+        } else {
+          const statusBadge = row.querySelector('td:nth-child(5) span');
+          const rowStatus = statusBadge ? statusBadge.textContent.trim().toLowerCase() : '';
+          if (rowStatus.includes(status)) {
+            row.style.display = '';
+            if (nextRow) nextRow.style.display = '';
+          } else {
+            row.style.display = 'none';
+            if (nextRow) nextRow.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    // ── Version history expand/collapse ──
+    function toggleVersionPanel(id, event) {
+      event.stopPropagation();
+      const panel = document.getElementById('panel-' + id);
+      const chevron = document.getElementById('chevron-' + id);
+      panel.classList.toggle('open');
+      chevron.classList.toggle('expanded');
+    }
+
+    // ── Dropdown menu toggle ──
+    let activeDropdown = null;
+    function toggleDropdown(id, event) {
+      event.stopPropagation();
+      const dropdown = document.getElementById('dropdown-' + id);
+      if (activeDropdown && activeDropdown !== dropdown) {
+        activeDropdown.classList.remove('open');
+      }
+      dropdown.classList.toggle('open');
+      activeDropdown = dropdown.classList.contains('open') ? dropdown : null;
+    }
+
+    // Close dropdowns on outside click
+    document.addEventListener('click', () => {
+      if (activeDropdown) {
+        activeDropdown.classList.remove('open');
+        activeDropdown = null;
+      }
+    });
+
+    // ── Modal open/close ──
+    function openModal() {
+      document.getElementById('submit-modal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      document.getElementById('submit-modal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    // ── Tag input handler ──
+    function handleTagInput(event, input) {
+      if (event.key === 'Enter' && input.value.trim()) {
+        event.preventDefault();
+        const tag = document.createElement('span');
+        tag.className = 'tag-chip inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700';
+        tag.innerHTML = `
+          ${input.value.trim()}
+          <button onclick="this.parentElement.remove()" class="ml-0.5 hover:text-primary-900">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        `;
+        input.parentElement.insertBefore(tag, input);
+        input.value = '';
+      }
+    }
+
+    // ── Submit skill simulation ──
+    function submitSkill() {
+      closeModal();
+      showValidation();
+    }
+
+    function showValidation() {
+      const panel = document.getElementById('validation-results');
+      const badge = document.getElementById('validation-badge');
+      const issues = document.getElementById('validation-issues');
+
+      // Simulate a failed validation for demo
+      badge.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200';
+      badge.innerHTML = '<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> FAILED';
+
+      issues.innerHTML = `
+        <div class="flex items-start gap-3 p-3 rounded-lg bg-red-50">
+          <svg class="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <div>
+            <div class="text-sm font-medium text-red-800">Unsafe network access detected</div>
+            <div class="text-xs text-neutral-600 mt-0.5">Line 9: Skill attempts to access domain not declared in permissions manifest.</div>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-3 rounded-lg bg-amber-50">
+          <svg class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div>
+            <div class="text-sm font-medium text-amber-800">Missing error handling</div>
+            <div class="text-xs text-neutral-600 mt-0.5">Line 9-11: Network fetch call lacks try/catch error handling.</div>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-3 rounded-lg bg-amber-50">
+          <svg class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div>
+            <div class="text-sm font-medium text-amber-800">Return type not explicitly defined</div>
+            <div class="text-xs text-neutral-600 mt-0.5">Method execute() should declare an explicit return type for safety.</div>
+          </div>
+        </div>
+      `;
+
+      panel.style.display = 'block';
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function hideValidation() {
+      document.getElementById('validation-results').style.display = 'none';
+    }
+
+    // ── Prototype Navigation Bridge ──
+    if (window.parent !== window) {
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href^="/"]');
+        if (link) {
+          window.parent.postMessage({ type: 'navigate', href: link.getAttribute('href') }, '*');
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+    }
+  </script>
+</body>
+</html>

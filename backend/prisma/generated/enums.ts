@@ -70,7 +70,10 @@ export const SkillCategory = {
   productivity: 'productivity',
   analytics: 'analytics',
   engineering: 'engineering',
-  communication: 'communication'
+  communication: 'communication',
+  security: 'security',
+  integration: 'integration',
+  custom: 'custom'
 } as const
 
 export type SkillCategory = (typeof SkillCategory)[keyof typeof SkillCategory]
@@ -119,7 +122,8 @@ export const AuditTargetType = {
   tenant: 'tenant',
   user: 'user',
   team_member: 'team_member',
-  api_key: 'api_key'
+  api_key: 'api_key',
+  channel: 'channel'
 } as const
 
 export type AuditTargetType = (typeof AuditTargetType)[keyof typeof AuditTargetType]
@@ -160,6 +164,36 @@ export const InviteStatus = {
 } as const
 
 export type InviteStatus = (typeof InviteStatus)[keyof typeof InviteStatus]
+
+
+export const ChannelPlatform = {
+  SLACK: 'SLACK',
+  TEAMS: 'TEAMS',
+  DISCORD: 'DISCORD',
+  GOOGLE_CHAT: 'GOOGLE_CHAT'
+} as const
+
+export type ChannelPlatform = (typeof ChannelPlatform)[keyof typeof ChannelPlatform]
+
+
+export const ConnectionStatus = {
+  pending: 'pending',
+  active: 'active',
+  disconnected: 'disconnected',
+  error: 'error'
+} as const
+
+export type ConnectionStatus = (typeof ConnectionStatus)[keyof typeof ConnectionStatus]
+
+
+export const RouteType = {
+  slash_command: 'slash_command',
+  channel_mapping: 'channel_mapping',
+  user_mapping: 'user_mapping',
+  tenant_default: 'tenant_default'
+} as const
+
+export type RouteType = (typeof RouteType)[keyof typeof RouteType]
 
 
 export const MessageType = {

@@ -3,9 +3,12 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
+import { getQueueToken } from '@nestjs/bullmq';
 import { SkillsService } from '../../../src/dashboard/skills/skills.service';
 import { PrismaService } from '../../../src/prisma/prisma.service';
 import { AuditService } from '../../../src/audit/audit.service';
+import { PermissionService } from '../../../src/dashboard/skills/permission.service';
+import { ALERT_QUEUE_NAME } from '../../../src/alert/alert.constants';
 
 // ---------------------------------------------------------------------------
 // Test Data Factories
@@ -40,6 +43,7 @@ const createMockAgent = (overrides: Partial<Record<string, unknown>> = {}) => ({
   id: AGENT_ID,
   name: 'Project Manager Bot',
   tenantId: TENANT_ID,
+  toolPolicy: { allow: ['network', 'filesystem'] },
   ...overrides,
 });
 
@@ -107,8 +111,10 @@ describe('SkillsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SkillsService,
+        PermissionService,
         { provide: PrismaService, useValue: prisma },
         { provide: AuditService, useValue: { logAction: jest.fn() } },
+        { provide: getQueueToken(ALERT_QUEUE_NAME), useValue: { add: jest.fn().mockResolvedValue(undefined) } },
       ],
     }).compile();
 
@@ -244,9 +250,13 @@ describe('SkillsService', () => {
         expect.objectContaining({
           where: expect.objectContaining({
             status: 'approved',
-            OR: [
-              { name: { contains: 'web', mode: 'insensitive' } },
-              { description: { contains: 'web', mode: 'insensitive' } },
+            AND: [
+              {
+                OR: [
+                  { name: { contains: 'web', mode: 'insensitive' } },
+                  { description: { contains: 'web', mode: 'insensitive' } },
+                ],
+              },
             ],
           }),
         }),
@@ -334,7 +344,7 @@ describe('SkillsService', () => {
       expect(item).toHaveProperty('installed', false);
     });
 
-    it('should default permissions to empty arrays when null', async () => {
+    it('should default permissions to empty manifest when null', async () => {
       const skill = createMockSkill({ permissions: null });
       prisma.skill.count.mockResolvedValue(1);
       prisma.skill.findMany.mockResolvedValue([skill]);
@@ -344,9 +354,9 @@ describe('SkillsService', () => {
       const result = await service.browseSkills(TENANT_ID, defaultQuery);
 
       expect(result.data[0].permissions).toEqual({
-        network: [],
-        files: [],
-        env: [],
+        network: { allowedDomains: [] },
+        files: { readPaths: [], writePaths: [] },
+        env: { required: [], optional: [] },
       });
     });
 
@@ -403,7 +413,11 @@ describe('SkillsService', () => {
 
       expect(prisma.skill.findFirst).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: SKILL_ID, status: 'approved' },
+          where: expect.objectContaining({
+            id: SKILL_ID,
+            status: 'approved',
+            OR: [{ tenantId: null }, { tenantId: TENANT_ID }],
+          }),
         }),
       );
     });
@@ -457,7 +471,7 @@ describe('SkillsService', () => {
       expect(result.changelog).toBe('');
     });
 
-    it('should default permissions to empty arrays when null', async () => {
+    it('should default permissions to empty manifest when null', async () => {
       prisma.skill.findFirst.mockResolvedValue(
         createMockSkill({ permissions: null }),
       );
@@ -467,9 +481,9 @@ describe('SkillsService', () => {
       const result = await service.getSkillDetail(TENANT_ID, SKILL_ID);
 
       expect(result.permissions).toEqual({
-        network: [],
-        files: [],
-        env: [],
+        network: { allowedDomains: [] },
+        files: { readPaths: [], writePaths: [] },
+        env: { required: [], optional: [] },
       });
     });
   });
@@ -634,6 +648,163 @@ describe('SkillsService', () => {
           where: { id: SKILL_ID, status: 'approved' },
         }),
       );
+    });
+
+    it('should throw ConflictException (409) when skill requires permissions denied by agent tool policy', async () => {
+      prisma.skill.findFirst.mockResolvedValue(createMockSkill());
+      prisma.agent.findFirst.mockResolvedValue(
+        createMockAgent({ toolPolicy: { allow: [] } }),
+      );
+      prisma.skillInstallation.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.installSkill(TENANT_ID, SKILL_ID, installDto),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('should succeed when agent tool policy allows required permissions', async () => {
+      prisma.skill.findFirst.mockResolvedValue(createMockSkill());
+      prisma.agent.findFirst.mockResolvedValue(
+        createMockAgent({ toolPolicy: { allow: ['network', 'filesystem'] } }),
+      );
+      prisma.skillInstallation.findUnique.mockResolvedValue(null);
+      prisma.skillInstallation.create.mockResolvedValue(createMockInstallation());
+      prisma.skill.update.mockResolvedValue(createMockSkill());
+
+      const result = await service.installSkill(TENANT_ID, SKILL_ID, installDto);
+
+      expect(result.status).toBe('installing');
+    });
+
+    it('should validate manifest before checking policy compatibility', async () => {
+      prisma.skill.findFirst.mockResolvedValue(
+        createMockSkill({ permissions: { network: ['api.com'], files: [], env: [] } }),
+      );
+      prisma.agent.findFirst.mockResolvedValue(
+        createMockAgent({ toolPolicy: { allow: ['network'] } }),
+      );
+      prisma.skillInstallation.findUnique.mockResolvedValue(null);
+      prisma.skillInstallation.create.mockResolvedValue(createMockInstallation());
+      prisma.skill.update.mockResolvedValue(createMockSkill());
+
+      const result = await service.installSkill(TENANT_ID, SKILL_ID, installDto);
+
+      expect(result.status).toBe('installing');
+    });
+
+    it('should include agent toolPolicy in select query', async () => {
+      prisma.skill.findFirst.mockResolvedValue(createMockSkill());
+      prisma.agent.findFirst.mockResolvedValue(createMockAgent());
+      prisma.skillInstallation.findUnique.mockResolvedValue(null);
+      prisma.skillInstallation.create.mockResolvedValue(createMockInstallation());
+      prisma.skill.update.mockResolvedValue(createMockSkill());
+
+      await service.installSkill(TENANT_ID, SKILL_ID, installDto);
+
+      expect(prisma.agent.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          select: expect.objectContaining({ toolPolicy: true }),
+        }),
+      );
+    });
+
+    it('should default toolPolicy to empty allow list when null', async () => {
+      prisma.skill.findFirst.mockResolvedValue(
+        createMockSkill({ permissions: null }),
+      );
+      prisma.agent.findFirst.mockResolvedValue(
+        createMockAgent({ toolPolicy: null }),
+      );
+      prisma.skillInstallation.findUnique.mockResolvedValue(null);
+      prisma.skillInstallation.create.mockResolvedValue(createMockInstallation());
+      prisma.skill.update.mockResolvedValue(createMockSkill());
+
+      const result = await service.installSkill(TENANT_ID, SKILL_ID, installDto);
+
+      expect(result.status).toBe('installing');
+    });
+  });
+
+  // =========================================================================
+  // Permission Normalization in Responses
+  // =========================================================================
+  describe('Permission Normalization', () => {
+    it('browseSkills should return normalized permissions (new format)', async () => {
+      const skill = createMockSkill({
+        permissions: {
+          network: { allowedDomains: ['api.com'] },
+          files: { readPaths: ['/data'], writePaths: [] },
+          env: { required: ['KEY'], optional: [] },
+        },
+      });
+      prisma.skill.count.mockResolvedValue(1);
+      prisma.skill.findMany.mockResolvedValue([skill]);
+      prisma.agent.findMany.mockResolvedValue([]);
+      prisma.skillInstallation.findMany.mockResolvedValue([]);
+
+      const result = await service.browseSkills(TENANT_ID, { page: 1, limit: 20 });
+
+      expect(result.data[0].permissions).toEqual({
+        network: { allowedDomains: ['api.com'] },
+        files: { readPaths: ['/data'], writePaths: [] },
+        env: { required: ['KEY'], optional: [] },
+      });
+    });
+
+    it('browseSkills should migrate legacy permissions transparently', async () => {
+      const skill = createMockSkill({
+        permissions: { network: ['https://*'], files: ['/tmp'], env: ['TOKEN'] },
+      });
+      prisma.skill.count.mockResolvedValue(1);
+      prisma.skill.findMany.mockResolvedValue([skill]);
+      prisma.agent.findMany.mockResolvedValue([]);
+      prisma.skillInstallation.findMany.mockResolvedValue([]);
+
+      const result = await service.browseSkills(TENANT_ID, { page: 1, limit: 20 });
+
+      expect(result.data[0].permissions).toEqual({
+        network: { allowedDomains: ['https://*'] },
+        files: { readPaths: ['/tmp'], writePaths: [] },
+        env: { required: ['TOKEN'], optional: [] },
+      });
+    });
+
+    it('getSkillDetail should return normalized permissions', async () => {
+      const skill = createMockSkill({
+        permissions: {
+          network: { allowedDomains: ['api.com'] },
+          files: { readPaths: [], writePaths: [] },
+          env: { required: [], optional: [] },
+        },
+      });
+      prisma.skill.findFirst.mockResolvedValue(skill);
+      prisma.agent.findMany.mockResolvedValue([]);
+      prisma.skillInstallation.findMany.mockResolvedValue([]);
+
+      const result = await service.getSkillDetail(TENANT_ID, SKILL_ID);
+
+      expect(result.permissions).toEqual({
+        network: { allowedDomains: ['api.com'] },
+        files: { readPaths: [], writePaths: [] },
+        env: { required: [], optional: [] },
+      });
+    });
+
+    it('getSkillDetail should handle legacy format gracefully', async () => {
+      const skill = createMockSkill({
+        permissions: { network: ['*.example.com'], files: [], env: ['API_KEY'] },
+      });
+      prisma.skill.findFirst.mockResolvedValue(skill);
+      prisma.agent.findMany.mockResolvedValue([]);
+      prisma.skillInstallation.findMany.mockResolvedValue([]);
+
+      const result = await service.getSkillDetail(TENANT_ID, SKILL_ID);
+
+      expect(result.permissions).toEqual({
+        network: { allowedDomains: ['*.example.com'] },
+        files: { readPaths: [], writePaths: [] },
+        env: { required: ['API_KEY'], optional: [] },
+      });
     });
   });
 

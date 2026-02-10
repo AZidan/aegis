@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Messages - Aegis Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            primary: {
+              50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc',
+              400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
+              800: '#3730a3', 900: '#312e81', 950: '#1e1b4b',
+            },
+            neutral: {
+              50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
+              400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155',
+              800: '#1e293b', 900: '#0f172a',
+            }
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace !important; }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a5b4fc; }
+
+    /* Row expand/collapse (audit-log pattern) */
+    .row-details { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.2s ease-out; opacity: 0; }
+    .row-details.expanded { max-height: 500px; opacity: 1; transition: max-height 0.4s ease-in, opacity 0.3s ease-in; }
+    .chevron-icon { transition: transform 0.25s ease; }
+    .chevron-icon.rotated { transform: rotate(90deg); }
+
+    /* Dropdown transitions */
+    .dropdown-menu { transform: translateY(-4px); opacity: 0; pointer-events: none; transition: transform 0.15s ease, opacity 0.15s ease; }
+    .dropdown-menu.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+
+    /* Table row hover */
+    tbody tr.msg-row:hover td { background-color: rgba(238, 242, 255, 0.5) !important; }
+
+    /* Sidebar link hover */
+    .sidebar-link { transition: background-color 0.15s ease, color 0.15s ease; }
+
+    /* Type pill toggle */
+    .type-pill { transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease; cursor: pointer; user-select: none; }
+
+    /* Drawer transitions */
+    .drawer-overlay { opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer-panel { transform: translateX(100%); transition: transform 0.3s cubic-bezier(0, 0, 0.2, 1); }
+    .drawer-panel.open { transform: translateX(0); }
+
+    /* Pending status pulse */
+    @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .pulse-dot { animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+    /* Agent avatar gradients */
+    .avatar-blue { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+    .avatar-green { background: linear-gradient(135deg, #10b981, #14b8a6); }
+    .avatar-purple { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
+    .avatar-orange { background: linear-gradient(135deg, #f59e0b, #f97316); }
+    .avatar-teal { background: linear-gradient(135deg, #06b6d4, #0d9488); }
+
+    /* Refresh spin */
+    @keyframes spin-once { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .spin-refresh { animation: spin-once 0.6s linear; }
+
+    /* Sidebar collapse */
+    .sidebar-collapsed { width: 64px !important; }
+    .sidebar-collapsed .sidebar-label { display: none !important; }
+    .sidebar-collapsed nav a { justify-content: center; padding-left: 0; padding-right: 0; }
+    .sidebar-collapsed .sidebar-footer-info { display: none !important; }
+  </style>
+</head>
+<body class="h-full bg-neutral-50 text-neutral-900 antialiased">
+  <div class="flex h-full min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR (Tenant Admin) ===== -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full z-50 flex flex-col bg-white border-r border-neutral-200 transition-all duration-300" style="width: 256px;">
+      <!-- Logo -->
+      <div class="flex items-center gap-2.5 px-5 h-16 border-b border-neutral-100">
+        <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="sidebar-label text-sm font-bold text-neutral-900 tracking-tight">Acme Corp</span>
+      </div>
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <div class="sidebar-label px-3 pb-2 pt-1 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">Workspace</div>
+        <a href="/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="sidebar-label">Dashboard</span>
+        </a>
+        <a href="/dashboard/agents" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+          <span class="sidebar-label">Agents</span>
+        </a>
+        <a href="/dashboard/skills" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 01-.837.276c-.47-.07-.802-.48-.968-.925a2.501 2.501 0 10-3.214 3.214c.446.166.855.497.925.968a.979.979 0 01-.276.837l-1.61 1.61a2.404 2.404 0 01-1.705.707 2.402 2.402 0 01-1.704-.706l-1.568-1.568a1.026 1.026 0 00-.877-.29c-.493.074-.84.504-1.02.968a2.5 2.5 0 11-3.237-3.237c.464-.18.894-.527.967-1.02a1.026 1.026 0 00-.289-.877l-1.568-1.568A2.402 2.402 0 011.998 12c0-.617.236-1.234.706-1.704L4.23 8.77c.24-.24.581-.353.917-.303.515.077.877.528 1.073 1.01a2.5 2.5 0 103.259-3.259c-.482-.196-.933-.558-1.01-1.073-.05-.336.062-.676.303-.917l1.525-1.525A2.402 2.402 0 0112 2c.617 0 1.234.236 1.704.706l1.568 1.568c.23.23.556.338.877.29.493-.074.84-.504 1.02-.969a2.5 2.5 0 113.237 3.237c-.464.18-.894.527-.967 1.02z"/></svg>
+          <span class="sidebar-label">Skills</span>
+        </a>
+        <!-- Messages (Active) -->
+        <a href="/dashboard/messages" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-primary-50 text-primary-600 font-semibold">
+          <svg class="w-[18px] h-[18px] text-primary-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <span class="sidebar-label">Messages</span>
+        </a>
+
+        <div class="sidebar-label px-3 pb-2 pt-5 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">Management</div>
+        <a href="/dashboard/settings" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900">
+          <svg class="w-[18px] h-[18px] text-neutral-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span class="sidebar-label">Settings</span>
+        </a>
+      </nav>
+      <!-- Footer -->
+      <div class="border-t border-neutral-100 px-3 py-3 space-y-2">
+        <button onclick="toggleSidebar()" class="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 transition-colors">
+          <svg id="collapse-icon" class="w-[18px] h-[18px] transition-transform duration-300 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+          <span class="sidebar-label text-sm">Collapse</span>
+        </button>
+        <div class="flex items-center gap-2.5 px-3 py-2">
+          <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-semibold text-xs flex-shrink-0">JD</div>
+          <div class="sidebar-label sidebar-footer-info flex-1 min-w-0">
+            <div class="text-sm font-medium text-neutral-900 truncate">Jane Doe</div>
+            <div class="text-xs text-neutral-500 truncate">Tenant Admin</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main id="main-content" class="flex-1 overflow-y-auto" style="margin-left: 256px;">
+      <div class="max-w-6xl mx-auto px-6 lg:px-8 py-6 lg:py-8">
+
+        <!-- Page Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h1 class="text-2xl font-bold text-neutral-900 tracking-tight">Agent Messages</h1>
+            <p class="mt-1 text-sm text-neutral-500">Monitor inter-agent communication within your workspace</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <!-- Refresh -->
+            <button onclick="handleRefresh(this)" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-100 transition-colors">
+              <svg id="refresh-icon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+              <span>Refresh</span>
+            </button>
+            <!-- Export Dropdown -->
+            <div class="relative">
+              <button onclick="toggleDropdown('exportMenu')" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-50 shadow-sm transition-colors">
+                <svg class="w-4 h-4 text-neutral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export
+                <svg class="w-3.5 h-3.5 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+              </button>
+              <div id="exportMenu" class="dropdown-menu absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border border-neutral-200 z-50 py-1">
+                <button class="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M8 17h2"/><path d="M14 13h2"/><path d="M14 17h2"/></svg>
+                  Export as JSON
+                </button>
+                <button class="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+                  Export as CSV
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Communication Summary Card -->
+        <div class="bg-white rounded-xl border border-neutral-200 shadow-sm p-5 mb-6">
+          <div class="flex flex-col lg:flex-row lg:items-start gap-6">
+            <!-- Summary Stats (left) -->
+            <div class="flex-1">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-neutral-900">Message Flow Overview</h2>
+                <span class="text-sm text-neutral-500">234 total messages</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                  <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-1">Total Messages</p>
+                  <p class="text-xl font-bold text-neutral-900">234</p>
+                </div>
+                <div>
+                  <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-1">Active Threads</p>
+                  <p class="text-xl font-bold text-neutral-900">18</p>
+                </div>
+                <div>
+                  <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-1">Avg Response</p>
+                  <p class="text-xl font-bold text-neutral-900">1.2s</p>
+                </div>
+                <div>
+                  <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-1">Failed</p>
+                  <p class="text-xl font-bold text-red-600">3</p>
+                </div>
+              </div>
+            </div>
+            <!-- Mini Flow Graph (right) -->
+            <div class="lg:w-[280px] flex-shrink-0">
+              <svg viewBox="0 0 280 140" class="w-full" style="height: 140px;">
+                <!-- Edges (behind nodes) -->
+                <line x1="70" y1="40" x2="180" y2="30" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <line x1="70" y1="40" x2="140" y2="100" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <line x1="180" y1="30" x2="250" y2="70" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                <line x1="140" y1="100" x2="250" y2="70" stroke="#cbd5e1" stroke-width="1" marker-end="url(#arrowhead)"/>
+                <line x1="250" y1="70" x2="180" y2="120" stroke="#cbd5e1" stroke-width="1" marker-end="url(#arrowhead)"/>
+                <line x1="70" y1="40" x2="180" y2="120" stroke="#cbd5e1" stroke-width="1" marker-end="url(#arrowhead)"/>
+                <!-- Arrow marker -->
+                <defs>
+                  <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                    <polygon points="0 0, 8 3, 0 6" fill="#94a3b8"/>
+                  </marker>
+                </defs>
+                <!-- Edge labels -->
+                <rect x="110" y="27" width="24" height="14" rx="3" fill="white" stroke="#e2e8f0" stroke-width="0.5"/>
+                <text x="122" y="37" text-anchor="middle" class="font-mono" style="font-size:8px;fill:#475569;font-family:'JetBrains Mono',monospace;">42</text>
+                <rect x="90" y="63" width="24" height="14" rx="3" fill="white" stroke="#e2e8f0" stroke-width="0.5"/>
+                <text x="102" y="73" text-anchor="middle" class="font-mono" style="font-size:8px;fill:#475569;font-family:'JetBrains Mono',monospace;">28</text>
+                <rect x="200" y="42" width="24" height="14" rx="3" fill="white" stroke="#e2e8f0" stroke-width="0.5"/>
+                <text x="212" y="52" text-anchor="middle" class="font-mono" style="font-size:8px;fill:#475569;font-family:'JetBrains Mono',monospace;">35</text>
+                <rect x="182" y="78" width="24" height="14" rx="3" fill="white" stroke="#e2e8f0" stroke-width="0.5"/>
+                <text x="194" y="88" text-anchor="middle" class="font-mono" style="font-size:8px;fill:#475569;font-family:'JetBrains Mono',monospace;">15</text>
+                <!-- Agent Nodes -->
+                <!-- Research Agent (RA) - blue -->
+                <circle cx="70" cy="40" r="18" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
+                <text x="70" y="44" text-anchor="middle" style="font-size:10px;fill:#4338ca;font-weight:600;font-family:'Inter',sans-serif;">RA</text>
+                <!-- Writing Agent (WA) - green -->
+                <circle cx="180" cy="30" r="18" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.5"/>
+                <text x="180" y="34" text-anchor="middle" style="font-size:10px;fill:#065f46;font-weight:600;font-family:'Inter',sans-serif;">WA</text>
+                <!-- Analytics Agent (AA) - purple -->
+                <circle cx="140" cy="100" r="18" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1.5"/>
+                <text x="140" y="104" text-anchor="middle" style="font-size:10px;fill:#5b21b6;font-weight:600;font-family:'Inter',sans-serif;">AA</text>
+                <!-- Support Agent (SA) - orange -->
+                <circle cx="250" cy="70" r="18" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5"/>
+                <text x="250" y="74" text-anchor="middle" style="font-size:10px;fill:#92400e;font-weight:600;font-family:'Inter',sans-serif;">SA</text>
+                <!-- DevOps Agent (DA) - teal -->
+                <circle cx="180" cy="120" r="18" fill="#f0fdfa" stroke="#99f6e4" stroke-width="1.5"/>
+                <text x="180" y="124" text-anchor="middle" style="font-size:10px;fill:#0f766e;font-weight:600;font-family:'Inter',sans-serif;">DA</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Bar + Message Timeline Card -->
+        <div class="bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden">
+
+          <!-- Filter Bar -->
+          <div class="p-4 border-b border-neutral-200">
+            <!-- Row 1: Primary Filters -->
+            <div class="flex flex-wrap items-end gap-3">
+              <!-- From Agent -->
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-medium text-neutral-500">From:</span>
+                <select class="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 min-w-[140px]">
+                  <option>All Agents</option>
+                  <option>Research Agent</option>
+                  <option>Writing Agent</option>
+                  <option>Analytics Agent</option>
+                  <option>Support Agent</option>
+                  <option>DevOps Agent</option>
+                </select>
+              </div>
+              <!-- Arrow -->
+              <svg class="w-4 h-4 text-neutral-300 flex-shrink-0 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+              <!-- To Agent -->
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-medium text-neutral-500">To:</span>
+                <select class="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 min-w-[140px]">
+                  <option>All Agents</option>
+                  <option>Research Agent</option>
+                  <option>Writing Agent</option>
+                  <option>Analytics Agent</option>
+                  <option>Support Agent</option>
+                  <option>DevOps Agent</option>
+                </select>
+              </div>
+
+              <!-- Divider -->
+              <div class="hidden sm:block w-px h-6 bg-neutral-200 mb-1"></div>
+
+              <!-- Type Filter Pills -->
+              <div class="flex items-center gap-1.5 mb-0.5">
+                <button onclick="toggleTypePill(this, 'all')" class="type-pill active px-3 py-1.5 rounded-full text-xs font-medium bg-primary-500 text-white shadow-sm" data-type="all">All</button>
+                <button onclick="toggleTypePill(this, 'direct')" class="type-pill px-3 py-1.5 rounded-full text-xs font-medium bg-neutral-50 text-neutral-600 border border-neutral-200 hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200" data-type="direct">Direct</button>
+                <button onclick="toggleTypePill(this, 'broadcast')" class="type-pill px-3 py-1.5 rounded-full text-xs font-medium bg-neutral-50 text-neutral-600 border border-neutral-200 hover:bg-violet-50 hover:text-violet-600 hover:border-violet-200" data-type="broadcast">Broadcast</button>
+                <button onclick="toggleTypePill(this, 'request')" class="type-pill px-3 py-1.5 rounded-full text-xs font-medium bg-neutral-50 text-neutral-600 border border-neutral-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200" data-type="request">Request</button>
+                <button onclick="toggleTypePill(this, 'response')" class="type-pill px-3 py-1.5 rounded-full text-xs font-medium bg-neutral-50 text-neutral-600 border border-neutral-200 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200" data-type="response">Response</button>
+              </div>
+
+              <!-- Divider -->
+              <div class="hidden sm:block w-px h-6 bg-neutral-200 mb-1"></div>
+
+              <!-- Status -->
+              <select class="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 min-w-[120px]">
+                <option>All Status</option>
+                <option>Delivered</option>
+                <option>Pending</option>
+                <option>Failed</option>
+              </select>
+
+              <!-- Date From -->
+              <input type="date" value="2026-02-03" class="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400" />
+              <input type="date" value="2026-02-10" class="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400" />
+            </div>
+            <!-- Row 2: Search -->
+            <div class="flex items-center gap-3 mt-3">
+              <div class="relative flex-1">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" placeholder="Search message content..." class="w-full pl-10 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 placeholder-neutral-400" />
+              </div>
+              <button class="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors hover:underline underline-offset-2 whitespace-nowrap">Clear Filters</button>
+            </div>
+          </div>
+
+          <!-- Timeline Header -->
+          <div class="flex items-center px-6 py-3 border-b border-neutral-200 bg-neutral-50">
+            <div class="w-8 flex-shrink-0"></div>
+            <div class="w-[80px] flex-shrink-0 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Time</div>
+            <div class="w-[130px] flex-shrink-0 text-xs font-semibold text-neutral-500 uppercase tracking-wider">From</div>
+            <div class="w-[24px] flex-shrink-0"></div>
+            <div class="w-[130px] flex-shrink-0 text-xs font-semibold text-neutral-500 uppercase tracking-wider">To</div>
+            <div class="w-[90px] flex-shrink-0 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Type</div>
+            <div class="flex-1 min-w-0 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Message</div>
+            <div class="w-[70px] flex-shrink-0 text-xs font-semibold text-neutral-500 uppercase tracking-wider text-center">Status</div>
+            <div class="w-8 flex-shrink-0"></div>
+          </div>
+
+          <!-- Message Rows -->
+          <div class="divide-y divide-neutral-100">
+
+            <!-- Row 1: Direct message -->
+            <div>
+              <div class="msg-row flex items-center px-6 py-3 cursor-pointer hover:bg-primary-50/30 transition-colors border-l-2 border-primary-300" onclick="toggleMessageRow(this)">
+                <div class="w-8 flex-shrink-0"><svg class="chevron-icon w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>
+                <div class="w-[80px] flex-shrink-0 font-mono text-xs text-neutral-400 tabular-nums">14:32:18</div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-blue flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">RA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Research Agent</span>
+                </div>
+                <div class="w-[24px] flex-shrink-0 flex justify-center"><svg class="w-3.5 h-3.5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg></div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-green flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">WA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Writing Agent</span>
+                </div>
+                <div class="w-[90px] flex-shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700 border border-primary-200">Direct</span></div>
+                <div class="flex-1 min-w-0"><p class="text-sm text-neutral-600 truncate">Completed research summary for Q4 market analysis report, 15 sources gathered</p></div>
+                <div class="w-[70px] flex-shrink-0 flex justify-center"><span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span></div>
+                <div class="w-8 flex-shrink-0"></div>
+              </div>
+              <div class="row-details">
+                <div class="px-12 py-4 bg-neutral-50/70 border-t border-neutral-100">
+                  <div class="flex items-center gap-4 mb-3 text-xs text-neutral-500">
+                    <span>ID: <span class="font-mono">msg_a8f3c21b</span></span>
+                    <span>Correlation: <span class="font-mono">corr_9d4e7f</span></span>
+                    <span>Delivered in <span class="font-mono">12ms</span></span>
+                    <button onclick="event.stopPropagation(); openDrawer(0)" class="text-primary-600 hover:text-primary-700 font-medium hover:underline underline-offset-2">View Full Details</button>
+                  </div>
+                  <div class="rounded-lg overflow-hidden">
+                    <div class="flex items-center justify-between bg-neutral-900 px-4 py-2 rounded-t-lg">
+                      <span class="font-mono text-xs text-neutral-400">Payload</span>
+                      <button onclick="event.stopPropagation(); copyPayload(this)" class="text-xs text-neutral-400 hover:text-white flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                        Copy
+                      </button>
+                    </div>
+                    <pre class="font-mono text-xs leading-relaxed bg-primary-950 text-primary-200 p-4 rounded-b-lg overflow-x-auto"><code>{
+  "type": "research_complete",
+  "topic": "Q4 Market Analysis",
+  "sources_count": 15,
+  "summary_length": 2847,
+  "key_findings": [
+    "Market growth projected at 12.3% YoY",
+    "3 new competitors entered the segment",
+    "Customer sentiment improved by 8%"
+  ],
+  "confidence_score": 0.94
+}</code></pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 2: Broadcast -->
+            <div>
+              <div class="msg-row flex items-center px-6 py-3 cursor-pointer hover:bg-primary-50/30 transition-colors border-l-2 border-violet-300" onclick="toggleMessageRow(this)">
+                <div class="w-8 flex-shrink-0"><svg class="chevron-icon w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>
+                <div class="w-[80px] flex-shrink-0 font-mono text-xs text-neutral-400 tabular-nums">14:30:05</div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-teal flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">DA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">DevOps Agent</span>
+                </div>
+                <div class="w-[24px] flex-shrink-0 flex justify-center"><svg class="w-3.5 h-3.5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg></div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-violet-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/></svg>
+                  <span class="text-sm font-medium text-neutral-900 truncate">All Agents</span>
+                </div>
+                <div class="w-[90px] flex-shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-violet-50 text-violet-700 border border-violet-200">Broadcast</span></div>
+                <div class="flex-1 min-w-0"><p class="text-sm text-neutral-600 truncate">Deployment complete: v2.4.1 rolled out to production cluster</p></div>
+                <div class="w-[70px] flex-shrink-0 flex justify-center"><span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span></div>
+                <div class="w-8 flex-shrink-0"></div>
+              </div>
+              <div class="row-details">
+                <div class="px-12 py-4 bg-neutral-50/70 border-t border-neutral-100">
+                  <div class="flex items-center gap-4 mb-3 text-xs text-neutral-500">
+                    <span>ID: <span class="font-mono">msg_b7e4d12a</span></span>
+                    <span>Recipients: <span class="font-mono">4 agents</span></span>
+                    <span>Delivered in <span class="font-mono">8ms</span></span>
+                    <button onclick="event.stopPropagation(); openDrawer(1)" class="text-primary-600 hover:text-primary-700 font-medium hover:underline underline-offset-2">View Full Details</button>
+                  </div>
+                  <div class="rounded-lg overflow-hidden">
+                    <div class="flex items-center justify-between bg-neutral-900 px-4 py-2 rounded-t-lg">
+                      <span class="font-mono text-xs text-neutral-400">Payload</span>
+                      <button onclick="event.stopPropagation(); copyPayload(this)" class="text-xs text-neutral-400 hover:text-white flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                        Copy
+                      </button>
+                    </div>
+                    <pre class="font-mono text-xs leading-relaxed bg-primary-950 text-primary-200 p-4 rounded-b-lg overflow-x-auto"><code>{
+  "type": "deployment_notification",
+  "version": "2.4.1",
+  "environment": "production",
+  "status": "success",
+  "changes": ["hotfix: memory leak in session handler", "perf: cache invalidation optimization"],
+  "rollback_available": true
+}</code></pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 3: Request -->
+            <div>
+              <div class="msg-row flex items-center px-6 py-3 cursor-pointer hover:bg-primary-50/30 transition-colors border-l-2 border-blue-300" onclick="toggleMessageRow(this)">
+                <div class="w-8 flex-shrink-0"><svg class="chevron-icon w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>
+                <div class="w-[80px] flex-shrink-0 font-mono text-xs text-neutral-400 tabular-nums">14:28:42</div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-purple flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">AA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Analytics Agent</span>
+                </div>
+                <div class="w-[24px] flex-shrink-0 flex justify-center"><svg class="w-3.5 h-3.5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg></div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-blue flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">RA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Research Agent</span>
+                </div>
+                <div class="w-[90px] flex-shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Request</span></div>
+                <div class="flex-1 min-w-0"><p class="text-sm text-neutral-600 truncate">Need updated revenue data for North America region, Q3-Q4 comparison</p></div>
+                <div class="w-[70px] flex-shrink-0 flex justify-center"><span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span></div>
+                <div class="w-8 flex-shrink-0"></div>
+              </div>
+              <div class="row-details">
+                <div class="px-12 py-4 bg-neutral-50/70 border-t border-neutral-100">
+                  <div class="flex items-center gap-4 mb-3 text-xs text-neutral-500">
+                    <span>ID: <span class="font-mono">msg_c3f8a91e</span></span>
+                    <span>Correlation: <span class="font-mono">corr_2b8e1a</span></span>
+                    <span>Delivered in <span class="font-mono">5ms</span></span>
+                    <button onclick="event.stopPropagation(); openDrawer(2)" class="text-primary-600 hover:text-primary-700 font-medium hover:underline underline-offset-2">View Full Details</button>
+                  </div>
+                  <div class="rounded-lg overflow-hidden">
+                    <div class="flex items-center justify-between bg-neutral-900 px-4 py-2 rounded-t-lg">
+                      <span class="font-mono text-xs text-neutral-400">Payload</span>
+                      <button onclick="event.stopPropagation(); copyPayload(this)" class="text-xs text-neutral-400 hover:text-white flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                        Copy
+                      </button>
+                    </div>
+                    <pre class="font-mono text-xs leading-relaxed bg-primary-950 text-primary-200 p-4 rounded-b-lg overflow-x-auto"><code>{
+  "type": "data_request",
+  "dataset": "revenue",
+  "region": "north_america",
+  "period": { "from": "2025-Q3", "to": "2025-Q4" },
+  "metrics": ["total_revenue", "growth_rate", "churn_rate"],
+  "format": "structured_json",
+  "priority": "high"
+}</code></pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 4: Response -->
+            <div>
+              <div class="msg-row flex items-center px-6 py-3 cursor-pointer hover:bg-primary-50/30 transition-colors border-l-2 border-emerald-300" onclick="toggleMessageRow(this)">
+                <div class="w-8 flex-shrink-0"><svg class="chevron-icon w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>
+                <div class="w-[80px] flex-shrink-0 font-mono text-xs text-neutral-400 tabular-nums">14:27:03</div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-blue flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">RA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Research Agent</span>
+                </div>
+                <div class="w-[24px] flex-shrink-0 flex justify-center"><svg class="w-3.5 h-3.5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg></div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-purple flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">AA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Analytics Agent</span>
+                </div>
+                <div class="w-[90px] flex-shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Response</span></div>
+                <div class="flex-1 min-w-0"><p class="text-sm text-neutral-600 truncate">Revenue data ready: NA Q3 $4.2M, Q4 $4.8M (+14.3% growth)</p></div>
+                <div class="w-[70px] flex-shrink-0 flex justify-center"><span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span></div>
+                <div class="w-8 flex-shrink-0"></div>
+              </div>
+              <div class="row-details">
+                <div class="px-12 py-4 bg-neutral-50/70 border-t border-neutral-100">
+                  <div class="flex items-center gap-4 mb-3 text-xs text-neutral-500">
+                    <span>ID: <span class="font-mono">msg_d2e7b43c</span></span>
+                    <span>Correlation: <span class="font-mono">corr_2b8e1a</span></span>
+                    <span>Delivered in <span class="font-mono">3ms</span></span>
+                    <button onclick="event.stopPropagation(); openDrawer(3)" class="text-primary-600 hover:text-primary-700 font-medium hover:underline underline-offset-2">View Full Details</button>
+                  </div>
+                  <div class="rounded-lg overflow-hidden">
+                    <div class="flex items-center justify-between bg-neutral-900 px-4 py-2 rounded-t-lg">
+                      <span class="font-mono text-xs text-neutral-400">Payload</span>
+                      <button onclick="event.stopPropagation(); copyPayload(this)" class="text-xs text-neutral-400 hover:text-white flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                        Copy
+                      </button>
+                    </div>
+                    <pre class="font-mono text-xs leading-relaxed bg-primary-950 text-primary-200 p-4 rounded-b-lg overflow-x-auto"><code>{
+  "type": "data_response",
+  "correlation_id": "corr_2b8e1a",
+  "data": {
+    "Q3": { "total_revenue": 4200000, "growth_rate": 0.089, "churn_rate": 0.032 },
+    "Q4": { "total_revenue": 4800000, "growth_rate": 0.143, "churn_rate": 0.028 }
+  },
+  "data_freshness": "2026-02-10T14:26:58Z"
+}</code></pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 5: Direct - Pending -->
+            <div>
+              <div class="msg-row flex items-center px-6 py-3 cursor-pointer hover:bg-primary-50/30 transition-colors border-l-2 border-primary-300" onclick="toggleMessageRow(this)">
+                <div class="w-8 flex-shrink-0"><svg class="chevron-icon w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>
+                <div class="w-[80px] flex-shrink-0 font-mono text-xs text-neutral-400 tabular-nums">14:25:11</div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-orange flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">SA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Support Agent</span>
+                </div>
+                <div class="w-[24px] flex-shrink-0 flex justify-center"><svg class="w-3.5 h-3.5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg></div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-green flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">WA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Writing Agent</span>
+                </div>
+                <div class="w-[90px] flex-shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700 border border-primary-200">Direct</span></div>
+                <div class="flex-1 min-w-0"><p class="text-sm text-neutral-600 truncate">Customer escalation: ticket #4821 needs knowledge base article update</p></div>
+                <div class="w-[70px] flex-shrink-0 flex justify-center"><span class="w-2 h-2 rounded-full bg-amber-500 pulse-dot inline-block"></span></div>
+                <div class="w-8 flex-shrink-0"></div>
+              </div>
+              <div class="row-details"></div>
+            </div>
+
+            <!-- Row 6: Request -->
+            <div>
+              <div class="msg-row flex items-center px-6 py-3 cursor-pointer hover:bg-primary-50/30 transition-colors border-l-2 border-blue-300" onclick="toggleMessageRow(this)">
+                <div class="w-8 flex-shrink-0"><svg class="chevron-icon w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>
+                <div class="w-[80px] flex-shrink-0 font-mono text-xs text-neutral-400 tabular-nums">14:22:37</div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-green flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">WA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Writing Agent</span>
+                </div>
+                <div class="w-[24px] flex-shrink-0 flex justify-center"><svg class="w-3.5 h-3.5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg></div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-purple flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">AA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Analytics Agent</span>
+                </div>
+                <div class="w-[90px] flex-shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Request</span></div>
+                <div class="flex-1 min-w-0"><p class="text-sm text-neutral-600 truncate">Need chart data for monthly active users trend, past 6 months</p></div>
+                <div class="w-[70px] flex-shrink-0 flex justify-center"><span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span></div>
+                <div class="w-8 flex-shrink-0"></div>
+              </div>
+              <div class="row-details"></div>
+            </div>
+
+            <!-- Row 7: Direct - Failed -->
+            <div>
+              <div class="msg-row flex items-center px-6 py-3 cursor-pointer hover:bg-primary-50/30 transition-colors border-l-2 border-primary-300" onclick="toggleMessageRow(this)">
+                <div class="w-8 flex-shrink-0"><svg class="chevron-icon w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>
+                <div class="w-[80px] flex-shrink-0 font-mono text-xs text-neutral-400 tabular-nums">14:18:55</div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-blue flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">RA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Research Agent</span>
+                </div>
+                <div class="w-[24px] flex-shrink-0 flex justify-center"><svg class="w-3.5 h-3.5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg></div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-teal flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">DA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">DevOps Agent</span>
+                </div>
+                <div class="w-[90px] flex-shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700 border border-primary-200">Direct</span></div>
+                <div class="flex-1 min-w-0"><p class="text-sm text-red-600 font-medium truncate">Error: Agent unreachable -- container restart in progress</p></div>
+                <div class="w-[70px] flex-shrink-0 flex items-center justify-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500 inline-block"></span><span class="text-xs text-red-600 font-medium">Failed</span></div>
+                <div class="w-8 flex-shrink-0"></div>
+              </div>
+              <div class="row-details"></div>
+            </div>
+
+            <!-- Row 8: Broadcast -->
+            <div>
+              <div class="msg-row flex items-center px-6 py-3 cursor-pointer hover:bg-primary-50/30 transition-colors border-l-2 border-violet-300" onclick="toggleMessageRow(this)">
+                <div class="w-8 flex-shrink-0"><svg class="chevron-icon w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>
+                <div class="w-[80px] flex-shrink-0 font-mono text-xs text-neutral-400 tabular-nums">14:15:22</div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-purple flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">AA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Analytics Agent</span>
+                </div>
+                <div class="w-[24px] flex-shrink-0 flex justify-center"><svg class="w-3.5 h-3.5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg></div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-violet-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/></svg>
+                  <span class="text-sm font-medium text-neutral-900 truncate">All Agents</span>
+                </div>
+                <div class="w-[90px] flex-shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-violet-50 text-violet-700 border border-violet-200">Broadcast</span></div>
+                <div class="flex-1 min-w-0"><p class="text-sm text-neutral-600 truncate">Daily metrics digest: 1,247 events processed, 99.2% success rate</p></div>
+                <div class="w-[70px] flex-shrink-0 flex justify-center"><span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span></div>
+                <div class="w-8 flex-shrink-0"></div>
+              </div>
+              <div class="row-details"></div>
+            </div>
+
+            <!-- Row 9: Response -->
+            <div>
+              <div class="msg-row flex items-center px-6 py-3 cursor-pointer hover:bg-primary-50/30 transition-colors border-l-2 border-emerald-300" onclick="toggleMessageRow(this)">
+                <div class="w-8 flex-shrink-0"><svg class="chevron-icon w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>
+                <div class="w-[80px] flex-shrink-0 font-mono text-xs text-neutral-400 tabular-nums">14:12:48</div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-purple flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">AA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Analytics Agent</span>
+                </div>
+                <div class="w-[24px] flex-shrink-0 flex justify-center"><svg class="w-3.5 h-3.5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg></div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-green flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">WA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Writing Agent</span>
+                </div>
+                <div class="w-[90px] flex-shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Response</span></div>
+                <div class="flex-1 min-w-0"><p class="text-sm text-neutral-600 truncate">MAU chart data: Jan 12.4k, Feb 13.1k, Mar 14.8k, Apr 15.2k, May 16.9k, Jun 18.3k</p></div>
+                <div class="w-[70px] flex-shrink-0 flex justify-center"><span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span></div>
+                <div class="w-8 flex-shrink-0"></div>
+              </div>
+              <div class="row-details"></div>
+            </div>
+
+            <!-- Row 10: Direct - Pending -->
+            <div>
+              <div class="msg-row flex items-center px-6 py-3 cursor-pointer hover:bg-primary-50/30 transition-colors border-l-2 border-primary-300" onclick="toggleMessageRow(this)">
+                <div class="w-8 flex-shrink-0"><svg class="chevron-icon w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>
+                <div class="w-[80px] flex-shrink-0 font-mono text-xs text-neutral-400 tabular-nums">14:10:09</div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-orange flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">SA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Support Agent</span>
+                </div>
+                <div class="w-[24px] flex-shrink-0 flex justify-center"><svg class="w-3.5 h-3.5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg></div>
+                <div class="w-[130px] flex-shrink-0 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full avatar-blue flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">RA</div>
+                  <span class="text-sm font-medium text-neutral-900 truncate">Research Agent</span>
+                </div>
+                <div class="w-[90px] flex-shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700 border border-primary-200">Direct</span></div>
+                <div class="flex-1 min-w-0"><p class="text-sm text-neutral-600 truncate">Can you look up the latest competitor pricing for Enterprise tier?</p></div>
+                <div class="w-[70px] flex-shrink-0 flex justify-center"><span class="w-2 h-2 rounded-full bg-amber-500 pulse-dot inline-block"></span></div>
+                <div class="w-8 flex-shrink-0"></div>
+              </div>
+              <div class="row-details"></div>
+            </div>
+
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-neutral-200 bg-neutral-50/50">
+            <p class="text-sm text-neutral-500">
+              Showing <span class="font-medium text-neutral-700">1-50</span> of <span class="font-medium text-neutral-700">234</span> messages
+            </p>
+            <div class="flex items-center gap-2">
+              <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-neutral-200 bg-white text-neutral-400 cursor-not-allowed" disabled>
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+              </button>
+              <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-primary-300 bg-primary-50 text-primary-700 text-sm font-semibold shadow-sm">1</button>
+              <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-neutral-200 bg-white text-neutral-700 text-sm font-medium hover:bg-neutral-50 transition-colors">2</button>
+              <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-neutral-200 bg-white text-neutral-700 text-sm font-medium hover:bg-neutral-50 transition-colors">3</button>
+              <span class="text-neutral-400 text-sm px-1">...</span>
+              <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-neutral-200 bg-white text-neutral-700 text-sm font-medium hover:bg-neutral-50 transition-colors">5</button>
+              <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-neutral-200 bg-white text-neutral-700 text-sm font-medium hover:bg-neutral-50 transition-colors">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ===== MESSAGE DETAIL DRAWER ===== -->
+    <div id="drawer-overlay" class="drawer-overlay fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]" onclick="closeDrawer()"></div>
+    <div id="drawer-panel" class="drawer-panel fixed right-0 top-0 h-full w-[480px] bg-white shadow-2xl z-[70] flex flex-col">
+      <!-- Drawer Header -->
+      <div class="flex items-center justify-between p-6 border-b border-neutral-200">
+        <h2 class="text-lg font-semibold text-neutral-900">Message Details</h2>
+        <button onclick="closeDrawer()" class="p-2 rounded-lg text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <!-- Drawer Body -->
+      <div class="flex-1 overflow-y-auto">
+        <!-- Metadata Section -->
+        <div class="p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-neutral-500 uppercase tracking-wider">Message ID</span>
+            <span class="font-mono text-sm text-neutral-700" id="drawer-msg-id">msg_a8f3c21b</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-neutral-500 uppercase tracking-wider">Timestamp</span>
+            <span class="font-mono text-sm text-neutral-700" id="drawer-timestamp">2026-02-10 14:32:18 UTC</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-neutral-500 uppercase tracking-wider">Type</span>
+            <span id="drawer-type-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700 border border-primary-200">Direct</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-neutral-500 uppercase tracking-wider">From</span>
+            <div class="flex items-center gap-2">
+              <div id="drawer-from-avatar" class="w-6 h-6 rounded-full avatar-blue flex items-center justify-center text-[9px] font-bold text-white">RA</div>
+              <span class="text-sm font-medium text-neutral-900" id="drawer-from-name">Research Agent</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-neutral-500 uppercase tracking-wider">To</span>
+            <div class="flex items-center gap-2">
+              <div id="drawer-to-avatar" class="w-6 h-6 rounded-full avatar-green flex items-center justify-center text-[9px] font-bold text-white">WA</div>
+              <span class="text-sm font-medium text-neutral-900" id="drawer-to-name">Writing Agent</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</span>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+              <span class="text-sm text-neutral-700" id="drawer-status">Delivered</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-neutral-500 uppercase tracking-wider">Correlation ID</span>
+            <span class="font-mono text-sm text-neutral-700" id="drawer-corr-id">corr_9d4e7f</span>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-neutral-200"></div>
+
+        <!-- Payload Section -->
+        <div class="p-6">
+          <h3 class="text-sm font-semibold text-neutral-900 mb-3">Message Payload</h3>
+          <div class="rounded-lg overflow-hidden">
+            <div class="flex items-center justify-between bg-neutral-900 px-4 py-2 rounded-t-lg">
+              <span class="font-mono text-xs text-neutral-400">JSON</span>
+              <button onclick="copyDrawerPayload()" class="text-xs text-neutral-400 hover:text-white flex items-center gap-1.5 transition-colors">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                Copy
+              </button>
+            </div>
+            <pre id="drawer-payload" class="font-mono text-xs leading-relaxed bg-primary-950 text-primary-200 p-4 rounded-b-lg overflow-x-auto max-h-[240px]"><code>{
+  "type": "research_complete",
+  "topic": "Q4 Market Analysis",
+  "sources_count": 15,
+  "summary_length": 2847,
+  "key_findings": [
+    "Market growth projected at 12.3% YoY",
+    "3 new competitors entered the segment",
+    "Customer sentiment improved by 8%"
+  ],
+  "confidence_score": 0.94
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-neutral-200"></div>
+
+        <!-- Related Messages Section -->
+        <div class="p-6">
+          <h3 class="text-sm font-semibold text-neutral-900 mb-3">Conversation Thread</h3>
+          <div class="space-y-0">
+            <!-- Thread entry 1 -->
+            <div class="flex gap-3 py-2.5 px-3 rounded-lg hover:bg-neutral-50 cursor-pointer transition-colors">
+              <div class="flex flex-col items-center">
+                <div class="w-2 h-2 rounded-full bg-blue-400 mt-1.5"></div>
+                <div class="w-px h-full bg-neutral-200 mt-1"></div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-0.5">
+                  <span class="text-sm font-medium text-neutral-900">Analytics Agent</span>
+                  <span class="font-mono text-xs text-neutral-400">14:28</span>
+                </div>
+                <p class="text-xs text-neutral-500 truncate">Need updated revenue data for North America...</p>
+              </div>
+            </div>
+            <!-- Thread entry 2 (current) -->
+            <div class="flex gap-3 py-2.5 px-3 rounded-lg bg-primary-50/50">
+              <div class="flex flex-col items-center">
+                <div class="w-2 h-2 rounded-full bg-primary-500 mt-1.5"></div>
+                <div class="w-px h-full bg-neutral-200 mt-1"></div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-0.5">
+                  <span class="text-sm font-medium text-primary-700">Research Agent</span>
+                  <span class="font-mono text-xs text-neutral-400">14:32</span>
+                  <span class="text-[10px] font-medium text-primary-600 bg-primary-100 px-1.5 py-0.5 rounded">Current</span>
+                </div>
+                <p class="text-xs text-neutral-500 truncate">Completed research summary for Q4 market analysis...</p>
+              </div>
+            </div>
+            <!-- Thread entry 3 -->
+            <div class="flex gap-3 py-2.5 px-3 rounded-lg hover:bg-neutral-50 cursor-pointer transition-colors">
+              <div class="flex flex-col items-center">
+                <div class="w-2 h-2 rounded-full bg-emerald-400 mt-1.5"></div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-0.5">
+                  <span class="text-sm font-medium text-neutral-900">Writing Agent</span>
+                  <span class="font-mono text-xs text-neutral-400">14:35</span>
+                </div>
+                <p class="text-xs text-neutral-500 truncate">Draft report generated from research summary, ready for review</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Drawer Footer -->
+      <div class="p-6 border-t border-neutral-200">
+        <button onclick="closeDrawer()" class="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-50 shadow-sm transition-colors">Close</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ---- Sidebar collapse/expand ----
+    let sidebarCollapsed = false;
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const collapseIcon = document.getElementById('collapse-icon');
+
+      if (sidebarCollapsed) {
+        sidebar.style.width = '64px';
+        mainContent.style.marginLeft = '64px';
+        labels.forEach(el => el.style.display = 'none');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.style.width = '256px';
+        mainContent.style.marginLeft = '256px';
+        labels.forEach(el => el.style.display = '');
+        collapseIcon.style.transform = '';
+      }
+    }
+
+    // ---- Dropdown toggle ----
+    function toggleDropdown(id) {
+      const menu = document.getElementById(id);
+      const isOpen = menu.classList.contains('open');
+      // Close all dropdowns first
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+      if (!isOpen) menu.classList.add('open');
+    }
+    // Close dropdowns on outside click
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.relative')) {
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+      }
+    });
+
+    // ---- Message row expand/collapse (audit-log pattern) ----
+    function toggleMessageRow(rowEl) {
+      const details = rowEl.parentElement.querySelector('.row-details');
+      const chevron = rowEl.querySelector('.chevron-icon');
+      if (!details) return;
+
+      // If row has no content, skip
+      if (details.innerHTML.trim() === '') return;
+
+      const isExpanded = details.classList.contains('expanded');
+      // Collapse all other rows first
+      document.querySelectorAll('.row-details.expanded').forEach(d => {
+        d.classList.remove('expanded');
+        d.closest('div').querySelector('.chevron-icon')?.classList.remove('rotated');
+      });
+      if (!isExpanded) {
+        details.classList.add('expanded');
+        chevron.classList.add('rotated');
+      }
+    }
+
+    // ---- Type pill toggle (multi-select) ----
+    function toggleTypePill(el, type) {
+      const pills = document.querySelectorAll('.type-pill');
+      if (type === 'all') {
+        // Reset all pills
+        pills.forEach(p => {
+          p.classList.remove('bg-primary-500', 'bg-violet-500', 'bg-blue-500', 'bg-emerald-500', 'text-white', 'shadow-sm', 'active');
+          p.classList.add('bg-neutral-50', 'text-neutral-600', 'border', 'border-neutral-200');
+        });
+        el.classList.remove('bg-neutral-50', 'text-neutral-600', 'border', 'border-neutral-200');
+        el.classList.add('bg-primary-500', 'text-white', 'shadow-sm', 'active');
+        return;
+      }
+
+      // Deactivate "All" pill
+      const allPill = document.querySelector('[data-type="all"]');
+      allPill.classList.remove('bg-primary-500', 'text-white', 'shadow-sm', 'active');
+      allPill.classList.add('bg-neutral-50', 'text-neutral-600', 'border', 'border-neutral-200');
+
+      // Toggle the clicked pill
+      const isActive = el.classList.contains('active');
+      if (isActive) {
+        el.classList.remove('active', 'text-white', 'shadow-sm');
+        // Remove type-specific colors
+        el.classList.remove('bg-primary-500', 'bg-violet-500', 'bg-blue-500', 'bg-emerald-500', 'border-primary-500', 'border-violet-500', 'border-blue-500', 'border-emerald-500');
+        el.classList.add('bg-neutral-50', 'text-neutral-600', 'border', 'border-neutral-200');
+      } else {
+        el.classList.add('active', 'shadow-sm');
+        el.classList.remove('bg-neutral-50', 'text-neutral-600', 'border-neutral-200');
+        // Add type-specific colors
+        const colorMap = { direct: 'primary', broadcast: 'violet', request: 'blue', response: 'emerald' };
+        const color = colorMap[type];
+        el.classList.add(`bg-${color}-500`, 'text-white', `border-${color}-500`);
+      }
+
+      // If no pills active, reactivate "All"
+      const activeCount = document.querySelectorAll('.type-pill.active').length;
+      if (activeCount === 0) {
+        allPill.classList.remove('bg-neutral-50', 'text-neutral-600', 'border', 'border-neutral-200');
+        allPill.classList.add('bg-primary-500', 'text-white', 'shadow-sm', 'active');
+      }
+    }
+
+    // ---- Refresh button ----
+    function handleRefresh(btn) {
+      const icon = document.getElementById('refresh-icon');
+      icon.classList.add('spin-refresh');
+      setTimeout(() => icon.classList.remove('spin-refresh'), 600);
+    }
+
+    // ---- Copy payload ----
+    function copyPayload(btn) {
+      const code = btn.closest('.rounded-lg').querySelector('code');
+      navigator.clipboard.writeText(code.textContent).then(() => {
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+        setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+      });
+    }
+
+    function copyDrawerPayload() {
+      const code = document.querySelector('#drawer-payload code');
+      navigator.clipboard.writeText(code.textContent).then(() => {
+        // Visual feedback could be added here
+      });
+    }
+
+    // ---- Drawer open/close ----
+    function openDrawer(msgIndex) {
+      document.getElementById('drawer-overlay').classList.add('open');
+      document.getElementById('drawer-panel').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawer-overlay').classList.remove('open');
+      document.getElementById('drawer-panel').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Close drawer with Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDrawer();
+    });
+
+    // ---- Prototype Navigation Bridge ----
+    if (window.parent !== window) {
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href^="/"]');
+        if (link) {
+          window.parent.postMessage({ type: 'navigate', href: link.getAttribute('href') }, '*');
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+    }
+  </script>
+</body>
+</html>

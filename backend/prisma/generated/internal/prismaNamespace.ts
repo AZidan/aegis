@@ -402,7 +402,9 @@ export const ModelName = {
   Alert: 'Alert',
   AuditLog: 'AuditLog',
   AgentMessage: 'AgentMessage',
-  AgentAllowlist: 'AgentAllowlist'
+  AgentAllowlist: 'AgentAllowlist',
+  ChannelConnection: 'ChannelConnection',
+  ChannelRouting: 'ChannelRouting'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -418,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "tenant" | "tenantConfigHistory" | "agent" | "agentRoleConfig" | "skill" | "refreshToken" | "apiKey" | "teamMember" | "teamInvite" | "agentChannel" | "agentActivity" | "agentMetrics" | "skillInstallation" | "containerHealth" | "alert" | "auditLog" | "agentMessage" | "agentAllowlist"
+    modelProps: "user" | "tenant" | "tenantConfigHistory" | "agent" | "agentRoleConfig" | "skill" | "refreshToken" | "apiKey" | "teamMember" | "teamInvite" | "agentChannel" | "agentActivity" | "agentMetrics" | "skillInstallation" | "containerHealth" | "alert" | "auditLog" | "agentMessage" | "agentAllowlist" | "channelConnection" | "channelRouting"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1828,6 +1830,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ChannelConnection: {
+      payload: Prisma.$ChannelConnectionPayload<ExtArgs>
+      fields: Prisma.ChannelConnectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChannelConnectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelConnectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChannelConnectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelConnectionPayload>
+        }
+        findFirst: {
+          args: Prisma.ChannelConnectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelConnectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChannelConnectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelConnectionPayload>
+        }
+        findMany: {
+          args: Prisma.ChannelConnectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelConnectionPayload>[]
+        }
+        create: {
+          args: Prisma.ChannelConnectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelConnectionPayload>
+        }
+        createMany: {
+          args: Prisma.ChannelConnectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChannelConnectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelConnectionPayload>[]
+        }
+        delete: {
+          args: Prisma.ChannelConnectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelConnectionPayload>
+        }
+        update: {
+          args: Prisma.ChannelConnectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelConnectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ChannelConnectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChannelConnectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChannelConnectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelConnectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ChannelConnectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelConnectionPayload>
+        }
+        aggregate: {
+          args: Prisma.ChannelConnectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChannelConnection>
+        }
+        groupBy: {
+          args: Prisma.ChannelConnectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChannelConnectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChannelConnectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChannelConnectionCountAggregateOutputType> | number
+        }
+      }
+    }
+    ChannelRouting: {
+      payload: Prisma.$ChannelRoutingPayload<ExtArgs>
+      fields: Prisma.ChannelRoutingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChannelRoutingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRoutingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChannelRoutingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRoutingPayload>
+        }
+        findFirst: {
+          args: Prisma.ChannelRoutingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRoutingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChannelRoutingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRoutingPayload>
+        }
+        findMany: {
+          args: Prisma.ChannelRoutingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRoutingPayload>[]
+        }
+        create: {
+          args: Prisma.ChannelRoutingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRoutingPayload>
+        }
+        createMany: {
+          args: Prisma.ChannelRoutingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChannelRoutingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRoutingPayload>[]
+        }
+        delete: {
+          args: Prisma.ChannelRoutingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRoutingPayload>
+        }
+        update: {
+          args: Prisma.ChannelRoutingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRoutingPayload>
+        }
+        deleteMany: {
+          args: Prisma.ChannelRoutingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChannelRoutingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChannelRoutingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRoutingPayload>[]
+        }
+        upsert: {
+          args: Prisma.ChannelRoutingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChannelRoutingPayload>
+        }
+        aggregate: {
+          args: Prisma.ChannelRoutingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChannelRouting>
+        }
+        groupBy: {
+          args: Prisma.ChannelRoutingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChannelRoutingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChannelRoutingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChannelRoutingCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1976,6 +2126,7 @@ export const SkillScalarFieldEnum = {
   isCore: 'isCore',
   authorId: 'authorId',
   submittedAt: 'submittedAt',
+  tenantId: 'tenantId',
   compatibleRoles: 'compatibleRoles',
   repositoryUrl: 'repositoryUrl',
   mainFile: 'mainFile',
@@ -2181,6 +2332,38 @@ export const AgentAllowlistScalarFieldEnum = {
 } as const
 
 export type AgentAllowlistScalarFieldEnum = (typeof AgentAllowlistScalarFieldEnum)[keyof typeof AgentAllowlistScalarFieldEnum]
+
+
+export const ChannelConnectionScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  platform: 'platform',
+  workspaceId: 'workspaceId',
+  workspaceName: 'workspaceName',
+  credentials: 'credentials',
+  status: 'status',
+  connectedAt: 'connectedAt',
+  lastHealthCheck: 'lastHealthCheck',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChannelConnectionScalarFieldEnum = (typeof ChannelConnectionScalarFieldEnum)[keyof typeof ChannelConnectionScalarFieldEnum]
+
+
+export const ChannelRoutingScalarFieldEnum = {
+  id: 'id',
+  connectionId: 'connectionId',
+  routeType: 'routeType',
+  sourceIdentifier: 'sourceIdentifier',
+  agentId: 'agentId',
+  priority: 'priority',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChannelRoutingScalarFieldEnum = (typeof ChannelRoutingScalarFieldEnum)[keyof typeof ChannelRoutingScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2579,6 +2762,48 @@ export type EnumAllowlistDirectionFieldRefInput<$PrismaModel> = FieldRefInputTyp
 export type ListEnumAllowlistDirectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AllowlistDirection[]'>
     
 
+
+/**
+ * Reference to a field of type 'ChannelPlatform'
+ */
+export type EnumChannelPlatformFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChannelPlatform'>
+    
+
+
+/**
+ * Reference to a field of type 'ChannelPlatform[]'
+ */
+export type ListEnumChannelPlatformFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChannelPlatform[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ConnectionStatus'
+ */
+export type EnumConnectionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ConnectionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ConnectionStatus[]'
+ */
+export type ListEnumConnectionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ConnectionStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'RouteType'
+ */
+export type EnumRouteTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RouteType'>
+    
+
+
+/**
+ * Reference to a field of type 'RouteType[]'
+ */
+export type ListEnumRouteTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RouteType[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2693,6 +2918,8 @@ export type GlobalOmitConfig = {
   auditLog?: Prisma.AuditLogOmit
   agentMessage?: Prisma.AgentMessageOmit
   agentAllowlist?: Prisma.AgentAllowlistOmit
+  channelConnection?: Prisma.ChannelConnectionOmit
+  channelRouting?: Prisma.ChannelRoutingOmit
 }
 
 /* Types for Logging */

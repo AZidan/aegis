@@ -13,6 +13,9 @@ import { ProvisioningModule } from './provisioning/provisioning.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AuditModule } from './audit/audit.module';
 import { ContainerModule } from './container/container.module';
+import { AlertModule } from './alert/alert.module';
+import { ChannelProxyModule } from './channel-proxy/channel-proxy.module';
+import { SlackModule } from './slack/slack.module';
 import configuration from './config/configuration';
 import { validateEnv } from './config/validation';
 
@@ -55,6 +58,9 @@ import { validateEnv } from './config/validation';
     // Audit (global — must load before feature modules)
     AuditModule,
 
+    // Security Alerts (after Audit, uses alert queue)
+    AlertModule,
+
     // Feature modules
     AuthModule,
     AdminModule,
@@ -62,6 +68,8 @@ import { validateEnv } from './config/validation';
     HealthModule,
     ProvisioningModule,
     ContainerModule,
+    ChannelProxyModule,
+    SlackModule,
   ],
   controllers: [AppController],
   providers: [AppService],

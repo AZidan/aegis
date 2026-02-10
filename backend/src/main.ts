@@ -15,14 +15,14 @@ async function bootstrap() {
 
   // CORS configuration
   const corsOrigins = configService
-    .get<string>('CORS_ORIGINS', 'http://localhost:3000')
+    .get<string>('CORS_ORIGINS', 'http://localhost:3000,http://localhost:3001')
     .split(',')
     .map((origin) => origin.trim());
 
   app.enableCors({
     origin: corsOrigins,
     credentials: true,
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Authorization', 'Content-Type', 'X-Tenant-Id'],
   });
 
