@@ -28,7 +28,7 @@ export const envSchema = z.object({
     .enum(['mock', 'docker', 'kubernetes'])
     .default('mock'),
   CONTAINER_DOCKER_HOST: z.string().optional(),
-  CONTAINER_OPENCLAW_IMAGE: z.string().default('openclaw/openclaw:latest'),
+  CONTAINER_OPENCLAW_IMAGE: z.string().default('openclaw/openclaw:secrets'),
   CONTAINER_NETWORK_NAME: z.string().default('aegis-tenant-network'),
   CONTAINER_BASE_PORT: z.string().regex(/^\d+$/).default('19000').transform(Number),
   CONTAINER_PORT_RANGE: z.string().regex(/^\d+$/).default('1000').transform(Number),

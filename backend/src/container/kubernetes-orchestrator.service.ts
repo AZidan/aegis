@@ -22,6 +22,7 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
   private kubeConfig?: k8s.KubeConfig;
   private appsApi?: k8s.AppsV1Api;
   private coreApi?: k8s.CoreV1Api;
+  private networkingApi?: k8s.NetworkingV1Api;
 
   constructor(private readonly configService: ConfigService) {
     this.initializeClient();
@@ -40,8 +41,15 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
     const containerPort = options.containerPort ?? DEFAULT_CONTAINER_PORT;
 
     await this.ensureNamespace(namespace);
+    await this.upsertSecret(namespace, `${name}-runtime-secrets`, {
+      OPENCLAW_AGE_KEY_FILE: '/run/secrets/age_key',
+      OPENCLAW_DATA_DIR: '/home/node/.openclaw',
+      OPENCLAW_SECRETS_DIR: '/run/secrets/openclaw',
+      ...(options.environment ?? {}),
+    });
     await this.upsertDeployment(namespace, name, image, containerPort, options);
     await this.upsertService(namespace, name, containerPort);
+    await this.upsertNetworkPolicy(namespace, name);
 
     const serviceDomain = this.configService.get<string>(
       'container.kubernetes.serviceDomain',
@@ -233,10 +241,11 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
 
     this.appsApi = this.kubeConfig.makeApiClient(k8s.AppsV1Api);
     this.coreApi = this.kubeConfig.makeApiClient(k8s.CoreV1Api);
+    this.networkingApi = this.kubeConfig.makeApiClient(k8s.NetworkingV1Api);
   }
 
   private assertEnabled(): void {
-    if (this.appsApi && this.coreApi) {
+    if (this.appsApi && this.coreApi && this.networkingApi) {
       return;
     }
     throw new ServiceUnavailableException(
@@ -365,6 +374,64 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
         name,
         namespace,
         body: configMap,
+      });
+    }
+  }
+
+  private async upsertSecret(
+    namespace: string,
+    name: string,
+    data: Record<string, string>,
+  ): Promise<void> {
+    const secret: k8s.V1Secret = {
+      metadata: { name },
+      type: 'Opaque',
+      stringData: data,
+    };
+    try {
+      await this.coreApi!.createNamespacedSecret({
+        namespace,
+        body: secret,
+      });
+    } catch (error) {
+      if (!this.isAlreadyExists(error)) {
+        throw error;
+      }
+      await this.coreApi!.replaceNamespacedSecret({
+        name,
+        namespace,
+        body: secret,
+      });
+    }
+  }
+
+  private async upsertNetworkPolicy(
+    namespace: string,
+    name: string,
+  ): Promise<void> {
+    const policyName = `${name}-deny-ingress`;
+    const policy: k8s.V1NetworkPolicy = {
+      metadata: { name: policyName },
+      spec: {
+        podSelector: { matchLabels: { app: name } },
+        policyTypes: ['Ingress'],
+        ingress: [],
+      },
+    };
+
+    try {
+      await this.networkingApi!.createNamespacedNetworkPolicy({
+        namespace,
+        body: policy,
+      });
+    } catch (error) {
+      if (!this.isAlreadyExists(error)) {
+        throw error;
+      }
+      await this.networkingApi!.replaceNamespacedNetworkPolicy({
+        name: policyName,
+        namespace,
+        body: policy,
       });
     }
   }
