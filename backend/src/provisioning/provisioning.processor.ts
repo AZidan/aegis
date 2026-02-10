@@ -10,6 +10,7 @@ import {
 import { CONTAINER_ORCHESTRATOR } from '../container/container.constants';
 import { ContainerOrchestrator } from '../container/interfaces/container-orchestrator.interface';
 import { ContainerHandle } from '../container/interfaces/container-config.interface';
+import { ContainerPortAllocatorService } from '../container/container-port-allocator.service';
 
 /**
  * Job data shape for provisioning jobs.
@@ -35,6 +36,7 @@ export class ProvisioningProcessor extends WorkerHost {
 
   constructor(
     private readonly prisma: PrismaService,
+    private readonly portAllocator: ContainerPortAllocatorService,
     @Inject(CONTAINER_ORCHESTRATOR)
     private readonly containerOrchestrator: ContainerOrchestrator,
   ) {
@@ -98,9 +100,11 @@ export class ProvisioningProcessor extends WorkerHost {
             // Reserved for K8s namespace/preflight work.
             break;
           case 'spinning_container':
+            const hostPort = await this.portAllocator.allocate(tenantId);
             container = await this.containerOrchestrator.create({
               tenantId,
               name: `aegis-${tenantId.slice(0, 8)}`,
+              hostPort,
               resourceLimits: this.extractResourceLimits(tenant.resourceLimits),
             });
 

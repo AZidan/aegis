@@ -39,6 +39,7 @@ export default () => ({
     openclawImage: process.env.CONTAINER_OPENCLAW_IMAGE || 'openclaw/openclaw:latest',
     networkName: process.env.CONTAINER_NETWORK_NAME || 'aegis-tenant-network',
     basePort: parseInt(process.env.CONTAINER_BASE_PORT || '19000', 10),
+    portRange: parseInt(process.env.CONTAINER_PORT_RANGE || '1000', 10),
   },
   cors: {
     origins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
