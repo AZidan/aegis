@@ -68,6 +68,9 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
     const { namespace, name } = this.parseContainerId(containerId);
     await this.tryDeleteDeployment(namespace, name);
     await this.tryDeleteService(namespace, name);
+    await this.tryDeleteConfigMap(namespace, `${name}-openclaw-config`);
+    await this.tryDeleteSecret(namespace, `${name}-runtime-secrets`);
+    await this.tryDeleteNetworkPolicy(namespace, `${name}-deny-ingress`);
   }
 
   async restart(containerId: string): Promise<void> {
@@ -508,6 +511,51 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
     }
   }
 
+  private async tryDeleteConfigMap(
+    namespace: string,
+    name: string,
+  ): Promise<void> {
+    try {
+      await this.coreApi!.deleteNamespacedConfigMap({
+        name,
+        namespace,
+      });
+    } catch (error) {
+      if (!this.isNotFound(error)) {
+        throw error;
+      }
+    }
+  }
+
+  private async tryDeleteSecret(namespace: string, name: string): Promise<void> {
+    try {
+      await this.coreApi!.deleteNamespacedSecret({
+        name,
+        namespace,
+      });
+    } catch (error) {
+      if (!this.isNotFound(error)) {
+        throw error;
+      }
+    }
+  }
+
+  private async tryDeleteNetworkPolicy(
+    namespace: string,
+    name: string,
+  ): Promise<void> {
+    try {
+      await this.networkingApi!.deleteNamespacedNetworkPolicy({
+        name,
+        namespace,
+      });
+    } catch (error) {
+      if (!this.isNotFound(error)) {
+        throw error;
+      }
+    }
+  }
+
   private buildDeployment(
     name: string,
     image: string,
@@ -539,6 +587,14 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
                 image,
                 ports: [{ containerPort }],
                 env: env.length > 0 ? env : undefined,
+                volumeMounts: [
+                  {
+                    name: 'openclaw-config',
+                    mountPath: '/home/node/.openclaw/openclaw.json',
+                    subPath: 'openclaw.json',
+                    readOnly: true,
+                  },
+                ],
                 resources:
                   cpu || memoryMb
                     ? {
@@ -548,6 +604,15 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
                         },
                       }
                     : undefined,
+              },
+            ],
+            volumes: [
+              {
+                name: 'openclaw-config',
+                configMap: {
+                  name: `${name}-openclaw-config`,
+                  optional: true,
+                },
               },
             ],
           },

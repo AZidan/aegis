@@ -31,4 +31,16 @@ describe('SecretsManagerService', () => {
     expect(encrypted).not.toBe(plaintext);
     expect(decrypted).toBe(plaintext);
   });
+
+  it('should throw in production when master key is missing', () => {
+    const previous = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    try {
+      expect(() => service.encrypt('value')).toThrow(
+        'AEGIS_SECRETS_MASTER_KEY is required outside development/test',
+      );
+    } finally {
+      process.env.NODE_ENV = previous;
+    }
+  });
 });

@@ -56,6 +56,12 @@ export class SecretsManagerService {
   private getMasterKey(): Buffer {
     const raw = process.env.AEGIS_SECRETS_MASTER_KEY;
     if (!raw || raw.trim().length === 0) {
+      const env = process.env.NODE_ENV ?? 'development';
+      if (env !== 'development' && env !== 'test') {
+        throw new Error(
+          'AEGIS_SECRETS_MASTER_KEY is required outside development/test',
+        );
+      }
       return createHash('sha256').update('aegis-dev-fallback-key').digest();
     }
 
