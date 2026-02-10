@@ -29,6 +29,7 @@
     "docker:reset": "npx prisma migrate reset --force"
   },
   "dependencies": {
+    "@kubernetes/client-node": "^1.4.0",
     "@nestjs/bullmq": "^11.0.4",
     "@nestjs/cache-manager": "^3.1.0",
     "@nestjs/common": "^11.1.13",
@@ -46,6 +47,7 @@
     "cache-manager-ioredis-yet": "^2.1.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
+    "dockerode": "^4.0.9",
     "ioredis": "^5.9.2",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
@@ -58,6 +60,7 @@
     "rxjs": "^7.8.2",
     "socket.io": "^4.8.3",
     "speakeasy": "^2.0.0",
+    "tar-stream": "^3.1.7",
     "uuid": "^13.0.0",
     "zod": "^4.3.6"
   },
@@ -74,6 +77,7 @@
     "@types/qrcode": "^1.5.6",
     "@types/speakeasy": "^2.0.10",
     "@types/supertest": "^6.0.3",
+    "@types/tar-stream": "^3.1.4",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.54.0",
     "@typescript-eslint/parser": "^8.54.0",

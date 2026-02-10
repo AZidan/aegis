@@ -2,6 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Job } from 'bullmq';
 import { ProvisioningProcessor } from '../../src/provisioning/provisioning.processor';
 import { PrismaService } from '../../src/prisma/prisma.service';
+import { CONTAINER_ORCHESTRATOR } from '../../src/container/container.constants';
+import { ContainerPortAllocatorService } from '../../src/container/container-port-allocator.service';
+import { ContainerConfigGeneratorService } from '../../src/container/container-config-generator.service';
+import { ContainerNetworkService } from '../../src/container/container-network.service';
 import {
   PROVISIONING_STEPS,
   MAX_PROVISIONING_RETRIES,
@@ -29,6 +33,35 @@ const mockPrismaService = {
   },
 };
 
+const mockContainerOrchestrator = {
+  create: jest.fn().mockResolvedValue({
+    id: 'oclaw-abc123',
+    url: 'https://oclaw-abc123.containers.aegis.ai',
+    hostPort: 19000,
+  }),
+  delete: jest.fn().mockResolvedValue(undefined),
+  restart: jest.fn().mockResolvedValue(undefined),
+  stop: jest.fn().mockResolvedValue(undefined),
+  getStatus: jest.fn().mockResolvedValue({ state: 'running', health: 'healthy', uptimeSeconds: 0 }),
+  getLogs: jest.fn().mockResolvedValue(''),
+  updateConfig: jest.fn().mockResolvedValue(undefined),
+};
+
+const mockPortAllocator = {
+  allocate: jest.fn().mockResolvedValue(19000),
+};
+
+const mockConfigGenerator = {
+  generateForTenant: jest.fn().mockResolvedValue({
+    gateway: { port: 18789 },
+  }),
+};
+
+const mockContainerNetwork = {
+  getContainerName: jest.fn().mockReturnValue('aegis-tenant-u'),
+  getDockerNetworkName: jest.fn().mockReturnValue('aegis-net-tenant-u'),
+};
+
 // Helper to create a mock Job
 function createMockJob(
   name: string,
@@ -48,6 +81,12 @@ describe('ProvisioningProcessor', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockPrismaService.tenant.findUnique.mockResolvedValue({
+      id: 'tenant-uuid-1',
+      companyName: 'Acme Corp',
+      provisioningAttempt: 1,
+      resourceLimits: { cpuCores: 4, memoryMb: 4096, diskGb: 25 },
+    });
 
     // Replace setTimeout to run immediately (skip simulated delays)
     jest.useFakeTimers();
@@ -56,6 +95,10 @@ describe('ProvisioningProcessor', () => {
       providers: [
         ProvisioningProcessor,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: ContainerPortAllocatorService, useValue: mockPortAllocator },
+        { provide: ContainerConfigGeneratorService, useValue: mockConfigGenerator },
+        { provide: ContainerNetworkService, useValue: mockContainerNetwork },
+        { provide: CONTAINER_ORCHESTRATOR, useValue: mockContainerOrchestrator },
       ],
     }).compile();
 
@@ -387,14 +430,19 @@ describe('ProvisioningProcessor', () => {
     });
 
     it('should include tenant company name in alert message', async () => {
-      prisma.tenant.update
-        .mockRejectedValueOnce(new Error('Disk full'))
-        .mockResolvedValue({});
-
-      prisma.tenant.findUnique.mockResolvedValue({
-        provisioningAttempt: MAX_PROVISIONING_RETRIES,
-        companyName: 'Acme Corp',
-      });
+      mockContainerOrchestrator.create.mockRejectedValueOnce(
+        new Error('Disk full'),
+      );
+      prisma.tenant.findUnique
+        .mockResolvedValueOnce({
+          id: 'tenant-uuid-1',
+          companyName: 'Acme Corp',
+          resourceLimits: { cpuCores: 4, memoryMb: 4096, diskGb: 25 },
+        })
+        .mockResolvedValueOnce({
+          provisioningAttempt: MAX_PROVISIONING_RETRIES,
+          companyName: 'Acme Corp',
+        });
 
       const job = createMockJob('provision-tenant', {
         tenantId: 'tenant-uuid-1',
@@ -409,6 +457,12 @@ describe('ProvisioningProcessor', () => {
           }),
         }),
       );
+
+      mockContainerOrchestrator.create.mockResolvedValue({
+        id: 'oclaw-abc123',
+        url: 'https://oclaw-abc123.containers.aegis.ai',
+        hostPort: 19000,
+      });
     });
   });
 });

@@ -2,6 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Job } from 'bullmq';
 import { ProvisioningProcessor } from '../../src/provisioning/provisioning.processor';
 import { PrismaService } from '../../src/prisma/prisma.service';
+import { CONTAINER_ORCHESTRATOR } from '../../src/container/container.constants';
+import { ContainerPortAllocatorService } from '../../src/container/container-port-allocator.service';
+import { ContainerConfigGeneratorService } from '../../src/container/container-config-generator.service';
+import { ContainerNetworkService } from '../../src/container/container-network.service';
 import {
   PROVISIONING_QUEUE_NAME,
 } from '../../src/provisioning/provisioning.constants';
@@ -28,6 +32,39 @@ const mockPrismaService = {
   },
 };
 
+const mockContainerOrchestrator = {
+  create: jest.fn().mockResolvedValue({
+    id: 'oclaw-abc123',
+    url: 'https://oclaw-abc123.containers.aegis.ai',
+    hostPort: 19000,
+  }),
+  delete: jest.fn(),
+  restart: jest.fn(),
+  stop: jest.fn(),
+  getStatus: jest.fn().mockResolvedValue({
+    state: 'running',
+    health: 'healthy',
+    uptimeSeconds: 0,
+  }),
+  getLogs: jest.fn(),
+  updateConfig: jest.fn().mockResolvedValue(undefined),
+};
+
+const mockPortAllocator = {
+  allocate: jest.fn().mockResolvedValue(19000),
+};
+
+const mockConfigGenerator = {
+  generateForTenant: jest.fn().mockResolvedValue({
+    gateway: { port: 18789 },
+  }),
+};
+
+const mockContainerNetwork = {
+  getContainerName: jest.fn().mockReturnValue('aegis-tenant-u'),
+  getDockerNetworkName: jest.fn().mockReturnValue('aegis-net-tenant-u'),
+};
+
 // Helper to create a mock Job
 function createMockJob(
   name: string,
@@ -45,11 +82,20 @@ describe('ProvisioningProcessor - Core Skill Installation', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+    mockPrismaService.tenant.findUnique.mockResolvedValue({
+      id: 'tenant-uuid-1',
+      companyName: 'Acme Corp',
+      resourceLimits: { cpuCores: 2, memoryMb: 2048, diskGb: 20 },
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProvisioningProcessor,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: ContainerPortAllocatorService, useValue: mockPortAllocator },
+        { provide: ContainerConfigGeneratorService, useValue: mockConfigGenerator },
+        { provide: ContainerNetworkService, useValue: mockContainerNetwork },
+        { provide: CONTAINER_ORCHESTRATOR, useValue: mockContainerOrchestrator },
       ],
     }).compile();
 

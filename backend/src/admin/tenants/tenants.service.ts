@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   Logger,
+  Inject,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/audit.service';
@@ -12,6 +13,8 @@ import { UpdateTenantDto } from './dto/update-tenant.dto';
 import { ListTenantsQueryDto } from './dto/list-tenants-query.dto';
 import { Prisma } from '../../../prisma/generated/client';
 import { PLAN_MAX_SKILLS } from '../../provisioning/provisioning.constants';
+import { CONTAINER_ORCHESTRATOR } from '../../container/container.constants';
+import { ContainerOrchestrator } from '../../container/interfaces/container-orchestrator.interface';
 
 /**
  * Tenants Service - Platform Admin: Tenants
@@ -87,6 +90,8 @@ export class TenantsService {
     private readonly prisma: PrismaService,
     private readonly provisioningService: ProvisioningService,
     private readonly auditService: AuditService,
+    @Inject(CONTAINER_ORCHESTRATOR)
+    private readonly containerOrchestrator: ContainerOrchestrator,
   ) {}
 
   // ==========================================================================
@@ -600,7 +605,17 @@ export class TenantsService {
       throw new NotFoundException('Tenant not found');
     }
 
-    this.logger.log(`Container restart initiated for tenant: ${id}`);
+    if (!tenant.containerId) {
+      throw new ConflictException(
+        'Tenant does not have an assigned container yet',
+      );
+    }
+
+    await this.containerOrchestrator.restart(tenant.containerId);
+
+    this.logger.log(
+      `Container restart initiated for tenant: ${id} (containerId=${tenant.containerId})`,
+    );
 
     // Contract response (202 Accepted - async operation)
     return {
@@ -642,7 +657,7 @@ export class TenantsService {
       orderBy: { timestamp: 'asc' },
     });
 
-    // Build current health (use real data if available, otherwise stub)
+    // Build current health (use real data if available, otherwise orchestrator fallback, then stub)
     const current = latestHealth
       ? {
           status: latestHealth.status,
@@ -652,14 +667,7 @@ export class TenantsService {
           uptime: latestHealth.uptime,
           timestamp: latestHealth.timestamp.toISOString(),
         }
-      : {
-          status: 'healthy' as const,
-          cpu: 12.5,
-          memory: 45.2,
-          disk: 23.1,
-          uptime: 86400,
-          timestamp: new Date().toISOString(),
-        };
+      : await this.buildCurrentHealthFromOrchestrator(tenant.containerId);
 
     // Build 24h history (use real data if available, otherwise stub with sample points)
     const history24h =
@@ -842,5 +850,43 @@ export class TenantsService {
     }
 
     return points;
+  }
+
+  private async buildCurrentHealthFromOrchestrator(
+    containerId: string | null,
+  ): Promise<{
+    status: 'healthy' | 'degraded' | 'down';
+    cpu: number;
+    memory: number;
+    disk: number;
+    uptime: number;
+    timestamp: string;
+  }> {
+    if (containerId) {
+      try {
+        const status = await this.containerOrchestrator.getStatus(containerId);
+        return {
+          status: status.health === 'unknown' ? 'down' : status.health,
+          cpu: 0,
+          memory: 0,
+          disk: 0,
+          uptime: status.uptimeSeconds ?? 0,
+          timestamp: new Date().toISOString(),
+        };
+      } catch (error) {
+        this.logger.warn(
+          `Orchestrator health fallback failed for container ${containerId}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+
+    return {
+      status: 'healthy',
+      cpu: 12.5,
+      memory: 45.2,
+      disk: 23.1,
+      uptime: 86400,
+      timestamp: new Date().toISOString(),
+    };
   }
 }
