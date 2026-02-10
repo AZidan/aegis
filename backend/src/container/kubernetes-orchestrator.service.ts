@@ -15,6 +15,7 @@ import {
   DEFAULT_K8S_NAMESPACE,
   DEFAULT_K8S_SERVICE_DOMAIN,
 } from './container.constants';
+import { ContainerNetworkService } from './container-network.service';
 
 @Injectable()
 export class KubernetesOrchestratorService implements ContainerOrchestrator {
@@ -24,7 +25,10 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
   private coreApi?: k8s.CoreV1Api;
   private networkingApi?: k8s.NetworkingV1Api;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly containerNetworkService: ContainerNetworkService,
+  ) {
     this.initializeClient();
   }
 
@@ -412,15 +416,8 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
     namespace: string,
     name: string,
   ): Promise<void> {
-    const policyName = `${name}-deny-ingress`;
-    const policy: k8s.V1NetworkPolicy = {
-      metadata: { name: policyName },
-      spec: {
-        podSelector: { matchLabels: { app: name } },
-        policyTypes: ['Ingress'],
-        ingress: [],
-      },
-    };
+    const policy = this.containerNetworkService.buildKubernetesDenyIngressPolicy(name);
+    const policyName = policy.metadata?.name ?? `${name}-deny-ingress`;
 
     try {
       await this.networkingApi!.createNamespacedNetworkPolicy({

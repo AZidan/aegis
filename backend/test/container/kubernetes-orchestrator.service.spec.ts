@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { KubernetesOrchestratorService } from '../../src/container/kubernetes-orchestrator.service';
+import { ContainerNetworkService } from '../../src/container/container-network.service';
 
 const appsApiMock = {
   createNamespacedDeployment: jest.fn(),
@@ -91,6 +92,7 @@ describe('KubernetesOrchestratorService', () => {
       providers: [
         KubernetesOrchestratorService,
         { provide: ConfigService, useValue: configServiceMock },
+        ContainerNetworkService,
       ],
     }).compile();
 
