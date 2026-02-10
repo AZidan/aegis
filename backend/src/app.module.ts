@@ -12,6 +12,7 @@ import { HealthModule } from './health/health.module';
 import { ProvisioningModule } from './provisioning/provisioning.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AuditModule } from './audit/audit.module';
+import { ContainerModule } from './container/container.module';
 import configuration from './config/configuration';
 import { validateEnv } from './config/validation';
 
@@ -60,6 +61,7 @@ import { validateEnv } from './config/validation';
     DashboardModule,
     HealthModule,
     ProvisioningModule,
+    ContainerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

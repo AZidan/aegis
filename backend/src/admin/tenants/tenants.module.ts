@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TenantsController } from './tenants.controller';
 import { TenantsService } from './tenants.service';
 import { ProvisioningModule } from '../../provisioning/provisioning.module';
+import { ContainerModule } from '../../container/container.module';
 
 /**
  * Tenants Module - Platform Admin: Tenants
@@ -11,7 +12,7 @@ import { ProvisioningModule } from '../../provisioning/provisioning.module';
  * ProvisioningModule provides the ProvisioningService for async container provisioning.
  */
 @Module({
-  imports: [ProvisioningModule],
+  imports: [ProvisioningModule, ContainerModule],
   controllers: [TenantsController],
   providers: [TenantsService],
   exports: [TenantsService],
