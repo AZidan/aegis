@@ -14,6 +14,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { AuditModule } from './audit/audit.module';
 import { AlertModule } from './alert/alert.module';
 import { ChannelProxyModule } from './channel-proxy/channel-proxy.module';
+import { SlackModule } from './slack/slack.module';
 import configuration from './config/configuration';
 import { validateEnv } from './config/validation';
 
@@ -66,6 +67,7 @@ import { validateEnv } from './config/validation';
     HealthModule,
     ProvisioningModule,
     ChannelProxyModule,
+    SlackModule,
   ],
   controllers: [AppController],
   providers: [AppService],

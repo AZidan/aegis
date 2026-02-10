@@ -681,6 +681,57 @@ export type EnumAllowlistDirectionWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumAllowlistDirectionFilter<$PrismaModel>
 }
 
+export type EnumChannelPlatformFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChannelPlatform | Prisma.EnumChannelPlatformFieldRefInput<$PrismaModel>
+  in?: $Enums.ChannelPlatform[] | Prisma.ListEnumChannelPlatformFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChannelPlatform[] | Prisma.ListEnumChannelPlatformFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChannelPlatformFilter<$PrismaModel> | $Enums.ChannelPlatform
+}
+
+export type EnumConnectionStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.ConnectionStatus | Prisma.EnumConnectionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ConnectionStatus[] | Prisma.ListEnumConnectionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ConnectionStatus[] | Prisma.ListEnumConnectionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumConnectionStatusFilter<$PrismaModel> | $Enums.ConnectionStatus
+}
+
+export type EnumChannelPlatformWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChannelPlatform | Prisma.EnumChannelPlatformFieldRefInput<$PrismaModel>
+  in?: $Enums.ChannelPlatform[] | Prisma.ListEnumChannelPlatformFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChannelPlatform[] | Prisma.ListEnumChannelPlatformFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChannelPlatformWithAggregatesFilter<$PrismaModel> | $Enums.ChannelPlatform
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumChannelPlatformFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumChannelPlatformFilter<$PrismaModel>
+}
+
+export type EnumConnectionStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ConnectionStatus | Prisma.EnumConnectionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ConnectionStatus[] | Prisma.ListEnumConnectionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ConnectionStatus[] | Prisma.ListEnumConnectionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumConnectionStatusWithAggregatesFilter<$PrismaModel> | $Enums.ConnectionStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumConnectionStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumConnectionStatusFilter<$PrismaModel>
+}
+
+export type EnumRouteTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.RouteType | Prisma.EnumRouteTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RouteType[] | Prisma.ListEnumRouteTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RouteType[] | Prisma.ListEnumRouteTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRouteTypeFilter<$PrismaModel> | $Enums.RouteType
+}
+
+export type EnumRouteTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RouteType | Prisma.EnumRouteTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RouteType[] | Prisma.ListEnumRouteTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RouteType[] | Prisma.ListEnumRouteTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRouteTypeWithAggregatesFilter<$PrismaModel> | $Enums.RouteType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRouteTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRouteTypeFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -1283,6 +1334,57 @@ export type NestedEnumAllowlistDirectionWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAllowlistDirectionFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAllowlistDirectionFilter<$PrismaModel>
+}
+
+export type NestedEnumChannelPlatformFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChannelPlatform | Prisma.EnumChannelPlatformFieldRefInput<$PrismaModel>
+  in?: $Enums.ChannelPlatform[] | Prisma.ListEnumChannelPlatformFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChannelPlatform[] | Prisma.ListEnumChannelPlatformFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChannelPlatformFilter<$PrismaModel> | $Enums.ChannelPlatform
+}
+
+export type NestedEnumConnectionStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.ConnectionStatus | Prisma.EnumConnectionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ConnectionStatus[] | Prisma.ListEnumConnectionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ConnectionStatus[] | Prisma.ListEnumConnectionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumConnectionStatusFilter<$PrismaModel> | $Enums.ConnectionStatus
+}
+
+export type NestedEnumChannelPlatformWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChannelPlatform | Prisma.EnumChannelPlatformFieldRefInput<$PrismaModel>
+  in?: $Enums.ChannelPlatform[] | Prisma.ListEnumChannelPlatformFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChannelPlatform[] | Prisma.ListEnumChannelPlatformFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChannelPlatformWithAggregatesFilter<$PrismaModel> | $Enums.ChannelPlatform
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumChannelPlatformFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumChannelPlatformFilter<$PrismaModel>
+}
+
+export type NestedEnumConnectionStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ConnectionStatus | Prisma.EnumConnectionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ConnectionStatus[] | Prisma.ListEnumConnectionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ConnectionStatus[] | Prisma.ListEnumConnectionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumConnectionStatusWithAggregatesFilter<$PrismaModel> | $Enums.ConnectionStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumConnectionStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumConnectionStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumRouteTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.RouteType | Prisma.EnumRouteTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RouteType[] | Prisma.ListEnumRouteTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RouteType[] | Prisma.ListEnumRouteTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRouteTypeFilter<$PrismaModel> | $Enums.RouteType
+}
+
+export type NestedEnumRouteTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RouteType | Prisma.EnumRouteTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RouteType[] | Prisma.ListEnumRouteTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RouteType[] | Prisma.ListEnumRouteTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRouteTypeWithAggregatesFilter<$PrismaModel> | $Enums.RouteType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRouteTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRouteTypeFilter<$PrismaModel>
 }
 
 

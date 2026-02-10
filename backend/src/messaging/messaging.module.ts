@@ -7,6 +7,7 @@ import { MessagingProcessor } from './messaging.processor';
 import { AllowlistService } from './allowlist.service';
 import { MessagingGateway } from './messaging.gateway';
 import { MessagingController } from './messaging.controller';
+import { MessageDashboardController } from './message-dashboard.controller';
 import { MESSAGING_QUEUE_NAME } from './messaging.constants';
 
 /**
@@ -37,7 +38,7 @@ import { MESSAGING_QUEUE_NAME } from './messaging.constants';
       }),
     }),
   ],
-  controllers: [MessagingController],
+  controllers: [MessageDashboardController, MessagingController],
   providers: [
     MessagingService,
     MessagingProcessor,

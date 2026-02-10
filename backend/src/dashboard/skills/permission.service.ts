@@ -1,5 +1,8 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 import { AuditService } from '../../audit/audit.service';
+import { ALERT_QUEUE_NAME } from '../../alert/alert.constants';
 import {
   PermissionManifest,
   LegacyPermissions,
@@ -15,7 +18,10 @@ import {
 export class PermissionService {
   private readonly logger = new Logger(PermissionService.name);
 
-  constructor(private readonly auditService: AuditService) {}
+  constructor(
+    private readonly auditService: AuditService,
+    @InjectQueue(ALERT_QUEUE_NAME) private readonly alertQueue: Queue,
+  ) {}
 
   /**
    * Validate a permission manifest against the new schema.
@@ -204,5 +210,24 @@ export class PermissionService {
     this.logger.warn(
       `Permission violation: ${violation.violationType} for skill ${violation.skillId} on agent ${violation.agentId}: ${violation.detail}`,
     );
+
+    // Fire-and-forget alert evaluation for permission violations
+    this.alertQueue
+      .add('evaluate-event', {
+        action: 'permission_violation',
+        actorId: violation.agentId,
+        tenantId,
+        details: {
+          violationType: violation.violationType,
+          detail: violation.detail,
+          skillId: violation.skillId,
+        },
+        timestamp: violation.timestamp.toISOString(),
+      })
+      .catch((err) => {
+        this.logger.warn(
+          `Failed to enqueue alert evaluation: ${err.message}`,
+        );
+      });
   }
 }

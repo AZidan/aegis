@@ -8,6 +8,7 @@ import {
   RULE_CROSS_TENANT_ACCESS,
   RULE_TOOL_POLICY_VIOLATION,
   RULE_AGENT_ERROR_SPIKE,
+  RULE_NETWORK_POLICY_VIOLATION,
   FAILED_LOGIN_THRESHOLD,
   FAILED_LOGIN_WINDOW_MS,
   AGENT_ERROR_THRESHOLD,
@@ -51,6 +52,14 @@ const BUILT_IN_RULES: AlertRule[] = [
     mode: 'rate_threshold',
     threshold: AGENT_ERROR_THRESHOLD,
     windowMs: AGENT_ERROR_WINDOW_MS,
+  },
+  {
+    id: RULE_NETWORK_POLICY_VIOLATION,
+    name: 'Network Policy Violation',
+    description: 'Any network request to a domain not in the allowed policy',
+    triggerActions: ['network_policy_violation'],
+    severity: 'warning',
+    mode: 'immediate',
   },
 ];
 

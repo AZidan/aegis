@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeftRight, ArrowRight, ArrowLeft } from 'lucide-react';
 
 import {
@@ -24,6 +24,8 @@ import { type GraphNode, DIRECTION_LABELS } from '@/lib/api/messaging';
 // Types
 // ---------------------------------------------------------------------------
 
+type Direction = 'both' | 'send_only' | 'receive_only';
+
 interface AllowlistEdgeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -31,14 +33,14 @@ interface AllowlistEdgeModalProps {
   onSave: (
     sourceId: string,
     targetId: string,
-    direction: 'both' | 'send_only' | 'receive_only',
+    direction: Direction,
   ) => void;
   isSaving?: boolean;
-  /** Pre-selected source agent (e.g. when clicking a node) */
+  /** Pre-selected values for editing an existing rule */
   preselectedSourceId?: string;
+  preselectedTargetId?: string;
+  preselectedDirection?: Direction;
 }
-
-type Direction = 'both' | 'send_only' | 'receive_only';
 
 // ---------------------------------------------------------------------------
 // Direction icon helper
@@ -66,27 +68,25 @@ export function AllowlistEdgeModal({
   onSave,
   isSaving = false,
   preselectedSourceId,
+  preselectedTargetId,
+  preselectedDirection,
 }: AllowlistEdgeModalProps) {
-  const [sourceId, setSourceId] = useState<string>(
-    preselectedSourceId ?? '',
-  );
+  const [sourceId, setSourceId] = useState<string>('');
   const [targetId, setTargetId] = useState<string>('');
   const [direction, setDirection] = useState<Direction>('both');
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Reset form when modal opens
-  const handleOpenChange = useCallback(
-    (nextOpen: boolean) => {
-      if (nextOpen) {
-        setSourceId(preselectedSourceId ?? '');
-        setTargetId('');
-        setDirection('both');
-        setValidationError(null);
-      }
-      onOpenChange(nextOpen);
-    },
-    [onOpenChange, preselectedSourceId],
-  );
+  const isEditing = !!(preselectedSourceId && preselectedTargetId);
+
+  // Sync form state when props change (open or preselected values)
+  useEffect(() => {
+    if (open) {
+      setSourceId(preselectedSourceId ?? '');
+      setTargetId(preselectedTargetId ?? '');
+      setDirection(preselectedDirection ?? 'both');
+      setValidationError(null);
+    }
+  }, [open, preselectedSourceId, preselectedTargetId, preselectedDirection]);
 
   // Filter targets to exclude selected source
   const targetAgents = useMemo(
@@ -95,7 +95,6 @@ export function AllowlistEdgeModal({
   );
 
   const handleSave = useCallback(() => {
-    // Validate
     if (!sourceId) {
       setValidationError('Please select a source agent.');
       return;
@@ -114,10 +113,12 @@ export function AllowlistEdgeModal({
   }, [sourceId, targetId, direction, onSave]);
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Communication Rule</DialogTitle>
+          <DialogTitle>
+            {isEditing ? 'Edit Communication Rule' : 'Add Communication Rule'}
+          </DialogTitle>
           <DialogDescription>
             Define which agents are allowed to communicate with each other.
           </DialogDescription>
@@ -203,7 +204,7 @@ export function AllowlistEdgeModal({
         <DialogFooter>
           <button
             type="button"
-            onClick={() => handleOpenChange(false)}
+            onClick={() => onOpenChange(false)}
             className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
           >
             Cancel
@@ -214,7 +215,7 @@ export function AllowlistEdgeModal({
             disabled={isSaving}
             className="rounded-lg bg-primary-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600 disabled:opacity-50"
           >
-            {isSaving ? 'Saving...' : 'Save Rule'}
+            {isSaving ? 'Saving...' : isEditing ? 'Update Rule' : 'Save Rule'}
           </button>
         </DialogFooter>
       </DialogContent>

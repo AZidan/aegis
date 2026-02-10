@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import {
   ReactFlow,
   Background,
@@ -8,6 +8,7 @@ import {
   MiniMap,
   type Node,
   type Edge,
+  type Connection,
   useNodesState,
   useEdgesState,
   MarkerType,
@@ -32,6 +33,7 @@ interface AllowlistGraphProps {
   graphNodes: GraphNode[];
   graphEdges: GraphEdge[];
   onNodeClick?: (nodeId: string) => void;
+  onConnect?: (sourceId: string, targetId: string) => void;
 }
 
 type AgentNodeData = {
@@ -187,21 +189,41 @@ export function AllowlistGraph({
   graphNodes,
   graphEdges,
   onNodeClick,
+  onConnect,
 }: AllowlistGraphProps) {
-  const initialNodes = useMemo(
+  const computedNodes = useMemo(
     () => computeGridLayout(graphNodes),
     [graphNodes],
   );
-  const initialEdges = useMemo(() => computeEdges(graphEdges), [graphEdges]);
+  const computedEdges = useMemo(() => computeEdges(graphEdges), [graphEdges]);
 
-  const [nodes, , onNodesChange] = useNodesState(initialNodes);
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(computedNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(computedEdges);
+
+  // Sync internal state when props change (e.g. after mutation + refetch)
+  useEffect(() => {
+    setNodes(computedNodes);
+  }, [computedNodes, setNodes]);
+
+  useEffect(() => {
+    setEdges(computedEdges);
+  }, [computedEdges, setEdges]);
 
   const handleNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node) => {
       onNodeClick?.(node.id);
     },
     [onNodeClick],
+  );
+
+  // Handle drag-to-connect between nodes
+  const handleConnect = useCallback(
+    (connection: Connection) => {
+      if (connection.source && connection.target && onConnect) {
+        onConnect(connection.source, connection.target);
+      }
+    },
+    [onConnect],
   );
 
   if (graphNodes.length === 0) {
@@ -223,6 +245,7 @@ export function AllowlistGraph({
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={handleNodeClick}
+        onConnect={handleConnect}
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{ padding: 0.3 }}

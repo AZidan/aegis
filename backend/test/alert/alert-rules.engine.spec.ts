@@ -143,6 +143,29 @@ describe('AlertRulesEngine', () => {
   });
 
   // =========================================================================
+  // evaluateEvent — Network Policy Violation (immediate)
+  // =========================================================================
+  describe('evaluateEvent — network_policy_violation', () => {
+    it('should return immediate match (warning) for network policy violation', async () => {
+      const conditions = await engine.evaluateEvent(
+        baseEvent({ action: 'network_policy_violation' }),
+      );
+
+      expect(conditions).toHaveLength(1);
+      expect(conditions[0].ruleId).toBe('network-policy-violation');
+      expect(conditions[0].matched).toBe(true);
+    });
+
+    it('should include network-policy-violation rule in built-in rules', () => {
+      const rule = engine.getRuleById('network-policy-violation');
+      expect(rule).toBeDefined();
+      expect(rule!.mode).toBe('immediate');
+      expect(rule!.triggerActions).toContain('network_policy_violation');
+      expect(rule!.severity).toBe('warning');
+    });
+  });
+
+  // =========================================================================
   // evaluateEvent — Unrelated action
   // =========================================================================
   describe('evaluateEvent — unrelated action', () => {

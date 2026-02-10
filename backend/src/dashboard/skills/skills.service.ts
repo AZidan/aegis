@@ -43,8 +43,12 @@ export class SkillsService {
   async browseSkills(tenantId: string, query: BrowseSkillsQueryDto) {
     const { category, role, search, page, limit, sort } = query;
 
-    // Build where clause - only approved skills are visible in marketplace
-    const where: Prisma.SkillWhereInput = { status: 'approved' };
+    // Build where clause - only approved skills visible in marketplace
+    // Tenant visibility: global skills (tenantId=null) + own tenant's approved private skills
+    const where: Prisma.SkillWhereInput = {
+      status: 'approved',
+      OR: [{ tenantId: null }, { tenantId }],
+    };
 
     if (category) {
       where.category = category;
@@ -55,9 +59,14 @@ export class SkillsService {
     }
 
     if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
+      // Wrap existing OR with AND to combine tenant visibility and search filters
+      where.AND = [
+        {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+          ],
+        },
       ];
     }
 
@@ -139,7 +148,11 @@ export class SkillsService {
   // ==========================================================================
   async getSkillDetail(tenantId: string, skillId: string) {
     const skill = await this.prisma.skill.findFirst({
-      where: { id: skillId, status: 'approved' },
+      where: {
+        id: skillId,
+        status: 'approved',
+        OR: [{ tenantId: null }, { tenantId }],
+      },
     });
 
     if (!skill) {

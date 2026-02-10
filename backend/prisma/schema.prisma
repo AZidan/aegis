@@ -63,6 +63,9 @@ enum SkillCategory {
   analytics
   engineering
   communication
+  security
+  integration
+  custom
 }
 
 enum SkillStatus {
@@ -271,6 +274,7 @@ model Tenant {
 
   configHistory      TenantConfigHistory[]
   channelConnections ChannelConnection[]
+  skills             Skill[]
 
   @@index([companyName])
   @@index([status])
@@ -391,6 +395,10 @@ model Skill {
   author      User     @relation("SkillAuthor", fields: [authorId], references: [id])
   submittedAt DateTime @default(now())
 
+  // Tenant scope (null = global/marketplace skill, set = private tenant skill)
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id])
+
   // Compatible roles
   compatibleRoles String[] // Array of AgentRole values
 
@@ -424,11 +432,12 @@ model Skill {
   // Relations
   installations SkillInstallation[]
 
-  @@unique([name, version])
+  @@unique([name, version, tenantId])
   @@index([category])
   @@index([status])
   @@index([rating])
   @@index([installCount])
+  @@index([tenantId])
   @@map("skills")
 }
 

@@ -26,3 +26,4 @@ export const RULE_FAILED_LOGIN_SPIKE = 'failed-login-spike';
 export const RULE_CROSS_TENANT_ACCESS = 'cross-tenant-access';
 export const RULE_TOOL_POLICY_VIOLATION = 'tool-policy-violation';
 export const RULE_AGENT_ERROR_SPIKE = 'agent-error-spike';
+export const RULE_NETWORK_POLICY_VIOLATION = 'network-policy-violation';

@@ -3,10 +3,12 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+import { getQueueToken } from '@nestjs/bullmq';
 import { SkillsService } from '../../../src/dashboard/skills/skills.service';
 import { PrismaService } from '../../../src/prisma/prisma.service';
 import { AuditService } from '../../../src/audit/audit.service';
 import { PermissionService } from '../../../src/dashboard/skills/permission.service';
+import { ALERT_QUEUE_NAME } from '../../../src/alert/alert.constants';
 
 // ---------------------------------------------------------------------------
 // Test Data
@@ -85,6 +87,7 @@ describe('SkillsService - Core Skill Uninstall Guard', () => {
         PermissionService,
         { provide: PrismaService, useValue: prisma },
         { provide: AuditService, useValue: { logAction: jest.fn() } },
+        { provide: getQueueToken(ALERT_QUEUE_NAME), useValue: { add: jest.fn().mockResolvedValue(undefined) } },
       ],
     }).compile();
 

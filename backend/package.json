@@ -41,6 +41,8 @@
     "@nestjs/websockets": "^11.1.13",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
+    "@slack/bolt": "^4.6.0",
+    "@slack/web-api": "^7.13.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.67.3",
     "cache-manager-ioredis-yet": "^2.1.2",

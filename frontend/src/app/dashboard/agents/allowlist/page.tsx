@@ -12,6 +12,7 @@ import {
 import { AllowlistGraph } from '@/components/dashboard/agents/allowlist-graph';
 import { AllowlistEdgeModal } from '@/components/dashboard/agents/allowlist-edge-modal';
 import { AllowlistTable } from '@/components/dashboard/agents/allowlist-table';
+import { type GraphEdge } from '@/lib/api/messaging';
 import { cn } from '@/lib/utils/cn';
 
 // ---------------------------------------------------------------------------
@@ -30,6 +31,12 @@ export default function AllowlistPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [preselectedSourceId, setPreselectedSourceId] = useState<
     string | undefined
+  >(undefined);
+  const [preselectedTargetId, setPreselectedTargetId] = useState<
+    string | undefined
+  >(undefined);
+  const [preselectedDirection, setPreselectedDirection] = useState<
+    'both' | 'send_only' | 'receive_only' | undefined
   >(undefined);
 
   // -------------------------------------------------------------------------
@@ -102,11 +109,22 @@ export default function AllowlistPage() {
 
   const handleNodeClick = useCallback((nodeId: string) => {
     setPreselectedSourceId(nodeId);
+    setPreselectedTargetId(undefined);
+    setPreselectedDirection(undefined);
     setModalOpen(true);
   }, []);
 
   const handleAddRule = useCallback(() => {
     setPreselectedSourceId(undefined);
+    setPreselectedTargetId(undefined);
+    setPreselectedDirection(undefined);
+    setModalOpen(true);
+  }, []);
+
+  const handleEditRule = useCallback((edge: GraphEdge) => {
+    setPreselectedSourceId(edge.source);
+    setPreselectedTargetId(edge.target);
+    setPreselectedDirection(edge.direction);
     setModalOpen(true);
   }, []);
 
@@ -117,6 +135,14 @@ export default function AllowlistPage() {
       direction: 'both' | 'send_only' | 'receive_only',
     ) => {
       saveMutation.mutate({ sourceId, targetId, direction });
+    },
+    [saveMutation],
+  );
+
+  // Handle drag-to-connect on graph (defaults to 'both' direction)
+  const handleGraphConnect = useCallback(
+    (sourceId: string, targetId: string) => {
+      saveMutation.mutate({ sourceId, targetId, direction: 'both' });
     },
     [saveMutation],
   );
@@ -223,12 +249,14 @@ export default function AllowlistPage() {
           graphNodes={nodes}
           graphEdges={edges}
           onNodeClick={handleNodeClick}
+          onConnect={handleGraphConnect}
         />
       ) : (
         <AllowlistTable
           graphNodes={nodes}
           graphEdges={edges}
           onDeleteEdge={handleDeleteEdge}
+          onEditRule={handleEditRule}
           onAddRule={handleAddRule}
         />
       )}
@@ -241,6 +269,8 @@ export default function AllowlistPage() {
         onSave={handleSaveRule}
         isSaving={saveMutation.isPending}
         preselectedSourceId={preselectedSourceId}
+        preselectedTargetId={preselectedTargetId}
+        preselectedDirection={preselectedDirection}
       />
 
       {/* Summary footer */}

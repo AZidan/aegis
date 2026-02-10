@@ -16,16 +16,16 @@
 meta:
   version: "1.0.0"
   theme_ref: "design-artifacts/theme.yaml"
-  total_screens: 18
+  total_screens: 21
   categories:
     - id: "platform_admin"
       label: "Platform Admin Dashboard"
       route_prefix: "/admin"
-      screens: 7
+      screens: 8
     - id: "tenant_admin"
       label: "Tenant Admin Dashboard"
       route_prefix: "/dashboard"
-      screens: 9
+      screens: 11
     - id: "auth"
       label: "Auth / Public"
       route_prefix: "/"
@@ -6346,3 +6346,1953 @@ screens:
         handler: "POST /api/auth/invites/:token/accept"
         on_success: "navigate:/dashboard"
         on_error: "show_toast:error"
+
+  # ===========================================================================
+  # SCREEN 19: Private Skill Upload
+  # ===========================================================================
+  # Tenant admin screen for managing private/custom skills -- submission,
+  # version management, validation results. Includes submit modal with
+  # permission manifest fields and a version history expansion panel.
+  # ===========================================================================
+  - id: "tenant_private_skills"
+    name: "Private Skills"
+    route: "/dashboard/skills/private"
+    layout: "sidebar"
+    auth_required: true
+    role_required: "tenant_admin"
+    screen_id: "TA-19"
+    flow_ref: "3.4"
+    sidebar_ref: "tenant_admin_sidebar"
+
+    data_sources:
+      - id: "private_skills"
+        endpoint: "GET /api/dashboard/skills/private"
+        params:
+          page: "{{pagination.page}}"
+          limit: 20
+          status: "{{filters.status}}"
+          sort: "submitted_at:desc"
+      - id: "skill_categories"
+        endpoint: "GET /api/skills/categories"
+      - id: "available_roles"
+        endpoint: "GET /api/dashboard/agents/roles"
+
+    components:
+      - type: "page_header"
+        props:
+          title: "Private Skills"
+          description: "Manage custom skills developed for your organization."
+          breadcrumbs:
+            - label: "Dashboard"
+              href: "/dashboard"
+            - label: "Skills"
+              href: "/dashboard/skills"
+            - label: "Private Skills"
+        children:
+          - type: "Button"
+            id: "submit_skill_btn"
+            props:
+              content: "Submit New Skill"
+              variant: "primary"
+              size: "md"
+              icon_left: "Plus"
+            style:
+              background: "components.button.variants.primary.bg"
+              color: "components.button.variants.primary.text"
+              height: "components.button.sizes.md.height"
+              padding_x: "components.button.sizes.md.padding_x"
+              font_size: "components.button.sizes.md.font_size"
+              font_weight: "typography.weights.semibold"
+              border_radius: "components.button.sizes.md.border_radius"
+              shadow: "components.button.variants.primary.shadow"
+            states:
+              hover:
+                background: "components.button.variants.primary.bg_hover"
+                shadow: "components.button.variants.primary.shadow_hover"
+              active:
+                background: "components.button.variants.primary.bg_active"
+            actions:
+              - event: "click"
+                handler: "open_modal:submit_skill_modal"
+
+      # Status Filter Tabs
+      - type: "HStack"
+        id: "status_tabs"
+        style:
+          gap: "spacing.1"
+          margin_bottom: "spacing.5"
+          border_bottom: "borders.width.thin solid colors.neutral.200"
+          padding_bottom: "spacing.0"
+        dark_mode:
+          border_bottom: "borders.width.thin solid dark_mode.colors.border.default"
+        children:
+          - type: "tab_button"
+            props:
+              label: "All"
+              value: "all"
+              active: "{{filters.status === 'all'}}"
+            style:
+              padding: "spacing.2 spacing.4"
+              font_size: "typography.scale.sm.size"
+              font_weight: "typography.weights.medium"
+              color: "colors.neutral.500"
+              border_bottom: "borders.width.medium solid transparent"
+              margin_bottom: "-1px"
+              transition: "animations.presets.colors"
+            states:
+              active:
+                color: "colors.primary.500"
+                border_bottom: "borders.width.medium solid colors.primary.500"
+              hover:
+                color: "colors.neutral.700"
+          - type: "tab_button"
+            props:
+              label: "Pending"
+              value: "pending"
+              count: "{{private_skills.counts.pending}}"
+          - type: "tab_button"
+            props:
+              label: "Approved"
+              value: "approved"
+              count: "{{private_skills.counts.approved}}"
+          - type: "tab_button"
+            props:
+              label: "Rejected"
+              value: "rejected"
+              count: "{{private_skills.counts.rejected}}"
+
+      # Skills Table Card
+      - type: "card"
+        id: "skills_table_card"
+        style:
+          background: "components.card.variants.default.bg"
+          border: "components.card.variants.default.border"
+          border_radius: "components.card.variants.default.border_radius"
+          shadow: "components.card.variants.default.shadow"
+          padding: "0"
+        dark_mode:
+          background: "dark_mode.components.card.bg"
+          border: "dark_mode.components.card.border"
+        children:
+          - type: "data_table"
+            id: "private_skills_table"
+            props:
+              data_source: "private_skills"
+              paginated: true
+              page_size: 20
+              sortable: true
+              empty_state:
+                icon: "Puzzle"
+                title: "No private skills yet"
+                description: "Submit your first custom skill to get started."
+                action_label: "Submit New Skill"
+                action_handler: "open_modal:submit_skill_modal"
+              columns:
+                - id: "name"
+                  header: "Skill Name"
+                  sortable: true
+                  cell_type: "text_with_subtitle"
+                  primary: "{{row.name}}"
+                  secondary: "{{row.description | truncate:60}}"
+                  style:
+                    primary_font_size: "typography.scale.sm.size"
+                    primary_font_weight: "typography.weights.medium"
+                    primary_color: "colors.neutral.900"
+                    secondary_font_size: "typography.scale.xs.size"
+                    secondary_color: "colors.neutral.500"
+                - id: "version"
+                  header: "Version"
+                  cell_type: "text"
+                  width: "90px"
+                  font_family: "typography.font_families.monospace.css"
+                  font_size: "typography.scale.sm.size"
+                  color: "colors.neutral.700"
+                - id: "category"
+                  header: "Category"
+                  cell_type: "badge"
+                  variant: "primary"
+                  width: "130px"
+                - id: "status"
+                  header: "Status"
+                  cell_type: "badge"
+                  width: "110px"
+                  variant_map:
+                    pending: "warning"
+                    approved: "success"
+                    rejected: "error"
+                  style:
+                    badge_pending_bg: "components.badge.variants.warning.bg"
+                    badge_pending_text: "components.badge.variants.warning.text"
+                    badge_approved_bg: "components.badge.variants.success.bg"
+                    badge_approved_text: "components.badge.variants.success.text"
+                    badge_rejected_bg: "components.badge.variants.error.bg"
+                    badge_rejected_text: "components.badge.variants.error.text"
+                    badge_padding_x: "components.badge.sizes.md.padding_x"
+                    badge_padding_y: "components.badge.sizes.md.padding_y"
+                    badge_font_size: "components.badge.sizes.md.font_size"
+                    badge_border_radius: "components.badge.sizes.md.border_radius"
+                    badge_font_weight: "components.badge.sizes.md.font_weight"
+                - id: "submitted_at"
+                  header: "Submitted"
+                  sortable: true
+                  cell_type: "relative_time"
+                  width: "130px"
+                  font_size: "typography.scale.xs.size"
+                  color: "colors.neutral.500"
+                - id: "actions"
+                  header: ""
+                  width: "120px"
+                  cell_type: "action_menu"
+                  items:
+                    - label: "View Details"
+                      icon: "Eye"
+                      action: "open_drawer:skill_detail_drawer:{{row.id}}"
+                    - label: "Edit"
+                      icon: "Pencil"
+                      action: "open_modal:edit_skill_modal:{{row.id}}"
+                      visible_when: "row.status !== 'approved'"
+                    - label: "Version History"
+                      icon: "History"
+                      action: "toggle_expand:version_panel:{{row.id}}"
+                    - label: "Delete"
+                      icon: "Trash2"
+                      action: "open_modal:delete_confirm:{{row.id}}"
+                      variant: "destructive"
+                      visible_when: "row.status !== 'approved'"
+
+          # Expandable Version History Panel (per row)
+          - type: "expandable_panel"
+            id: "version_panel"
+            style:
+              background: "colors.neutral.50"
+              border_top: "borders.width.thin solid colors.neutral.200"
+              padding: "spacing.4 spacing.6"
+            dark_mode:
+              background: "dark_mode.colors.bg.muted"
+              border_top: "borders.width.thin solid dark_mode.colors.border.default"
+            children:
+              - type: "HStack"
+                style:
+                  justify_content: "space-between"
+                  align_items: "center"
+                  margin_bottom: "spacing.3"
+                children:
+                  - type: "Text"
+                    props:
+                      content: "Version History"
+                    style:
+                      font_size: "typography.headings.h4.size"
+                      font_weight: "typography.headings.h4.weight"
+                      color: "colors.neutral.800"
+              - type: "VStack"
+                id: "version_list"
+                props:
+                  data_source: "GET /api/dashboard/skills/private/{{row.id}}/versions"
+                style:
+                  gap: "spacing.2"
+                item_template:
+                  type: "HStack"
+                  style:
+                    justify_content: "space-between"
+                    align_items: "center"
+                    padding: "spacing.2 spacing.3"
+                    border_radius: "borders.radius.md"
+                    background: "colors.neutral.white"
+                    border: "borders.width.thin solid colors.neutral.200"
+                  dark_mode:
+                    background: "dark_mode.colors.bg.raised"
+                    border: "borders.width.thin solid dark_mode.colors.border.default"
+                  children:
+                    - type: "HStack"
+                      style:
+                        gap: "spacing.3"
+                        align_items: "center"
+                      children:
+                        - type: "Text"
+                          props:
+                            content: "v{{item.version}}"
+                          style:
+                            font_family: "typography.font_families.monospace.css"
+                            font_size: "typography.scale.sm.size"
+                            font_weight: "typography.weights.semibold"
+                            color: "colors.primary.600"
+                        - type: "Text"
+                          props:
+                            content: "{{item.created_at | relative_time}}"
+                          style:
+                            font_size: "typography.scale.xs.size"
+                            color: "colors.neutral.400"
+                            font_family: "typography.font_families.monospace.css"
+                        - type: "badge"
+                          props:
+                            content: "{{item.status}}"
+                            variant: "{{item.status === 'approved' ? 'success' : item.status === 'pending' ? 'warning' : 'error'}}"
+                    - type: "Button"
+                      props:
+                        content: "Rollback"
+                        variant: "ghost"
+                        size: "xs"
+                        icon_left: "RotateCcw"
+                        visible_when: "item.version !== row.version && item.status === 'approved'"
+                      style:
+                        color: "colors.primary.500"
+                        font_size: "typography.scale.xs.size"
+                      actions:
+                        - event: "click"
+                          handler: "POST /api/dashboard/skills/private/{{row.id}}/rollback/{{item.version}}"
+                          confirm: "Rollback to v{{item.version}}?"
+                          on_success: "refresh:private_skills"
+
+      # Validation Results Card (shown after submission)
+      - type: "card"
+        id: "validation_results_card"
+        props:
+          visible_when: "validation_result"
+        style:
+          background: "components.card.variants.default.bg"
+          border: "components.card.variants.default.border"
+          border_radius: "components.card.variants.default.border_radius"
+          shadow: "components.card.variants.default.shadow"
+          padding: "components.card.variants.default.padding"
+          margin_top: "spacing.semantic.section_gap"
+        dark_mode:
+          background: "dark_mode.components.card.bg"
+          border: "dark_mode.components.card.border"
+        children:
+          - type: "HStack"
+            style:
+              justify_content: "space-between"
+              align_items: "center"
+              margin_bottom: "spacing.4"
+            children:
+              - type: "HStack"
+                style:
+                  gap: "spacing.3"
+                  align_items: "center"
+                children:
+                  - type: "Text"
+                    props:
+                      content: "Validation Results"
+                    style:
+                      font_size: "typography.headings.h3.size"
+                      font_weight: "typography.headings.h3.weight"
+                      color: "colors.neutral.900"
+                  - type: "badge"
+                    props:
+                      content: "{{validation_result.passed ? 'PASSED' : 'FAILED'}}"
+                      variant: "{{validation_result.passed ? 'success' : 'error'}}"
+                    style:
+                      font_size: "components.badge.sizes.sm.font_size"
+                      padding_x: "components.badge.sizes.sm.padding_x"
+                      padding_y: "components.badge.sizes.sm.padding_y"
+              - type: "Button"
+                props:
+                  content: "Dismiss"
+                  variant: "ghost"
+                  size: "sm"
+                  icon_left: "X"
+                actions:
+                  - event: "click"
+                    handler: "set_state:validation_result:null"
+          - type: "VStack"
+            id: "validation_issues_list"
+            props:
+              visible_when: "validation_result.issues.length > 0"
+            style:
+              gap: "spacing.2"
+            children:
+              - type: "HStack"
+                props:
+                  for_each: "validation_result.issues"
+                style:
+                  gap: "spacing.3"
+                  padding: "spacing.3"
+                  border_radius: "borders.radius.md"
+                  background: "{{item.severity === 'error' ? 'colors.semantic.error.light' : item.severity === 'warning' ? 'colors.semantic.warning.light' : 'colors.neutral.50'}}"
+                  align_items: "flex-start"
+                children:
+                  - type: "icon"
+                    props:
+                      name: "{{item.severity === 'error' ? 'XCircle' : 'AlertTriangle'}}"
+                    style:
+                      color: "{{item.severity === 'error' ? 'colors.semantic.error.main' : 'colors.semantic.warning.main'}}"
+                      size: "16px"
+                      flex_shrink: "0"
+                      margin_top: "spacing.0.5"
+                  - type: "VStack"
+                    style:
+                      gap: "spacing.0.5"
+                    children:
+                      - type: "Text"
+                        props:
+                          content: "{{item.message}}"
+                        style:
+                          font_size: "typography.scale.sm.size"
+                          font_weight: "typography.weights.medium"
+                          color: "{{item.severity === 'error' ? 'colors.semantic.error.dark' : 'colors.semantic.warning.dark'}}"
+                      - type: "Text"
+                        props:
+                          content: "{{item.detail}}"
+                          visible_when: "item.detail"
+                        style:
+                          font_size: "typography.scale.xs.size"
+                          color: "colors.neutral.600"
+
+    # Submit Skill Modal
+    modals:
+      - type: "modal"
+        id: "submit_skill_modal"
+        props:
+          title: "Submit New Skill"
+        style:
+          overlay:
+            background: "components.modal.overlay.bg"
+            backdrop_filter: "components.modal.overlay.backdrop_filter"
+          container:
+            background: "components.modal.container.bg"
+            border_radius: "components.modal.container.border_radius"
+            shadow: "components.modal.container.shadow"
+            padding: "components.modal.container.padding"
+            max_width: "640px"
+            width: "100%"
+            max_height: "90vh"
+            overflow_y: "auto"
+        dark_mode:
+          overlay:
+            background: "dark_mode.components.modal.overlay_bg"
+          container:
+            background: "dark_mode.components.modal.container_bg"
+            border: "dark_mode.components.modal.container_border"
+        children:
+          - type: "form"
+            id: "submit_skill_form"
+            style:
+              gap: "spacing.semantic.form_gap"
+            children:
+              # Basic Information Section
+              - type: "Text"
+                props:
+                  content: "Basic Information"
+                style:
+                  font_size: "typography.headings.h5.size"
+                  font_weight: "typography.headings.h5.weight"
+                  color: "colors.neutral.800"
+                  margin_bottom: "spacing.1"
+              - type: "HStack"
+                style:
+                  gap: "spacing.4"
+                responsive:
+                  sm_down:
+                    flex_direction: "column"
+                children:
+                  - type: "form_field"
+                    props:
+                      label: "Skill Name"
+                      type: "text"
+                      placeholder: "e.g., Customer Sentiment Analyzer"
+                      required: true
+                      name: "name"
+                    style:
+                      flex: "2"
+                  - type: "form_field"
+                    props:
+                      label: "Version"
+                      type: "text"
+                      placeholder: "1.0.0"
+                      required: true
+                      name: "version"
+                      pattern: "^\\d+\\.\\d+\\.\\d+$"
+                      hint: "Semantic versioning (e.g., 1.0.0)"
+                    style:
+                      flex: "1"
+              - type: "form_field"
+                props:
+                  label: "Description"
+                  type: "textarea"
+                  placeholder: "Describe what this skill does and when agents should use it..."
+                  required: true
+                  name: "description"
+                  rows: 3
+                  max_length: 500
+                  show_count: true
+              - type: "HStack"
+                style:
+                  gap: "spacing.4"
+                responsive:
+                  sm_down:
+                    flex_direction: "column"
+                children:
+                  - type: "form_field"
+                    props:
+                      label: "Category"
+                      type: "select"
+                      required: true
+                      name: "category"
+                      options:
+                        - label: "Productivity"
+                          value: "productivity"
+                        - label: "Analytics"
+                          value: "analytics"
+                        - label: "Engineering"
+                          value: "engineering"
+                        - label: "Communication"
+                          value: "communication"
+                        - label: "Security"
+                          value: "security"
+                        - label: "Integration"
+                          value: "integration"
+                        - label: "Custom"
+                          value: "custom"
+                    style:
+                      flex: "1"
+                  - type: "form_field"
+                    props:
+                      label: "Compatible Roles"
+                      type: "multi_select"
+                      required: true
+                      name: "compatible_roles"
+                      options_from: "available_roles"
+                      option_label: "{{item.name}}"
+                      option_value: "{{item.id}}"
+                      placeholder: "Select roles..."
+                    style:
+                      flex: "1"
+
+              # Source Code Section
+              - type: "Divider"
+                style:
+                  border_top: "borders.width.thin solid colors.neutral.200"
+                  margin: "spacing.2 0"
+              - type: "Text"
+                props:
+                  content: "Source Code"
+                style:
+                  font_size: "typography.headings.h5.size"
+                  font_weight: "typography.headings.h5.weight"
+                  color: "colors.neutral.800"
+                  margin_bottom: "spacing.1"
+              - type: "code_editor"
+                id: "skill_source_editor"
+                props:
+                  language: "typescript"
+                  name: "source_code"
+                  placeholder: "// Paste or write your skill source code here..."
+                  required: true
+                  line_numbers: true
+                style:
+                  font_family: "typography.font_families.monospace.css"
+                  font_size: "typography.scale.sm.size"
+                  border: "borders.width.thin solid colors.neutral.200"
+                  border_radius: "borders.radius.md"
+                  min_height: "250px"
+                  max_height: "400px"
+                  overflow: "auto"
+                dark_mode:
+                  border: "borders.width.thin solid dark_mode.colors.border.default"
+                  background: "dark_mode.colors.bg.overlay"
+
+              # Permissions Section
+              - type: "Divider"
+                style:
+                  border_top: "borders.width.thin solid colors.neutral.200"
+                  margin: "spacing.2 0"
+              - type: "Text"
+                props:
+                  content: "Permissions"
+                style:
+                  font_size: "typography.headings.h5.size"
+                  font_weight: "typography.headings.h5.weight"
+                  color: "colors.neutral.800"
+                  margin_bottom: "spacing.1"
+              - type: "Text"
+                props:
+                  content: "Declare the resources this skill requires access to."
+                style:
+                  font_size: "typography.scale.xs.size"
+                  color: "colors.neutral.500"
+                  margin_bottom: "spacing.3"
+              - type: "form_field"
+                props:
+                  label: "Network Domains"
+                  type: "tag_input"
+                  name: "permissions.network_domains"
+                  placeholder: "api.example.com"
+                  hint: "Domains this skill needs to reach. Press Enter to add."
+              - type: "form_field"
+                props:
+                  label: "File Paths"
+                  type: "tag_input"
+                  name: "permissions.file_paths"
+                  placeholder: "/workspace/data"
+                  hint: "File system paths required by this skill."
+              - type: "form_field"
+                props:
+                  label: "Environment Variables"
+                  type: "tag_input"
+                  name: "permissions.env_vars"
+                  placeholder: "API_KEY"
+                  hint: "Environment variables this skill needs to read."
+
+              # Modal Footer
+              - type: "HStack"
+                style:
+                  justify_content: "flex-end"
+                  gap: "spacing.3"
+                  padding_top: "components.modal.footer.padding_top"
+                  border_top: "components.modal.footer.border_top"
+                children:
+                  - type: "Button"
+                    props:
+                      content: "Cancel"
+                      variant: "secondary"
+                      size: "md"
+                    actions:
+                      - event: "click"
+                        handler: "close_modal:submit_skill_modal"
+                  - type: "Button"
+                    props:
+                      content: "Validate & Submit"
+                      variant: "primary"
+                      size: "md"
+                      icon_left: "CheckCircle"
+                      loading_text: "Validating..."
+                      type: "submit"
+
+      # Delete Confirmation Modal
+      - type: "modal"
+        id: "delete_confirm"
+        props:
+          title: "Delete Skill"
+        style:
+          overlay:
+            background: "components.modal.overlay.bg"
+          container:
+            background: "components.modal.container.bg"
+            border_radius: "components.modal.container.border_radius"
+            shadow: "components.modal.container.shadow"
+            padding: "components.modal.container.padding"
+            max_width: "components.modal.container.max_width"
+        children:
+          - type: "Text"
+            props:
+              content: "Are you sure you want to delete this skill? This action cannot be undone."
+            style:
+              font_size: "typography.scale.sm.size"
+              color: "colors.neutral.600"
+              margin_bottom: "spacing.4"
+          - type: "HStack"
+            style:
+              justify_content: "flex-end"
+              gap: "spacing.3"
+              padding_top: "components.modal.footer.padding_top"
+              border_top: "components.modal.footer.border_top"
+            children:
+              - type: "Button"
+                props:
+                  content: "Cancel"
+                  variant: "secondary"
+                  size: "md"
+                actions:
+                  - event: "click"
+                    handler: "close_modal:delete_confirm"
+              - type: "Button"
+                props:
+                  content: "Delete Skill"
+                  variant: "destructive"
+                  size: "md"
+                  icon_left: "Trash2"
+                actions:
+                  - event: "click"
+                    handler: "DELETE /api/dashboard/skills/private/{{selected_skill.id}}"
+                    on_success: "refresh:private_skills"
+                    on_error: "show_toast:error"
+
+    actions:
+      - event: "form:submit"
+        target: "submit_skill_form"
+        handler: "POST /api/dashboard/skills/private"
+        on_success:
+          - "close_modal:submit_skill_modal"
+          - "refresh:private_skills"
+          - "set_state:validation_result:response.validation"
+          - "show_toast:success:Skill submitted for review"
+        on_error: "show_toast:error"
+      - event: "filter:change"
+        target: "status_tabs"
+        handler: "set_param:status:{{value}}"
+
+  # ===========================================================================
+  # SCREEN 20: Security Posture Dashboard
+  # ===========================================================================
+  # Platform admin security overview showing alerts, violations, compliance
+  # metrics, and trend data. Central hub for security monitoring.
+  # ===========================================================================
+  - id: "platform_admin_security_posture"
+    name: "Security Posture Dashboard"
+    route: "/admin/dashboard/security-posture"
+    layout: "sidebar"
+    auth_required: true
+    role_required: "platform_admin"
+    screen_id: "PA-20"
+    flow_ref: "1.4"
+    sidebar_ref: "platform_admin_sidebar"
+
+    data_sources:
+      - id: "security_summary"
+        endpoint: "GET /api/admin/dashboard/security-posture/summary"
+        params:
+          range: "{{filters.time_range}}"
+        refresh: "60s"
+      - id: "alerts_by_rule"
+        endpoint: "GET /api/admin/dashboard/security-posture/alerts-by-rule"
+        params:
+          range: "{{filters.time_range}}"
+      - id: "violation_trend"
+        endpoint: "GET /api/admin/dashboard/security-posture/violation-trend"
+        params:
+          range: "{{filters.time_range}}"
+      - id: "policy_compliance"
+        endpoint: "GET /api/admin/dashboard/security-posture/compliance"
+
+    components:
+      - type: "page_header"
+        props:
+          title: "Security Posture"
+          description: "Platform security overview, alert analysis, and compliance status."
+          breadcrumbs:
+            - label: "Admin"
+              href: "/admin"
+            - label: "Security Posture"
+        children:
+          - type: "HStack"
+            style:
+              gap: "spacing.3"
+            children:
+              - type: "Button"
+                props:
+                  content: "View All Alerts"
+                  variant: "secondary"
+                  size: "md"
+                  icon_left: "Bell"
+                  href: "/admin/alerts"
+                style:
+                  background: "components.button.variants.secondary.bg"
+                  color: "components.button.variants.secondary.text"
+                  border: "components.button.variants.secondary.border"
+                  height: "components.button.sizes.md.height"
+                  padding_x: "components.button.sizes.md.padding_x"
+                  font_size: "components.button.sizes.md.font_size"
+                  border_radius: "components.button.sizes.md.border_radius"
+                states:
+                  hover:
+                    background: "components.button.variants.secondary.bg_hover"
+                    shadow: "components.button.variants.secondary.shadow_hover"
+
+      # Time Range Filter
+      - type: "HStack"
+        id: "time_filter"
+        style:
+          gap: "spacing.1"
+          margin_bottom: "spacing.5"
+          background: "colors.neutral.100"
+          border_radius: "borders.radius.lg"
+          padding: "spacing.1"
+          width: "fit-content"
+        dark_mode:
+          background: "dark_mode.colors.bg.muted"
+        children:
+          - type: "pill_button"
+            props:
+              label: "24h"
+              value: "24h"
+              active: "{{filters.time_range === '24h'}}"
+            style:
+              padding: "spacing.1.5 spacing.4"
+              font_size: "typography.scale.sm.size"
+              font_weight: "typography.weights.medium"
+              color: "colors.neutral.600"
+              border_radius: "borders.radius.md"
+              transition: "animations.presets.colors"
+            states:
+              active:
+                background: "colors.neutral.white"
+                color: "colors.neutral.900"
+                shadow: "shadows.xs"
+              hover:
+                color: "colors.neutral.900"
+            dark_mode:
+              states:
+                active:
+                  background: "dark_mode.colors.bg.raised"
+                  color: "dark_mode.colors.text.primary"
+          - type: "pill_button"
+            props:
+              label: "7d"
+              value: "7d"
+              active: "{{filters.time_range === '7d'}}"
+          - type: "pill_button"
+            props:
+              label: "30d"
+              value: "30d"
+              active: "{{filters.time_range === '30d'}}"
+
+      # Summary Metric Cards
+      - type: "HStack"
+        id: "security_metrics_row"
+        style:
+          gap: "spacing.semantic.card_gap"
+          margin_bottom: "spacing.semantic.section_gap"
+          display: "grid"
+          grid_template_columns: "repeat(4, 1fr)"
+        responsive:
+          lg:
+            grid_template_columns: "repeat(4, 1fr)"
+          md:
+            grid_template_columns: "repeat(2, 1fr)"
+          sm:
+            grid_template_columns: "1fr"
+        children:
+          - type: "metric_card"
+            id: "total_alerts_metric"
+            props:
+              label: "Total Alerts"
+              value: "{{security_summary.total_alerts}}"
+              trend_value: "{{security_summary.total_alerts_trend}}"
+              trend_direction: "{{security_summary.total_alerts_trend_direction}}"
+              icon: "Bell"
+            style:
+              background: "components.metric_card.bg"
+              border: "components.metric_card.border"
+              border_radius: "components.metric_card.border_radius"
+              padding: "components.metric_card.padding"
+            dark_mode:
+              background: "dark_mode.components.card.bg"
+              border: "dark_mode.components.card.border"
+            children:
+              - type: "Text"
+                props:
+                  content: "{{label}}"
+                style:
+                  font_size: "components.metric_card.label.font_size"
+                  font_weight: "components.metric_card.label.font_weight"
+                  color: "components.metric_card.label.color"
+                  text_transform: "components.metric_card.label.text_transform"
+                  letter_spacing: "components.metric_card.label.letter_spacing"
+              - type: "Text"
+                props:
+                  content: "{{value}}"
+                style:
+                  font_size: "components.metric_card.value.font_size"
+                  font_weight: "components.metric_card.value.font_weight"
+                  color: "components.metric_card.value.color"
+              - type: "HStack"
+                props:
+                  visible_when: "trend_value"
+                style:
+                  gap: "spacing.1"
+                  align_items: "center"
+                  margin_top: "spacing.1"
+                children:
+                  - type: "icon"
+                    props:
+                      name: "{{trend_direction === 'up' ? 'TrendingUp' : 'TrendingDown'}}"
+                    style:
+                      size: "14px"
+                      color: "{{trend_direction === 'up' ? 'components.metric_card.trend.negative' : 'components.metric_card.trend.positive'}}"
+                  - type: "Text"
+                    props:
+                      content: "{{trend_value}}"
+                    style:
+                      font_size: "components.metric_card.trend.font_size"
+                      font_weight: "components.metric_card.trend.font_weight"
+                      color: "{{trend_direction === 'up' ? 'components.metric_card.trend.negative' : 'components.metric_card.trend.positive'}}"
+
+          - type: "metric_card"
+            id: "unresolved_alerts_metric"
+            props:
+              label: "Unresolved"
+              value: "{{security_summary.unresolved_alerts}}"
+              icon: "AlertCircle"
+              value_color_condition:
+                gte_10: "colors.semantic.error.main"
+                gte_5: "colors.semantic.warning.main"
+                lt_5: "colors.semantic.success.main"
+            style:
+              background: "components.metric_card.bg"
+              border: "components.metric_card.border"
+              border_radius: "components.metric_card.border_radius"
+              padding: "components.metric_card.padding"
+
+          - type: "metric_card"
+            id: "critical_alerts_metric"
+            props:
+              label: "Critical Alerts"
+              value: "{{security_summary.critical_alerts}}"
+              icon: "ShieldAlert"
+              value_color_condition:
+                gte_1: "colors.semantic.error.main"
+                lt_1: "colors.semantic.success.main"
+            style:
+              background: "components.metric_card.bg"
+              border: "components.metric_card.border"
+              border_radius: "components.metric_card.border_radius"
+              padding: "components.metric_card.padding"
+
+          - type: "metric_card"
+            id: "compliance_score_metric"
+            props:
+              label: "Compliance Score"
+              value: "{{security_summary.compliance_score}}%"
+              icon: "ShieldCheck"
+              value_color_condition:
+                gte_90: "colors.semantic.success.main"
+                gte_70: "colors.semantic.warning.main"
+                lt_70: "colors.semantic.error.main"
+            style:
+              background: "components.metric_card.bg"
+              border: "components.metric_card.border"
+              border_radius: "components.metric_card.border_radius"
+              padding: "components.metric_card.padding"
+
+      # Main Content: 2-column grid
+      - type: "HStack"
+        id: "security_main_content"
+        style:
+          gap: "spacing.semantic.card_gap"
+          align_items: "flex-start"
+          display: "grid"
+          grid_template_columns: "1fr 1fr"
+        responsive:
+          lg:
+            grid_template_columns: "1fr 1fr"
+          md_down:
+            grid_template_columns: "1fr"
+        children:
+
+          # Alerts by Rule Card
+          - type: "card"
+            id: "alerts_by_rule_card"
+            style:
+              background: "components.card.variants.default.bg"
+              border: "components.card.variants.default.border"
+              border_radius: "components.card.variants.default.border_radius"
+              shadow: "components.card.variants.default.shadow"
+              padding: "components.card.variants.default.padding"
+            dark_mode:
+              background: "dark_mode.components.card.bg"
+              border: "dark_mode.components.card.border"
+            children:
+              - type: "Text"
+                props:
+                  content: "Alerts by Rule"
+                style:
+                  font_size: "typography.headings.h3.size"
+                  font_weight: "typography.headings.h3.weight"
+                  color: "colors.neutral.900"
+                  margin_bottom: "spacing.5"
+                dark_mode:
+                  color: "dark_mode.colors.text.primary"
+              - type: "VStack"
+                id: "rule_breakdown_list"
+                props:
+                  data_source: "alerts_by_rule"
+                  empty_state:
+                    icon: "ShieldCheck"
+                    title: "No alerts"
+                    description: "No security alerts in this time range."
+                style:
+                  gap: "spacing.3"
+                item_template:
+                  type: "VStack"
+                  style:
+                    gap: "spacing.2"
+                  children:
+                    - type: "HStack"
+                      style:
+                        justify_content: "space-between"
+                        align_items: "center"
+                      children:
+                        - type: "Text"
+                          props:
+                            content: "{{item.rule_name}}"
+                          style:
+                            font_size: "typography.scale.sm.size"
+                            font_weight: "typography.weights.medium"
+                            color: "colors.neutral.800"
+                        - type: "HStack"
+                          style:
+                            gap: "spacing.3"
+                            align_items: "center"
+                          children:
+                            - type: "Text"
+                              props:
+                                content: "{{item.count}}"
+                              style:
+                                font_size: "typography.scale.sm.size"
+                                font_weight: "typography.weights.bold"
+                                color: "colors.neutral.900"
+                                font_family: "typography.font_families.monospace.css"
+                            - type: "Text"
+                              props:
+                                content: "{{item.last_triggered | relative_time}}"
+                              style:
+                                font_size: "typography.scale.xs.size"
+                                color: "colors.neutral.400"
+                    # Horizontal bar
+                    - type: "progress_bar"
+                      props:
+                        value: "{{item.count}}"
+                        max: "{{alerts_by_rule.max_count}}"
+                      style:
+                        height: "6px"
+                        border_radius: "borders.radius.full"
+                        background: "colors.neutral.100"
+                        fill_color: "{{item.severity === 'critical' ? 'colors.semantic.error.main' : item.severity === 'high' ? 'colors.semantic.warning.main' : 'colors.primary.500'}}"
+                      dark_mode:
+                        background: "dark_mode.colors.bg.muted"
+
+          # Permission Violations Trend Card
+          - type: "card"
+            id: "violation_trend_card"
+            style:
+              background: "components.card.variants.default.bg"
+              border: "components.card.variants.default.border"
+              border_radius: "components.card.variants.default.border_radius"
+              shadow: "components.card.variants.default.shadow"
+              padding: "components.card.variants.default.padding"
+            dark_mode:
+              background: "dark_mode.components.card.bg"
+              border: "dark_mode.components.card.border"
+            children:
+              - type: "HStack"
+                style:
+                  justify_content: "space-between"
+                  align_items: "center"
+                  margin_bottom: "spacing.5"
+                children:
+                  - type: "Text"
+                    props:
+                      content: "Permission Violations"
+                    style:
+                      font_size: "typography.headings.h3.size"
+                      font_weight: "typography.headings.h3.weight"
+                      color: "colors.neutral.900"
+                    dark_mode:
+                      color: "dark_mode.colors.text.primary"
+                  - type: "badge"
+                    props:
+                      content: "{{violation_trend.trend_label}}"
+                      variant: "{{violation_trend.trend_direction === 'decreasing' ? 'success' : violation_trend.trend_direction === 'increasing' ? 'error' : 'default'}}"
+                    style:
+                      font_size: "components.badge.sizes.sm.font_size"
+                      padding_x: "components.badge.sizes.sm.padding_x"
+                      padding_y: "components.badge.sizes.sm.padding_y"
+                      border_radius: "components.badge.sizes.sm.border_radius"
+              - type: "area_chart"
+                id: "violation_trend_chart"
+                props:
+                  data_source: "violation_trend.data_points"
+                  x_axis: "timestamp"
+                  y_axis: "count"
+                  show_grid: true
+                  show_tooltip: true
+                  fill_opacity: 0.15
+                style:
+                  height: "240px"
+                  line_color: "colors.primary.500"
+                  fill_color: "colors.primary.100"
+                  grid_color: "colors.neutral.200"
+                  axis_label_color: "colors.neutral.500"
+                  axis_label_font_size: "typography.scale.xs.size"
+                  tooltip_bg: "colors.neutral.900"
+                  tooltip_color: "colors.neutral.white"
+                  tooltip_border_radius: "borders.radius.md"
+                  tooltip_font_size: "typography.scale.xs.size"
+                dark_mode:
+                  line_color: "dark_mode.colors.primary.500"
+                  fill_color: "dark_mode.colors.primary.100"
+                  grid_color: "dark_mode.colors.border.default"
+                  axis_label_color: "dark_mode.colors.text.muted"
+                  tooltip_bg: "dark_mode.colors.bg.overlay"
+
+      # Policy Compliance Section
+      - type: "card"
+        id: "policy_compliance_card"
+        style:
+          background: "components.card.variants.default.bg"
+          border: "components.card.variants.default.border"
+          border_radius: "components.card.variants.default.border_radius"
+          shadow: "components.card.variants.default.shadow"
+          padding: "components.card.variants.default.padding"
+          margin_top: "spacing.semantic.card_gap"
+        dark_mode:
+          background: "dark_mode.components.card.bg"
+          border: "dark_mode.components.card.border"
+        children:
+          - type: "HStack"
+            style:
+              justify_content: "space-between"
+              align_items: "center"
+              margin_bottom: "spacing.5"
+            children:
+              - type: "Text"
+                props:
+                  content: "Network Policy Compliance"
+                style:
+                  font_size: "typography.headings.h3.size"
+                  font_weight: "typography.headings.h3.weight"
+                  color: "colors.neutral.900"
+                dark_mode:
+                  color: "dark_mode.colors.text.primary"
+              - type: "Text"
+                props:
+                  content: "{{policy_compliance.compliant_count}} / {{policy_compliance.total_tenants}} tenants"
+                style:
+                  font_size: "typography.scale.sm.size"
+                  color: "colors.neutral.500"
+                  font_family: "typography.font_families.monospace.css"
+
+          # Compliance Progress Bar
+          - type: "VStack"
+            style:
+              gap: "spacing.3"
+              margin_bottom: "spacing.5"
+            children:
+              - type: "progress_bar"
+                id: "compliance_progress"
+                props:
+                  value: "{{policy_compliance.compliance_percentage}}"
+                  max: 100
+                  label: "{{policy_compliance.compliance_percentage}}%"
+                style:
+                  height: "12px"
+                  border_radius: "borders.radius.full"
+                  background: "colors.neutral.100"
+                  fill_color: "{{policy_compliance.compliance_percentage >= 90 ? 'colors.semantic.success.main' : policy_compliance.compliance_percentage >= 70 ? 'colors.semantic.warning.main' : 'colors.semantic.error.main'}}"
+                dark_mode:
+                  background: "dark_mode.colors.bg.muted"
+              - type: "HStack"
+                style:
+                  justify_content: "space-between"
+                children:
+                  - type: "Text"
+                    props:
+                      content: "With active network policy"
+                    style:
+                      font_size: "typography.scale.xs.size"
+                      color: "colors.semantic.success.dark"
+                  - type: "Text"
+                    props:
+                      content: "Without network policy"
+                    style:
+                      font_size: "typography.scale.xs.size"
+                      color: "colors.semantic.error.dark"
+
+          # Non-compliant Tenants List
+          - type: "VStack"
+            id: "non_compliant_list"
+            props:
+              visible_when: "policy_compliance.non_compliant_tenants.length > 0"
+            style:
+              gap: "spacing.2"
+            children:
+              - type: "Text"
+                props:
+                  content: "Tenants Without Network Policy"
+                style:
+                  font_size: "typography.scale.sm.size"
+                  font_weight: "typography.weights.semibold"
+                  color: "colors.neutral.700"
+                  margin_bottom: "spacing.2"
+              - type: "HStack"
+                props:
+                  for_each: "policy_compliance.non_compliant_tenants"
+                style:
+                  justify_content: "space-between"
+                  align_items: "center"
+                  padding: "spacing.3"
+                  border_radius: "borders.radius.md"
+                  background: "colors.semantic.warning.light"
+                  border: "borders.width.thin solid colors.semantic.warning.border"
+                dark_mode:
+                  background: "dark_mode.colors.semantic.warning.light"
+                  border: "borders.width.thin solid dark_mode.colors.semantic.warning.border"
+                children:
+                  - type: "HStack"
+                    style:
+                      gap: "spacing.3"
+                      align_items: "center"
+                    children:
+                      - type: "icon"
+                        props:
+                          name: "AlertTriangle"
+                        style:
+                          color: "colors.semantic.warning.main"
+                          size: "16px"
+                      - type: "VStack"
+                        style:
+                          gap: "spacing.0.5"
+                        children:
+                          - type: "Text"
+                            props:
+                              content: "{{item.company_name}}"
+                            style:
+                              font_size: "typography.scale.sm.size"
+                              font_weight: "typography.weights.medium"
+                              color: "colors.semantic.warning.dark"
+                          - type: "Text"
+                            props:
+                              content: "{{item.agent_count}} agents, {{item.skill_count}} skills"
+                            style:
+                              font_size: "typography.scale.xs.size"
+                              color: "colors.neutral.600"
+                  - type: "Button"
+                    props:
+                      content: "Configure"
+                      variant: "ghost"
+                      size: "xs"
+                      href: "/admin/tenants/{{item.id}}/network-policy"
+                    style:
+                      color: "colors.primary.500"
+                      font_size: "typography.scale.xs.size"
+
+    actions:
+      - event: "filter:change"
+        target: "time_filter"
+        handler: "set_param:time_range:{{value}}"
+      - event: "auto_refresh"
+        interval: "60s"
+        handler: "refresh:security_summary,alerts_by_rule,violation_trend"
+
+  # ===========================================================================
+  # SCREEN 21: Inter-Agent Message Dashboard
+  # ===========================================================================
+  # Tenant admin timeline view of inter-agent messages with filtering,
+  # search, detail drawer, and export capabilities.
+  # ===========================================================================
+  - id: "tenant_message_dashboard"
+    name: "Inter-Agent Messages"
+    route: "/dashboard/messages"
+    layout: "sidebar"
+    auth_required: true
+    role_required: "tenant_admin"
+    screen_id: "TA-21"
+    flow_ref: "3.5"
+    sidebar_ref: "tenant_admin_sidebar"
+
+    data_sources:
+      - id: "messages"
+        endpoint: "GET /api/dashboard/messages"
+        params:
+          page: "{{pagination.page}}"
+          limit: 50
+          from_agent: "{{filters.from_agent}}"
+          to_agent: "{{filters.to_agent}}"
+          type: "{{filters.message_type}}"
+          status: "{{filters.status}}"
+          date_from: "{{filters.date_from}}"
+          date_to: "{{filters.date_to}}"
+          search: "{{filters.search}}"
+      - id: "agents_list"
+        endpoint: "GET /api/dashboard/agents?fields=id,name,role"
+      - id: "message_flow"
+        endpoint: "GET /api/dashboard/messages/flow-summary"
+        params:
+          range: "{{filters.date_from}},{{filters.date_to}}"
+
+    components:
+      - type: "page_header"
+        props:
+          title: "Inter-Agent Messages"
+          description: "Monitor and inspect messages exchanged between your agents."
+          breadcrumbs:
+            - label: "Dashboard"
+              href: "/dashboard"
+            - label: "Messages"
+        children:
+          - type: "HStack"
+            style:
+              gap: "spacing.3"
+            children:
+              - type: "Button"
+                id: "refresh_btn"
+                props:
+                  content: "Refresh"
+                  variant: "ghost"
+                  size: "md"
+                  icon_left: "RefreshCw"
+                style:
+                  color: "components.button.variants.ghost.text"
+                states:
+                  hover:
+                    background: "components.button.variants.ghost.bg_hover"
+                actions:
+                  - event: "click"
+                    handler: "refresh:messages,message_flow"
+              - type: "dropdown_menu"
+                id: "export_menu"
+                props:
+                  trigger:
+                    type: "Button"
+                    props:
+                      content: "Export"
+                      variant: "secondary"
+                      size: "md"
+                      icon_left: "Download"
+                    style:
+                      background: "components.button.variants.secondary.bg"
+                      color: "components.button.variants.secondary.text"
+                      border: "components.button.variants.secondary.border"
+                      height: "components.button.sizes.md.height"
+                      padding_x: "components.button.sizes.md.padding_x"
+                      font_size: "components.button.sizes.md.font_size"
+                      border_radius: "components.button.sizes.md.border_radius"
+                  items:
+                    - label: "Export as JSON"
+                      icon: "FileJson"
+                      action: "GET /api/dashboard/messages/export?format=json"
+                    - label: "Export as CSV"
+                      icon: "FileSpreadsheet"
+                      action: "GET /api/dashboard/messages/export?format=csv"
+
+      # Mini Flow Diagram Card
+      - type: "card"
+        id: "flow_diagram_card"
+        style:
+          background: "components.card.variants.default.bg"
+          border: "components.card.variants.default.border"
+          border_radius: "components.card.variants.default.border_radius"
+          shadow: "components.card.variants.default.shadow"
+          padding: "components.card.variants.default.padding"
+          margin_bottom: "spacing.semantic.card_gap"
+        dark_mode:
+          background: "dark_mode.components.card.bg"
+          border: "dark_mode.components.card.border"
+        children:
+          - type: "HStack"
+            style:
+              justify_content: "space-between"
+              align_items: "center"
+              margin_bottom: "spacing.4"
+            children:
+              - type: "Text"
+                props:
+                  content: "Message Flow Overview"
+                style:
+                  font_size: "typography.headings.h3.size"
+                  font_weight: "typography.headings.h3.weight"
+                  color: "colors.neutral.900"
+                dark_mode:
+                  color: "dark_mode.colors.text.primary"
+              - type: "Text"
+                props:
+                  content: "{{message_flow.total_messages}} total messages"
+                style:
+                  font_size: "typography.scale.sm.size"
+                  color: "colors.neutral.500"
+          - type: "flow_diagram"
+            id: "agent_flow_mini"
+            props:
+              data_source: "message_flow"
+              node_type: "agent"
+              edge_type: "message_count"
+              layout: "horizontal"
+              interactive: false
+            style:
+              height: "140px"
+              node_bg: "colors.primary.50"
+              node_border: "borders.width.thin solid colors.primary.200"
+              node_border_radius: "borders.radius.lg"
+              node_text_color: "colors.primary.700"
+              node_font_size: "typography.scale.xs.size"
+              node_font_weight: "typography.weights.semibold"
+              edge_color: "colors.neutral.300"
+              edge_label_bg: "colors.neutral.white"
+              edge_label_color: "colors.neutral.600"
+              edge_label_font_size: "typography.scale.xs.size"
+              edge_label_font_family: "typography.font_families.monospace.css"
+            dark_mode:
+              node_bg: "dark_mode.colors.primary.50"
+              node_border: "borders.width.thin solid dark_mode.colors.primary.200"
+              node_text_color: "dark_mode.colors.primary.500"
+              edge_color: "dark_mode.colors.border.strong"
+              edge_label_bg: "dark_mode.colors.bg.raised"
+              edge_label_color: "dark_mode.colors.text.secondary"
+
+      # Filter Bar + Timeline Card
+      - type: "card"
+        id: "messages_card"
+        style:
+          background: "components.card.variants.default.bg"
+          border: "components.card.variants.default.border"
+          border_radius: "components.card.variants.default.border_radius"
+          shadow: "components.card.variants.default.shadow"
+          padding: "0"
+        dark_mode:
+          background: "dark_mode.components.card.bg"
+          border: "dark_mode.components.card.border"
+        children:
+          # Filter Bar
+          - type: "HStack"
+            id: "message_filters"
+            style:
+              padding: "spacing.4"
+              gap: "spacing.3"
+              border_bottom: "borders.width.thin solid colors.neutral.200"
+              flex_wrap: "wrap"
+              align_items: "flex-end"
+            dark_mode:
+              border_bottom: "borders.width.thin solid dark_mode.colors.border.default"
+            children:
+              - type: "select"
+                id: "from_agent_filter"
+                props:
+                  label: "From Agent"
+                  placeholder: "Any agent"
+                  options_from: "agents_list"
+                  option_label: "{{item.name}}"
+                  option_value: "{{item.id}}"
+                  clearable: true
+                style:
+                  min_width: "160px"
+                  background: "components.input.default.bg"
+                  border: "components.input.default.border"
+                  border_radius: "components.input.default.border_radius"
+                  font_size: "components.input.default.font_size"
+                  height: "components.input.default.height"
+                dark_mode:
+                  background: "dark_mode.components.input.bg"
+                  border: "dark_mode.components.input.border"
+                  color: "dark_mode.components.input.text_color"
+              - type: "select"
+                id: "to_agent_filter"
+                props:
+                  label: "To Agent"
+                  placeholder: "Any agent"
+                  options_from: "agents_list"
+                  option_label: "{{item.name}}"
+                  option_value: "{{item.id}}"
+                  clearable: true
+                style:
+                  min_width: "160px"
+              - type: "select"
+                id: "type_filter"
+                props:
+                  label: "Message Type"
+                  placeholder: "All types"
+                  multi_select: true
+                  options:
+                    - label: "Direct"
+                      value: "direct"
+                    - label: "Broadcast"
+                      value: "broadcast"
+                    - label: "Request"
+                      value: "request"
+                    - label: "Response"
+                      value: "response"
+                style:
+                  min_width: "160px"
+              - type: "select"
+                id: "status_filter"
+                props:
+                  label: "Status"
+                  placeholder: "All statuses"
+                  options:
+                    - label: "Delivered"
+                      value: "delivered"
+                    - label: "Pending"
+                      value: "pending"
+                    - label: "Failed"
+                      value: "failed"
+                style:
+                  min_width: "130px"
+              - type: "form_field"
+                id: "date_range_filter"
+                props:
+                  type: "date_range"
+                  placeholder: "Date range..."
+                style:
+                  min_width: "220px"
+              - type: "form_field"
+                id: "search_input"
+                props:
+                  type: "search"
+                  placeholder: "Search messages..."
+                  icon_left: "Search"
+                style:
+                  flex: "1"
+                  min_width: "200px"
+                  background: "components.input.default.bg"
+                  border: "components.input.default.border"
+                  border_radius: "components.input.default.border_radius"
+                  font_size: "components.input.default.font_size"
+                  height: "components.input.default.height"
+                  padding_left: "spacing.10"
+                dark_mode:
+                  background: "dark_mode.components.input.bg"
+                  border: "dark_mode.components.input.border"
+
+          # Message Timeline
+          - type: "VStack"
+            id: "message_timeline"
+            props:
+              data_source: "messages"
+              empty_state:
+                icon: "MessageSquare"
+                title: "No messages found"
+                description: "Adjust your filters or wait for agents to exchange messages."
+            style:
+              padding: "0"
+            item_template:
+              type: "HStack"
+              id: "message_row_{{item.id}}"
+              style:
+                gap: "spacing.4"
+                padding: "spacing.4 spacing.6"
+                border_bottom: "borders.width.thin solid colors.neutral.100"
+                align_items: "flex-start"
+                cursor: "pointer"
+                transition: "animations.presets.colors"
+              states:
+                hover:
+                  background: "colors.neutral.50"
+              dark_mode:
+                border_bottom: "borders.width.thin solid dark_mode.colors.border.muted"
+                states:
+                  hover:
+                    background: "dark_mode.colors.bg.muted"
+              actions:
+                - event: "click"
+                  handler: "open_drawer:message_detail_drawer:{{item.id}}"
+              children:
+                # Timestamp Column
+                - type: "Text"
+                  props:
+                    content: "{{item.timestamp | time:'HH:mm:ss'}}"
+                  style:
+                    font_family: "typography.font_families.monospace.css"
+                    font_size: "typography.scale.xs.size"
+                    color: "colors.neutral.400"
+                    width: "70px"
+                    flex_shrink: "0"
+                    padding_top: "spacing.0.5"
+
+                # Agent Avatars (from -> to)
+                - type: "HStack"
+                  style:
+                    gap: "spacing.2"
+                    align_items: "center"
+                    width: "140px"
+                    flex_shrink: "0"
+                  children:
+                    - type: "avatar"
+                      props:
+                        name: "{{item.from_agent_name}}"
+                        size: "28px"
+                      style:
+                        border_radius: "borders.radius.full"
+                        border: "borders.width.medium solid colors.primary.200"
+                    - type: "icon"
+                      props:
+                        name: "ArrowRight"
+                      style:
+                        size: "14px"
+                        color: "colors.neutral.400"
+                    - type: "avatar"
+                      props:
+                        name: "{{item.to_agent_name}}"
+                        size: "28px"
+                      style:
+                        border_radius: "borders.radius.full"
+                        border: "borders.width.medium solid colors.secondary.200"
+
+                # Message Type Badge
+                - type: "badge"
+                  props:
+                    content: "{{item.type}}"
+                    variant: "{{item.type === 'direct' ? 'primary' : item.type === 'broadcast' ? 'info' : item.type === 'request' ? 'warning' : 'success'}}"
+                  style:
+                    width: "80px"
+                    flex_shrink: "0"
+                    text_align: "center"
+                    font_size: "components.badge.sizes.sm.font_size"
+                    padding_x: "components.badge.sizes.sm.padding_x"
+                    padding_y: "components.badge.sizes.sm.padding_y"
+                    border_radius: "components.badge.sizes.sm.border_radius"
+                    font_weight: "components.badge.sizes.sm.font_weight"
+
+                # Message Preview
+                - type: "VStack"
+                  style:
+                    gap: "spacing.0.5"
+                    flex: "1"
+                    min_width: "0"
+                  children:
+                    - type: "Text"
+                      props:
+                        content: "{{item.from_agent_name}} -> {{item.to_agent_name}}"
+                      style:
+                        font_size: "typography.scale.xs.size"
+                        font_weight: "typography.weights.medium"
+                        color: "colors.neutral.600"
+                    - type: "Text"
+                      props:
+                        content: "{{item.payload_preview | truncate:120}}"
+                      style:
+                        font_size: "typography.scale.sm.size"
+                        color: "colors.neutral.700"
+                        overflow: "hidden"
+                        text_overflow: "ellipsis"
+                        white_space: "nowrap"
+
+                # Expand icon
+                - type: "icon"
+                  props:
+                    name: "ChevronRight"
+                  style:
+                    size: "16px"
+                    color: "colors.neutral.400"
+                    flex_shrink: "0"
+                    margin_top: "spacing.1"
+
+          # Pagination Bar
+          - type: "HStack"
+            id: "pagination_bar"
+            style:
+              justify_content: "space-between"
+              align_items: "center"
+              padding: "spacing.3 spacing.6"
+              border_top: "borders.width.thin solid colors.neutral.200"
+            dark_mode:
+              border_top: "borders.width.thin solid dark_mode.colors.border.default"
+            children:
+              - type: "Text"
+                props:
+                  content: "Showing {{messages.from}}-{{messages.to}} of {{messages.total}}"
+                style:
+                  font_size: "typography.scale.sm.size"
+                  color: "colors.neutral.500"
+              - type: "pagination"
+                props:
+                  current_page: "{{pagination.page}}"
+                  total_pages: "{{messages.total_pages}}"
+                  page_size: 50
+                style:
+                  button_size: "components.button.sizes.sm.height"
+                  button_border_radius: "components.button.sizes.sm.border_radius"
+                  active_bg: "colors.primary.500"
+                  active_color: "colors.neutral.white"
+                  inactive_bg: "transparent"
+                  inactive_color: "colors.neutral.600"
+
+    # Message Detail Drawer (right slide-in)
+    drawers:
+      - type: "drawer"
+        id: "message_detail_drawer"
+        props:
+          title: "Message Detail"
+          position: "right"
+          width: "480px"
+        style:
+          background: "colors.neutral.white"
+          border_left: "borders.width.thin solid colors.neutral.200"
+          shadow: "shadows.xl"
+          z_index: "z_index.modal"
+          transition: "transform 300ms cubic-bezier(0.4, 0, 0.2, 1)"
+        dark_mode:
+          background: "dark_mode.colors.bg.overlay"
+          border_left: "borders.width.thin solid dark_mode.colors.border.default"
+        children:
+          # Drawer Header
+          - type: "HStack"
+            style:
+              justify_content: "space-between"
+              align_items: "center"
+              padding: "spacing.4 spacing.5"
+              border_bottom: "borders.width.thin solid colors.neutral.200"
+            dark_mode:
+              border_bottom: "borders.width.thin solid dark_mode.colors.border.default"
+            children:
+              - type: "Text"
+                props:
+                  content: "Message Detail"
+                style:
+                  font_size: "typography.headings.h3.size"
+                  font_weight: "typography.headings.h3.weight"
+                  color: "colors.neutral.900"
+                dark_mode:
+                  color: "dark_mode.colors.text.primary"
+              - type: "Button"
+                props:
+                  variant: "ghost"
+                  size: "sm"
+                  icon_left: "X"
+                  aria_label: "Close drawer"
+                actions:
+                  - event: "click"
+                    handler: "close_drawer:message_detail_drawer"
+
+          # Drawer Body
+          - type: "VStack"
+            style:
+              padding: "spacing.5"
+              gap: "spacing.5"
+              overflow_y: "auto"
+              flex: "1"
+            children:
+              # Metadata Section
+              - type: "VStack"
+                style:
+                  gap: "spacing.3"
+                children:
+                  - type: "Text"
+                    props:
+                      content: "Metadata"
+                    style:
+                      font_size: "typography.headings.h5.size"
+                      font_weight: "typography.headings.h5.weight"
+                      color: "colors.neutral.800"
+                      margin_bottom: "spacing.1"
+                  - type: "HStack"
+                    style:
+                      justify_content: "space-between"
+                    children:
+                      - type: "Text"
+                        props:
+                          content: "Message ID"
+                        style:
+                          font_size: "typography.scale.sm.size"
+                          color: "colors.neutral.500"
+                      - type: "Text"
+                        props:
+                          content: "{{selected_message.id}}"
+                        style:
+                          font_size: "typography.scale.sm.size"
+                          font_family: "typography.font_families.monospace.css"
+                          color: "colors.neutral.700"
+                  - type: "HStack"
+                    style:
+                      justify_content: "space-between"
+                    children:
+                      - type: "Text"
+                        props:
+                          content: "Timestamp"
+                        style:
+                          font_size: "typography.scale.sm.size"
+                          color: "colors.neutral.500"
+                      - type: "Text"
+                        props:
+                          content: "{{selected_message.timestamp | datetime:'full'}}"
+                        style:
+                          font_size: "typography.scale.sm.size"
+                          font_family: "typography.font_families.monospace.css"
+                          color: "colors.neutral.700"
+                  - type: "HStack"
+                    style:
+                      justify_content: "space-between"
+                    children:
+                      - type: "Text"
+                        props:
+                          content: "Type"
+                        style:
+                          font_size: "typography.scale.sm.size"
+                          color: "colors.neutral.500"
+                      - type: "badge"
+                        props:
+                          content: "{{selected_message.type}}"
+                          variant: "{{selected_message.type === 'direct' ? 'primary' : selected_message.type === 'broadcast' ? 'info' : selected_message.type === 'request' ? 'warning' : 'success'}}"
+                  - type: "HStack"
+                    style:
+                      justify_content: "space-between"
+                    children:
+                      - type: "Text"
+                        props:
+                          content: "From"
+                        style:
+                          font_size: "typography.scale.sm.size"
+                          color: "colors.neutral.500"
+                      - type: "HStack"
+                        style:
+                          gap: "spacing.2"
+                          align_items: "center"
+                        children:
+                          - type: "avatar"
+                            props:
+                              name: "{{selected_message.from_agent_name}}"
+                              size: "20px"
+                          - type: "Text"
+                            props:
+                              content: "{{selected_message.from_agent_name}}"
+                            style:
+                              font_size: "typography.scale.sm.size"
+                              color: "colors.neutral.900"
+                  - type: "HStack"
+                    style:
+                      justify_content: "space-between"
+                    children:
+                      - type: "Text"
+                        props:
+                          content: "To"
+                        style:
+                          font_size: "typography.scale.sm.size"
+                          color: "colors.neutral.500"
+                      - type: "HStack"
+                        style:
+                          gap: "spacing.2"
+                          align_items: "center"
+                        children:
+                          - type: "avatar"
+                            props:
+                              name: "{{selected_message.to_agent_name}}"
+                              size: "20px"
+                          - type: "Text"
+                            props:
+                              content: "{{selected_message.to_agent_name}}"
+                            style:
+                              font_size: "typography.scale.sm.size"
+                              color: "colors.neutral.900"
+                  - type: "HStack"
+                    style:
+                      justify_content: "space-between"
+                    children:
+                      - type: "Text"
+                        props:
+                          content: "Status"
+                        style:
+                          font_size: "typography.scale.sm.size"
+                          color: "colors.neutral.500"
+                      - type: "badge"
+                        props:
+                          content: "{{selected_message.status}}"
+                          variant: "{{selected_message.status === 'delivered' ? 'success' : selected_message.status === 'pending' ? 'warning' : 'error'}}"
+
+              # Payload Section
+              - type: "Divider"
+                style:
+                  border_top: "borders.width.thin solid colors.neutral.200"
+              - type: "VStack"
+                style:
+                  gap: "spacing.2"
+                children:
+                  - type: "HStack"
+                    style:
+                      justify_content: "space-between"
+                      align_items: "center"
+                    children:
+                      - type: "Text"
+                        props:
+                          content: "Payload"
+                        style:
+                          font_size: "typography.headings.h5.size"
+                          font_weight: "typography.headings.h5.weight"
+                          color: "colors.neutral.800"
+                      - type: "Button"
+                        props:
+                          content: "Copy"
+                          variant: "ghost"
+                          size: "xs"
+                          icon_left: "Copy"
+                        style:
+                          color: "colors.neutral.500"
+                          font_size: "typography.scale.xs.size"
+                        actions:
+                          - event: "click"
+                            handler: "clipboard:copy:{{selected_message.payload | json}}"
+                  - type: "code_editor"
+                    id: "payload_viewer"
+                    props:
+                      language: "json"
+                      value: "{{selected_message.payload | json:pretty}}"
+                      read_only: true
+                      line_numbers: true
+                    style:
+                      font_family: "typography.font_families.monospace.css"
+                      font_size: "typography.scale.xs.size"
+                      border: "borders.width.thin solid colors.neutral.200"
+                      border_radius: "borders.radius.md"
+                      min_height: "200px"
+                      max_height: "400px"
+                      overflow: "auto"
+                      background: "colors.neutral.50"
+                    dark_mode:
+                      border: "borders.width.thin solid dark_mode.colors.border.default"
+                      background: "dark_mode.colors.bg.base"
+
+              # Related Messages Section
+              - type: "Divider"
+                style:
+                  border_top: "borders.width.thin solid colors.neutral.200"
+              - type: "VStack"
+                id: "related_messages"
+                props:
+                  visible_when: "selected_message.related_messages.length > 0"
+                style:
+                  gap: "spacing.2"
+                children:
+                  - type: "Text"
+                    props:
+                      content: "Related Messages"
+                    style:
+                      font_size: "typography.headings.h5.size"
+                      font_weight: "typography.headings.h5.weight"
+                      color: "colors.neutral.800"
+                      margin_bottom: "spacing.1"
+                  - type: "VStack"
+                    props:
+                      for_each: "selected_message.related_messages"
+                    style:
+                      gap: "spacing.2"
+                    children:
+                      - type: "HStack"
+                        style:
+                          gap: "spacing.3"
+                          padding: "spacing.2 spacing.3"
+                          border_radius: "borders.radius.md"
+                          background: "colors.neutral.50"
+                          cursor: "pointer"
+                          transition: "animations.presets.colors"
+                        states:
+                          hover:
+                            background: "colors.neutral.100"
+                        dark_mode:
+                          background: "dark_mode.colors.bg.muted"
+                          states:
+                            hover:
+                              background: "dark_mode.colors.bg.subtle"
+                        actions:
+                          - event: "click"
+                            handler: "open_drawer:message_detail_drawer:{{item.id}}"
+                        children:
+                          - type: "Text"
+                            props:
+                              content: "{{item.timestamp | time:'HH:mm:ss'}}"
+                            style:
+                              font_family: "typography.font_families.monospace.css"
+                              font_size: "typography.scale.xs.size"
+                              color: "colors.neutral.400"
+                              width: "60px"
+                          - type: "badge"
+                            props:
+                              content: "{{item.type}}"
+                              variant: "outline"
+                            style:
+                              font_size: "typography.scale.xs.size"
+                          - type: "Text"
+                            props:
+                              content: "{{item.from_agent_name}} -> {{item.to_agent_name}}"
+                            style:
+                              font_size: "typography.scale.xs.size"
+                              color: "colors.neutral.600"
+                              flex: "1"
+
+    actions:
+      - event: "filter:change"
+        target: "message_filters"
+        handler: "refresh:messages"
+      - event: "search:change"
+        target: "search_input"
+        debounce: "300ms"
+        handler: "set_param:search:{{value}}"
+      - event: "page:change"
+        target: "pagination_bar"
+        handler: "set_param:page:{{value}}"

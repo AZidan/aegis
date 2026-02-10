@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
+import { getQueueToken } from '@nestjs/bullmq';
 import { PermissionService } from '../../../src/dashboard/skills/permission.service';
 import { AuditService } from '../../../src/audit/audit.service';
+import { ALERT_QUEUE_NAME } from '../../../src/alert/alert.constants';
 import {
   PermissionManifest,
   LegacyPermissions,
@@ -37,6 +39,7 @@ describe('PermissionService', () => {
       providers: [
         PermissionService,
         { provide: AuditService, useValue: auditService },
+        { provide: getQueueToken(ALERT_QUEUE_NAME), useValue: { add: jest.fn().mockResolvedValue(undefined) } },
       ],
     }).compile();
 
