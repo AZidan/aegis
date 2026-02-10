@@ -5,6 +5,7 @@ import { PrismaService } from '../../src/prisma/prisma.service';
 import { CONTAINER_ORCHESTRATOR } from '../../src/container/container.constants';
 import { ContainerPortAllocatorService } from '../../src/container/container-port-allocator.service';
 import { ContainerConfigGeneratorService } from '../../src/container/container-config-generator.service';
+import { ContainerNetworkService } from '../../src/container/container-network.service';
 import {
   PROVISIONING_STEPS,
   MAX_PROVISIONING_RETRIES,
@@ -56,6 +57,11 @@ const mockConfigGenerator = {
   }),
 };
 
+const mockContainerNetwork = {
+  getContainerName: jest.fn().mockReturnValue('aegis-tenant-u'),
+  getDockerNetworkName: jest.fn().mockReturnValue('aegis-net-tenant-u'),
+};
+
 // Helper to create a mock Job
 function createMockJob(
   name: string,
@@ -91,6 +97,7 @@ describe('ProvisioningProcessor', () => {
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: ContainerPortAllocatorService, useValue: mockPortAllocator },
         { provide: ContainerConfigGeneratorService, useValue: mockConfigGenerator },
+        { provide: ContainerNetworkService, useValue: mockContainerNetwork },
         { provide: CONTAINER_ORCHESTRATOR, useValue: mockContainerOrchestrator },
       ],
     }).compile();
