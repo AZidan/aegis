@@ -70,6 +70,7 @@
     "@nestjs/cli": "^11.0.16",
     "@nestjs/testing": "^11.1.13",
     "@types/bcrypt": "^6.0.0",
+    "@types/dockerode": "^4.0.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.2.1",
     "@types/passport-github2": "^1.2.9",
@@ -109,7 +110,8 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "moduleNameMapper": {
-      "^src/(.*)$": "<rootDir>/src/$1"
+      "^src/(.*)$": "<rootDir>/src/$1",
+      "^@kubernetes/client-node$": "<rootDir>/src/__mocks__/@kubernetes/client-node.ts"
     },
     "collectCoverageFrom": [
       "src/**/*.(t|j)s",
@@ -118,7 +120,7 @@
     "coverageDirectory": "coverage",
     "testEnvironment": "node",
     "transformIgnorePatterns": [
-      "node_modules/(?!uuid)"
+      "node_modules/(?!uuid|@kubernetes/client-node)"
     ]
   }
 }

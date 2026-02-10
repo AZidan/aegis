@@ -3,7 +3,7 @@
   "files": {
     "architecture.md": {
       "hash": "39f846040a10",
-      "indexed_at": "2026-02-05T21:07:47.496764+00:00",
+      "indexed_at": "2026-02-10T00:51:38.706632+00:00",
       "language": "markdown",
       "lines": 203,
       "symbols": [
@@ -273,6 +273,6 @@
       ]
     }
   },
-  "generated_at": "2026-02-08T22:15:54.815374+00:00",
+  "generated_at": "2026-02-10T00:52:00.317563+00:00",
   "version": "1.0"
 }

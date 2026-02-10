@@ -3,7 +3,7 @@
   "files": {
     "update-colors.py": {
       "hash": "8dbc0b3ad9d1",
-      "indexed_at": "2026-02-06T11:22:12.379415+00:00",
+      "indexed_at": "2026-02-10T00:51:38.777713+00:00",
       "language": "python",
       "lines": 127,
       "symbols": [
@@ -29,6 +29,6 @@
       ]
     }
   },
-  "generated_at": "2026-02-08T22:15:54.815792+00:00",
+  "generated_at": "2026-02-10T00:52:00.317877+00:00",
   "version": "1.0"
 }

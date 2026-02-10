@@ -1,16 +1,9 @@
 {
   "directory": "",
   "files": {
-    ".eslintrc.js": {
-      "hash": "34459be0ef4f",
-      "indexed_at": "2026-02-06T18:02:36.786025+00:00",
-      "language": "javascript",
-      "lines": 29,
-      "symbols": []
-    },
     "DATABASE_SCHEMA.md": {
       "hash": "abf76fc9c8a8",
-      "indexed_at": "2026-02-06T18:09:36.816065+00:00",
+      "indexed_at": "2026-02-10T00:52:07.849320+00:00",
       "language": "markdown",
       "lines": 660,
       "symbols": [
@@ -518,7 +511,7 @@
     },
     "ER_DIAGRAM.md": {
       "hash": "f089107a6390",
-      "indexed_at": "2026-02-06T18:12:44.861568+00:00",
+      "indexed_at": "2026-02-10T00:52:07.848136+00:00",
       "language": "markdown",
       "lines": 464,
       "symbols": [
@@ -692,7 +685,7 @@
     },
     "PRISMA7_SETUP.md": {
       "hash": "7aed1af0522b",
-      "indexed_at": "2026-02-06T18:02:36.784192+00:00",
+      "indexed_at": "2026-02-10T00:52:07.851503+00:00",
       "language": "markdown",
       "lines": 198,
       "symbols": [
@@ -888,7 +881,7 @@
     },
     "PROJECT_STRUCTURE.md": {
       "hash": "483fa269576c",
-      "indexed_at": "2026-02-06T18:02:36.777329+00:00",
+      "indexed_at": "2026-02-10T00:52:07.847553+00:00",
       "language": "markdown",
       "lines": 434,
       "symbols": [
@@ -1307,7 +1300,7 @@
     },
     "README.md": {
       "hash": "ace3d457887b",
-      "indexed_at": "2026-02-06T18:02:36.782459+00:00",
+      "indexed_at": "2026-02-10T00:52:07.850641+00:00",
       "language": "markdown",
       "lines": 358,
       "symbols": [
@@ -1615,7 +1608,7 @@
     },
     "SETUP_COMPLETE.md": {
       "hash": "ef23d75bf1b1",
-      "indexed_at": "2026-02-06T18:02:36.778628+00:00",
+      "indexed_at": "2026-02-10T00:52:07.850107+00:00",
       "language": "markdown",
       "lines": 489,
       "symbols": [
@@ -1937,7 +1930,7 @@
     },
     "STAGE_2_COMPLETION.md": {
       "hash": "1ed2cce3ee70",
-      "indexed_at": "2026-02-06T18:11:39.061263+00:00",
+      "indexed_at": "2026-02-10T00:52:07.851180+00:00",
       "language": "markdown",
       "lines": 355,
       "symbols": [
@@ -2303,6 +2296,6 @@
       ]
     }
   },
-  "generated_at": "2026-02-08T22:15:54.658261+00:00",
+  "generated_at": "2026-02-10T00:52:07.903440+00:00",
   "version": "1.0"
 }
