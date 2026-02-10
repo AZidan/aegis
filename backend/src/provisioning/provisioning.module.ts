@@ -3,6 +3,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { ProvisioningService } from './provisioning.service';
 import { ProvisioningProcessor } from './provisioning.processor';
 import { PROVISIONING_QUEUE_NAME } from './provisioning.constants';
+import { ContainerModule } from '../container/container.module';
 
 /**
  * Provisioning Module
@@ -21,6 +22,7 @@ import { PROVISIONING_QUEUE_NAME } from './provisioning.constants';
  */
 @Module({
   imports: [
+    ContainerModule,
     BullModule.registerQueue({ name: PROVISIONING_QUEUE_NAME }),
   ],
   providers: [ProvisioningService, ProvisioningProcessor],
