@@ -31,6 +31,7 @@ export const envSchema = z.object({
   CONTAINER_OPENCLAW_IMAGE: z.string().default('openclaw/openclaw:latest'),
   CONTAINER_NETWORK_NAME: z.string().default('aegis-tenant-network'),
   CONTAINER_BASE_PORT: z.string().regex(/^\d+$/).default('19000').transform(Number),
+  CONTAINER_PORT_RANGE: z.string().regex(/^\d+$/).default('1000').transform(Number),
 
   CORS_ORIGINS: z.string().default('http://localhost:3000'),
 

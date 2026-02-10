@@ -4,12 +4,14 @@ import { CONTAINER_ORCHESTRATOR } from './container.constants';
 import { DockerOrchestratorService } from './docker-orchestrator.service';
 import { KubernetesOrchestratorService } from './kubernetes-orchestrator.service';
 import { MockOrchestratorService } from './mock-orchestrator.service';
+import { ContainerPortAllocatorService } from './container-port-allocator.service';
 
 @Module({
   providers: [
     DockerOrchestratorService,
     KubernetesOrchestratorService,
     MockOrchestratorService,
+    ContainerPortAllocatorService,
     {
       provide: CONTAINER_ORCHESTRATOR,
       inject: [
@@ -38,6 +40,6 @@ import { MockOrchestratorService } from './mock-orchestrator.service';
       },
     },
   ],
-  exports: [CONTAINER_ORCHESTRATOR],
+  exports: [CONTAINER_ORCHESTRATOR, ContainerPortAllocatorService],
 })
 export class ContainerModule {}
