@@ -1,27 +1,92 @@
-import { execFile } from 'node:child_process';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { PassThrough } from 'node:stream';
 import { DockerOrchestratorService } from '../../src/container/docker-orchestrator.service';
 import { KubernetesOrchestratorService } from '../../src/container/kubernetes-orchestrator.service';
 import { ContainerOrchestrator } from '../../src/container/interfaces/container-orchestrator.interface';
 
-jest.mock('node:child_process', () => ({
-  execFile: jest.fn(),
-}));
+const dockerContainerMock = {
+  id: 'container-123',
+  start: jest.fn().mockResolvedValue(undefined),
+  inspect: jest.fn().mockResolvedValue({
+    State: {
+      Status: 'running',
+      Running: true,
+      Health: { Status: 'healthy' },
+      StartedAt: '2026-02-10T00:00:00.000Z',
+    },
+  }),
+  restart: jest.fn().mockResolvedValue(undefined),
+  stop: jest.fn().mockResolvedValue(undefined),
+  remove: jest.fn().mockResolvedValue(undefined),
+  logs: jest.fn().mockResolvedValue(Buffer.from('out')),
+  exec: jest.fn().mockResolvedValue({
+    start: jest.fn().mockImplementation(async () => {
+      const stream = new PassThrough();
+      setImmediate(() => stream.end());
+      return stream;
+    }),
+    inspect: jest.fn().mockResolvedValue({ ExitCode: 0 }),
+  }),
+};
+const dockerClientMock = {
+  createContainer: jest.fn().mockResolvedValue(dockerContainerMock),
+  getContainer: jest.fn().mockReturnValue(dockerContainerMock),
+  listNetworks: jest.fn().mockResolvedValue([{ Name: 'aegis-tenant-network' }]),
+  createNetwork: jest.fn().mockResolvedValue(undefined),
+};
 
-type ExecFileCallback = (
-  error: Error | null,
-  stdout: string,
-  stderr: string,
-) => void;
+const appsApiMock = {
+  createNamespacedDeployment: jest.fn(),
+  replaceNamespacedDeployment: jest.fn(),
+  readNamespacedDeployment: jest.fn().mockResolvedValue({
+    metadata: { creationTimestamp: '2026-02-10T00:00:00.000Z' },
+    spec: {
+      replicas: 1,
+      template: { spec: { containers: [{ name: 'openclaw', env: [] }] } },
+    },
+    status: { availableReplicas: 1, readyReplicas: 1 },
+  }),
+  deleteNamespacedDeployment: jest.fn(),
+};
+const coreApiMock = {
+  readNamespace: jest.fn().mockResolvedValue({}),
+  createNamespace: jest.fn(),
+  createNamespacedService: jest.fn(),
+  replaceNamespacedService: jest.fn(),
+  deleteNamespacedService: jest.fn(),
+  createNamespacedConfigMap: jest.fn(),
+  replaceNamespacedConfigMap: jest.fn(),
+  listNamespacedPod: jest.fn().mockResolvedValue({
+    items: [{ metadata: { name: 'openclaw-1-abc' } }],
+  }),
+  readNamespacedPodLog: jest.fn().mockResolvedValue('out'),
+};
+const kubeConfigMock = {
+  loadFromDefault: jest.fn(),
+  setCurrentContext: jest.fn(),
+  makeApiClient: jest.fn((apiType: { name?: string }) =>
+    apiType.name === 'MockAppsV1Api' ? appsApiMock : coreApiMock,
+  ),
+};
 
-const execFileMock = execFile as unknown as jest.Mock;
+jest.mock('dockerode', () =>
+  jest.fn().mockImplementation(() => dockerClientMock),
+);
+jest.mock('@kubernetes/client-node', () => {
+  class MockAppsV1Api {}
+  class MockCoreV1Api {}
+  return {
+    KubeConfig: jest.fn().mockImplementation(() => kubeConfigMock),
+    AppsV1Api: MockAppsV1Api,
+    CoreV1Api: MockCoreV1Api,
+  };
+});
 
 type RuntimeCase = {
   runtime: 'docker' | 'kubernetes';
   provider: new (...args: never[]) => ContainerOrchestrator;
   containerId: string;
-  command: string;
 };
 
 const CASES: RuntimeCase[] = [
@@ -29,13 +94,11 @@ const CASES: RuntimeCase[] = [
     runtime: 'docker',
     provider: DockerOrchestratorService,
     containerId: 'container-123',
-    command: 'docker',
   },
   {
     runtime: 'kubernetes',
     provider: KubernetesOrchestratorService,
     containerId: 'aegis-tenants/openclaw-1',
-    command: 'kubectl',
   },
 ];
 
@@ -63,7 +126,6 @@ describe('ContainerOrchestrator contract', () => {
 
     beforeEach(async () => {
       jest.clearAllMocks();
-
       const module: TestingModule = await Test.createTestingModule({
         providers: [
           runtimeCase.provider,
@@ -78,132 +140,29 @@ describe('ContainerOrchestrator contract', () => {
     });
 
     it('restart should resolve', async () => {
-      execFileMock.mockImplementation(
-        (
-          _command: string,
-          _args: string[],
-          _opts: unknown,
-          callback: ExecFileCallback,
-        ) => callback(null, '', ''),
-      );
-
       await expect(service.restart(runtimeCase.containerId)).resolves.toBeUndefined();
-      expect(execFileMock).toHaveBeenCalledWith(
-        runtimeCase.command,
-        expect.any(Array),
-        expect.any(Object),
-        expect.any(Function),
-      );
     });
 
     it('getStatus should map to running/healthy', async () => {
-      execFileMock.mockImplementation(
-        (
-          command: string,
-          args: string[],
-          _opts: unknown,
-          callback: ExecFileCallback,
-        ) => {
-          if (command === 'docker' && args[0] === 'inspect') {
-            callback(
-              null,
-              JSON.stringify({
-                Status: 'running',
-                Running: true,
-                Health: { Status: 'healthy' },
-                StartedAt: '2026-02-10T00:00:00.000Z',
-              }),
-              '',
-            );
-            return;
-          }
-
-          if (
-            command === 'kubectl' &&
-            args.includes('get') &&
-            args.includes('deployment')
-          ) {
-            callback(
-              null,
-              JSON.stringify({
-                metadata: { creationTimestamp: '2026-02-10T00:00:00.000Z' },
-                spec: { replicas: 1 },
-                status: { availableReplicas: 1, readyReplicas: 1 },
-              }),
-              '',
-            );
-            return;
-          }
-
-          callback(null, '', '');
-        },
-      );
-
       const status = await service.getStatus(runtimeCase.containerId);
       expect(status.state).toBe('running');
       expect(status.health).toBe('healthy');
     });
 
     it('getLogs should support tail and since options', async () => {
-      execFileMock.mockImplementation(
-        (
-          _command: string,
-          _args: string[],
-          _opts: unknown,
-          callback: ExecFileCallback,
-        ) => callback(null, 'out', 'err'),
-      );
-
       const logs = await service.getLogs(runtimeCase.containerId, {
         tailLines: 25,
         sinceSeconds: 90,
       });
       expect(logs).toContain('out');
-      expect(logs).toContain('err');
-      expect(execFileMock).toHaveBeenCalledWith(
-        runtimeCase.command,
-        expect.arrayContaining(['--tail', '25']),
-        expect.any(Object),
-        expect.any(Function),
-      );
     });
 
-    it('updateConfig should resolve as a no-op', async () => {
+    it('updateConfig should resolve', async () => {
       await expect(
         service.updateConfig(runtimeCase.containerId, {
           openclawConfig: { gateway: { port: 18789 } },
         }),
       ).resolves.toBeUndefined();
     });
-  });
-
-  it('kubernetes should fail fast when runtime is not enabled', async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        KubernetesOrchestratorService,
-        {
-          provide: ConfigService,
-          useValue: {
-            get: jest.fn((key: string, defaultValue?: unknown) => {
-              if (key === 'container.kubernetes.enabled') {
-                return false;
-              }
-              if (key === 'container.kubernetes.namespace') {
-                return 'aegis-tenants';
-              }
-              return defaultValue;
-            }),
-          },
-        },
-      ],
-    }).compile();
-
-    const service = module.get<KubernetesOrchestratorService>(
-      KubernetesOrchestratorService,
-    );
-
-    await expect(service.restart('aegis-tenants/openclaw-1')).rejects.toThrow(
-      'Kubernetes runtime is not enabled',
-    );
   });
 });

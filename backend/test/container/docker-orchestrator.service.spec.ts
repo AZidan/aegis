@@ -1,21 +1,58 @@
-import { execFile } from 'node:child_process';
+import { PassThrough } from 'node:stream';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { DockerOrchestratorService } from '../../src/container/docker-orchestrator.service';
 
-jest.mock('node:child_process', () => ({
-  execFile: jest.fn(),
-}));
+type MockContainer = {
+  id: string;
+  start: jest.Mock;
+  inspect: jest.Mock;
+  restart: jest.Mock;
+  stop: jest.Mock;
+  remove: jest.Mock;
+  logs: jest.Mock;
+  exec: jest.Mock;
+};
 
-type ExecFileCallback = (
-  error: Error | null,
-  stdout: string,
-  stderr: string,
-) => void;
+const createContainerMock = (): MockContainer => ({
+  id: 'container-123',
+  start: jest.fn().mockResolvedValue(undefined),
+  inspect: jest.fn().mockResolvedValue({
+    State: {
+      Status: 'running',
+      Running: true,
+      StartedAt: '2026-02-10T00:00:00.000Z',
+      Health: { Status: 'healthy' },
+    },
+  }),
+  restart: jest.fn().mockResolvedValue(undefined),
+  stop: jest.fn().mockResolvedValue(undefined),
+  remove: jest.fn().mockResolvedValue(undefined),
+  logs: jest.fn().mockResolvedValue(Buffer.from('stdout-line\nstderr-line')),
+  exec: jest.fn().mockResolvedValue({
+    start: jest.fn().mockImplementation(async () => {
+      const stream = new PassThrough();
+      setImmediate(() => stream.end());
+      return stream;
+    }),
+    inspect: jest.fn().mockResolvedValue({ ExitCode: 0 }),
+  }),
+});
+
+const dockerClientMock = {
+  createContainer: jest.fn(),
+  getContainer: jest.fn(),
+  listNetworks: jest.fn(),
+  createNetwork: jest.fn(),
+};
+
+jest.mock('dockerode', () =>
+  jest.fn().mockImplementation(() => dockerClientMock),
+);
 
 describe('DockerOrchestratorService', () => {
   let service: DockerOrchestratorService;
-  const execFileMock = execFile as unknown as jest.Mock;
+  let containerMock: MockContainer;
 
   const configServiceMock = {
     get: jest.fn((key: string, defaultValue?: unknown) => {
@@ -29,6 +66,13 @@ describe('DockerOrchestratorService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    containerMock = createContainerMock();
+    dockerClientMock.createContainer.mockResolvedValue(containerMock);
+    dockerClientMock.getContainer.mockReturnValue(containerMock);
+    dockerClientMock.listNetworks.mockResolvedValue([
+      { Name: 'aegis-tenant-network' },
+    ]);
+    dockerClientMock.createNetwork.mockResolvedValue(undefined);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -40,26 +84,7 @@ describe('DockerOrchestratorService', () => {
     service = module.get<DockerOrchestratorService>(DockerOrchestratorService);
   });
 
-  it('create should ensure network and run docker container', async () => {
-    execFileMock.mockImplementation(
-      (
-        _cmd: string,
-        args: string[],
-        _opts: unknown,
-        callback: ExecFileCallback,
-      ) => {
-        if (args[0] === 'network' && args[1] === 'ls') {
-          callback(null, 'aegis-tenant-network\n', '');
-          return;
-        }
-        if (args[0] === 'run') {
-          callback(null, 'container-123\n', '');
-          return;
-        }
-        callback(null, '', '');
-      },
-    );
-
+  it('create should ensure network and create a container', async () => {
     const result = await service.create({
       tenantId: 'tenant-uuid-1',
       name: 'aegis-tenant',
@@ -73,104 +98,57 @@ describe('DockerOrchestratorService', () => {
       url: 'http://localhost:19123',
       hostPort: 19123,
     });
-
-    expect(execFileMock).toHaveBeenCalledWith(
-      'docker',
-      expect.arrayContaining(['run', '-d', '--name', 'aegis-tenant']),
-      expect.any(Object),
-      expect.any(Function),
+    expect(dockerClientMock.createContainer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'aegis-tenant',
+        Image: 'openclaw/openclaw:latest',
+      }),
     );
+    expect(containerMock.start).toHaveBeenCalled();
   });
 
   it('getStatus should map running and healthy state', async () => {
-    execFileMock.mockImplementation(
-      (
-        _cmd: string,
-        args: string[],
-        _opts: unknown,
-        callback: ExecFileCallback,
-      ) => {
-        if (args[0] === 'inspect') {
-          callback(
-            null,
-            JSON.stringify({
-              Status: 'running',
-              Running: true,
-              StartedAt: '2026-02-10T00:00:00.000Z',
-              Health: { Status: 'healthy' },
-            }),
-            '',
-          );
-          return;
-        }
-        callback(null, '', '');
-      },
-    );
-
     const status = await service.getStatus('container-123');
     expect(status.state).toBe('running');
     expect(status.health).toBe('healthy');
     expect(status.startedAt).toBeInstanceOf(Date);
   });
 
-  it('getLogs should include tail and since args', async () => {
-    execFileMock.mockImplementation(
-      (
-        _cmd: string,
-        args: string[],
-        _opts: unknown,
-        callback: ExecFileCallback,
-      ) => {
-        if (args[0] === 'logs') {
-          callback(null, 'stdout-line', 'stderr-line');
-          return;
-        }
-        callback(null, '', '');
-      },
-    );
-
+  it('getLogs should include options', async () => {
     const logs = await service.getLogs('container-123', {
       tailLines: 50,
       sinceSeconds: 120,
     });
 
     expect(logs).toContain('stdout-line');
-    expect(logs).toContain('stderr-line');
-    expect(execFileMock).toHaveBeenCalledWith(
-      'docker',
-      ['logs', '--tail', '50', '--since', '120s', 'container-123'],
-      expect.any(Object),
-      expect.any(Function),
+    expect(containerMock.logs).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tail: 50,
+        since: 120,
+      }),
     );
   });
 
-  it('updateConfig should not throw for placeholder updates', async () => {
-    execFileMock.mockImplementation(
-      (
-        _cmd: string,
-        _args: string[],
-        _opts: unknown,
-        callback: ExecFileCallback,
-      ) => callback(null, '', ''),
-    );
-
+  it('updateConfig should write config and restart container', async () => {
     await expect(
       service.updateConfig('container-123', {
         openclawConfig: { gateway: { port: 18789 } },
       }),
     ).resolves.toBeUndefined();
 
-    expect(execFileMock).toHaveBeenCalledWith(
-      'docker',
-      expect.arrayContaining(['cp']),
-      expect.any(Object),
-      expect.any(Function),
-    );
-    expect(execFileMock).toHaveBeenCalledWith(
-      'docker',
-      ['restart', 'container-123'],
-      expect.any(Object),
-      expect.any(Function),
-    );
+    expect(containerMock.exec).toHaveBeenCalled();
+    expect(containerMock.restart).toHaveBeenCalled();
+  });
+
+  it('getLogs should read stream output', async () => {
+    const stream = new PassThrough();
+    containerMock.logs.mockResolvedValueOnce(stream);
+    setImmediate(() => {
+      stream.write('stream-line');
+      stream.end();
+    });
+
+    const logs = await service.getLogs('container-123');
+    expect(logs).toContain('stream-line');
   });
 });
