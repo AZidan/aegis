@@ -3,12 +3,14 @@ import { BullModule } from '@nestjs/bullmq';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import Redis from 'ioredis';
+import { ConfigService } from '@nestjs/config';
 import { TenantsModule } from '../admin/tenants/tenants.module';
 import { HealthMonitorService, HEALTH_REDIS_CLIENT } from './health-monitor.service';
 import { HealthCheckProcessor } from './health-check.processor';
 import { HealthCleanupProcessor } from './health-cleanup.processor';
 import { MockHealthProbe } from './mock-health-probe';
 import { HEALTH_PROBE_STRATEGY } from './health-probe.interface';
+import { DockerHealthProbe } from './docker-health-probe';
 
 /**
  * Health Module
@@ -39,9 +41,19 @@ import { HEALTH_PROBE_STRATEGY } from './health-probe.interface';
     HealthMonitorService,
     HealthCheckProcessor,
     HealthCleanupProcessor,
+    MockHealthProbe,
+    DockerHealthProbe,
     {
       provide: HEALTH_PROBE_STRATEGY,
-      useClass: MockHealthProbe,
+      inject: [ConfigService, MockHealthProbe, DockerHealthProbe],
+      useFactory: (
+        configService: ConfigService,
+        mockProbe: MockHealthProbe,
+        dockerProbe: DockerHealthProbe,
+      ) => {
+        const runtime = configService.get<string>('container.runtime', 'mock');
+        return runtime === 'mock' ? mockProbe : dockerProbe;
+      },
     },
     {
       provide: HEALTH_REDIS_CLIENT,
