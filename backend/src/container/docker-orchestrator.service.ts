@@ -49,7 +49,12 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
 
     await this.ensureNetwork(networkName);
 
-    const env = Object.entries(options.environment ?? {}).map(
+    const secureRuntimeEnv: Record<string, string> = {
+      OPENCLAW_AGE_KEY_FILE: '/run/secrets/age_key',
+      OPENCLAW_DATA_DIR: '/home/node/.openclaw',
+      OPENCLAW_SECRETS_DIR: '/run/secrets/openclaw',
+    };
+    const env = Object.entries({ ...secureRuntimeEnv, ...(options.environment ?? {}) }).map(
       ([key, value]) => `${key}=${value}`,
     );
     const memoryBytes = options.resourceLimits?.memoryMb
@@ -69,6 +74,12 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
       Labels: {
         'aegis.tenantId': options.tenantId,
       },
+      Healthcheck: {
+        Test: ['CMD-SHELL', 'wget -q -O - http://127.0.0.1:18789/health || exit 1'],
+        Interval: 15_000_000_000,
+        Timeout: 5_000_000_000,
+        Retries: 5,
+      },
       HostConfig: {
         NetworkMode: networkName,
         PortBindings: {
@@ -82,6 +93,8 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
         ReadonlyRootfs: true,
         CapDrop: ['ALL'],
         Tmpfs: {
+          '/home/node/.openclaw': 'rw,noexec,nosuid,size=5242880',
+          '/tmp': 'rw,noexec,nosuid,size=1048576',
           '/run/secrets/openclaw': 'rw,noexec,nosuid,size=65536',
         },
       },

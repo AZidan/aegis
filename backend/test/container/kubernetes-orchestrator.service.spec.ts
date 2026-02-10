@@ -17,8 +17,14 @@ const coreApiMock = {
   deleteNamespacedService: jest.fn(),
   createNamespacedConfigMap: jest.fn(),
   replaceNamespacedConfigMap: jest.fn(),
+  createNamespacedSecret: jest.fn(),
+  replaceNamespacedSecret: jest.fn(),
   listNamespacedPod: jest.fn(),
   readNamespacedPodLog: jest.fn(),
+};
+const networkingApiMock = {
+  createNamespacedNetworkPolicy: jest.fn(),
+  replaceNamespacedNetworkPolicy: jest.fn(),
 };
 
 const kubeConfigMock = {
@@ -30,10 +36,12 @@ const kubeConfigMock = {
 jest.mock('@kubernetes/client-node', () => {
   class MockAppsV1Api {}
   class MockCoreV1Api {}
+  class MockNetworkingV1Api {}
   return {
     KubeConfig: jest.fn().mockImplementation(() => kubeConfigMock),
     AppsV1Api: MockAppsV1Api,
     CoreV1Api: MockCoreV1Api,
+    NetworkingV1Api: MockNetworkingV1Api,
   };
 });
 
@@ -59,6 +67,9 @@ describe('KubernetesOrchestratorService', () => {
       const name = (apiType as { name?: string }).name;
       if (name === 'MockAppsV1Api') {
         return appsApiMock;
+      }
+      if (name === 'MockNetworkingV1Api') {
+        return networkingApiMock;
       }
       return coreApiMock;
     });
@@ -100,8 +111,10 @@ describe('KubernetesOrchestratorService', () => {
 
     expect(result.id).toBe('aegis-tenants/openclaw-1');
     expect(coreApiMock.createNamespace).toHaveBeenCalled();
+    expect(coreApiMock.createNamespacedSecret).toHaveBeenCalled();
     expect(appsApiMock.createNamespacedDeployment).toHaveBeenCalled();
     expect(coreApiMock.createNamespacedService).toHaveBeenCalled();
+    expect(networkingApiMock.createNamespacedNetworkPolicy).toHaveBeenCalled();
   });
 
   it('getStatus should return healthy when replicas are ready', async () => {

@@ -36,7 +36,8 @@ export default () => ({
   container: {
     runtime: process.env.CONTAINER_RUNTIME || 'mock',
     dockerHost: process.env.CONTAINER_DOCKER_HOST || 'unix:///var/run/docker.sock',
-    openclawImage: process.env.CONTAINER_OPENCLAW_IMAGE || 'openclaw/openclaw:latest',
+    openclawImage:
+      process.env.CONTAINER_OPENCLAW_IMAGE || 'openclaw/openclaw:secrets',
     networkName: process.env.CONTAINER_NETWORK_NAME || 'aegis-tenant-network',
     basePort: parseInt(process.env.CONTAINER_BASE_PORT || '19000', 10),
     portRange: parseInt(process.env.CONTAINER_PORT_RANGE || '1000', 10),

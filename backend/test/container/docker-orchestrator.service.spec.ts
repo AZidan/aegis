@@ -102,6 +102,16 @@ describe('DockerOrchestratorService', () => {
       expect.objectContaining({
         name: 'aegis-tenant',
         Image: 'openclaw/openclaw:latest',
+        Healthcheck: expect.objectContaining({
+          Retries: 5,
+        }),
+        HostConfig: expect.objectContaining({
+          ReadonlyRootfs: true,
+          Tmpfs: expect.objectContaining({
+            '/run/secrets/openclaw': expect.any(String),
+            '/home/node/.openclaw': expect.any(String),
+          }),
+        }),
       }),
     );
     expect(containerMock.start).toHaveBeenCalled();

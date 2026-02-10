@@ -62,12 +62,22 @@ const coreApiMock = {
   }),
   readNamespacedPodLog: jest.fn().mockResolvedValue('out'),
 };
+const networkingApiMock = {
+  createNamespacedNetworkPolicy: jest.fn(),
+  replaceNamespacedNetworkPolicy: jest.fn(),
+};
 const kubeConfigMock = {
   loadFromDefault: jest.fn(),
   setCurrentContext: jest.fn(),
-  makeApiClient: jest.fn((apiType: { name?: string }) =>
-    apiType.name === 'MockAppsV1Api' ? appsApiMock : coreApiMock,
-  ),
+  makeApiClient: jest.fn((apiType: { name?: string }) => {
+    if (apiType.name === 'MockAppsV1Api') {
+      return appsApiMock;
+    }
+    if (apiType.name === 'MockNetworkingV1Api') {
+      return networkingApiMock;
+    }
+    return coreApiMock;
+  }),
 };
 
 jest.mock('dockerode', () =>
@@ -76,10 +86,12 @@ jest.mock('dockerode', () =>
 jest.mock('@kubernetes/client-node', () => {
   class MockAppsV1Api {}
   class MockCoreV1Api {}
+  class MockNetworkingV1Api {}
   return {
     KubeConfig: jest.fn().mockImplementation(() => kubeConfigMock),
     AppsV1Api: MockAppsV1Api,
     CoreV1Api: MockCoreV1Api,
+    NetworkingV1Api: MockNetworkingV1Api,
   };
 });
 
