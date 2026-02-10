@@ -7,6 +7,7 @@ import { TenantsService } from '../../src/admin/tenants/tenants.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvisioningService } from '../../src/provisioning/provisioning.service';
 import { AuditService } from '../../src/audit/audit.service';
+import { CONTAINER_ORCHESTRATOR } from '../../src/container/container.constants';
 
 // ---------------------------------------------------------------------------
 // Test Data Factories
@@ -25,6 +26,7 @@ const createMockTenant = (overrides: Partial<Record<string, unknown>> = {}) => (
   plan: 'growth',
   industry: 'Technology',
   expectedAgentCount: 10,
+  containerId: 'oclaw-abc123',
   containerUrl: 'https://tenant-uuid-1.containers.aegis.ai',
   resourceLimits: { cpuCores: 4, memoryMb: 4096, diskGb: 25, maxAgents: 10 },
   modelDefaults: { tier: 'sonnet', thinkingMode: 'low' },
@@ -146,6 +148,15 @@ describe('TenantsService', () => {
         {
           provide: AuditService,
           useValue: { logAction: jest.fn().mockResolvedValue(undefined) },
+        },
+        {
+          provide: CONTAINER_ORCHESTRATOR,
+          useValue: {
+            restart: jest.fn().mockResolvedValue(undefined),
+            getStatus: jest
+              .fn()
+              .mockResolvedValue({ state: 'running', health: 'healthy', uptimeSeconds: 0 }),
+          },
         },
       ],
     }).compile();

@@ -4,6 +4,8 @@ import { Job } from 'bullmq';
 import { ProvisioningService } from '../../src/provisioning/provisioning.service';
 import { ProvisioningProcessor } from '../../src/provisioning/provisioning.processor';
 import { PrismaService } from '../../src/prisma/prisma.service';
+import { CONTAINER_ORCHESTRATOR } from '../../src/container/container.constants';
+import { ContainerPortAllocatorService } from '../../src/container/container-port-allocator.service';
 import {
   PROVISIONING_QUEUE_NAME,
   PROVISIONING_STEPS,
@@ -33,6 +35,17 @@ const mockPrismaService = {
   tenant: {
     update: jest.fn().mockResolvedValue({}),
     findUnique: jest.fn(),
+    findMany: jest.fn().mockResolvedValue([]),
+  },
+  agent: {
+    findMany: jest.fn().mockResolvedValue([]),
+  },
+  skill: {
+    findMany: jest.fn().mockResolvedValue([]),
+    update: jest.fn().mockResolvedValue({}),
+  },
+  skillInstallation: {
+    create: jest.fn().mockResolvedValue({}),
   },
   alert: {
     create: jest.fn().mockResolvedValue({}),
@@ -41,6 +54,24 @@ const mockPrismaService = {
 
 const mockProvisioningQueue = {
   add: jest.fn().mockResolvedValue({ id: 'job-1' }),
+};
+
+const mockContainerOrchestrator = {
+  create: jest.fn().mockResolvedValue({
+    id: 'oclaw-abc123',
+    url: 'https://oclaw-abc123.containers.aegis.ai',
+    hostPort: 19000,
+  }),
+  delete: jest.fn().mockResolvedValue(undefined),
+  restart: jest.fn().mockResolvedValue(undefined),
+  stop: jest.fn().mockResolvedValue(undefined),
+  getStatus: jest.fn().mockResolvedValue({ state: 'running', health: 'healthy', uptimeSeconds: 0 }),
+  getLogs: jest.fn().mockResolvedValue(''),
+  updateConfig: jest.fn().mockResolvedValue(undefined),
+};
+
+const mockPortAllocator = {
+  allocate: jest.fn().mockResolvedValue(19000),
 };
 
 // Helper to create a mock Job
@@ -64,12 +95,20 @@ describe('Provisioning Flow Integration', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+    mockPrismaService.tenant.findUnique.mockResolvedValue({
+      id: 'tenant-uuid-1',
+      companyName: 'Acme Corp',
+      provisioningAttempt: 1,
+      resourceLimits: { cpuCores: 4, memoryMb: 4096, diskGb: 25 },
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProvisioningService,
         ProvisioningProcessor,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: ContainerPortAllocatorService, useValue: mockPortAllocator },
+        { provide: CONTAINER_ORCHESTRATOR, useValue: mockContainerOrchestrator },
         {
           provide: getQueueToken(PROVISIONING_QUEUE_NAME),
           useValue: mockProvisioningQueue,
