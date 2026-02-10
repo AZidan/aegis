@@ -5,3 +5,5 @@ export const DEFAULT_OPENCLAW_IMAGE = 'openclaw/openclaw:latest';
 export const DEFAULT_CONTAINER_NETWORK = 'aegis-tenant-network';
 export const DEFAULT_CONTAINER_BASE_PORT = 19000;
 export const DEFAULT_CONTAINER_PORT = 18789;
+export const DEFAULT_K8S_NAMESPACE = 'aegis-tenants';
+export const DEFAULT_K8S_SERVICE_DOMAIN = 'svc.cluster.local';

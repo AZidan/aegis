@@ -25,6 +25,12 @@ Kubernetes support is included behind the same abstraction layer for production,
 
 If production rollout requires strict MVP parity with K8s namespace/service/network policy in this sprint, treat Kubernetes items below as mandatory acceptance criteria. Otherwise mark them as follow-up gate criteria before production cutover.
 
+Runtime abstraction guarantee (mandatory):
+- all provisioning/health/restart flows depend on `ContainerOrchestrator` only
+- dev path: `CONTAINER_RUNTIME=docker`
+- production path: `CONTAINER_RUNTIME=kubernetes`
+- runtime-specific clients are isolated behind adapter services; no direct Docker/K8s calls in business services
+
 ## What Already Exists
 
 | Component | Location | Current State |
@@ -215,6 +221,17 @@ Source of truth:
 - health probe timeout = 5s default
 - timeout/refusal maps to `down`
 - degraded responses map to `degraded`, not hard-fail unless policy says so
+
+## Runtime Selection Matrix
+
+| Environment | Runtime | Required Flags | Notes |
+|------------|---------|----------------|-------|
+| Local dev | docker | `CONTAINER_RUNTIME=docker` | Uses Docker CLI with tenant network + deterministic host ports |
+| CI/unit tests | mock | `CONTAINER_RUNTIME=mock` | No container runtime dependency |
+| Production | kubernetes | `CONTAINER_RUNTIME=kubernetes`, `CONTAINER_K8S_ENABLED=true` (or cluster env) | Uses Kubernetes adapter with namespace-scoped deployments/services |
+
+Kubernetes enablement guard:
+- if runtime is `kubernetes` but kube env is not available (`CONTAINER_K8S_ENABLED` false and no `KUBECONFIG` / `KUBERNETES_SERVICE_HOST`), orchestrator fails fast with explicit `ServiceUnavailableException`
 
 ## Execution Order
 

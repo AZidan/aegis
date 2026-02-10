@@ -32,6 +32,13 @@ export const envSchema = z.object({
   CONTAINER_NETWORK_NAME: z.string().default('aegis-tenant-network'),
   CONTAINER_BASE_PORT: z.string().regex(/^\d+$/).default('19000').transform(Number),
   CONTAINER_PORT_RANGE: z.string().regex(/^\d+$/).default('1000').transform(Number),
+  CONTAINER_K8S_ENABLED: z
+    .enum(['true', 'false'])
+    .optional()
+    .default('false'),
+  CONTAINER_K8S_NAMESPACE: z.string().optional(),
+  CONTAINER_K8S_CONTEXT: z.string().optional(),
+  CONTAINER_K8S_SERVICE_DOMAIN: z.string().optional(),
 
   CORS_ORIGINS: z.string().default('http://localhost:3000'),
 
