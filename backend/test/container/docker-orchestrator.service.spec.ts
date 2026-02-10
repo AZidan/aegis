@@ -2,6 +2,7 @@ import { PassThrough } from 'node:stream';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { DockerOrchestratorService } from '../../src/container/docker-orchestrator.service';
+import { ContainerNetworkService } from '../../src/container/container-network.service';
 
 type MockContainer = {
   id: string;
@@ -80,6 +81,7 @@ describe('DockerOrchestratorService', () => {
       providers: [
         DockerOrchestratorService,
         { provide: ConfigService, useValue: configServiceMock },
+        ContainerNetworkService,
       ],
     }).compile();
 
@@ -114,9 +116,32 @@ describe('DockerOrchestratorService', () => {
             '/home/node/.openclaw': expect.any(String),
           }),
         }),
+        Labels: expect.objectContaining({
+          'aegis.tenantId': 'tenant-uuid-1',
+          'aegis.managedBy': 'aegis-container-orchestrator',
+        }),
       }),
     );
     expect(containerMock.start).toHaveBeenCalled();
+  });
+
+  it('create should create managed network when missing', async () => {
+    dockerClientMock.listNetworks.mockResolvedValueOnce([]);
+
+    await service.create({
+      tenantId: 'tenant-uuid-2',
+      hostPort: 19124,
+    });
+
+    expect(dockerClientMock.createNetwork).toHaveBeenCalledWith(
+      expect.objectContaining({
+        Name: 'aegis-tenant-network',
+        Labels: expect.objectContaining({
+          'aegis.tenantId': 'tenant-uuid-2',
+          'aegis.networkScope': 'tenant',
+        }),
+      }),
+    );
   });
 
   it('getStatus should map running and healthy state', async () => {

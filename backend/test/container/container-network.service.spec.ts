@@ -22,4 +22,30 @@ describe('ContainerNetworkService', () => {
       'aegis-tenant-uuid-1',
     );
   });
+
+  it('should build managed container labels', () => {
+    expect(service.getContainerLabels('tenant-uuid-1')).toEqual({
+      'aegis.tenantId': 'tenant-uuid-1',
+      'aegis.managedBy': 'aegis-container-orchestrator',
+    });
+  });
+
+  it('should build docker network labels', () => {
+    expect(service.getDockerNetworkLabels('tenant-uuid-1')).toEqual({
+      'aegis.tenantId': 'tenant-uuid-1',
+      'aegis.managedBy': 'aegis-container-orchestrator',
+      'aegis.networkScope': 'tenant',
+    });
+  });
+
+  it('should build deny-ingress policy for a workload', () => {
+    expect(service.buildKubernetesDenyIngressPolicy('openclaw-1')).toEqual({
+      metadata: { name: 'openclaw-1-deny-ingress' },
+      spec: {
+        podSelector: { matchLabels: { app: 'openclaw-1' } },
+        policyTypes: ['Ingress'],
+        ingress: [],
+      },
+    });
+  });
 });

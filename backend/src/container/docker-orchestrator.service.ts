@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import Docker from 'dockerode';
 import tar from 'tar-stream';
 import { ContainerOrchestrator } from './interfaces/container-orchestrator.interface';
+import { ContainerNetworkService } from './container-network.service';
 import {
   ContainerConfigUpdate,
   ContainerCreateOptions,
@@ -22,7 +23,10 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
   private readonly logger = new Logger(DockerOrchestratorService.name);
   private readonly docker: Docker;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly containerNetworkService: ContainerNetworkService,
+  ) {
     this.docker = this.createDockerClient();
   }
 
@@ -48,7 +52,10 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
         DEFAULT_CONTAINER_NETWORK,
       );
 
-    await this.ensureNetwork(networkName);
+    await this.ensureNetwork(
+      networkName,
+      this.containerNetworkService.getDockerNetworkLabels(options.tenantId),
+    );
 
     const secureRuntimeEnv: Record<string, string> = {
       OPENCLAW_AGE_KEY_FILE: '/run/secrets/age_key',
@@ -73,7 +80,7 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
         [`${containerPort}/tcp`]: {},
       },
       Labels: {
-        'aegis.tenantId': options.tenantId,
+        ...this.containerNetworkService.getContainerLabels(options.tenantId),
       },
       Healthcheck: {
         Test: ['CMD-SHELL', 'wget -q -O - http://127.0.0.1:18789/health || exit 1'],
@@ -186,7 +193,10 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
     await this.restart(containerId);
   }
 
-  private async ensureNetwork(networkName: string): Promise<void> {
+  private async ensureNetwork(
+    networkName: string,
+    labels?: Record<string, string>,
+  ): Promise<void> {
     const networks = await this.docker.listNetworks({
       filters: {
         name: [networkName],
@@ -201,7 +211,7 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
       return;
     }
 
-    await this.docker.createNetwork({ Name: networkName });
+    await this.docker.createNetwork({ Name: networkName, Labels: labels });
   }
 
   private createDockerClient(): Docker {
