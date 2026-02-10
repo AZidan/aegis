@@ -1,4 +1,5 @@
 import { execFile } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ContainerOrchestrator } from './interfaces/container-orchestrator.interface';
@@ -266,10 +267,49 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
     update: ContainerConfigUpdate,
   ): Promise<void> {
     this.assertEnabled();
-    const updateKeys = Object.keys(update).join(', ') || 'none';
-    this.logger.debug(
-      `Kubernetes updateConfig accepted for ${containerId}; keys=${updateKeys}. Runtime mutation is currently a no-op.`,
-    );
+    const { namespace, name } = this.parseContainerId(containerId);
+
+    if (update.environment && Object.keys(update.environment).length > 0) {
+      const envArgs = ['-n', namespace, 'set', 'env', `deployment/${name}`];
+      for (const [key, value] of Object.entries(update.environment)) {
+        envArgs.push(`${key}=${value}`);
+      }
+      await this.runKubectl(envArgs);
+    }
+
+    if (update.openclawConfig) {
+      const configPayload = JSON.stringify(update.openclawConfig, null, 2);
+      const hash = this.hashConfig(configPayload);
+      const configMapName = `${name}-openclaw-config`;
+      const indentedConfig = configPayload
+        .split('\n')
+        .map((line) => `    ${line}`)
+        .join('\n');
+
+      await this.runKubectl(['-n', namespace, 'apply', '-f', '-'], {
+        stdin: [
+          'apiVersion: v1',
+          'kind: ConfigMap',
+          'metadata:',
+          `  name: ${configMapName}`,
+          'data:',
+          '  openclaw.json: |',
+          indentedConfig,
+        ].join('\n'),
+      });
+
+      await this.runKubectl([
+        '-n',
+        namespace,
+        'set',
+        'env',
+        `deployment/${name}`,
+        `AEGIS_OPENCLAW_CONFIG_HASH=${hash}`,
+        `AEGIS_OPENCLAW_CONFIGMAP=${configMapName}`,
+      ]);
+    }
+
+    await this.restart(containerId);
   }
 
   private assertEnabled(): void {
@@ -366,5 +406,9 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
       return undefined;
     }
     return Math.max(0, Math.floor((Date.now() - started.getTime()) / 1000));
+  }
+
+  private hashConfig(payload: string): string {
+    return createHash('sha256').update(payload).digest('hex').slice(0, 12);
   }
 }
