@@ -11,6 +11,7 @@ import { CONTAINER_ORCHESTRATOR } from '../container/container.constants';
 import { ContainerOrchestrator } from '../container/interfaces/container-orchestrator.interface';
 import { ContainerHandle } from '../container/interfaces/container-config.interface';
 import { ContainerPortAllocatorService } from '../container/container-port-allocator.service';
+import { ContainerConfigGeneratorService } from '../container/container-config-generator.service';
 
 /**
  * Job data shape for provisioning jobs.
@@ -37,6 +38,7 @@ export class ProvisioningProcessor extends WorkerHost {
   constructor(
     private readonly prisma: PrismaService,
     private readonly portAllocator: ContainerPortAllocatorService,
+    private readonly configGenerator: ContainerConfigGeneratorService,
     @Inject(CONTAINER_ORCHESTRATOR)
     private readonly containerOrchestrator: ContainerOrchestrator,
   ) {
@@ -123,8 +125,11 @@ export class ProvisioningProcessor extends WorkerHost {
               );
             }
 
+            const openclawConfig =
+              await this.configGenerator.generateForTenant(tenantId);
+
             await this.containerOrchestrator.updateConfig(container.id, {
-              openclawConfig: {},
+              openclawConfig: openclawConfig as unknown as Record<string, unknown>,
             });
             break;
           case 'installing_skills':

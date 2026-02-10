@@ -6,6 +6,7 @@ import { ProvisioningProcessor } from '../../src/provisioning/provisioning.proce
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { CONTAINER_ORCHESTRATOR } from '../../src/container/container.constants';
 import { ContainerPortAllocatorService } from '../../src/container/container-port-allocator.service';
+import { ContainerConfigGeneratorService } from '../../src/container/container-config-generator.service';
 import {
   PROVISIONING_QUEUE_NAME,
   PROVISIONING_STEPS,
@@ -74,6 +75,12 @@ const mockPortAllocator = {
   allocate: jest.fn().mockResolvedValue(19000),
 };
 
+const mockConfigGenerator = {
+  generateForTenant: jest.fn().mockResolvedValue({
+    gateway: { port: 18789 },
+  }),
+};
+
 // Helper to create a mock Job
 function createMockJob(
   name: string,
@@ -108,6 +115,7 @@ describe('Provisioning Flow Integration', () => {
         ProvisioningProcessor,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: ContainerPortAllocatorService, useValue: mockPortAllocator },
+        { provide: ContainerConfigGeneratorService, useValue: mockConfigGenerator },
         { provide: CONTAINER_ORCHESTRATOR, useValue: mockContainerOrchestrator },
         {
           provide: getQueueToken(PROVISIONING_QUEUE_NAME),

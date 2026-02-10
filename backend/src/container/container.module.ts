@@ -6,6 +6,9 @@ import { KubernetesOrchestratorService } from './kubernetes-orchestrator.service
 import { MockOrchestratorService } from './mock-orchestrator.service';
 import { ContainerPortAllocatorService } from './container-port-allocator.service';
 import { ContainerRuntimePreflightService } from './container-runtime-preflight.service';
+import { ContainerConfigGeneratorService } from './container-config-generator.service';
+import { SecretsManagerService } from './secrets-manager.service';
+import { ContainerNetworkService } from './container-network.service';
 
 @Module({
   providers: [
@@ -14,6 +17,9 @@ import { ContainerRuntimePreflightService } from './container-runtime-preflight.
     MockOrchestratorService,
     ContainerPortAllocatorService,
     ContainerRuntimePreflightService,
+    ContainerConfigGeneratorService,
+    SecretsManagerService,
+    ContainerNetworkService,
     {
       provide: CONTAINER_ORCHESTRATOR,
       inject: [
@@ -42,6 +48,12 @@ import { ContainerRuntimePreflightService } from './container-runtime-preflight.
       },
     },
   ],
-  exports: [CONTAINER_ORCHESTRATOR, ContainerPortAllocatorService],
+  exports: [
+    CONTAINER_ORCHESTRATOR,
+    ContainerPortAllocatorService,
+    ContainerConfigGeneratorService,
+    SecretsManagerService,
+    ContainerNetworkService,
+  ],
 })
 export class ContainerModule {}
