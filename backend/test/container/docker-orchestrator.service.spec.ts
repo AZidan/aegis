@@ -145,8 +145,32 @@ describe('DockerOrchestratorService', () => {
   });
 
   it('updateConfig should not throw for placeholder updates', async () => {
+    execFileMock.mockImplementation(
+      (
+        _cmd: string,
+        _args: string[],
+        _opts: unknown,
+        callback: ExecFileCallback,
+      ) => callback(null, '', ''),
+    );
+
     await expect(
-      service.updateConfig('container-123', { openclawConfig: {} }),
+      service.updateConfig('container-123', {
+        openclawConfig: { gateway: { port: 18789 } },
+      }),
     ).resolves.toBeUndefined();
+
+    expect(execFileMock).toHaveBeenCalledWith(
+      'docker',
+      expect.arrayContaining(['cp']),
+      expect.any(Object),
+      expect.any(Function),
+    );
+    expect(execFileMock).toHaveBeenCalledWith(
+      'docker',
+      ['restart', 'container-123'],
+      expect.any(Object),
+      expect.any(Function),
+    );
   });
 });

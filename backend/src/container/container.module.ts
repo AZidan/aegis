@@ -5,6 +5,7 @@ import { DockerOrchestratorService } from './docker-orchestrator.service';
 import { KubernetesOrchestratorService } from './kubernetes-orchestrator.service';
 import { MockOrchestratorService } from './mock-orchestrator.service';
 import { ContainerPortAllocatorService } from './container-port-allocator.service';
+import { ContainerRuntimePreflightService } from './container-runtime-preflight.service';
 
 @Module({
   providers: [
@@ -12,6 +13,7 @@ import { ContainerPortAllocatorService } from './container-port-allocator.servic
     KubernetesOrchestratorService,
     MockOrchestratorService,
     ContainerPortAllocatorService,
+    ContainerRuntimePreflightService,
     {
       provide: CONTAINER_ORCHESTRATOR,
       inject: [

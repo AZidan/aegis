@@ -1,4 +1,7 @@
 import { execFile } from 'node:child_process';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ContainerOrchestrator } from './interfaces/container-orchestrator.interface';
@@ -155,10 +158,44 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
     containerId: string,
     update: ContainerConfigUpdate,
   ): Promise<void> {
-    const updateKeys = Object.keys(update).join(', ') || 'none';
-    this.logger.debug(
-      `Docker updateConfig accepted for ${containerId}; keys=${updateKeys}. Runtime mutation is currently a no-op.`,
-    );
+    if (!update.openclawConfig && !update.environment) {
+      return;
+    }
+
+    if (update.environment && Object.keys(update.environment).length > 0) {
+      this.logger.warn(
+        `Docker runtime env mutation is not supported in-place for ${containerId}; ignoring environment update keys.`,
+      );
+    }
+
+    if (!update.openclawConfig) {
+      return;
+    }
+
+    const tempDir = await mkdtemp(join(tmpdir(), 'aegis-openclaw-'));
+    const localConfigPath = join(tempDir, 'openclaw.json');
+    try {
+      const payload = JSON.stringify(update.openclawConfig, null, 2);
+      await writeFile(localConfigPath, payload, 'utf8');
+
+      await this.runDocker([
+        'cp',
+        localConfigPath,
+        `${containerId}:/home/node/.openclaw/openclaw.json`,
+      ]);
+      await this.runDocker([
+        'exec',
+        containerId,
+        'sh',
+        '-lc',
+        'chmod 600 /home/node/.openclaw/openclaw.json || true',
+      ]);
+
+      // OpenClaw runtime reload strategy for now is controlled restart.
+      await this.restart(containerId);
+    } finally {
+      await rm(tempDir, { recursive: true, force: true });
+    }
   }
 
   private async ensureNetwork(networkName: string): Promise<void> {

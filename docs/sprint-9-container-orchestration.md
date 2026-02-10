@@ -30,6 +30,7 @@ Runtime abstraction guarantee (mandatory):
 - dev path: `CONTAINER_RUNTIME=docker`
 - production path: `CONTAINER_RUNTIME=kubernetes`
 - runtime-specific clients are isolated behind adapter services; no direct Docker/K8s calls in business services
+- startup preflight validates selected runtime reachability before serving traffic
 
 ## What Already Exists
 
@@ -232,6 +233,11 @@ Source of truth:
 
 Kubernetes enablement guard:
 - if runtime is `kubernetes` but kube env is not available (`CONTAINER_K8S_ENABLED` false and no `KUBECONFIG` / `KUBERNETES_SERVICE_HOST`), orchestrator fails fast with explicit `ServiceUnavailableException`
+
+Runtime config application:
+- Docker adapter applies `openclawConfig` by copying `/home/node/.openclaw/openclaw.json` into container and performing controlled restart
+- Kubernetes adapter applies config artifact (ConfigMap + hash env marker) and performs rollout restart
+- in-place env mutation is best-effort and adapter-specific; all flows remain interface-driven
 
 ## Execution Order
 
