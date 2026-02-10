@@ -20,6 +20,7 @@ const dockerContainerMock = {
   stop: jest.fn().mockResolvedValue(undefined),
   remove: jest.fn().mockResolvedValue(undefined),
   logs: jest.fn().mockResolvedValue(Buffer.from('out')),
+  putArchive: jest.fn().mockResolvedValue(undefined),
   exec: jest.fn().mockResolvedValue({
     start: jest.fn().mockImplementation(async () => {
       const stream = new PassThrough();

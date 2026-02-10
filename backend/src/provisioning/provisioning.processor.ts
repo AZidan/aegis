@@ -12,6 +12,7 @@ import { ContainerOrchestrator } from '../container/interfaces/container-orchest
 import { ContainerHandle } from '../container/interfaces/container-config.interface';
 import { ContainerPortAllocatorService } from '../container/container-port-allocator.service';
 import { ContainerConfigGeneratorService } from '../container/container-config-generator.service';
+import { ContainerNetworkService } from '../container/container-network.service';
 
 /**
  * Job data shape for provisioning jobs.
@@ -39,6 +40,7 @@ export class ProvisioningProcessor extends WorkerHost {
     private readonly prisma: PrismaService,
     private readonly portAllocator: ContainerPortAllocatorService,
     private readonly configGenerator: ContainerConfigGeneratorService,
+    private readonly containerNetworkService: ContainerNetworkService,
     @Inject(CONTAINER_ORCHESTRATOR)
     private readonly containerOrchestrator: ContainerOrchestrator,
   ) {
@@ -103,9 +105,14 @@ export class ProvisioningProcessor extends WorkerHost {
             break;
           case 'spinning_container':
             const hostPort = await this.portAllocator.allocate(tenantId);
+            const containerName =
+              this.containerNetworkService.getContainerName(tenantId);
+            const networkName =
+              this.containerNetworkService.getDockerNetworkName(tenantId);
             container = await this.containerOrchestrator.create({
               tenantId,
-              name: `aegis-${tenantId.slice(0, 8)}`,
+              name: containerName,
+              networkName,
               hostPort,
               resourceLimits: this.extractResourceLimits(tenant.resourceLimits),
             });

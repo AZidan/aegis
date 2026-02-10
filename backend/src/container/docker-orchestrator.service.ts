@@ -2,6 +2,7 @@ import { once } from 'node:events';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Docker from 'dockerode';
+import tar from 'tar-stream';
 import { ContainerOrchestrator } from './interfaces/container-orchestrator.interface';
 import {
   ContainerConfigUpdate,
@@ -171,11 +172,14 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
     }
 
     const payload = JSON.stringify(update.openclawConfig, null, 2);
-    const encoded = Buffer.from(payload, 'utf8').toString('base64');
+    const container = this.docker.getContainer(containerId);
+    const archive = await this.createTarArchive('openclaw.json', payload);
 
+    await this.runContainerCommand(containerId, 'mkdir -p /home/node/.openclaw');
+    await container.putArchive(archive, { path: '/home/node/.openclaw' });
     await this.runContainerCommand(
       containerId,
-      `mkdir -p /home/node/.openclaw && echo '${encoded}' | base64 -d > /home/node/.openclaw/openclaw.json && chmod 600 /home/node/.openclaw/openclaw.json`,
+      'chmod 600 /home/node/.openclaw/openclaw.json || true',
     );
 
     // OpenClaw runtime reload strategy for now is controlled restart.
@@ -291,6 +295,39 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
     ]);
     await completion;
     return Buffer.concat(chunks).toString('utf8');
+  }
+
+  private async createTarArchive(
+    fileName: string,
+    content: string,
+  ): Promise<Buffer> {
+    const pack = tar.pack();
+    const archivePromise = this.streamToBuffer(pack as unknown as NodeJS.ReadableStream);
+    await new Promise<void>((resolve, reject) => {
+      pack.entry({ name: fileName, mode: 0o600 }, content, (error) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve();
+      });
+    });
+    pack.finalize();
+    return archivePromise;
+  }
+
+  private async streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
+    const chunks: Buffer[] = [];
+    stream.on('data', (chunk: Buffer | string) =>
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)),
+    );
+    await Promise.race([
+      once(stream, 'end'),
+      once(stream, 'error').then(([error]) => {
+        throw error;
+      }),
+    ]);
+    return Buffer.concat(chunks);
   }
 
   private mapState(

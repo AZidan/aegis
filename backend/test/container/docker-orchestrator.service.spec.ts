@@ -12,6 +12,7 @@ type MockContainer = {
   remove: jest.Mock;
   logs: jest.Mock;
   exec: jest.Mock;
+  putArchive: jest.Mock;
 };
 
 const createContainerMock = (): MockContainer => ({
@@ -29,6 +30,7 @@ const createContainerMock = (): MockContainer => ({
   stop: jest.fn().mockResolvedValue(undefined),
   remove: jest.fn().mockResolvedValue(undefined),
   logs: jest.fn().mockResolvedValue(Buffer.from('stdout-line\nstderr-line')),
+  putArchive: jest.fn().mockResolvedValue(undefined),
   exec: jest.fn().mockResolvedValue({
     start: jest.fn().mockImplementation(async () => {
       const stream = new PassThrough();
@@ -146,6 +148,7 @@ describe('DockerOrchestratorService', () => {
       }),
     ).resolves.toBeUndefined();
 
+    expect(containerMock.putArchive).toHaveBeenCalled();
     expect(containerMock.exec).toHaveBeenCalled();
     expect(containerMock.restart).toHaveBeenCalled();
   });
