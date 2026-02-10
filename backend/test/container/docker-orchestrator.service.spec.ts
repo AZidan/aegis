@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { DockerOrchestratorService } from '../../src/container/docker-orchestrator.service';
 import { ContainerNetworkService } from '../../src/container/container-network.service';
+import { SecretsManagerService } from '../../src/container/secrets-manager.service';
 
 type MockContainer = {
   id: string;
@@ -82,6 +83,7 @@ describe('DockerOrchestratorService', () => {
         DockerOrchestratorService,
         { provide: ConfigService, useValue: configServiceMock },
         ContainerNetworkService,
+        SecretsManagerService,
       ],
     }).compile();
 
@@ -123,6 +125,20 @@ describe('DockerOrchestratorService', () => {
       }),
     );
     expect(containerMock.start).toHaveBeenCalled();
+  });
+
+  it('create should inject age key into /run/secrets after start', async () => {
+    await service.create({
+      tenantId: 'tenant-uuid-1',
+      name: 'aegis-tenant-age',
+      hostPort: 19125,
+    });
+
+    // putArchive called for age key injection
+    expect(containerMock.putArchive).toHaveBeenCalledWith(
+      expect.any(Buffer),
+      { path: '/run/secrets' },
+    );
   });
 
   it('create should create managed network when missing', async () => {

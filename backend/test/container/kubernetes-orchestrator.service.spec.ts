@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { KubernetesOrchestratorService } from '../../src/container/kubernetes-orchestrator.service';
 import { ContainerNetworkService } from '../../src/container/container-network.service';
+import { SecretsManagerService } from '../../src/container/secrets-manager.service';
 
 const appsApiMock = {
   createNamespacedDeployment: jest.fn(),
@@ -20,6 +21,7 @@ const coreApiMock = {
   replaceNamespacedConfigMap: jest.fn(),
   createNamespacedSecret: jest.fn(),
   replaceNamespacedSecret: jest.fn(),
+  deleteNamespacedSecret: jest.fn(),
   listNamespacedPod: jest.fn(),
   readNamespacedPodLog: jest.fn(),
 };
@@ -93,6 +95,7 @@ describe('KubernetesOrchestratorService', () => {
         KubernetesOrchestratorService,
         { provide: ConfigService, useValue: configServiceMock },
         ContainerNetworkService,
+        SecretsManagerService,
       ],
     }).compile();
 
@@ -126,6 +129,70 @@ describe('KubernetesOrchestratorService', () => {
                 volumes: expect.arrayContaining([
                   expect.objectContaining({
                     name: 'openclaw-config',
+                  }),
+                ]),
+              }),
+            }),
+          }),
+        }),
+      }),
+    );
+  });
+
+  it('create should upsert age-key secret', async () => {
+    coreApiMock.readNamespace.mockResolvedValue({});
+
+    await service.create({
+      tenantId: 'tenant-uuid-1',
+      name: 'openclaw-1',
+    });
+
+    // Should be called twice: runtime-secrets + age-key
+    expect(coreApiMock.createNamespacedSecret).toHaveBeenCalledTimes(2);
+    expect(coreApiMock.createNamespacedSecret).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({
+          metadata: { name: 'openclaw-1-age-key' },
+          stringData: expect.objectContaining({
+            age_key: expect.stringContaining('AGE-SECRET-KEY-1'),
+          }),
+        }),
+      }),
+    );
+  });
+
+  it('create should include age-key volume mount in deployment', async () => {
+    coreApiMock.readNamespace.mockResolvedValue({});
+
+    await service.create({
+      tenantId: 'tenant-uuid-1',
+      name: 'openclaw-1',
+    });
+
+    expect(appsApiMock.createNamespacedDeployment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({
+          spec: expect.objectContaining({
+            template: expect.objectContaining({
+              spec: expect.objectContaining({
+                volumes: expect.arrayContaining([
+                  expect.objectContaining({
+                    name: 'age-key',
+                    secret: expect.objectContaining({
+                      secretName: 'openclaw-1-age-key',
+                    }),
+                  }),
+                ]),
+                containers: expect.arrayContaining([
+                  expect.objectContaining({
+                    volumeMounts: expect.arrayContaining([
+                      expect.objectContaining({
+                        name: 'age-key',
+                        mountPath: '/run/secrets/age_key',
+                        subPath: 'age_key',
+                        readOnly: true,
+                      }),
+                    ]),
                   }),
                 ]),
               }),

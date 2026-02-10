@@ -16,6 +16,7 @@ import {
   DEFAULT_K8S_SERVICE_DOMAIN,
 } from './container.constants';
 import { ContainerNetworkService } from './container-network.service';
+import { SecretsManagerService } from './secrets-manager.service';
 
 @Injectable()
 export class KubernetesOrchestratorService implements ContainerOrchestrator {
@@ -28,6 +29,7 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
   constructor(
     private readonly configService: ConfigService,
     private readonly containerNetworkService: ContainerNetworkService,
+    private readonly secretsManager: SecretsManagerService,
   ) {
     this.initializeClient();
   }
@@ -51,6 +53,13 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
       OPENCLAW_SECRETS_DIR: '/run/secrets/openclaw',
       ...(options.environment ?? {}),
     });
+
+    // Create a separate secret for the age key file (mounted as a volume)
+    const ageKeyContent = this.secretsManager.getAgePrivateKeyForTenant(options.tenantId);
+    await this.upsertSecret(namespace, `${name}-age-key`, {
+      'age_key': ageKeyContent,
+    });
+
     await this.upsertDeployment(namespace, name, image, containerPort, options);
     await this.upsertService(namespace, name, containerPort);
     await this.upsertNetworkPolicy(namespace, name);
@@ -74,6 +83,7 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
     await this.tryDeleteService(namespace, name);
     await this.tryDeleteConfigMap(namespace, `${name}-openclaw-config`);
     await this.tryDeleteSecret(namespace, `${name}-runtime-secrets`);
+    await this.tryDeleteSecret(namespace, `${name}-age-key`);
     await this.tryDeleteNetworkPolicy(namespace, `${name}-deny-ingress`);
   }
 
@@ -591,6 +601,12 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
                     subPath: 'openclaw.json',
                     readOnly: true,
                   },
+                  {
+                    name: 'age-key',
+                    mountPath: '/run/secrets/age_key',
+                    subPath: 'age_key',
+                    readOnly: true,
+                  },
                 ],
                 resources:
                   cpu || memoryMb
@@ -609,6 +625,13 @@ export class KubernetesOrchestratorService implements ContainerOrchestrator {
                 configMap: {
                   name: `${name}-openclaw-config`,
                   optional: true,
+                },
+              },
+              {
+                name: 'age-key',
+                secret: {
+                  secretName: `${name}-age-key`,
+                  defaultMode: 0o400,
                 },
               },
             ],

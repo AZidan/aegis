@@ -3,7 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { PassThrough } from 'node:stream';
 import { DockerOrchestratorService } from '../../src/container/docker-orchestrator.service';
 import { KubernetesOrchestratorService } from '../../src/container/kubernetes-orchestrator.service';
+import { ContainerNetworkService } from '../../src/container/container-network.service';
 import { ContainerOrchestrator } from '../../src/container/interfaces/container-orchestrator.interface';
+import { SecretsManagerService } from '../../src/container/secrets-manager.service';
 
 const dockerContainerMock = {
   id: 'container-123',
@@ -142,6 +144,8 @@ describe('ContainerOrchestrator contract', () => {
       const module: TestingModule = await Test.createTestingModule({
         providers: [
           runtimeCase.provider,
+          ContainerNetworkService,
+          SecretsManagerService,
           {
             provide: ConfigService,
             useValue: makeConfigService(runtimeCase.runtime),

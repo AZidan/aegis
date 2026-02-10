@@ -5,6 +5,7 @@ import Docker from 'dockerode';
 import tar from 'tar-stream';
 import { ContainerOrchestrator } from './interfaces/container-orchestrator.interface';
 import { ContainerNetworkService } from './container-network.service';
+import { SecretsManagerService } from './secrets-manager.service';
 import {
   ContainerConfigUpdate,
   ContainerCreateOptions,
@@ -26,6 +27,7 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
   constructor(
     private readonly configService: ConfigService,
     private readonly containerNetworkService: ContainerNetworkService,
+    private readonly secretsManager: SecretsManagerService,
   ) {
     this.docker = this.createDockerClient();
   }
@@ -108,6 +110,11 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
       },
     });
     await container.start();
+
+    // Inject age private key for SOPS decryption
+    const ageKeyContent = this.secretsManager.getAgePrivateKeyForTenant(options.tenantId);
+    const ageKeyArchive = await this.createTarArchive('age_key', ageKeyContent);
+    await container.putArchive(ageKeyArchive, { path: '/run/secrets' });
 
     return {
       id: container.id,
