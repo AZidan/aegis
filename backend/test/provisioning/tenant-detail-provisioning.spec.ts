@@ -3,6 +3,7 @@ import { TenantsService } from '../../src/admin/tenants/tenants.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvisioningService } from '../../src/provisioning/provisioning.service';
 import { AuditService } from '../../src/audit/audit.service';
+import { CONTAINER_ORCHESTRATOR } from '../../src/container/container.constants';
 
 /**
  * Tenant Detail - Provisioning Info Tests
@@ -75,6 +76,15 @@ const mockProvisioningService = {
   getProvisioningStatus: jest.fn(),
 };
 
+const mockContainerOrchestrator = {
+  restart: jest.fn().mockResolvedValue(undefined),
+  getStatus: jest.fn().mockResolvedValue({
+    state: 'running',
+    health: 'healthy',
+    uptimeSeconds: 0,
+  }),
+};
+
 // ----- Test Suite -----
 
 describe('TenantsService - getTenantDetail with provisioning', () => {
@@ -89,6 +99,10 @@ describe('TenantsService - getTenantDetail with provisioning', () => {
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: ProvisioningService, useValue: mockProvisioningService },
         { provide: AuditService, useValue: { logAction: jest.fn() } },
+        {
+          provide: CONTAINER_ORCHESTRATOR,
+          useValue: mockContainerOrchestrator,
+        },
       ],
     }).compile();
 

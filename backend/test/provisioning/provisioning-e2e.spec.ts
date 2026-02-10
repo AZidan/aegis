@@ -8,6 +8,7 @@ import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvisioningService } from '../../src/provisioning/provisioning.service';
 import { AuditService } from '../../src/audit/audit.service';
 import { JwtAuthGuard } from '../../src/auth/guards/jwt-auth.guard';
+import { CONTAINER_ORCHESTRATOR } from '../../src/container/container.constants';
 import {
   PROVISIONING_QUEUE_NAME,
   PLAN_MAX_SKILLS,
@@ -90,6 +91,15 @@ const mockProvisioningQueue = {
   add: jest.fn().mockResolvedValue({ id: 'job-1' }),
 };
 
+const mockContainerOrchestrator = {
+  restart: jest.fn().mockResolvedValue(undefined),
+  getStatus: jest.fn().mockResolvedValue({
+    state: 'running',
+    health: 'healthy',
+    uptimeSeconds: 0,
+  }),
+};
+
 // ---------------------------------------------------------------------------
 // Mock JWT Guard to inject a platform_admin user
 // ---------------------------------------------------------------------------
@@ -126,6 +136,10 @@ describe('Provisioning E2E (HTTP API)', () => {
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: AuditService, useValue: { logAction: jest.fn() } },
         {
+          provide: CONTAINER_ORCHESTRATOR,
+          useValue: mockContainerOrchestrator,
+        },
+        {
           provide: getQueueToken(PROVISIONING_QUEUE_NAME),
           useValue: mockProvisioningQueue,
         },
@@ -140,7 +154,9 @@ describe('Provisioning E2E (HTTP API)', () => {
   });
 
   afterEach(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   // ==========================================================================
