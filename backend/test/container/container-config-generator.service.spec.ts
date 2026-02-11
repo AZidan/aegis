@@ -24,6 +24,7 @@ const mockPrisma = {
 
 const mockSecrets = {
   getGatewayTokenForTenant: jest.fn().mockReturnValue('tenant-token'),
+  getHookTokenForTenant: jest.fn().mockReturnValue('hook-token'),
 };
 
 describe('ContainerConfigGeneratorService', () => {
@@ -95,10 +96,11 @@ describe('ContainerConfigGeneratorService', () => {
     const config = await service.generateForTenant('tenant-1');
 
     expect(config.gateway.auth.token).toBe('tenant-token');
-    expect(config.agents.list['agent-a']).toBeDefined();
+    expect(config.agents.list).toHaveLength(1);
+    expect(config.agents.list[0].id).toBe('agent-a');
     expect(config.bindings.length).toBe(1);
     expect(config.channels.slack.workspaceId).toBe('ws-1');
-    expect(config.messaging.allowlist['agent-a']).toEqual(['agent-b']);
+    expect(config.agents.list[0].subagents?.allowAgents).toEqual(['agent-b']);
     expect(config.skills['agent-a'][0].name).toBe('Search');
   });
 
@@ -117,10 +119,9 @@ describe('ContainerConfigGeneratorService', () => {
 
     const config = await service.generateForTenant('tenant-1');
 
-    expect(config.agents.list).toEqual({});
+    expect(config.agents.list).toEqual([]);
     expect(config.bindings).toEqual([]);
     expect(config.channels).toEqual({});
-    expect(config.messaging.allowlist).toEqual({});
     expect(config.skills).toEqual({});
   });
 
@@ -139,7 +140,20 @@ describe('ContainerConfigGeneratorService', () => {
     ]);
 
     const config = await service.generateForTenant('tenant-1');
-    expect(config.messaging.allowlist['agent-a']).toEqual(['agent-c']);
+    expect(config.agents.list[0].subagents?.allowAgents).toEqual(['agent-c']);
+  });
+
+  it('should enable responses endpoint and hooks in generated config', async () => {
+    const config = await service.generateForTenant('tenant-1');
+
+    expect(config.gateway.http).toEqual({
+      endpoints: { responses: { enabled: true } },
+    });
+    expect(config.hooks).toEqual({
+      enabled: true,
+      token: 'hook-token',
+    });
+    expect(mockSecrets.getHookTokenForTenant).toHaveBeenCalledWith('tenant-1');
   });
 
   it('should fall back for malformed model/tool policy fields', async () => {
@@ -160,8 +174,9 @@ describe('ContainerConfigGeneratorService', () => {
     ]);
 
     const config = await service.generateForTenant('tenant-1');
-    expect(config.agents.list['agent-a'].model.tier).toBe('sonnet');
-    expect(config.agents.list['agent-a'].model.thinkingMode).toBe('standard');
-    expect(config.agents.list['agent-a'].tools.allow).toEqual([]);
+    const agentConfig = config.agents.list[0];
+    expect(agentConfig.id).toBe('agent-a');
+    expect(agentConfig.tools.deny).toContain('elevated');
+    expect(agentConfig.tools.allow).toBeUndefined();
   });
 });

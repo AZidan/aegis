@@ -1,4 +1,5 @@
 export interface OpenClawGatewayConfig {
+  mode: 'local' | 'tailscale';
   bind: 'lan' | 'localhost';
   port: number;
   auth: {
@@ -8,40 +9,47 @@ export interface OpenClawGatewayConfig {
   controlUi: {
     enabled: boolean;
   };
+  http?: {
+    endpoints?: {
+      responses?: { enabled: boolean };
+    };
+  };
 }
 
 export interface OpenClawAgentConfig {
-  model: {
-    tier: string;
-    temperature: number;
-    thinkingMode: string;
+  id: string;
+  identity?: {
+    name: string;
+    emoji?: string;
   };
   tools: {
-    allow: string[];
-    deny: string[];
+    profile?: string;
+    allow?: string[];
+    deny?: string[];
   };
-  sandbox: {
-    mode: 'all' | 'none';
+  subagents?: {
+    allowAgents?: string[];
   };
-  workspace: string;
 }
 
 export interface OpenClawConfig {
   gateway: OpenClawGatewayConfig;
+  hooks?: {
+    enabled: boolean;
+    token: string;
+  };
   agents: {
     defaults: {
-      sandbox: {
-        mode: 'all';
-        scope: 'agent';
-        workspaceAccess: 'ro' | 'rw';
+      workspace: string;
+      maxConcurrent: number;
+      model?: {
+        primary: string;
       };
-      tools: {
-        sandbox: {
-          denyPaths: string[];
-        };
+      compaction?: {
+        mode: string;
       };
     };
-    list: Record<string, OpenClawAgentConfig>;
+    list: OpenClawAgentConfig[];
   };
   bindings: Array<{
     agentId: string;
@@ -61,9 +69,6 @@ export interface OpenClawConfig {
       dmPolicy: 'allowlist';
     }
   >;
-  messaging: {
-    allowlist: Record<string, string[]>;
-  };
   skills: Record<
     string,
     Array<{

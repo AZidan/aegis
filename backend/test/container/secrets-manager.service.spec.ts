@@ -23,6 +23,17 @@ describe('SecretsManagerService', () => {
     expect(tokenA).not.toBe(tokenC);
   });
 
+  it('should generate deterministic hook token different from gateway token', () => {
+    const hookA = service.getHookTokenForTenant('tenant-1');
+    const hookB = service.getHookTokenForTenant('tenant-1');
+    const hookC = service.getHookTokenForTenant('tenant-2');
+    const gwToken = service.getGatewayTokenForTenant('tenant-1');
+
+    expect(hookA).toBe(hookB);
+    expect(hookA).not.toBe(hookC);
+    expect(hookA).not.toBe(gwToken);
+  });
+
   it('should encrypt and decrypt plaintext', () => {
     const plaintext = 'secret-value';
     const encrypted = service.encrypt(plaintext);

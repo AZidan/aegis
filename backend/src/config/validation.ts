@@ -40,6 +40,14 @@ export const envSchema = z.object({
   CONTAINER_K8S_CONTEXT: z.string().optional(),
   CONTAINER_K8S_SERVICE_DOMAIN: z.string().optional(),
 
+  SLACK_CLIENT_ID: z.string().optional(),
+  SLACK_CLIENT_SECRET: z.string().optional(),
+  SLACK_SIGNING_SECRET: z.string().optional(),
+  SLACK_APP_TOKEN: z.string().optional(),
+  SLACK_REDIRECT_URI: z.string().optional(),
+
+  AEGIS_SECRETS_MASTER_KEY: z.string().optional(),
+
   CORS_ORIGINS: z.string().default('http://localhost:3000'),
 
   BCRYPT_ROUNDS: z.string().regex(/^\d+$/).default('12').transform(Number),

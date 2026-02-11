@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AgentsController } from './agents.controller';
 import { AgentsService } from './agents.service';
+import { ContainerModule } from '../../container/container.module';
 
 /**
  * Agents Module - Tenant: Agents
@@ -9,6 +10,7 @@ import { AgentsService } from './agents.service';
  * PrismaService is globally available via PrismaModule.
  */
 @Module({
+  imports: [ContainerModule],
   controllers: [AgentsController],
   providers: [AgentsService],
   exports: [AgentsService],

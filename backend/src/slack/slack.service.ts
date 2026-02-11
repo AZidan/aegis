@@ -12,6 +12,7 @@ import {
   SLACK_TOKEN_REVOKED_ERRORS,
   SLACK_RATE_LIMITED_ERROR,
 } from './slack.constants';
+import { PrismaService } from '../prisma/prisma.service';
 
 /**
  * SlackService
@@ -32,7 +33,10 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
   private readonly workspaceClients = new Map<string, WebClient>();
   private isStarted = false;
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async onModuleInit(): Promise<void> {
     const appToken = this.configService.get<string>(
@@ -51,6 +55,7 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
     }
 
     await this.initializeApp();
+    await this.loadExistingConnections();
   }
 
   async onModuleDestroy(): Promise<void> {
@@ -75,7 +80,14 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
     }
 
     this.boltApp = new App({
-      token: undefined, // multi-workspace: no single bot token
+      authorize: async ({ teamId }) => {
+        // Multi-workspace: look up the bot token for this workspace
+        const client = teamId ? this.workspaceClients.get(teamId) : undefined;
+        if (!client) {
+          throw new Error(`No credentials found for workspace ${teamId}`);
+        }
+        return { botToken: (client as any).token };
+      },
       appToken,
       signingSecret,
       socketMode: true,
@@ -86,6 +98,37 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
     });
 
     this.logger.log('Slack Bolt App initialized (Socket Mode)');
+  }
+
+  /**
+   * Load existing active SLACK connections from the database on startup.
+   * Registers a WebClient for each workspace so the authorize callback works.
+   */
+  private async loadExistingConnections(): Promise<void> {
+    try {
+      const connections = await this.prisma.channelConnection.findMany({
+        where: { platform: 'SLACK', status: 'active' },
+        select: { workspaceId: true, credentials: true },
+      });
+
+      for (const conn of connections) {
+        const creds = conn.credentials as Record<string, unknown> | null;
+        const botToken = (creds?.bot_token ?? creds?.botToken) as string | undefined;
+        if (botToken && conn.workspaceId) {
+          this.registerWorkspaceClient(conn.workspaceId, botToken);
+        }
+      }
+
+      if (connections.length > 0) {
+        this.logger.log(
+          `Loaded ${connections.length} existing Slack connection(s) from database`,
+        );
+      }
+    } catch (error) {
+      this.logger.warn(
+        `Failed to load existing Slack connections: ${(error as Error).message}`,
+      );
+    }
   }
 
   /**

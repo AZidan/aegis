@@ -1,6 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { ChannelsModule } from '../channels/channels.module';
+import { ContainerModule } from '../container/container.module';
 import { SlackModule } from '../slack/slack.module';
 import { ChannelProxyService } from './channel-proxy.service';
 import { ChannelProxyProcessor } from './channel-proxy.processor';
@@ -13,6 +14,7 @@ import { CHANNEL_PROXY_QUEUE_NAME } from './channel-proxy.constants';
 
 @Module({
   imports: [
+    ContainerModule,
     ChannelsModule,
     forwardRef(() => SlackModule),
     BullModule.registerQueue({ name: CHANNEL_PROXY_QUEUE_NAME }),

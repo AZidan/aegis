@@ -13,6 +13,7 @@ import { UpdateToolPolicyDto } from './dto/update-tool-policy.dto';
 import { ListAgentsQueryDto } from './dto/list-agents-query.dto';
 import { TOOL_CATEGORIES } from '../tools/tool-categories';
 import { ROLE_DEFAULT_POLICIES } from '../tools/role-defaults';
+import { ContainerConfigSyncService } from '../../container/container-config-sync.service';
 
 /**
  * Plan-based agent limits.
@@ -49,6 +50,7 @@ export class AgentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
+    private readonly configSync: ContainerConfigSyncService,
   ) {}
 
   // ==========================================================================
@@ -303,6 +305,9 @@ export class AgentsService {
       agentId: agent.id,
     });
 
+    // Push updated config to running container (fire-and-forget)
+    this.configSync.syncTenantConfig(tenantId);
+
     // Contract response (201)
     return {
       id: agent.id,
@@ -554,6 +559,9 @@ export class AgentsService {
       agentId,
     });
 
+    // Push updated config to running container (fire-and-forget)
+    this.configSync.syncTenantConfig(tenantId);
+
     // Contract response
     return {
       id: updated.id,
@@ -596,6 +604,9 @@ export class AgentsService {
       tenantId,
       agentId,
     });
+
+    // Push updated config to running container (fire-and-forget)
+    this.configSync.syncTenantConfig(tenantId);
 
     this.logger.log(`Agent deleted: ${agentId} for tenant ${tenantId}`);
   }
