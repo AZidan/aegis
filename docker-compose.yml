@@ -81,11 +81,13 @@ services:
       CONTAINER_NETWORK_NAME: ${CONTAINER_NETWORK_NAME:-aegis-tenant-network}
       CONTAINER_BASE_PORT: ${CONTAINER_BASE_PORT:-19000}
       CONTAINER_PORT_RANGE: ${CONTAINER_PORT_RANGE:-1000}
+      AEGIS_SECRETS_DIR: /tmp/aegis-secrets
     volumes:
       - ./backend:/app
       - /app/node_modules
       - /app/prisma/generated
       - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/aegis-secrets:/tmp/aegis-secrets
     depends_on:
       postgres:
         condition: service_healthy

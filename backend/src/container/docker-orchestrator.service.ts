@@ -75,7 +75,11 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
     // The secrets-entrypoint.sh validates this file on startup, so it must
     // be available before the container starts.
     const ageKeyContent = this.secretsManager.getAgePrivateKeyForTenant(options.tenantId);
-    const ageKeyDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aegis-age-'));
+    // Use a shared host-mapped directory so bind mounts resolve correctly
+    // when the backend itself runs inside a container (Docker-in-Docker via socket).
+    const secretsBase = process.env.AEGIS_SECRETS_DIR || path.join(os.tmpdir(), 'aegis-secrets');
+    fs.mkdirSync(secretsBase, { recursive: true });
+    const ageKeyDir = fs.mkdtempSync(path.join(secretsBase, 'age-'));
     const ageKeyPath = path.join(ageKeyDir, 'age_key');
     fs.writeFileSync(ageKeyPath, ageKeyContent, { mode: 0o400 });
 
