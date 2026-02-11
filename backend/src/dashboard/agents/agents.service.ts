@@ -1037,60 +1037,49 @@ export class AgentsService {
       throw new NotFoundException('Agent not found');
     }
 
-    // Find all routing rules for this agent, including connection details
-    const routes = await this.prisma.channelRouting.findMany({
-      where: { agentId },
-      include: {
-        connection: {
-          select: {
-            id: true,
-            platform: true,
-            workspaceName: true,
-            status: true,
-            tenantId: true,
-          },
-        },
+    // Get all tenant connections (so they appear even without routes)
+    const tenantConnections = await this.prisma.channelConnection.findMany({
+      where: { tenantId },
+      select: {
+        id: true,
+        platform: true,
+        workspaceName: true,
+        status: true,
       },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    // Find all routing rules for this agent
+    const routes = await this.prisma.channelRouting.findMany({
+      where: { agentId, connection: { tenantId } },
       orderBy: [{ priority: 'desc' }, { createdAt: 'asc' }],
     });
 
-    // Filter routes to only those whose connection belongs to this tenant
-    const tenantRoutes = routes.filter(
-      (r) => r.connection.tenantId === tenantId,
-    );
-
-    // Group routes by connection
-    const connectionMap = new Map<
-      string,
-      {
-        id: string;
-        platform: string;
-        workspaceName: string | null;
-        status: string;
-        routes: Array<{
-          id: string;
-          routeType: string;
-          sourceIdentifier: string;
-          priority: number;
-          isActive: boolean;
-          createdAt: string;
-          updatedAt: string;
-        }>;
-      }
-    >();
-
-    for (const route of tenantRoutes) {
-      const conn = route.connection;
-      if (!connectionMap.has(conn.id)) {
-        connectionMap.set(conn.id, {
+    // Build connection map seeded with all tenant connections
+    const connectionMap = new Map(
+      tenantConnections.map((conn) => [
+        conn.id,
+        {
           id: conn.id,
           platform: conn.platform,
           workspaceName: conn.workspaceName,
           status: conn.status,
-          routes: [],
-        });
-      }
-      connectionMap.get(conn.id)!.routes.push({
+          routes: [] as Array<{
+            id: string;
+            routeType: string;
+            sourceIdentifier: string;
+            priority: number;
+            isActive: boolean;
+            createdAt: string;
+            updatedAt: string;
+          }>,
+        },
+      ]),
+    );
+
+    // Attach routes to their connections
+    for (const route of routes) {
+      connectionMap.get(route.connectionId)?.routes.push({
         id: route.id,
         routeType: route.routeType,
         sourceIdentifier: route.sourceIdentifier,
