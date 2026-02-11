@@ -65,6 +65,29 @@ export class HealthMonitorService {
     if (status === 'healthy') {
       // Reset failure counter on healthy status
       await this.redis.del(failureKey);
+
+      // Recover tenant status if it was marked failed by the circuit breaker
+      try {
+        const tenant = await this.prisma.tenant.findUnique({
+          where: { id: tenantId },
+          select: { status: true },
+        });
+        if (tenant?.status === 'failed') {
+          await this.prisma.tenant.update({
+            where: { id: tenantId },
+            data: { status: 'active' },
+          });
+          this.logger.log(
+            `Tenant ${tenantId} recovered: status changed from failed to active`,
+          );
+        }
+      } catch (error) {
+        this.logger.error(
+          `Failed to recover tenant ${tenantId} status`,
+          error instanceof Error ? error.stack : String(error),
+        );
+      }
+
       return;
     }
 
