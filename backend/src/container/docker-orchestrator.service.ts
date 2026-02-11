@@ -145,9 +145,26 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
     });
     await container.start();
 
+    // Connect the tenant container to the shared management network so the
+    // backend (which also sits on this network) can reach it by container name.
+    const managementNetwork = this.configService.get<string>(
+      'container.networkName',
+      DEFAULT_CONTAINER_NETWORK,
+    );
+    if (managementNetwork !== networkName) {
+      try {
+        const mgmtNet = this.docker.getNetwork(managementNetwork);
+        await mgmtNet.connect({ Container: container.id });
+      } catch (error) {
+        this.logger.warn(
+          `Could not attach container to management network "${managementNetwork}": ${(error as Error).message}`,
+        );
+      }
+    }
+
     return {
       id: container.id,
-      url: `http://localhost:${hostPort}`,
+      url: `http://${name}:${containerPort}`,
       hostPort,
     };
   }
