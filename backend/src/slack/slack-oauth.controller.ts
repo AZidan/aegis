@@ -1,14 +1,16 @@
 import {
   Controller,
   Get,
+  Header,
   Query,
   Req,
+  Res,
   UseGuards,
   HttpCode,
   HttpStatus,
   BadRequestException,
 } from '@nestjs/common';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TenantGuard } from '../common/guards/tenant.guard';
 import { SlackOAuthService } from './slack-oauth.service';
@@ -50,27 +52,51 @@ export class SlackOAuthController {
    * - error: Error code if the user denied access
    */
   @Get('callback')
-  @HttpCode(HttpStatus.OK)
+  @Header('Content-Type', 'text/html')
   async handleCallback(
     @Query('code') code: string,
     @Query('state') state: string,
-    @Query('error') error?: string,
-  ): Promise<{
-    success: boolean;
-    workspaceId?: string;
-    workspaceName?: string;
-    error?: string;
-  }> {
+    @Query('error') error: string | undefined,
+    @Res() res: Response,
+  ): Promise<void> {
     if (error) {
-      return { success: false, error: `Slack authorization denied: ${error}` };
+      res.send(this.buildCallbackHtml('slack-oauth-error', { error: `Slack authorization denied: ${error}` }));
+      return;
     }
 
     if (!code || !state) {
-      throw new BadRequestException(
-        'Missing required query parameters: code and state',
-      );
+      res.send(this.buildCallbackHtml('slack-oauth-error', { error: 'Missing required query parameters' }));
+      return;
     }
 
-    return this.oauthService.handleCallback(code, state);
+    try {
+      const result = await this.oauthService.handleCallback(code, state);
+      res.send(this.buildCallbackHtml('slack-oauth-success', {
+        workspaceName: result.workspaceName,
+        workspaceId: result.workspaceId,
+      }));
+    } catch (err) {
+      res.send(this.buildCallbackHtml('slack-oauth-error', {
+        error: err instanceof Error ? err.message : 'OAuth callback failed',
+      }));
+    }
+  }
+
+  private buildCallbackHtml(
+    type: 'slack-oauth-success' | 'slack-oauth-error',
+    data: Record<string, string | undefined>,
+  ): string {
+    const payload = JSON.stringify({ type, ...data });
+    return `<!DOCTYPE html>
+<html><head><title>Slack Authorization</title></head>
+<body>
+<p>${type === 'slack-oauth-success' ? 'Connected! This window will close.' : 'Authorization failed.'}</p>
+<script>
+  if (window.opener) {
+    window.opener.postMessage(${payload}, '*');
+  }
+  setTimeout(function() { window.close(); }, 1500);
+</script>
+</body></html>`;
   }
 }
