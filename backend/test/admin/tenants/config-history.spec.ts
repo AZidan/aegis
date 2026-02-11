@@ -4,6 +4,7 @@ import { TenantsService } from '../../../src/admin/tenants/tenants.service';
 import { PrismaService } from '../../../src/prisma/prisma.service';
 import { ProvisioningService } from '../../../src/provisioning/provisioning.service';
 import { AuditService } from '../../../src/audit/audit.service';
+import { CONTAINER_ORCHESTRATOR } from '../../../src/container/container.constants';
 
 // ---------------------------------------------------------------------------
 // Test Data Factories
@@ -59,6 +60,10 @@ describe('TenantsService - Config History & Rollback', () => {
     };
   };
   let mockProvisioningService: { startProvisioning: jest.Mock };
+  let mockContainerOrchestrator: {
+    restart: jest.Mock;
+    getStatus: jest.Mock;
+  };
 
   beforeEach(async () => {
     mockPrisma = {
@@ -75,6 +80,14 @@ describe('TenantsService - Config History & Rollback', () => {
     };
 
     mockProvisioningService = { startProvisioning: jest.fn() };
+    mockContainerOrchestrator = {
+      restart: jest.fn().mockResolvedValue(undefined),
+      getStatus: jest.fn().mockResolvedValue({
+        state: 'running',
+        health: 'healthy',
+        uptimeSeconds: 0,
+      }),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -82,6 +95,10 @@ describe('TenantsService - Config History & Rollback', () => {
         { provide: PrismaService, useValue: mockPrisma },
         { provide: ProvisioningService, useValue: mockProvisioningService },
         { provide: AuditService, useValue: { logAction: jest.fn() } },
+        {
+          provide: CONTAINER_ORCHESTRATOR,
+          useValue: mockContainerOrchestrator,
+        },
       ],
     }).compile();
 

@@ -7,6 +7,7 @@ import { CONTAINER_CONFIG_QUEUE_NAME } from './container-config.constants';
 import { ContainerConfigGeneratorService } from './container-config-generator.service';
 import { ContainerConfigSyncService } from './container-config-sync.service';
 import { ContainerConfigProcessor } from './container-config.processor';
+import { ContainerModule } from '../container/container.module';
 
 /**
  * Provisioning Module
@@ -27,6 +28,7 @@ import { ContainerConfigProcessor } from './container-config.processor';
  */
 @Module({
   imports: [
+    ContainerModule,
     BullModule.registerQueue({ name: PROVISIONING_QUEUE_NAME }),
     BullModule.registerQueue({ name: CONTAINER_CONFIG_QUEUE_NAME }),
   ],

@@ -338,7 +338,7 @@ describe('AuditService', () => {
             tenantId: 'tenant-uuid-1',
             agentId: 'agent-uuid-1',
             userId: 'user-uuid-1',
-            action: 'tenant.create',
+            action: { startsWith: 'tenant.create', mode: 'insensitive' },
             targetType: 'tenant',
             severity: 'warning',
             timestamp: { gte: dateFrom, lte: dateTo },

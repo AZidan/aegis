@@ -1,5 +1,5 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Logger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -7,7 +7,12 @@ import {
   PROVISIONING_STEPS,
   MAX_PROVISIONING_RETRIES,
 } from './provisioning.constants';
-import { randomUUID } from 'node:crypto';
+import { CONTAINER_ORCHESTRATOR } from '../container/container.constants';
+import { ContainerOrchestrator } from '../container/interfaces/container-orchestrator.interface';
+import { ContainerHandle } from '../container/interfaces/container-config.interface';
+import { ContainerPortAllocatorService } from '../container/container-port-allocator.service';
+import { ContainerConfigGeneratorService } from '../container/container-config-generator.service';
+import { ContainerNetworkService } from '../container/container-network.service';
 
 /**
  * Job data shape for provisioning jobs.
@@ -20,11 +25,10 @@ interface ProvisioningJobData {
  * Provisioning Processor
  *
  * BullMQ worker that processes tenant container provisioning jobs.
- * Walks through 5 provisioning steps with simulated delays,
- * updating the tenant record in the DB after each step so that
- * polling clients can track progress.
+ * Walks through 5 provisioning steps and updates tenant progress so
+ * polling clients can track the lifecycle in near real-time.
  *
- * On completion: sets tenant status to 'active', generates containerId + containerUrl.
+ * On completion: sets tenant status to 'active' and persists real container fields.
  * On failure: retries up to MAX_PROVISIONING_RETRIES times.
  * On final failure: sets tenant status to 'failed', creates an Alert record.
  */
@@ -32,7 +36,14 @@ interface ProvisioningJobData {
 export class ProvisioningProcessor extends WorkerHost {
   private readonly logger = new Logger(ProvisioningProcessor.name);
 
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly portAllocator: ContainerPortAllocatorService,
+    private readonly configGenerator: ContainerConfigGeneratorService,
+    private readonly containerNetworkService: ContainerNetworkService,
+    @Inject(CONTAINER_ORCHESTRATOR)
+    private readonly containerOrchestrator: ContainerOrchestrator,
+  ) {
     super();
   }
 
@@ -57,6 +68,21 @@ export class ProvisioningProcessor extends WorkerHost {
     this.logger.log(`Starting provisioning for tenant: ${tenantId}`);
 
     try {
+      const tenant = await this.prisma.tenant.findUnique({
+        where: { id: tenantId },
+        select: {
+          id: true,
+          companyName: true,
+          resourceLimits: true,
+        },
+      });
+
+      if (!tenant) {
+        throw new Error(`Tenant ${tenantId} not found`);
+      }
+
+      let container: ContainerHandle | null = null;
+
       // Execute each provisioning step
       for (const step of PROVISIONING_STEPS) {
         // Update DB with step start
@@ -73,8 +99,62 @@ export class ProvisioningProcessor extends WorkerHost {
           `Tenant ${tenantId}: step=${step.name}, progress=${step.progressStart}%`,
         );
 
-        // Simulated work delay (MVP - real provisioning would replace this)
-        await this.sleep(step.delayMs);
+        switch (step.name) {
+          case 'creating_namespace':
+            // Reserved for K8s namespace/preflight work.
+            break;
+          case 'spinning_container':
+            const hostPort = await this.portAllocator.allocate(tenantId);
+            const containerName =
+              this.containerNetworkService.getContainerName(tenantId);
+            const networkName =
+              this.containerNetworkService.getDockerNetworkName(tenantId);
+            container = await this.containerOrchestrator.create({
+              tenantId,
+              name: containerName,
+              networkName,
+              hostPort,
+              resourceLimits: this.extractResourceLimits(tenant.resourceLimits),
+            });
+
+            await this.prisma.tenant.update({
+              where: { id: tenantId },
+              data: {
+                containerId: container.id,
+                containerUrl: container.url,
+              },
+            });
+            break;
+          case 'configuring':
+            if (!container?.id) {
+              throw new Error(
+                `Container was not created before config step for tenant ${tenantId}`,
+              );
+            }
+
+            const openclawConfig =
+              await this.configGenerator.generateForTenant(tenantId);
+
+            await this.containerOrchestrator.updateConfig(container.id, {
+              openclawConfig: openclawConfig as unknown as Record<string, unknown>,
+            });
+            break;
+          case 'installing_skills':
+            await this.installCoreSkills(tenantId);
+            break;
+          case 'health_check':
+            if (!container?.id) {
+              throw new Error(
+                `Container was not created before health step for tenant ${tenantId}`,
+              );
+            }
+
+            await this.waitForHealthy(container.id);
+            break;
+          default:
+            // Fallback to previous behavior for unknown future steps.
+            await this.sleep(step.delayMs);
+        }
 
         // Update DB with step completion progress
         await this.prisma.tenant.update({
@@ -85,16 +165,18 @@ export class ProvisioningProcessor extends WorkerHost {
         });
       }
 
-      // All steps completed successfully - mark tenant as active
-      const containerId = `oclaw-${randomUUID().slice(0, 12)}`;
-      const containerUrl = `https://${containerId}.containers.aegis.ai`;
+      if (!container?.id || !container.url) {
+        throw new Error(
+          `Provisioning did not produce container details for tenant ${tenantId}`,
+        );
+      }
 
       await this.prisma.tenant.update({
         where: { id: tenantId },
         data: {
           status: 'active',
-          containerId,
-          containerUrl,
+          containerId: container.id,
+          containerUrl: container.url,
           provisioningStep: 'completed',
           provisioningProgress: 100,
           provisioningMessage: 'Provisioning completed successfully.',
@@ -102,11 +184,8 @@ export class ProvisioningProcessor extends WorkerHost {
       });
 
       this.logger.log(
-        `Provisioning completed for tenant: ${tenantId} -> containerId: ${containerId}`,
+        `Provisioning completed for tenant: ${tenantId} -> containerId: ${container.id}`,
       );
-
-      // Auto-install core skills on all tenant agents
-      await this.installCoreSkills(tenantId);
     } catch (error) {
       await this.handleProvisioningFailure(tenantId, error);
     }
@@ -252,5 +331,56 @@ export class ProvisioningProcessor extends WorkerHost {
    */
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private async waitForHealthy(
+    containerId: string,
+    maxAttempts = 10,
+    delayMs = 3_000,
+  ): Promise<void> {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const status = await this.containerOrchestrator.getStatus(containerId);
+      if (status.health === 'healthy') {
+        return;
+      }
+
+      if (attempt < maxAttempts) {
+        await this.sleep(delayMs);
+      }
+    }
+
+    throw new Error(
+      `Container ${containerId} did not become healthy within ${maxAttempts} attempts`,
+    );
+  }
+
+  private extractResourceLimits(
+    value: unknown,
+  ): { cpu: string; memoryMb: number; diskGb?: number } | undefined {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return undefined;
+    }
+
+    const record = value as Record<string, unknown>;
+    const cpuRaw = record.cpuCores ?? record.cpu;
+    const memoryRaw = record.memoryMb;
+    const diskRaw = record.diskGb;
+
+    if (typeof memoryRaw !== 'number') {
+      return undefined;
+    }
+
+    const cpu =
+      typeof cpuRaw === 'number'
+        ? String(cpuRaw)
+        : typeof cpuRaw === 'string'
+          ? cpuRaw
+          : '1';
+
+    return {
+      cpu,
+      memoryMb: memoryRaw,
+      diskGb: typeof diskRaw === 'number' ? diskRaw : undefined,
+    };
   }
 }

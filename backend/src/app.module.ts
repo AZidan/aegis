@@ -12,6 +12,7 @@ import { HealthModule } from './health/health.module';
 import { ProvisioningModule } from './provisioning/provisioning.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AuditModule } from './audit/audit.module';
+import { ContainerModule } from './container/container.module';
 import { AlertModule } from './alert/alert.module';
 import { ChannelProxyModule } from './channel-proxy/channel-proxy.module';
 import { SlackModule } from './slack/slack.module';
@@ -66,6 +67,7 @@ import { validateEnv } from './config/validation';
     DashboardModule,
     HealthModule,
     ProvisioningModule,
+    ContainerModule,
     ChannelProxyModule,
     SlackModule,
   ],

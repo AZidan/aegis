@@ -349,6 +349,7 @@ describe('AuthService', () => {
           { provide: PrismaService, useValue: prisma },
           { provide: JwtService, useValue: jwtService },
           { provide: ConfigService, useValue: configService },
+          { provide: AuditService, useValue: { logAction: jest.fn() } },
         ],
       }).compile();
 

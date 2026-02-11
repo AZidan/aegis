@@ -24,6 +24,22 @@ export const envSchema = z.object({
   GITHUB_CLIENT_SECRET: z.string().optional(),
   GITHUB_CALLBACK_URL: z.string().url().optional(),
 
+  CONTAINER_RUNTIME: z
+    .enum(['mock', 'docker', 'kubernetes'])
+    .default('mock'),
+  CONTAINER_DOCKER_HOST: z.string().optional(),
+  CONTAINER_OPENCLAW_IMAGE: z.string().default('openclaw/openclaw:secrets'),
+  CONTAINER_NETWORK_NAME: z.string().default('aegis-tenant-network'),
+  CONTAINER_BASE_PORT: z.string().regex(/^\d+$/).default('19000').transform(Number),
+  CONTAINER_PORT_RANGE: z.string().regex(/^\d+$/).default('1000').transform(Number),
+  CONTAINER_K8S_ENABLED: z
+    .enum(['true', 'false'])
+    .optional()
+    .default('false'),
+  CONTAINER_K8S_NAMESPACE: z.string().optional(),
+  CONTAINER_K8S_CONTEXT: z.string().optional(),
+  CONTAINER_K8S_SERVICE_DOMAIN: z.string().optional(),
+
   CORS_ORIGINS: z.string().default('http://localhost:3000'),
 
   BCRYPT_ROUNDS: z.string().regex(/^\d+$/).default('12').transform(Number),

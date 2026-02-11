@@ -16,6 +16,7 @@ import { PermissionService } from '../../src/dashboard/skills/permission.service
 import { TenantsService } from '../../src/admin/tenants/tenants.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvisioningService } from '../../src/provisioning/provisioning.service';
+import { CONTAINER_ORCHESTRATOR } from '../../src/container/container.constants';
 
 // ---------------------------------------------------------------------------
 // Shared mock data
@@ -80,6 +81,22 @@ function createMockAuditService() {
 function createMockProvisioningService() {
   return {
     startProvisioning: jest.fn().mockResolvedValue(undefined),
+  };
+}
+
+function createMockContainerOrchestrator() {
+  return {
+    create: jest.fn(),
+    delete: jest.fn(),
+    restart: jest.fn().mockResolvedValue(undefined),
+    stop: jest.fn(),
+    getStatus: jest.fn().mockResolvedValue({
+      state: 'running',
+      health: 'healthy',
+      uptimeSeconds: 0,
+    }),
+    getLogs: jest.fn(),
+    updateConfig: jest.fn(),
   };
 }
 
@@ -376,11 +393,13 @@ describe('TenantsService audit integration', () => {
   let service: TenantsService;
   let auditService: { logAction: jest.Mock };
   let provisioningService: { startProvisioning: jest.Mock };
+  let containerOrchestrator: ReturnType<typeof createMockContainerOrchestrator>;
   let prisma: Record<string, Record<string, jest.Mock>>;
 
   beforeEach(async () => {
     auditService = createMockAuditService();
     provisioningService = createMockProvisioningService();
+    containerOrchestrator = createMockContainerOrchestrator();
 
     prisma = {
       tenant: {
@@ -404,6 +423,7 @@ describe('TenantsService audit integration', () => {
         { provide: PrismaService, useValue: prisma },
         { provide: ProvisioningService, useValue: provisioningService },
         { provide: AuditService, useValue: auditService },
+        { provide: CONTAINER_ORCHESTRATOR, useValue: containerOrchestrator },
       ],
     }).compile();
 
@@ -493,6 +513,9 @@ describe('Cross-cutting audit integration', () => {
   let tenantsAudit: { logAction: jest.Mock };
   let tenantsPrisma: Record<string, Record<string, jest.Mock>>;
   let provisioningService: { startProvisioning: jest.Mock };
+  let tenantsContainerOrchestrator: ReturnType<
+    typeof createMockContainerOrchestrator
+  >;
 
   beforeEach(async () => {
     agentsAudit = createMockAuditService();
@@ -549,6 +572,7 @@ describe('Cross-cutting audit integration', () => {
 
     tenantsAudit = createMockAuditService();
     provisioningService = createMockProvisioningService();
+    tenantsContainerOrchestrator = createMockContainerOrchestrator();
     tenantsPrisma = {
       tenant: {
         findUnique: jest.fn(),
@@ -571,6 +595,10 @@ describe('Cross-cutting audit integration', () => {
         { provide: PrismaService, useValue: tenantsPrisma },
         { provide: ProvisioningService, useValue: provisioningService },
         { provide: AuditService, useValue: tenantsAudit },
+        {
+          provide: CONTAINER_ORCHESTRATOR,
+          useValue: tenantsContainerOrchestrator,
+        },
       ],
     }).compile();
     tenantsService = tenantsModule.get<TenantsService>(TenantsService);
