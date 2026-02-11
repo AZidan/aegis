@@ -32,11 +32,16 @@ export class ContainerRuntimePreflightService implements OnModuleInit {
 
   private async verifyDocker(): Promise<void> {
     const dockerHost = this.configService.get<string>('container.dockerHost');
-    const env = dockerHost
-      ? { ...process.env, DOCKER_HOST: dockerHost }
-      : process.env;
+    const env: NodeJS.ProcessEnv = {
+      ...process.env,
+      // Negotiate older API version to avoid mismatch between CLI and daemon
+      DOCKER_API_VERSION: process.env.DOCKER_API_VERSION || '1.43',
+    };
+    if (dockerHost) {
+      env.DOCKER_HOST = dockerHost;
+    }
 
-    await this.runCommand('docker', ['version', '--format', '{{.Server.Version}}'], env);
+    await this.runCommand('docker', ['info', '--format', '{{.ServerVersion}}'], env);
   }
 
   private async verifyKubernetes(): Promise<void> {

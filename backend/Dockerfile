@@ -24,6 +24,10 @@ RUN npm ci --only=production && npm cache clean --force
 # ============================================================================
 FROM base AS development
 
+# Install Docker CLI for container orchestration (communicates via mounted socket)
+# and curl for health probes
+RUN apk add --no-cache docker-cli curl
+
 # Install development dependencies
 COPY package*.json ./
 RUN npm ci && npm cache clean --force
