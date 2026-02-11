@@ -1,6 +1,7 @@
 import { execFile } from 'node:child_process';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import Docker from 'dockerode';
 
 @Injectable()
 export class ContainerRuntimePreflightService implements OnModuleInit {
@@ -32,16 +33,24 @@ export class ContainerRuntimePreflightService implements OnModuleInit {
 
   private async verifyDocker(): Promise<void> {
     const dockerHost = this.configService.get<string>('container.dockerHost');
-    const env: NodeJS.ProcessEnv = {
-      ...process.env,
-      // Negotiate older API version to avoid mismatch between CLI and daemon
-      DOCKER_API_VERSION: process.env.DOCKER_API_VERSION || '1.43',
-    };
-    if (dockerHost) {
-      env.DOCKER_HOST = dockerHost;
+    const opts: Docker.DockerOptions = {};
+
+    if (dockerHost?.startsWith('unix://')) {
+      opts.socketPath = dockerHost.replace('unix://', '');
+    } else if (dockerHost) {
+      opts.host = dockerHost;
     }
 
-    await this.runCommand('docker', ['info', '--format', '{{.ServerVersion}}'], env);
+    const docker = new Docker(opts);
+
+    try {
+      const info = await docker.info();
+      this.logger.log(`Docker daemon: v${info.ServerVersion}`);
+    } catch (error) {
+      throw new Error(
+        `Container runtime preflight failed: cannot reach Docker daemon -> ${(error as Error).message}`,
+      );
+    }
   }
 
   private async verifyKubernetes(): Promise<void> {

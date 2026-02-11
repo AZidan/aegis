@@ -3,6 +3,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { ContainerRuntimePreflightService } from '../../src/container/container-runtime-preflight.service';
 
+// Mock dockerode — docker.info() used by verifyDocker
+const mockDockerInfo = jest.fn();
+jest.mock('dockerode', () =>
+  jest.fn().mockImplementation(() => ({
+    info: mockDockerInfo,
+  })),
+);
+
 jest.mock('node:child_process', () => ({
   execFile: jest.fn(),
 }));
@@ -49,27 +57,27 @@ describe('ContainerRuntimePreflightService', () => {
   it('should skip checks for mock runtime', async () => {
     const service = await makeService(buildConfig('mock'));
     await expect(service.onModuleInit()).resolves.toBeUndefined();
+    expect(mockDockerInfo).not.toHaveBeenCalled();
     expect(execFileMock).not.toHaveBeenCalled();
   });
 
-  it('should run docker preflight for docker runtime', async () => {
-    execFileMock.mockImplementation(
-      (
-        _cmd: string,
-        _args: string[],
-        _opts: unknown,
-        callback: ExecFileCallback,
-      ) => callback(null, '24.0.0', ''),
-    );
+  it('should call docker.info() for docker runtime', async () => {
+    mockDockerInfo.mockResolvedValue({ ServerVersion: '27.5.1' });
 
     const service = await makeService(buildConfig('docker'));
     await expect(service.onModuleInit()).resolves.toBeUndefined();
 
-    expect(execFileMock).toHaveBeenCalledWith(
-      'docker',
-      ['version', '--format', '{{.Server.Version}}'],
-      expect.any(Object),
-      expect.any(Function),
+    expect(mockDockerInfo).toHaveBeenCalled();
+    // Should NOT shell out to docker CLI
+    expect(execFileMock).not.toHaveBeenCalled();
+  });
+
+  it('should throw when docker daemon is unreachable', async () => {
+    mockDockerInfo.mockRejectedValue(new Error('connect ENOENT'));
+
+    const service = await makeService(buildConfig('docker'));
+    await expect(service.onModuleInit()).rejects.toThrow(
+      /cannot reach Docker daemon/,
     );
   });
 
