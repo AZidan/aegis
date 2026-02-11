@@ -1,18 +1,26 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { Processor, WorkerHost, InjectQueue } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
-import { Job } from 'bullmq';
+import { Job, Queue } from 'bullmq';
 import { PlatformDispatcherService } from './platform-dispatcher.service';
+import { SecretsManagerService } from '../container/secrets-manager.service';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   ForwardToContainerJob,
   DispatchToPlatformJob,
 } from './interfaces/channel-proxy.interface';
 import { CHANNEL_PROXY_QUEUE_NAME } from './channel-proxy.constants';
+import { ChannelPlatform } from '../../prisma/generated/client';
 
 @Processor(CHANNEL_PROXY_QUEUE_NAME)
 export class ChannelProxyProcessor extends WorkerHost {
   private readonly logger = new Logger(ChannelProxyProcessor.name);
 
-  constructor(private readonly platformDispatcher: PlatformDispatcherService) {
+  constructor(
+    private readonly platformDispatcher: PlatformDispatcherService,
+    private readonly secretsManager: SecretsManagerService,
+    private readonly prisma: PrismaService,
+    @InjectQueue(CHANNEL_PROXY_QUEUE_NAME) private readonly proxyQueue: Queue,
+  ) {
     super();
   }
 
@@ -42,28 +50,81 @@ export class ChannelProxyProcessor extends WorkerHost {
     job: Job<ForwardToContainerJob>,
   ): Promise<void> {
     const { sessionContext, event, containerUrl } = job.data;
+    const gatewayToken = this.secretsManager.getGatewayTokenForTenant(
+      sessionContext.tenantId,
+    );
 
-    const url = `${containerUrl}/hooks/aegis`;
+    // Call OpenClaw Responses API (synchronous request-response)
+    const url = `${containerUrl}/v1/responses`;
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${gatewayToken}`,
+      },
       body: JSON.stringify({
-        sessionId: sessionContext.sessionId,
-        agentId: sessionContext.agentId,
-        tenantId: sessionContext.tenantId,
-        platform: sessionContext.platform,
-        event,
+        model: 'anthropic/claude-sonnet-4-5',
+        input: event.text,
+        stream: false,
       }),
     });
 
     if (!response.ok) {
+      const body = await response.text().catch(() => '');
       throw new Error(
-        `Container forward failed: ${response.status} ${response.statusText}`,
+        `Container forward failed: ${response.status} ${response.statusText} ${body}`,
       );
     }
 
+    const data = (await response.json()) as {
+      output?: Array<{
+        content?: Array<{ type: string; text: string }>;
+      }>;
+      usage?: { input_tokens: number; output_tokens: number };
+    };
+
+    const responseText =
+      data.output
+        ?.flatMap((msg) => msg.content ?? [])
+        ?.filter((c) => c.type === 'output_text')
+        ?.map((c) => c.text)
+        ?.join('\n') ?? '';
+
+    if (!responseText) {
+      this.logger.warn(
+        `Empty agent response for session ${sessionContext.sessionId}`,
+      );
+      return;
+    }
+
+    // Find active channel connection to enqueue outbound reply
+    const connection = await this.prisma.channelConnection.findFirst({
+      where: {
+        tenantId: sessionContext.tenantId,
+        platform: sessionContext.platform as ChannelPlatform,
+        status: 'active',
+      },
+      select: { id: true, credentials: true },
+    });
+
+    if (connection) {
+      await this.proxyQueue.add('dispatch-to-platform', {
+        message: {
+          tenantId: sessionContext.tenantId,
+          agentId: sessionContext.agentId,
+          platform: sessionContext.platform,
+          workspaceId: sessionContext.workspaceId,
+          channelId: sessionContext.channelId ?? event.channelId ?? '',
+          text: responseText,
+          threadId: event.threadId,
+        },
+        connectionId: connection.id,
+        credentials: connection.credentials as Record<string, unknown>,
+      });
+    }
+
     this.logger.log(
-      `Forwarded to container: session ${sessionContext.sessionId} -> ${url}`,
+      `Forwarded to container: session ${sessionContext.sessionId}, response ${responseText.length} chars`,
     );
   }
 

@@ -19,6 +19,7 @@ import { ProvisioningService } from '../../src/provisioning/provisioning.service
 import { CONTAINER_ORCHESTRATOR } from '../../src/container/container.constants';
 import { ChannelRoutingService } from '../../src/channels/channel-routing.service';
 import { ContainerConfigSyncService } from '../../src/provisioning/container-config-sync.service';
+import { ContainerConfigSyncService as TenantConfigSyncService } from '../../src/container/container-config-sync.service';
 import { ContainerConfigGeneratorService } from '../../src/provisioning/container-config-generator.service';
 
 // ---------------------------------------------------------------------------
@@ -143,6 +144,7 @@ describe('AgentsService audit integration', () => {
         { provide: AuditService, useValue: auditService },
         { provide: ChannelRoutingService, useValue: { getRoutesForAgent: jest.fn().mockResolvedValue([]) } },
         { provide: ContainerConfigSyncService, useValue: { syncAgentConfig: jest.fn().mockResolvedValue(undefined) } },
+        { provide: TenantConfigSyncService, useValue: { syncTenantConfig: jest.fn().mockResolvedValue(undefined) } },
         { provide: ContainerConfigGeneratorService, useValue: { generateAgentWorkspace: jest.fn().mockResolvedValue({}) } },
       ],
     }).compile();
@@ -546,6 +548,7 @@ describe('Cross-cutting audit integration', () => {
         { provide: AuditService, useValue: agentsAudit },
         { provide: ChannelRoutingService, useValue: { getRoutesForAgent: jest.fn().mockResolvedValue([]) } },
         { provide: ContainerConfigSyncService, useValue: { syncAgentConfig: jest.fn().mockResolvedValue(undefined) } },
+        { provide: TenantConfigSyncService, useValue: { syncTenantConfig: jest.fn().mockResolvedValue(undefined) } },
         { provide: ContainerConfigGeneratorService, useValue: { generateAgentWorkspace: jest.fn().mockResolvedValue({}) } },
       ],
     }).compile();

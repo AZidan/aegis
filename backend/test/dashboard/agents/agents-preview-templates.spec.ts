@@ -5,6 +5,7 @@ import { PrismaService } from '../../../src/prisma/prisma.service';
 import { AuditService } from '../../../src/audit/audit.service';
 import { ChannelRoutingService } from '../../../src/channels/channel-routing.service';
 import { ContainerConfigSyncService } from '../../../src/provisioning/container-config-sync.service';
+import { ContainerConfigSyncService as TenantConfigSyncService } from '../../../src/container/container-config-sync.service';
 import { ContainerConfigGeneratorService } from '../../../src/provisioning/container-config-generator.service';
 
 // ---------------------------------------------------------------------------
@@ -97,6 +98,7 @@ describe('AgentsService - previewTemplates', () => {
         { provide: ChannelRoutingService, useValue: mockChannelRoutingService },
         { provide: ContainerConfigSyncService, useValue: mockConfigSyncService },
         { provide: ContainerConfigGeneratorService, useValue: realGenerator },
+        { provide: TenantConfigSyncService, useValue: { syncTenantConfig: jest.fn().mockResolvedValue(undefined) } },
       ],
     }).compile();
 

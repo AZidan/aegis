@@ -5,6 +5,7 @@ import { PrismaService } from '../../../src/prisma/prisma.service';
 import { AuditService } from '../../../src/audit/audit.service';
 import { ChannelRoutingService } from '../../../src/channels/channel-routing.service';
 import { ContainerConfigSyncService } from '../../../src/provisioning/container-config-sync.service';
+import { ContainerConfigSyncService as TenantConfigSyncService } from '../../../src/container/container-config-sync.service';
 import { ContainerConfigGeneratorService } from '../../../src/provisioning/container-config-generator.service';
 import { TOOL_CATEGORIES } from '../../../src/dashboard/tools/tool-categories';
 import { ROLE_DEFAULT_POLICIES } from '../../../src/dashboard/tools/role-defaults';
@@ -116,6 +117,7 @@ describe('AgentsService - Tool Policy', () => {
         { provide: ChannelRoutingService, useValue: { findRoutingRules: jest.fn() } },
         { provide: ContainerConfigSyncService, useValue: { syncAgentConfig: jest.fn() } },
         { provide: ContainerConfigGeneratorService, useValue: { generateWorkspace: jest.fn(), hydrateTemplate: jest.fn() } },
+        { provide: TenantConfigSyncService, useValue: { syncTenantConfig: jest.fn().mockResolvedValue(undefined) } },
       ],
     }).compile();
 

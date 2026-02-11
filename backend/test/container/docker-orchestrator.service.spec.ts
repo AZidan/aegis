@@ -90,7 +90,7 @@ describe('DockerOrchestratorService', () => {
     service = module.get<DockerOrchestratorService>(DockerOrchestratorService);
   });
 
-  it('create should ensure network and create a container', async () => {
+  it('create should ensure network and create a container with wait-for-config entrypoint', async () => {
     const result = await service.create({
       tenantId: 'tenant-uuid-1',
       name: 'aegis-tenant',
@@ -108,15 +108,18 @@ describe('DockerOrchestratorService', () => {
       expect.objectContaining({
         name: 'aegis-tenant',
         Image: 'openclaw/openclaw:latest',
+        Entrypoint: ['sh', '-c'],
+        Cmd: [expect.stringContaining('openclaw.json')],
         Healthcheck: expect.objectContaining({
           Retries: 5,
+          StartPeriod: 30_000_000_000,
+          Test: expect.arrayContaining([expect.stringContaining('curl')]),
         }),
         HostConfig: expect.objectContaining({
-          ReadonlyRootfs: true,
-          Tmpfs: expect.objectContaining({
-            '/run/secrets/openclaw': expect.any(String),
-            '/home/node/.openclaw': expect.any(String),
-          }),
+          Binds: expect.arrayContaining([
+            expect.stringContaining('age_key:/run/secrets/age_key:ro'),
+          ]),
+          CapDrop: ['ALL'],
         }),
         Labels: expect.objectContaining({
           'aegis.tenantId': 'tenant-uuid-1',
@@ -127,18 +130,52 @@ describe('DockerOrchestratorService', () => {
     expect(containerMock.start).toHaveBeenCalled();
   });
 
-  it('create should inject age key into /run/secrets after start', async () => {
+  it('create should bind-mount age key file (not inject via tar)', async () => {
     await service.create({
       tenantId: 'tenant-uuid-1',
       name: 'aegis-tenant-age',
       hostPort: 19125,
     });
 
-    // putArchive called for age key injection
-    expect(containerMock.putArchive).toHaveBeenCalledWith(
-      expect.any(Buffer),
-      { path: '/run/secrets' },
+    // Age key is now bind-mounted, not injected via putArchive
+    expect(containerMock.putArchive).not.toHaveBeenCalled();
+    expect(dockerClientMock.createContainer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        HostConfig: expect.objectContaining({
+          Binds: expect.arrayContaining([
+            expect.stringContaining('age_key:/run/secrets/age_key:ro'),
+          ]),
+        }),
+      }),
     );
+  });
+
+  it('create should set NODE_OPTIONS heap size based on memory limit', async () => {
+    await service.create({
+      tenantId: 'tenant-uuid-1',
+      name: 'aegis-tenant-heap',
+      hostPort: 19126,
+      resourceLimits: { cpu: '1', memoryMb: 1024 },
+    });
+
+    expect(dockerClientMock.createContainer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        Env: expect.arrayContaining([
+          'NODE_OPTIONS=--max-old-space-size=768',
+        ]),
+      }),
+    );
+  });
+
+  it('create should remove existing container with same name (idempotent)', async () => {
+    await service.create({
+      tenantId: 'tenant-uuid-1',
+      name: 'aegis-tenant-idem',
+      hostPort: 19127,
+    });
+
+    // getContainer is called to check for existing container
+    expect(dockerClientMock.getContainer).toHaveBeenCalledWith('aegis-tenant-idem');
   });
 
   it('create should create managed network when missing', async () => {
@@ -182,7 +219,7 @@ describe('DockerOrchestratorService', () => {
     );
   });
 
-  it('updateConfig should write config and restart container', async () => {
+  it('updateConfig should write config via putArchive without restarting', async () => {
     await expect(
       service.updateConfig('container-123', {
         openclawConfig: { gateway: { port: 18789 } },
@@ -191,7 +228,8 @@ describe('DockerOrchestratorService', () => {
 
     expect(containerMock.putArchive).toHaveBeenCalled();
     expect(containerMock.exec).toHaveBeenCalled();
-    expect(containerMock.restart).toHaveBeenCalled();
+    // No restart after config update (OpenClaw picks up config on startup)
+    expect(containerMock.restart).not.toHaveBeenCalled();
   });
 
   it('getLogs should read stream output', async () => {

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { SlackService } from '../../src/slack/slack.service';
+import { PrismaService } from '../../src/prisma/prisma.service';
 
 // Mock @slack/web-api WebClient
 const mockPostMessage = jest.fn();
@@ -48,6 +49,14 @@ describe('SlackService', () => {
               };
               return config[key];
             }),
+          },
+        },
+        {
+          provide: PrismaService,
+          useValue: {
+            channelConnection: {
+              findMany: jest.fn().mockResolvedValue([]),
+            },
           },
         },
       ],

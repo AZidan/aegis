@@ -44,6 +44,18 @@ export class DockerHealthProbe implements HealthProbeStrategy {
       });
 
       if (!response.ok) {
+        // A non-2xx response still means the process is listening.
+        // OpenClaw returns 404 for HTTP requests (it's a WebSocket gateway).
+        // Treat any HTTP response as "healthy" — connection refused = down.
+        if (response.status === 404 || response.status === 426) {
+          return {
+            status: 'healthy',
+            cpuPercent: 0,
+            memoryMb: 0,
+            diskGb: 0,
+            uptime: 0,
+          };
+        }
         this.logger.warn(
           `Health endpoint returned ${response.status} for tenant ${tenant.id}`,
         );

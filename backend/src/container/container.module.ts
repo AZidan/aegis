@@ -9,6 +9,7 @@ import { ContainerRuntimePreflightService } from './container-runtime-preflight.
 import { ContainerConfigGeneratorService } from './container-config-generator.service';
 import { SecretsManagerService } from './secrets-manager.service';
 import { ContainerNetworkService } from './container-network.service';
+import { ContainerConfigSyncService } from './container-config-sync.service';
 
 @Module({
   providers: [
@@ -20,6 +21,7 @@ import { ContainerNetworkService } from './container-network.service';
     ContainerConfigGeneratorService,
     SecretsManagerService,
     ContainerNetworkService,
+    ContainerConfigSyncService,
     {
       provide: CONTAINER_ORCHESTRATOR,
       inject: [
@@ -54,6 +56,7 @@ import { ContainerNetworkService } from './container-network.service';
     ContainerConfigGeneratorService,
     SecretsManagerService,
     ContainerNetworkService,
+    ContainerConfigSyncService,
   ],
 })
 export class ContainerModule {}

@@ -77,22 +77,29 @@ export class ContainerConfigGeneratorService {
     ]);
 
     const defaultModel = this.readModelDefaults(tenant.modelDefaults);
-    const agentList: OpenClawConfig['agents']['list'] = {};
+    const agentList: OpenClawConfig['agents']['list'] = [];
     for (const agent of agents) {
       const policy = this.readToolPolicy(agent.toolPolicy);
-      agentList[agent.id] = {
-        model: {
-          tier: (agent.modelTier || defaultModel.tier).toString(),
-          temperature: agent.temperature ?? 0.3,
-          thinkingMode: (agent.thinkingMode || defaultModel.thinkingMode).toString(),
+
+      // Build allowlist from inter-agent allowlist for this agent
+      const agentAllowlist = allowlistRows
+        .filter((r) => r.agentId === agent.id && (r.direction === 'both' || r.direction === 'send_only'))
+        .map((r) => r.allowedAgentId);
+
+      agentList.push({
+        id: agent.id,
+        identity: {
+          name: agent.name,
         },
         tools: {
-          allow: policy.allow,
-          deny: [...policy.deny, 'elevated'],
+          profile: 'full',
+          allow: policy.allow.length > 0 ? policy.allow : undefined,
+          deny: policy.deny.length > 0 ? [...policy.deny, 'elevated'] : ['elevated'],
         },
-        sandbox: { mode: 'all' },
-        workspace: `/home/node/.openclaw/workspaces/${agent.id}`,
-      };
+        subagents: agentAllowlist.length > 0
+          ? { allowAgents: agentAllowlist }
+          : undefined,
+      });
     }
 
     const bindings: OpenClawConfig['bindings'] = [];
@@ -141,6 +148,7 @@ export class ContainerConfigGeneratorService {
 
     return {
       gateway: {
+        mode: 'local',
         bind: 'lan',
         port: 18789,
         auth: {
@@ -150,27 +158,31 @@ export class ContainerConfigGeneratorService {
         controlUi: {
           enabled: false,
         },
+        http: {
+          endpoints: {
+            responses: { enabled: true },
+          },
+        },
+      },
+      hooks: {
+        enabled: true,
+        token: this.secretsManager.getHookTokenForTenant(tenantId),
       },
       agents: {
         defaults: {
-          sandbox: {
-            mode: 'all',
-            scope: 'agent',
-            workspaceAccess: 'ro',
+          workspace: '/home/node/.openclaw/workspace',
+          maxConcurrent: 4,
+          model: {
+            primary: this.resolveModelId(defaultModel.tier),
           },
-          tools: {
-            sandbox: {
-              denyPaths: ['~/.openclaw/**', '/run/secrets/**'],
-            },
+          compaction: {
+            mode: 'safeguard',
           },
         },
         list: agentList,
       },
       bindings,
       channels,
-      messaging: {
-        allowlist,
-      },
       skills,
       logging: {
         redactSensitive: 'tools',
@@ -203,6 +215,19 @@ export class ContainerConfigGeneratorService {
       ? record.deny.filter((entry): entry is string => typeof entry === 'string')
       : [];
     return { allow, deny };
+  }
+
+  private static readonly MODEL_MAP: Record<string, string> = {
+    sonnet: 'anthropic/claude-sonnet-4-5',
+    opus: 'anthropic/claude-opus-4-5',
+    haiku: 'anthropic/claude-haiku-4-5',
+  };
+
+  private resolveModelId(tier: string): string {
+    return (
+      ContainerConfigGeneratorService.MODEL_MAP[tier] ??
+      (tier.includes('/') ? tier : `anthropic/claude-${tier}`)
+    );
   }
 
   private readModelDefaults(value: unknown): { tier: string; thinkingMode: string } {

@@ -23,6 +23,14 @@ export class SecretsManagerService {
       .slice(0, 64);
   }
 
+  getHookTokenForTenant(tenantId: string): string {
+    const keyMaterial = this.getMasterKey();
+    return createHash('sha256')
+      .update(`hook:${tenantId}:${keyMaterial.toString('hex')}`)
+      .digest('base64url')
+      .slice(0, 64);
+  }
+
   encrypt(plaintext: string): string {
     const iv = randomBytes(12);
     const key = this.getMasterKey();

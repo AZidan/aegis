@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/audit.service';
-import { ContainerConfigSyncService } from '../../provisioning/container-config-sync.service';
+import { ContainerConfigSyncService as PerAgentConfigSyncService } from '../../provisioning/container-config-sync.service';
 import { ContainerConfigGeneratorService } from '../../provisioning/container-config-generator.service';
 import { Prisma } from '../../../prisma/generated/client';
 import { CreateAgentDto } from './dto/create-agent.dto';
@@ -18,6 +18,7 @@ import { CreateAgentRouteDto } from './dto/create-agent-route.dto';
 import { TOOL_CATEGORIES } from '../tools/tool-categories';
 import { ROLE_DEFAULT_POLICIES } from '../tools/role-defaults';
 import { ChannelRoutingService } from '../../channels/channel-routing.service';
+import { ContainerConfigSyncService as TenantConfigSyncService } from '../../container/container-config-sync.service';
 
 /**
  * Plan-based agent limits.
@@ -55,8 +56,9 @@ export class AgentsService {
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
     private readonly channelRoutingService: ChannelRoutingService,
-    @Optional() private readonly configSyncService: ContainerConfigSyncService,
+    @Optional() private readonly configSyncService: PerAgentConfigSyncService,
     @Optional() private readonly configGeneratorService: ContainerConfigGeneratorService,
+    private readonly configSync: TenantConfigSyncService,
   ) {}
 
   // ==========================================================================
@@ -317,6 +319,9 @@ export class AgentsService {
       agentId: agent.id,
     });
 
+    // Push updated config to running container (fire-and-forget)
+    this.configSync.syncTenantConfig(tenantId);
+
     // Contract response (201)
     return {
       id: agent.id,
@@ -575,6 +580,9 @@ export class AgentsService {
       agentId,
     });
 
+    // Push updated config to running container (fire-and-forget)
+    this.configSync.syncTenantConfig(tenantId);
+
     // Contract response
     return {
       id: updated.id,
@@ -617,6 +625,9 @@ export class AgentsService {
       tenantId,
       agentId,
     });
+
+    // Push updated config to running container (fire-and-forget)
+    this.configSync.syncTenantConfig(tenantId);
 
     this.logger.log(`Agent deleted: ${agentId} for tenant ${tenantId}`);
   }

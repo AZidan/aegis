@@ -335,8 +335,8 @@ export class ProvisioningProcessor extends WorkerHost {
 
   private async waitForHealthy(
     containerId: string,
-    maxAttempts = 10,
-    delayMs = 3_000,
+    maxAttempts = 30,
+    delayMs = 5_000,
   ): Promise<void> {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       const status = await this.containerOrchestrator.getStatus(containerId);

@@ -1,4 +1,7 @@
 import { once } from 'node:events';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Docker from 'dockerode';
@@ -59,10 +62,32 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
       this.containerNetworkService.getDockerNetworkLabels(options.tenantId),
     );
 
+    // Clean up any existing container with the same name (idempotent retries)
+    try {
+      const existing = this.docker.getContainer(name);
+      await existing.remove({ force: true });
+      this.logger.warn(`Removed existing container "${name}" before re-creation`);
+    } catch {
+      // Container doesn't exist - expected on first attempt
+    }
+
+    // Write age private key to a host temp file for bind mounting.
+    // The secrets-entrypoint.sh validates this file on startup, so it must
+    // be available before the container starts.
+    const ageKeyContent = this.secretsManager.getAgePrivateKeyForTenant(options.tenantId);
+    const ageKeyDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aegis-age-'));
+    const ageKeyPath = path.join(ageKeyDir, 'age_key');
+    fs.writeFileSync(ageKeyPath, ageKeyContent, { mode: 0o400 });
+
+    // Calculate Node.js heap limit: 75% of container memory, min 256MB
+    const containerMemoryMb = options.resourceLimits?.memoryMb ?? 1024;
+    const heapSizeMb = Math.max(256, Math.floor(containerMemoryMb * 0.75));
+
     const secureRuntimeEnv: Record<string, string> = {
       OPENCLAW_AGE_KEY_FILE: '/run/secrets/age_key',
       OPENCLAW_DATA_DIR: '/home/node/.openclaw',
       OPENCLAW_SECRETS_DIR: '/run/secrets/openclaw',
+      NODE_OPTIONS: `--max-old-space-size=${heapSizeMb}`,
     };
     const env = Object.entries({ ...secureRuntimeEnv, ...(options.environment ?? {}) }).map(
       ([key, value]) => `${key}=${value}`,
@@ -74,10 +99,19 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
       ? Math.round(Number(options.resourceLimits.cpu) * 1_000_000_000)
       : undefined;
 
+    // The container starts with a wait-for-config wrapper that polls for
+    // openclaw.json before exec'ing the real entrypoint. This avoids the
+    // race where OpenClaw exits immediately because the provisioning
+    // pipeline hasn't injected the config yet.
     const container = await this.docker.createContainer({
       Image: image,
       name,
       Env: env.length > 0 ? env : undefined,
+      Entrypoint: ['sh', '-c'],
+      Cmd: [
+        'for i in $(seq 1 240); do [ -f /home/node/.openclaw/openclaw.json ] && break; sleep 0.5; done; ' +
+        'exec /usr/local/bin/secrets-entrypoint.sh node dist/index.js gateway --bind lan --port 18789',
+      ],
       ExposedPorts: {
         [`${containerPort}/tcp`]: {},
       },
@@ -85,36 +119,27 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
         ...this.containerNetworkService.getContainerLabels(options.tenantId),
       },
       Healthcheck: {
-        Test: ['CMD-SHELL', 'wget -q -O - http://127.0.0.1:18789/health || exit 1'],
+        Test: ['CMD-SHELL', 'curl -s -o /dev/null -w "" http://127.0.0.1:18789/ || exit 1'],
         Interval: 15_000_000_000,
         Timeout: 5_000_000_000,
         Retries: 5,
+        StartPeriod: 30_000_000_000,
       },
       HostConfig: {
         NetworkMode: networkName,
         PortBindings: {
           [`${containerPort}/tcp`]: [{ HostPort: String(hostPort) }],
         },
+        Binds: [`${ageKeyPath}:/run/secrets/age_key:ro`],
         Memory: memoryBytes,
         NanoCpus:
           nanoCpus && Number.isFinite(nanoCpus) && nanoCpus > 0
             ? nanoCpus
             : undefined,
-        ReadonlyRootfs: true,
         CapDrop: ['ALL'],
-        Tmpfs: {
-          '/home/node/.openclaw': 'rw,noexec,nosuid,size=5242880',
-          '/tmp': 'rw,noexec,nosuid,size=1048576',
-          '/run/secrets/openclaw': 'rw,noexec,nosuid,size=65536',
-        },
       },
     });
     await container.start();
-
-    // Inject age private key for SOPS decryption
-    const ageKeyContent = this.secretsManager.getAgePrivateKeyForTenant(options.tenantId);
-    const ageKeyArchive = await this.createTarArchive('age_key', ageKeyContent);
-    await container.putArchive(ageKeyArchive, { path: '/run/secrets' });
 
     return {
       id: container.id,
@@ -187,17 +212,14 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
 
     const payload = JSON.stringify(update.openclawConfig, null, 2);
     const container = this.docker.getContainer(containerId);
-    const archive = await this.createTarArchive('openclaw.json', payload);
+    const archive = await this.createTarArchive('openclaw.json', payload, {
+      uid: 1000,
+      gid: 1000,
+      mode: 0o600,
+    });
 
     await this.runContainerCommand(containerId, 'mkdir -p /home/node/.openclaw');
     await container.putArchive(archive, { path: '/home/node/.openclaw' });
-    await this.runContainerCommand(
-      containerId,
-      'chmod 600 /home/node/.openclaw/openclaw.json || true',
-    );
-
-    // OpenClaw runtime reload strategy for now is controlled restart.
-    await this.restart(containerId);
   }
 
   private async ensureNetwork(
@@ -249,22 +271,80 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
     }
   }
 
+  /**
+   * Write file content into a running container via exec + stdin.
+   * This bypasses Docker's ReadonlyRootfs API check since the process
+   * runs inside the container where tmpfs mounts are writable.
+   */
+  private async writeFileViaExec(
+    containerId: string,
+    filePath: string,
+    content: string,
+  ): Promise<void> {
+    const container = this.docker.getContainer(containerId);
+    const dir = filePath.substring(0, filePath.lastIndexOf('/'));
+    // base64 encode to safely handle special chars in JSON
+    const b64 = Buffer.from(content).toString('base64');
+    const cmd = `mkdir -p ${dir} && echo '${b64}' | base64 -d > ${filePath} && chmod 600 ${filePath}`;
+
+    const exec = await container.exec({
+      Cmd: ['sh', '-c', cmd],
+      AttachStdout: true,
+      AttachStderr: true,
+    });
+    const stream = await exec.start({ Tty: false });
+    stream.on('data', () => {});
+
+    let timeoutHandle: NodeJS.Timeout | undefined;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutHandle = setTimeout(
+        () => reject(new Error('writeFileViaExec timed out')),
+        15_000,
+      );
+      timeoutHandle.unref();
+    });
+    try {
+      await Promise.race([
+        once(stream, 'end'),
+        once(stream, 'close'),
+        once(stream, 'finish'),
+        once(stream, 'error').then(([error]) => {
+          throw error;
+        }),
+        timeoutPromise,
+      ]);
+    } finally {
+      if (timeoutHandle) clearTimeout(timeoutHandle);
+    }
+
+    const result = await exec.inspect();
+    if ((result.ExitCode ?? 1) !== 0) {
+      throw new Error(
+        `writeFileViaExec failed for ${containerId}:${filePath} with exit code ${result.ExitCode ?? -1}`,
+      );
+    }
+  }
+
   private async runContainerCommand(
     containerId: string,
     command: string,
   ): Promise<void> {
     const container = this.docker.getContainer(containerId);
     const exec = await container.exec({
-      Cmd: ['sh', '-lc', command],
+      Cmd: ['sh', '-c', command],
       AttachStdout: true,
       AttachStderr: true,
     });
-    const stream = await exec.start({});
+    const stream = await exec.start({ Tty: false });
+
+    // Consume stream data to prevent backpressure stalls
+    stream.on('data', () => {});
+
     let timeoutHandle: NodeJS.Timeout | undefined;
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutHandle = setTimeout(
         () => reject(new Error('Container exec timed out')),
-        10_000,
+        15_000,
       );
       timeoutHandle.unref();
     });
@@ -317,17 +397,27 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
   private async createTarArchive(
     fileName: string,
     content: string,
+    options?: { uid?: number; gid?: number; mode?: number },
   ): Promise<Buffer> {
     const pack = tar.pack();
     const archivePromise = this.streamToBuffer(pack as unknown as NodeJS.ReadableStream);
     await new Promise<void>((resolve, reject) => {
-      pack.entry({ name: fileName, mode: 0o600 }, content, (error) => {
-        if (error) {
-          reject(error);
-          return;
-        }
-        resolve();
-      });
+      pack.entry(
+        {
+          name: fileName,
+          mode: options?.mode ?? 0o600,
+          uid: options?.uid ?? 0,
+          gid: options?.gid ?? 0,
+        },
+        content,
+        (error) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve();
+        },
+      );
     });
     pack.finalize();
     return archivePromise;
