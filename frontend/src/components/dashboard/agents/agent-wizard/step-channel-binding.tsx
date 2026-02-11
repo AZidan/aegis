@@ -9,6 +9,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
+import { fetchSlackInstallUrl } from '@/lib/api/agents';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -69,13 +70,16 @@ export function StepChannelBinding({
   const handleSlackConnect = async () => {
     setConnecting(true);
     try {
-      // Open OAuth popup
+      // Fetch the Slack OAuth URL via authenticated API call
+      const { url } = await fetchSlackInstallUrl();
+
+      // Open the Slack OAuth URL directly in a popup
       const width = 600;
       const height = 700;
       const left = window.screenX + (window.outerWidth - width) / 2;
       const top = window.screenY + (window.outerHeight - height) / 2;
       window.open(
-        `${process.env.NEXT_PUBLIC_API_URL}/integrations/slack/install`,
+        url,
         'slack-oauth',
         `width=${width},height=${height},left=${left},top=${top},popup=yes`
       );
