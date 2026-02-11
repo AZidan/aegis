@@ -17,10 +17,13 @@ logs/
 *.log
 
 # CodeMap indexes
-.codemap/
+**/.codemap/
 
 # OS files
-.DS_Store
+**/.DS_Store
+
+# Build output
+output/
 Thumbs.db
 
 # IDE
