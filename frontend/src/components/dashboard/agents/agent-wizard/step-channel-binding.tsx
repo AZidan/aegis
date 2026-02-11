@@ -75,7 +75,7 @@ export function StepChannelBinding({
       const left = window.screenX + (window.outerWidth - width) / 2;
       const top = window.screenY + (window.outerHeight - height) / 2;
       window.open(
-        '/api/integrations/slack/install',
+        `${process.env.NEXT_PUBLIC_API_URL}/integrations/slack/install`,
         'slack-oauth',
         `width=${width},height=${height},left=${left},top=${top},popup=yes`
       );
