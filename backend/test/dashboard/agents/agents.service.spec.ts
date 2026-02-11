@@ -6,6 +6,9 @@ import {
 import { AgentsService } from '../../../src/dashboard/agents/agents.service';
 import { PrismaService } from '../../../src/prisma/prisma.service';
 import { AuditService } from '../../../src/audit/audit.service';
+import { ChannelRoutingService } from '../../../src/channels/channel-routing.service';
+import { ContainerConfigSyncService } from '../../../src/provisioning/container-config-sync.service';
+import { ContainerConfigGeneratorService } from '../../../src/provisioning/container-config-generator.service';
 
 // ---------------------------------------------------------------------------
 // Test Data Factories
@@ -131,6 +134,9 @@ describe('AgentsService', () => {
         AgentsService,
         { provide: PrismaService, useValue: prisma },
         { provide: AuditService, useValue: { logAction: jest.fn() } },
+        { provide: ChannelRoutingService, useValue: { getRoutesForAgent: jest.fn().mockResolvedValue([]) } },
+        { provide: ContainerConfigSyncService, useValue: { syncAgentConfig: jest.fn().mockResolvedValue(undefined) } },
+        { provide: ContainerConfigGeneratorService, useValue: { generateAgentWorkspace: jest.fn().mockResolvedValue({}) } },
       ],
     }).compile();
 

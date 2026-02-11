@@ -17,6 +17,9 @@ import { TenantsService } from '../../src/admin/tenants/tenants.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvisioningService } from '../../src/provisioning/provisioning.service';
 import { CONTAINER_ORCHESTRATOR } from '../../src/container/container.constants';
+import { ChannelRoutingService } from '../../src/channels/channel-routing.service';
+import { ContainerConfigSyncService } from '../../src/provisioning/container-config-sync.service';
+import { ContainerConfigGeneratorService } from '../../src/provisioning/container-config-generator.service';
 
 // ---------------------------------------------------------------------------
 // Shared mock data
@@ -138,6 +141,9 @@ describe('AgentsService audit integration', () => {
         AgentsService,
         { provide: PrismaService, useValue: prisma },
         { provide: AuditService, useValue: auditService },
+        { provide: ChannelRoutingService, useValue: { getRoutesForAgent: jest.fn().mockResolvedValue([]) } },
+        { provide: ContainerConfigSyncService, useValue: { syncAgentConfig: jest.fn().mockResolvedValue(undefined) } },
+        { provide: ContainerConfigGeneratorService, useValue: { generateAgentWorkspace: jest.fn().mockResolvedValue({}) } },
       ],
     }).compile();
 
@@ -538,6 +544,9 @@ describe('Cross-cutting audit integration', () => {
         AgentsService,
         { provide: PrismaService, useValue: agentsPrisma },
         { provide: AuditService, useValue: agentsAudit },
+        { provide: ChannelRoutingService, useValue: { getRoutesForAgent: jest.fn().mockResolvedValue([]) } },
+        { provide: ContainerConfigSyncService, useValue: { syncAgentConfig: jest.fn().mockResolvedValue(undefined) } },
+        { provide: ContainerConfigGeneratorService, useValue: { generateAgentWorkspace: jest.fn().mockResolvedValue({}) } },
       ],
     }).compile();
     agentsService = agentsModule.get<AgentsService>(AgentsService);
