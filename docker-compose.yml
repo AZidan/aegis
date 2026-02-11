@@ -77,7 +77,7 @@ services:
       SLACK_REDIRECT_URI: ${SLACK_REDIRECT_URI:-http://localhost:3000/api/integrations/slack/callback}
       CONTAINER_RUNTIME: ${CONTAINER_RUNTIME:-docker}
       CONTAINER_DOCKER_HOST: unix:///var/run/docker.sock
-      CONTAINER_OPENCLAW_IMAGE: ${CONTAINER_OPENCLAW_IMAGE:-openclaw/openclaw:secrets}
+      CONTAINER_OPENCLAW_IMAGE: ${CONTAINER_OPENCLAW_IMAGE:-openclaw/openclaw:latest}
       CONTAINER_NETWORK_NAME: ${CONTAINER_NETWORK_NAME:-aegis-tenant-network}
       CONTAINER_BASE_PORT: ${CONTAINER_BASE_PORT:-19000}
       CONTAINER_PORT_RANGE: ${CONTAINER_PORT_RANGE:-1000}
