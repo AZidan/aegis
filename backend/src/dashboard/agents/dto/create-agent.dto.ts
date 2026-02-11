@@ -35,6 +35,13 @@ export const createAgentSchema = z.object({
   toolPolicy: z.object({
     allow: z.array(z.string()),
   }),
+
+  // Step 1.5: Custom template overrides (optional)
+  customTemplates: z.object({
+    soulTemplate: z.string().optional(),
+    agentsTemplate: z.string().optional(),
+    heartbeatTemplate: z.string().optional(),
+  }).optional(),
 });
 
 export type CreateAgentDto = z.infer<typeof createAgentSchema>;

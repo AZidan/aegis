@@ -1,27 +1,222 @@
 'use client';
 
 import * as React from 'react';
+import {
+  MessageSquare,
+  ExternalLink,
+  Check,
+  AlertCircle,
+  Clock,
+} from 'lucide-react';
+import { cn } from '@/lib/utils/cn';
 
 // ---------------------------------------------------------------------------
-// StepChannelBinding - Coming Soon
+// Types
 // ---------------------------------------------------------------------------
 
-export function StepChannelBinding() {
+export interface ChannelBindingState {
+  slackConnected: boolean;
+  slackWorkspaceName?: string;
+}
+
+interface StepChannelBindingProps {
+  channels: ChannelBindingState;
+  onChannelsChange: (channels: ChannelBindingState) => void;
+}
+
+// ---------------------------------------------------------------------------
+// Platform definitions
+// ---------------------------------------------------------------------------
+
+const PLATFORMS = [
+  {
+    id: 'slack',
+    name: 'Slack',
+    icon: MessageSquare,
+    available: true,
+    description:
+      'Connect your Slack workspace to route messages to this agent.',
+    color: 'bg-[#4A154B]',
+  },
+  {
+    id: 'teams',
+    name: 'Microsoft Teams',
+    icon: MessageSquare,
+    available: false,
+    description: 'Connect Teams channels for enterprise collaboration.',
+    color: 'bg-[#464EB8]',
+  },
+  {
+    id: 'discord',
+    name: 'Discord',
+    icon: MessageSquare,
+    available: false,
+    description: 'Connect Discord servers for community management.',
+    color: 'bg-[#5865F2]',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// StepChannelBinding
+// ---------------------------------------------------------------------------
+
+export function StepChannelBinding({
+  channels,
+  onChannelsChange,
+}: StepChannelBindingProps) {
+  const [connecting, setConnecting] = React.useState(false);
+
+  const handleSlackConnect = async () => {
+    setConnecting(true);
+    try {
+      // Open OAuth popup
+      const width = 600;
+      const height = 700;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+      window.open(
+        '/api/integrations/slack/install',
+        'slack-oauth',
+        `width=${width},height=${height},left=${left},top=${top},popup=yes`
+      );
+
+      // Listen for postMessage from callback page
+      const handler = (event: MessageEvent) => {
+        if (event.data?.type === 'slack-oauth-success') {
+          onChannelsChange({
+            slackConnected: true,
+            slackWorkspaceName:
+              event.data.workspaceName || 'Connected Workspace',
+          });
+          setConnecting(false);
+          window.removeEventListener('message', handler);
+        } else if (event.data?.type === 'slack-oauth-error') {
+          setConnecting(false);
+          window.removeEventListener('message', handler);
+        }
+      };
+      window.addEventListener('message', handler);
+
+      // Fallback: timeout after 2 minutes
+      setTimeout(() => {
+        setConnecting(false);
+        window.removeEventListener('message', handler);
+      }, 120_000);
+    } catch {
+      setConnecting(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="rounded-full bg-neutral-100 p-4 mb-4">
-        <svg className="h-8 w-8 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
-        </svg>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg font-semibold text-neutral-900">
+          Channel Integration
+        </h2>
+        <p className="text-sm text-neutral-500 mt-1">
+          Connect your agent to communication platforms. You can also configure
+          channels later from the agent detail page.
+        </p>
       </div>
-      <h3 className="text-lg font-semibold text-neutral-900 mb-2">Channel Integration</h3>
-      <p className="text-sm text-neutral-500 max-w-md">
-        Connect your agent to Telegram, Slack, and other channels.
-        This feature requires OAuth setup and will be available in a future update.
-      </p>
-      <span className="mt-4 inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
-        Coming Soon
-      </span>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {PLATFORMS.map((platform) => {
+          const isConnected =
+            platform.id === 'slack' && channels.slackConnected;
+          const Icon = platform.icon;
+
+          return (
+            <div
+              key={platform.id}
+              className={cn(
+                'relative rounded-xl border p-5 transition-all',
+                isConnected
+                  ? 'border-emerald-200 bg-emerald-50/50'
+                  : platform.available
+                    ? 'border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-sm'
+                    : 'border-neutral-100 bg-neutral-50/50 opacity-60'
+              )}
+            >
+              {/* Platform header */}
+              <div className="flex items-center gap-3 mb-3">
+                <div
+                  className={cn(
+                    'flex items-center justify-center w-10 h-10 rounded-lg text-white',
+                    platform.color
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-neutral-900">
+                    {platform.name}
+                  </h3>
+                  {!platform.available && (
+                    <span className="inline-flex items-center gap-1 text-xs text-amber-600 font-medium">
+                      <Clock className="h-3 w-3" /> Coming Soon
+                    </span>
+                  )}
+                  {isConnected && (
+                    <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium">
+                      <Check className="h-3 w-3" /> Connected
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <p className="text-xs text-neutral-500 mb-4">
+                {platform.description}
+              </p>
+
+              {/* Connected state */}
+              {isConnected && (
+                <div className="text-xs text-neutral-600 bg-white rounded-lg p-2.5 border border-emerald-100 mb-3">
+                  Workspace:{' '}
+                  <span className="font-medium">
+                    {channels.slackWorkspaceName}
+                  </span>
+                </div>
+              )}
+
+              {/* Action button */}
+              {platform.available && !isConnected && (
+                <button
+                  onClick={
+                    platform.id === 'slack' ? handleSlackConnect : undefined
+                  }
+                  disabled={connecting}
+                  className={cn(
+                    'w-full inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                    connecting
+                      ? 'bg-neutral-100 text-neutral-400 cursor-wait'
+                      : 'bg-primary-500 text-white hover:bg-primary-600'
+                  )}
+                >
+                  {connecting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-neutral-300 border-t-transparent rounded-full animate-spin" />
+                      Connecting...
+                    </>
+                  ) : (
+                    <>
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      Connect
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex items-start gap-2 rounded-lg bg-blue-50 border border-blue-100 p-3">
+        <AlertCircle className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+        <p className="text-xs text-blue-700">
+          Channel binding is optional during agent creation. You can configure
+          channels later from the agent detail page under the Channels tab.
+        </p>
+      </div>
     </div>
   );
 }

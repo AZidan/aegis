@@ -11,25 +11,30 @@ import type {
   ModelTier,
   ThinkingMode,
   CreateAgentPayload,
+  CustomTemplates,
 } from '@/lib/api/agents';
-import { useCreateAgent } from '@/lib/hooks/use-agents';
+import { useCreateAgent, useRoles } from '@/lib/hooks/use-agents';
 
 import { WizardStepper } from '@/components/dashboard/agents/agent-wizard/wizard-stepper';
 import { StepBasicInfo } from '@/components/dashboard/agents/agent-wizard/step-basic-info';
+import { StepTemplates } from '@/components/dashboard/agents/agent-wizard/step-templates';
 import { StepModelConfig } from '@/components/dashboard/agents/agent-wizard/step-model-config';
 import {
   StepToolPolicy,
   DEFAULT_CATEGORIES,
   type WizardToolCategory,
 } from '@/components/dashboard/agents/agent-wizard/step-tool-policy';
-import { StepChannelBinding } from '@/components/dashboard/agents/agent-wizard/step-channel-binding';
+import {
+  StepChannelBinding,
+  type ChannelBindingState,
+} from '@/components/dashboard/agents/agent-wizard/step-channel-binding';
 import { StepReview } from '@/components/dashboard/agents/agent-wizard/step-review';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 // ---------------------------------------------------------------------------
 // Agent Creation Wizard Page
@@ -38,6 +43,7 @@ const TOTAL_STEPS = 5;
 export default function AgentCreatePage() {
   const router = useRouter();
   const createMutation = useCreateAgent();
+  const { data: roles } = useRoles();
 
   // Wizard state
   const [step, setStep] = React.useState(1);
@@ -48,13 +54,25 @@ export default function AgentCreatePage() {
   const [role, setRole] = React.useState<AgentRole | ''>('');
   const [avatarColor, setAvatarColor] = React.useState('#6366f1');
 
-  // Step 2: Model Config
+  // Step 2: Templates
+  const [customTemplates, setCustomTemplates] = React.useState<CustomTemplates>(
+    {}
+  );
+
+  // Step 3: Model Config
   const [modelTier, setModelTier] = React.useState<ModelTier>('sonnet');
-  const [thinkingMode, setThinkingMode] = React.useState<ThinkingMode>('extended');
+  const [thinkingMode, setThinkingMode] =
+    React.useState<ThinkingMode>('extended');
   const [temperature, setTemperature] = React.useState(0.3);
 
-  // Step 3: Tool Policy
-  const [categories, setCategories] = React.useState<WizardToolCategory[]>(DEFAULT_CATEGORIES);
+  // Step 4: Tool Policy
+  const [categories, setCategories] =
+    React.useState<WizardToolCategory[]>(DEFAULT_CATEGORIES);
+
+  // Step 5: Channels
+  const [channels, setChannels] = React.useState<ChannelBindingState>({
+    slackConnected: false,
+  });
 
   // ---------------------------------------------------------------------------
   // Navigation
@@ -65,12 +83,14 @@ export default function AgentCreatePage() {
       case 1:
         return name.trim().length > 0 && role !== '';
       case 2:
-        return true;
+        return true; // Templates are optional
       case 3:
         return true;
       case 4:
         return true;
       case 5:
+        return true; // Channels are optional
+      case 6:
         return true;
       default:
         return false;
@@ -106,6 +126,11 @@ export default function AgentCreatePage() {
       cat.tools.filter((t) => t.enabled).map((t) => t.id)
     );
 
+    // Only include customTemplates if user actually customized something
+    const hasCustomTemplates = Object.values(customTemplates).some(
+      (v) => v && v.length > 0
+    );
+
     const payload: CreateAgentPayload = {
       name: name.trim(),
       description: description.trim() || undefined,
@@ -115,6 +140,7 @@ export default function AgentCreatePage() {
       temperature,
       avatarColor,
       toolPolicy: { allow: enabledToolIds },
+      ...(hasCustomTemplates ? { customTemplates } : {}),
     };
 
     createMutation.mutate(payload, {
@@ -167,6 +193,14 @@ export default function AgentCreatePage() {
           />
         )}
         {step === 2 && (
+          <StepTemplates
+            role={role as string}
+            roles={roles}
+            customTemplates={customTemplates}
+            onCustomTemplatesChange={setCustomTemplates}
+          />
+        )}
+        {step === 3 && (
           <StepModelConfig
             modelTier={modelTier}
             onModelTierChange={setModelTier}
@@ -176,16 +210,19 @@ export default function AgentCreatePage() {
             onTemperatureChange={setTemperature}
           />
         )}
-        {step === 3 && (
+        {step === 4 && (
           <StepToolPolicy
             categories={categories}
             onCategoriesChange={setCategories}
           />
         )}
-        {step === 4 && (
-          <StepChannelBinding />
-        )}
         {step === 5 && (
+          <StepChannelBinding
+            channels={channels}
+            onChannelsChange={setChannels}
+          />
+        )}
+        {step === 6 && (
           <StepReview
             name={name}
             description={description}

@@ -164,6 +164,7 @@ export const AgentScalarFieldEnum = {
   personality: 'personality',
   toolPolicy: 'toolPolicy',
   assistedUser: 'assistedUser',
+  customTemplates: 'customTemplates',
   openclawAgentId: 'openclawAgentId',
   lastActive: 'lastActive',
   createdAt: 'createdAt',
@@ -182,6 +183,12 @@ export const AgentRoleConfigScalarFieldEnum = {
   defaultToolCategories: 'defaultToolCategories',
   sortOrder: 'sortOrder',
   isSystem: 'isSystem',
+  soulTemplate: 'soulTemplate',
+  agentsTemplate: 'agentsTemplate',
+  heartbeatTemplate: 'heartbeatTemplate',
+  userTemplate: 'userTemplate',
+  identityEmoji: 'identityEmoji',
+  openclawConfigTemplate: 'openclawConfigTemplate',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

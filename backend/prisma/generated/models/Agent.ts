@@ -84,6 +84,7 @@ export type AgentCountAggregateOutputType = {
   personality: number
   toolPolicy: number
   assistedUser: number
+  customTemplates: number
   openclawAgentId: number
   lastActive: number
   createdAt: number
@@ -150,6 +151,7 @@ export type AgentCountAggregateInputType = {
   personality?: true
   toolPolicy?: true
   assistedUser?: true
+  customTemplates?: true
   openclawAgentId?: true
   lastActive?: true
   createdAt?: true
@@ -257,6 +259,7 @@ export type AgentGroupByOutputType = {
   personality: string | null
   toolPolicy: runtime.JsonValue
   assistedUser: runtime.JsonValue | null
+  customTemplates: runtime.JsonValue | null
   openclawAgentId: string | null
   lastActive: Date | null
   createdAt: Date
@@ -300,6 +303,7 @@ export type AgentWhereInput = {
   personality?: Prisma.StringNullableFilter<"Agent"> | string | null
   toolPolicy?: Prisma.JsonFilter<"Agent">
   assistedUser?: Prisma.JsonNullableFilter<"Agent">
+  customTemplates?: Prisma.JsonNullableFilter<"Agent">
   openclawAgentId?: Prisma.StringNullableFilter<"Agent"> | string | null
   lastActive?: Prisma.DateTimeNullableFilter<"Agent"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Agent"> | Date | string
@@ -331,6 +335,7 @@ export type AgentOrderByWithRelationInput = {
   personality?: Prisma.SortOrderInput | Prisma.SortOrder
   toolPolicy?: Prisma.SortOrder
   assistedUser?: Prisma.SortOrderInput | Prisma.SortOrder
+  customTemplates?: Prisma.SortOrderInput | Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrderInput | Prisma.SortOrder
   lastActive?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -365,6 +370,7 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   personality?: Prisma.StringNullableFilter<"Agent"> | string | null
   toolPolicy?: Prisma.JsonFilter<"Agent">
   assistedUser?: Prisma.JsonNullableFilter<"Agent">
+  customTemplates?: Prisma.JsonNullableFilter<"Agent">
   openclawAgentId?: Prisma.StringNullableFilter<"Agent"> | string | null
   lastActive?: Prisma.DateTimeNullableFilter<"Agent"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Agent"> | Date | string
@@ -396,6 +402,7 @@ export type AgentOrderByWithAggregationInput = {
   personality?: Prisma.SortOrderInput | Prisma.SortOrder
   toolPolicy?: Prisma.SortOrder
   assistedUser?: Prisma.SortOrderInput | Prisma.SortOrder
+  customTemplates?: Prisma.SortOrderInput | Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrderInput | Prisma.SortOrder
   lastActive?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -424,6 +431,7 @@ export type AgentScalarWhereWithAggregatesInput = {
   personality?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
   toolPolicy?: Prisma.JsonWithAggregatesFilter<"Agent">
   assistedUser?: Prisma.JsonNullableWithAggregatesFilter<"Agent">
+  customTemplates?: Prisma.JsonNullableWithAggregatesFilter<"Agent">
   openclawAgentId?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
   lastActive?: Prisma.DateTimeNullableWithAggregatesFilter<"Agent"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Agent"> | Date | string
@@ -443,6 +451,7 @@ export type AgentCreateInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -474,6 +483,7 @@ export type AgentUncheckedCreateInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -503,6 +513,7 @@ export type AgentUpdateInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -534,6 +545,7 @@ export type AgentUncheckedUpdateInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -564,6 +576,7 @@ export type AgentCreateManyInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -583,6 +596,7 @@ export type AgentUpdateManyMutationInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -603,6 +617,7 @@ export type AgentUncheckedUpdateManyInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -633,6 +648,7 @@ export type AgentCountOrderByAggregateInput = {
   personality?: Prisma.SortOrder
   toolPolicy?: Prisma.SortOrder
   assistedUser?: Prisma.SortOrder
+  customTemplates?: Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrder
   lastActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -910,6 +926,7 @@ export type AgentCreateWithoutTenantInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -939,6 +956,7 @@ export type AgentUncheckedCreateWithoutTenantInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -998,6 +1016,7 @@ export type AgentScalarWhereInput = {
   personality?: Prisma.StringNullableFilter<"Agent"> | string | null
   toolPolicy?: Prisma.JsonFilter<"Agent">
   assistedUser?: Prisma.JsonNullableFilter<"Agent">
+  customTemplates?: Prisma.JsonNullableFilter<"Agent">
   openclawAgentId?: Prisma.StringNullableFilter<"Agent"> | string | null
   lastActive?: Prisma.DateTimeNullableFilter<"Agent"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Agent"> | Date | string
@@ -1017,6 +1036,7 @@ export type AgentCreateWithoutChannelsInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1047,6 +1067,7 @@ export type AgentUncheckedCreateWithoutChannelsInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1091,6 +1112,7 @@ export type AgentUpdateWithoutChannelsInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1121,6 +1143,7 @@ export type AgentUncheckedUpdateWithoutChannelsInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1149,6 +1172,7 @@ export type AgentCreateWithoutActivitiesInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1179,6 +1203,7 @@ export type AgentUncheckedCreateWithoutActivitiesInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1223,6 +1248,7 @@ export type AgentUpdateWithoutActivitiesInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1253,6 +1279,7 @@ export type AgentUncheckedUpdateWithoutActivitiesInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1281,6 +1308,7 @@ export type AgentCreateWithoutMetricsInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1311,6 +1339,7 @@ export type AgentUncheckedCreateWithoutMetricsInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1355,6 +1384,7 @@ export type AgentUpdateWithoutMetricsInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1385,6 +1415,7 @@ export type AgentUncheckedUpdateWithoutMetricsInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1413,6 +1444,7 @@ export type AgentCreateWithoutInstalledSkillsInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1443,6 +1475,7 @@ export type AgentUncheckedCreateWithoutInstalledSkillsInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1487,6 +1520,7 @@ export type AgentUpdateWithoutInstalledSkillsInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1517,6 +1551,7 @@ export type AgentUncheckedUpdateWithoutInstalledSkillsInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1545,6 +1580,7 @@ export type AgentCreateWithoutAuditLogsInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1575,6 +1611,7 @@ export type AgentUncheckedCreateWithoutAuditLogsInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1619,6 +1656,7 @@ export type AgentUpdateWithoutAuditLogsInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1649,6 +1687,7 @@ export type AgentUncheckedUpdateWithoutAuditLogsInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1677,6 +1716,7 @@ export type AgentCreateWithoutMessagesSentInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1707,6 +1747,7 @@ export type AgentUncheckedCreateWithoutMessagesSentInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1740,6 +1781,7 @@ export type AgentCreateWithoutMessagesReceivedInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1770,6 +1812,7 @@ export type AgentUncheckedCreateWithoutMessagesReceivedInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1814,6 +1857,7 @@ export type AgentUpdateWithoutMessagesSentInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1844,6 +1888,7 @@ export type AgentUncheckedUpdateWithoutMessagesSentInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1883,6 +1928,7 @@ export type AgentUpdateWithoutMessagesReceivedInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1913,6 +1959,7 @@ export type AgentUncheckedUpdateWithoutMessagesReceivedInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1941,6 +1988,7 @@ export type AgentCreateWithoutAllowlistOwnerInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -1971,6 +2019,7 @@ export type AgentUncheckedCreateWithoutAllowlistOwnerInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -2004,6 +2053,7 @@ export type AgentCreateWithoutAllowlistTargetInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -2034,6 +2084,7 @@ export type AgentUncheckedCreateWithoutAllowlistTargetInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -2078,6 +2129,7 @@ export type AgentUpdateWithoutAllowlistOwnerInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2108,6 +2160,7 @@ export type AgentUncheckedUpdateWithoutAllowlistOwnerInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2147,6 +2200,7 @@ export type AgentUpdateWithoutAllowlistTargetInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2177,6 +2231,7 @@ export type AgentUncheckedUpdateWithoutAllowlistTargetInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2205,6 +2260,7 @@ export type AgentCreateWithoutChannelRoutingInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -2235,6 +2291,7 @@ export type AgentUncheckedCreateWithoutChannelRoutingInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -2279,6 +2336,7 @@ export type AgentUpdateWithoutChannelRoutingInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2309,6 +2367,7 @@ export type AgentUncheckedUpdateWithoutChannelRoutingInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2337,6 +2396,7 @@ export type AgentCreateManyTenantInput = {
   personality?: string | null
   toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
@@ -2356,6 +2416,7 @@ export type AgentUpdateWithoutTenantInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2385,6 +2446,7 @@ export type AgentUncheckedUpdateWithoutTenantInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2414,6 +2476,7 @@ export type AgentUncheckedUpdateManyWithoutTenantInput = {
   personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2546,6 +2609,7 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   personality?: boolean
   toolPolicy?: boolean
   assistedUser?: boolean
+  customTemplates?: boolean
   openclawAgentId?: boolean
   lastActive?: boolean
   createdAt?: boolean
@@ -2578,6 +2642,7 @@ export type AgentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   personality?: boolean
   toolPolicy?: boolean
   assistedUser?: boolean
+  customTemplates?: boolean
   openclawAgentId?: boolean
   lastActive?: boolean
   createdAt?: boolean
@@ -2599,6 +2664,7 @@ export type AgentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   personality?: boolean
   toolPolicy?: boolean
   assistedUser?: boolean
+  customTemplates?: boolean
   openclawAgentId?: boolean
   lastActive?: boolean
   createdAt?: boolean
@@ -2620,13 +2686,14 @@ export type AgentSelectScalar = {
   personality?: boolean
   toolPolicy?: boolean
   assistedUser?: boolean
+  customTemplates?: boolean
   openclawAgentId?: boolean
   lastActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "role" | "status" | "tenantId" | "modelTier" | "thinkingMode" | "temperature" | "avatarColor" | "personality" | "toolPolicy" | "assistedUser" | "openclawAgentId" | "lastActive" | "createdAt" | "updatedAt", ExtArgs["result"]["agent"]>
+export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "role" | "status" | "tenantId" | "modelTier" | "thinkingMode" | "temperature" | "avatarColor" | "personality" | "toolPolicy" | "assistedUser" | "customTemplates" | "openclawAgentId" | "lastActive" | "createdAt" | "updatedAt", ExtArgs["result"]["agent"]>
 export type AgentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   channels?: boolean | Prisma.Agent$channelsArgs<ExtArgs>
@@ -2677,6 +2744,7 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     personality: string | null
     toolPolicy: runtime.JsonValue
     assistedUser: runtime.JsonValue | null
+    customTemplates: runtime.JsonValue | null
     openclawAgentId: string | null
     lastActive: Date | null
     createdAt: Date
@@ -3128,6 +3196,7 @@ export interface AgentFieldRefs {
   readonly personality: Prisma.FieldRef<"Agent", 'String'>
   readonly toolPolicy: Prisma.FieldRef<"Agent", 'Json'>
   readonly assistedUser: Prisma.FieldRef<"Agent", 'Json'>
+  readonly customTemplates: Prisma.FieldRef<"Agent", 'Json'>
   readonly openclawAgentId: Prisma.FieldRef<"Agent", 'String'>
   readonly lastActive: Prisma.FieldRef<"Agent", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Agent", 'DateTime'>

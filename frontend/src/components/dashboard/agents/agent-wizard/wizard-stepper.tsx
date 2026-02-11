@@ -6,9 +6,10 @@ import { cn } from '@/lib/utils/cn';
 
 const STEPS = [
   { label: 'Basic Info', comingSoon: false },
+  { label: 'Templates', comingSoon: false },
   { label: 'Model & Config', comingSoon: false },
   { label: 'Tool Policy', comingSoon: false },
-  { label: 'Channels', comingSoon: true },
+  { label: 'Channels', comingSoon: false },
   { label: 'Review', comingSoon: false },
 ];
 

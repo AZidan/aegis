@@ -141,7 +141,7 @@ export function StepReview({
         <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden">
           <button
             type="button"
-            onClick={() => onStepClick(2)}
+            onClick={() => onStepClick(3)}
             className="w-full flex items-center justify-between px-5 py-4 border-b border-neutral-100 hover:bg-neutral-50 transition-colors cursor-pointer"
           >
             <span className="text-sm font-semibold text-neutral-900">
@@ -183,7 +183,7 @@ export function StepReview({
         <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden">
           <button
             type="button"
-            onClick={() => onStepClick(3)}
+            onClick={() => onStepClick(4)}
             className="w-full flex items-center justify-between px-5 py-4 border-b border-neutral-100 hover:bg-neutral-50 transition-colors cursor-pointer"
           >
             <span className="text-sm font-semibold text-neutral-900">

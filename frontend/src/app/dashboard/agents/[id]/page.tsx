@@ -9,6 +9,7 @@ import { AgentOverviewTab } from '@/components/dashboard/agents/agent-overview-t
 import { AgentActivityTab } from '@/components/dashboard/agents/agent-activity-tab';
 import { AgentConfigTab } from '@/components/dashboard/agents/agent-config-tab';
 import { AgentLogsTab } from '@/components/dashboard/agents/agent-logs-tab';
+import { AgentChannelsTab } from '@/components/dashboard/agents/agent-channels-tab';
 import {
   useAgent,
   useAgentAction,
@@ -20,12 +21,13 @@ import {
 // Tab configuration
 // ---------------------------------------------------------------------------
 
-type TabKey = 'overview' | 'activity' | 'configuration' | 'logs';
+type TabKey = 'overview' | 'activity' | 'configuration' | 'channels' | 'logs';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'overview', label: 'Overview' },
   { key: 'activity', label: 'Activity' },
   { key: 'configuration', label: 'Configuration' },
+  { key: 'channels', label: 'Channels' },
   { key: 'logs', label: 'Logs' },
 ];
 
@@ -118,6 +120,7 @@ export default function AgentDetailPage() {
       {activeTab === 'overview' && <AgentOverviewTab agent={agent} />}
       {activeTab === 'activity' && <AgentActivityTab agentId={agentId} />}
       {activeTab === 'configuration' && <AgentConfigTab agent={agent} />}
+      {activeTab === 'channels' && <AgentChannelsTab agentId={agentId} />}
       {activeTab === 'logs' && <AgentLogsTab agentId={agentId} />}
     </div>
   );

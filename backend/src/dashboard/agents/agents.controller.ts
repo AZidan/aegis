@@ -28,6 +28,10 @@ import {
   listAgentsQuerySchema,
   ListAgentsQueryDto,
 } from './dto/list-agents-query.dto';
+import {
+  createAgentRouteSchema,
+  CreateAgentRouteDto,
+} from './dto/create-agent-route.dto';
 
 /**
  * Agents Controller - Tenant: Agents
@@ -87,6 +91,82 @@ export class AgentsController {
   ) {
     const tenantId = this.getTenantId(req);
     return this.agentsService.createAgent(tenantId, dto);
+  }
+
+  // ==========================================================================
+  // POST /api/dashboard/agents/preview-templates - Preview rendered templates
+  // Returns hydrated template previews for the wizard editor.
+  // ==========================================================================
+  @Post('preview-templates')
+  @HttpCode(HttpStatus.OK)
+  async previewTemplates(
+    @Body() body: { role: string; customTemplates?: { soulTemplate?: string; agentsTemplate?: string; heartbeatTemplate?: string }; agentName?: string },
+  ) {
+    return this.agentsService.previewTemplates(
+      body.role,
+      body.customTemplates,
+      body.agentName,
+    );
+  }
+
+  // ==========================================================================
+  // GET /api/dashboard/agents/:id/channels - Get Agent Channel Routes
+  // Returns all channel connections with routing rules for this agent.
+  // ==========================================================================
+  @Get(':id/channels')
+  @HttpCode(HttpStatus.OK)
+  async getAgentChannels(@Req() req: Request, @Param('id') id: string) {
+    const tenantId = this.getTenantId(req);
+    return this.agentsService.getAgentChannels(tenantId, id);
+  }
+
+  // ==========================================================================
+  // POST /api/dashboard/agents/:id/channels/:connectionId/route
+  // Create a routing rule for this agent on a specific connection.
+  // ==========================================================================
+  @Post(':id/channels/:connectionId/route')
+  @HttpCode(HttpStatus.CREATED)
+  async createAgentChannelRoute(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Param('connectionId') connectionId: string,
+    @Body(new ZodValidationPipe(createAgentRouteSchema))
+    dto: CreateAgentRouteDto,
+  ) {
+    const tenantId = this.getTenantId(req);
+    const userId =
+      (req as any).user?.sub || (req as any).user?.id || 'unknown';
+    return this.agentsService.createAgentChannelRoute(
+      tenantId,
+      id,
+      connectionId,
+      dto,
+      userId,
+    );
+  }
+
+  // ==========================================================================
+  // DELETE /api/dashboard/agents/:id/channels/:connectionId/route/:ruleId
+  // Delete a routing rule for this agent on a specific connection.
+  // ==========================================================================
+  @Delete(':id/channels/:connectionId/route/:ruleId')
+  @HttpCode(HttpStatus.OK)
+  async deleteAgentChannelRoute(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Param('connectionId') connectionId: string,
+    @Param('ruleId') ruleId: string,
+  ) {
+    const tenantId = this.getTenantId(req);
+    const userId =
+      (req as any).user?.sub || (req as any).user?.id || 'unknown';
+    return this.agentsService.deleteAgentChannelRoute(
+      tenantId,
+      id,
+      connectionId,
+      ruleId,
+      userId,
+    );
   }
 
   // ==========================================================================

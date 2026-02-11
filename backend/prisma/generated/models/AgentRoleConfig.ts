@@ -42,6 +42,11 @@ export type AgentRoleConfigMinAggregateOutputType = {
   color: string | null
   sortOrder: number | null
   isSystem: boolean | null
+  soulTemplate: string | null
+  agentsTemplate: string | null
+  heartbeatTemplate: string | null
+  userTemplate: string | null
+  identityEmoji: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -54,6 +59,11 @@ export type AgentRoleConfigMaxAggregateOutputType = {
   color: string | null
   sortOrder: number | null
   isSystem: boolean | null
+  soulTemplate: string | null
+  agentsTemplate: string | null
+  heartbeatTemplate: string | null
+  userTemplate: string | null
+  identityEmoji: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -67,6 +77,12 @@ export type AgentRoleConfigCountAggregateOutputType = {
   defaultToolCategories: number
   sortOrder: number
   isSystem: number
+  soulTemplate: number
+  agentsTemplate: number
+  heartbeatTemplate: number
+  userTemplate: number
+  identityEmoji: number
+  openclawConfigTemplate: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -89,6 +105,11 @@ export type AgentRoleConfigMinAggregateInputType = {
   color?: true
   sortOrder?: true
   isSystem?: true
+  soulTemplate?: true
+  agentsTemplate?: true
+  heartbeatTemplate?: true
+  userTemplate?: true
+  identityEmoji?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -101,6 +122,11 @@ export type AgentRoleConfigMaxAggregateInputType = {
   color?: true
   sortOrder?: true
   isSystem?: true
+  soulTemplate?: true
+  agentsTemplate?: true
+  heartbeatTemplate?: true
+  userTemplate?: true
+  identityEmoji?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -114,6 +140,12 @@ export type AgentRoleConfigCountAggregateInputType = {
   defaultToolCategories?: true
   sortOrder?: true
   isSystem?: true
+  soulTemplate?: true
+  agentsTemplate?: true
+  heartbeatTemplate?: true
+  userTemplate?: true
+  identityEmoji?: true
+  openclawConfigTemplate?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -214,6 +246,12 @@ export type AgentRoleConfigGroupByOutputType = {
   defaultToolCategories: string[]
   sortOrder: number
   isSystem: boolean
+  soulTemplate: string | null
+  agentsTemplate: string | null
+  heartbeatTemplate: string | null
+  userTemplate: string | null
+  identityEmoji: string | null
+  openclawConfigTemplate: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
   _count: AgentRoleConfigCountAggregateOutputType | null
@@ -250,6 +288,12 @@ export type AgentRoleConfigWhereInput = {
   defaultToolCategories?: Prisma.StringNullableListFilter<"AgentRoleConfig">
   sortOrder?: Prisma.IntFilter<"AgentRoleConfig"> | number
   isSystem?: Prisma.BoolFilter<"AgentRoleConfig"> | boolean
+  soulTemplate?: Prisma.StringNullableFilter<"AgentRoleConfig"> | string | null
+  agentsTemplate?: Prisma.StringNullableFilter<"AgentRoleConfig"> | string | null
+  heartbeatTemplate?: Prisma.StringNullableFilter<"AgentRoleConfig"> | string | null
+  userTemplate?: Prisma.StringNullableFilter<"AgentRoleConfig"> | string | null
+  identityEmoji?: Prisma.StringNullableFilter<"AgentRoleConfig"> | string | null
+  openclawConfigTemplate?: Prisma.JsonNullableFilter<"AgentRoleConfig">
   createdAt?: Prisma.DateTimeFilter<"AgentRoleConfig"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AgentRoleConfig"> | Date | string
 }
@@ -263,6 +307,12 @@ export type AgentRoleConfigOrderByWithRelationInput = {
   defaultToolCategories?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isSystem?: Prisma.SortOrder
+  soulTemplate?: Prisma.SortOrderInput | Prisma.SortOrder
+  agentsTemplate?: Prisma.SortOrderInput | Prisma.SortOrder
+  heartbeatTemplate?: Prisma.SortOrderInput | Prisma.SortOrder
+  userTemplate?: Prisma.SortOrderInput | Prisma.SortOrder
+  identityEmoji?: Prisma.SortOrderInput | Prisma.SortOrder
+  openclawConfigTemplate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -279,6 +329,12 @@ export type AgentRoleConfigWhereUniqueInput = Prisma.AtLeast<{
   defaultToolCategories?: Prisma.StringNullableListFilter<"AgentRoleConfig">
   sortOrder?: Prisma.IntFilter<"AgentRoleConfig"> | number
   isSystem?: Prisma.BoolFilter<"AgentRoleConfig"> | boolean
+  soulTemplate?: Prisma.StringNullableFilter<"AgentRoleConfig"> | string | null
+  agentsTemplate?: Prisma.StringNullableFilter<"AgentRoleConfig"> | string | null
+  heartbeatTemplate?: Prisma.StringNullableFilter<"AgentRoleConfig"> | string | null
+  userTemplate?: Prisma.StringNullableFilter<"AgentRoleConfig"> | string | null
+  identityEmoji?: Prisma.StringNullableFilter<"AgentRoleConfig"> | string | null
+  openclawConfigTemplate?: Prisma.JsonNullableFilter<"AgentRoleConfig">
   createdAt?: Prisma.DateTimeFilter<"AgentRoleConfig"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AgentRoleConfig"> | Date | string
 }, "id" | "name">
@@ -292,6 +348,12 @@ export type AgentRoleConfigOrderByWithAggregationInput = {
   defaultToolCategories?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isSystem?: Prisma.SortOrder
+  soulTemplate?: Prisma.SortOrderInput | Prisma.SortOrder
+  agentsTemplate?: Prisma.SortOrderInput | Prisma.SortOrder
+  heartbeatTemplate?: Prisma.SortOrderInput | Prisma.SortOrder
+  userTemplate?: Prisma.SortOrderInput | Prisma.SortOrder
+  identityEmoji?: Prisma.SortOrderInput | Prisma.SortOrder
+  openclawConfigTemplate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.AgentRoleConfigCountOrderByAggregateInput
@@ -313,6 +375,12 @@ export type AgentRoleConfigScalarWhereWithAggregatesInput = {
   defaultToolCategories?: Prisma.StringNullableListFilter<"AgentRoleConfig">
   sortOrder?: Prisma.IntWithAggregatesFilter<"AgentRoleConfig"> | number
   isSystem?: Prisma.BoolWithAggregatesFilter<"AgentRoleConfig"> | boolean
+  soulTemplate?: Prisma.StringNullableWithAggregatesFilter<"AgentRoleConfig"> | string | null
+  agentsTemplate?: Prisma.StringNullableWithAggregatesFilter<"AgentRoleConfig"> | string | null
+  heartbeatTemplate?: Prisma.StringNullableWithAggregatesFilter<"AgentRoleConfig"> | string | null
+  userTemplate?: Prisma.StringNullableWithAggregatesFilter<"AgentRoleConfig"> | string | null
+  identityEmoji?: Prisma.StringNullableWithAggregatesFilter<"AgentRoleConfig"> | string | null
+  openclawConfigTemplate?: Prisma.JsonNullableWithAggregatesFilter<"AgentRoleConfig">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AgentRoleConfig"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AgentRoleConfig"> | Date | string
 }
@@ -326,6 +394,12 @@ export type AgentRoleConfigCreateInput = {
   defaultToolCategories?: Prisma.AgentRoleConfigCreatedefaultToolCategoriesInput | string[]
   sortOrder?: number
   isSystem?: boolean
+  soulTemplate?: string | null
+  agentsTemplate?: string | null
+  heartbeatTemplate?: string | null
+  userTemplate?: string | null
+  identityEmoji?: string | null
+  openclawConfigTemplate?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -339,6 +413,12 @@ export type AgentRoleConfigUncheckedCreateInput = {
   defaultToolCategories?: Prisma.AgentRoleConfigCreatedefaultToolCategoriesInput | string[]
   sortOrder?: number
   isSystem?: boolean
+  soulTemplate?: string | null
+  agentsTemplate?: string | null
+  heartbeatTemplate?: string | null
+  userTemplate?: string | null
+  identityEmoji?: string | null
+  openclawConfigTemplate?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -352,6 +432,12 @@ export type AgentRoleConfigUpdateInput = {
   defaultToolCategories?: Prisma.AgentRoleConfigUpdatedefaultToolCategoriesInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  soulTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  agentsTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heartbeatTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityEmoji?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  openclawConfigTemplate?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -365,6 +451,12 @@ export type AgentRoleConfigUncheckedUpdateInput = {
   defaultToolCategories?: Prisma.AgentRoleConfigUpdatedefaultToolCategoriesInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  soulTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  agentsTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heartbeatTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityEmoji?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  openclawConfigTemplate?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -378,6 +470,12 @@ export type AgentRoleConfigCreateManyInput = {
   defaultToolCategories?: Prisma.AgentRoleConfigCreatedefaultToolCategoriesInput | string[]
   sortOrder?: number
   isSystem?: boolean
+  soulTemplate?: string | null
+  agentsTemplate?: string | null
+  heartbeatTemplate?: string | null
+  userTemplate?: string | null
+  identityEmoji?: string | null
+  openclawConfigTemplate?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -391,6 +489,12 @@ export type AgentRoleConfigUpdateManyMutationInput = {
   defaultToolCategories?: Prisma.AgentRoleConfigUpdatedefaultToolCategoriesInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  soulTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  agentsTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heartbeatTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityEmoji?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  openclawConfigTemplate?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -404,6 +508,12 @@ export type AgentRoleConfigUncheckedUpdateManyInput = {
   defaultToolCategories?: Prisma.AgentRoleConfigUpdatedefaultToolCategoriesInput | string[]
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  soulTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  agentsTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  heartbeatTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userTemplate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityEmoji?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  openclawConfigTemplate?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -425,6 +535,12 @@ export type AgentRoleConfigCountOrderByAggregateInput = {
   defaultToolCategories?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isSystem?: Prisma.SortOrder
+  soulTemplate?: Prisma.SortOrder
+  agentsTemplate?: Prisma.SortOrder
+  heartbeatTemplate?: Prisma.SortOrder
+  userTemplate?: Prisma.SortOrder
+  identityEmoji?: Prisma.SortOrder
+  openclawConfigTemplate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -441,6 +557,11 @@ export type AgentRoleConfigMaxOrderByAggregateInput = {
   color?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isSystem?: Prisma.SortOrder
+  soulTemplate?: Prisma.SortOrder
+  agentsTemplate?: Prisma.SortOrder
+  heartbeatTemplate?: Prisma.SortOrder
+  userTemplate?: Prisma.SortOrder
+  identityEmoji?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -453,6 +574,11 @@ export type AgentRoleConfigMinOrderByAggregateInput = {
   color?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isSystem?: Prisma.SortOrder
+  soulTemplate?: Prisma.SortOrder
+  agentsTemplate?: Prisma.SortOrder
+  heartbeatTemplate?: Prisma.SortOrder
+  userTemplate?: Prisma.SortOrder
+  identityEmoji?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -481,6 +607,12 @@ export type AgentRoleConfigSelect<ExtArgs extends runtime.Types.Extensions.Inter
   defaultToolCategories?: boolean
   sortOrder?: boolean
   isSystem?: boolean
+  soulTemplate?: boolean
+  agentsTemplate?: boolean
+  heartbeatTemplate?: boolean
+  userTemplate?: boolean
+  identityEmoji?: boolean
+  openclawConfigTemplate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["agentRoleConfig"]>
@@ -494,6 +626,12 @@ export type AgentRoleConfigSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   defaultToolCategories?: boolean
   sortOrder?: boolean
   isSystem?: boolean
+  soulTemplate?: boolean
+  agentsTemplate?: boolean
+  heartbeatTemplate?: boolean
+  userTemplate?: boolean
+  identityEmoji?: boolean
+  openclawConfigTemplate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["agentRoleConfig"]>
@@ -507,6 +645,12 @@ export type AgentRoleConfigSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   defaultToolCategories?: boolean
   sortOrder?: boolean
   isSystem?: boolean
+  soulTemplate?: boolean
+  agentsTemplate?: boolean
+  heartbeatTemplate?: boolean
+  userTemplate?: boolean
+  identityEmoji?: boolean
+  openclawConfigTemplate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["agentRoleConfig"]>
@@ -520,11 +664,17 @@ export type AgentRoleConfigSelectScalar = {
   defaultToolCategories?: boolean
   sortOrder?: boolean
   isSystem?: boolean
+  soulTemplate?: boolean
+  agentsTemplate?: boolean
+  heartbeatTemplate?: boolean
+  userTemplate?: boolean
+  identityEmoji?: boolean
+  openclawConfigTemplate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AgentRoleConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "label" | "description" | "color" | "defaultToolCategories" | "sortOrder" | "isSystem" | "createdAt" | "updatedAt", ExtArgs["result"]["agentRoleConfig"]>
+export type AgentRoleConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "label" | "description" | "color" | "defaultToolCategories" | "sortOrder" | "isSystem" | "soulTemplate" | "agentsTemplate" | "heartbeatTemplate" | "userTemplate" | "identityEmoji" | "openclawConfigTemplate" | "createdAt" | "updatedAt", ExtArgs["result"]["agentRoleConfig"]>
 
 export type $AgentRoleConfigPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AgentRoleConfig"
@@ -538,6 +688,12 @@ export type $AgentRoleConfigPayload<ExtArgs extends runtime.Types.Extensions.Int
     defaultToolCategories: string[]
     sortOrder: number
     isSystem: boolean
+    soulTemplate: string | null
+    agentsTemplate: string | null
+    heartbeatTemplate: string | null
+    userTemplate: string | null
+    identityEmoji: string | null
+    openclawConfigTemplate: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["agentRoleConfig"]>
@@ -971,6 +1127,12 @@ export interface AgentRoleConfigFieldRefs {
   readonly defaultToolCategories: Prisma.FieldRef<"AgentRoleConfig", 'String[]'>
   readonly sortOrder: Prisma.FieldRef<"AgentRoleConfig", 'Int'>
   readonly isSystem: Prisma.FieldRef<"AgentRoleConfig", 'Boolean'>
+  readonly soulTemplate: Prisma.FieldRef<"AgentRoleConfig", 'String'>
+  readonly agentsTemplate: Prisma.FieldRef<"AgentRoleConfig", 'String'>
+  readonly heartbeatTemplate: Prisma.FieldRef<"AgentRoleConfig", 'String'>
+  readonly userTemplate: Prisma.FieldRef<"AgentRoleConfig", 'String'>
+  readonly identityEmoji: Prisma.FieldRef<"AgentRoleConfig", 'String'>
+  readonly openclawConfigTemplate: Prisma.FieldRef<"AgentRoleConfig", 'Json'>
   readonly createdAt: Prisma.FieldRef<"AgentRoleConfig", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"AgentRoleConfig", 'DateTime'>
 }

@@ -3,16 +3,21 @@ import {
   NotFoundException,
   BadRequestException,
   Logger,
+  Optional,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/audit.service';
+import { ContainerConfigSyncService } from '../../provisioning/container-config-sync.service';
+import { ContainerConfigGeneratorService } from '../../provisioning/container-config-generator.service';
 import { Prisma } from '../../../prisma/generated/client';
 import { CreateAgentDto } from './dto/create-agent.dto';
 import { UpdateAgentDto } from './dto/update-agent.dto';
 import { UpdateToolPolicyDto } from './dto/update-tool-policy.dto';
 import { ListAgentsQueryDto } from './dto/list-agents-query.dto';
+import { CreateAgentRouteDto } from './dto/create-agent-route.dto';
 import { TOOL_CATEGORIES } from '../tools/tool-categories';
 import { ROLE_DEFAULT_POLICIES } from '../tools/role-defaults';
+import { ChannelRoutingService } from '../../channels/channel-routing.service';
 
 /**
  * Plan-based agent limits.
@@ -49,6 +54,9 @@ export class AgentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
+    private readonly channelRoutingService: ChannelRoutingService,
+    @Optional() private readonly configSyncService: ContainerConfigSyncService,
+    @Optional() private readonly configGeneratorService: ContainerConfigGeneratorService,
   ) {}
 
   // ==========================================================================
@@ -282,6 +290,9 @@ export class AgentsService {
         personality: dto.personality,
         toolPolicy: toolPolicy as Prisma.InputJsonValue,
         assistedUser: assistedUser as Prisma.InputJsonValue,
+        customTemplates: dto.customTemplates
+          ? (dto.customTemplates as Prisma.InputJsonValue)
+          : Prisma.JsonNull,
         tenantId,
       },
     });
@@ -289,6 +300,9 @@ export class AgentsService {
     this.logger.log(
       `Agent created: ${agent.id} (${agent.name}) for tenant ${tenantId} - status: provisioning`,
     );
+
+    // Fire-and-forget config sync to generate workspace files
+    this.configSyncService?.syncAgentConfig(agent.id);
 
     this.auditService.logAction({
       actorType: 'system',
@@ -541,6 +555,13 @@ export class AgentsService {
 
     this.logger.log(`Agent updated: ${agentId} for tenant ${tenantId}`);
 
+    // Fire-and-forget config sync if relevant fields changed
+    const configFields = ['personality', 'modelTier', 'thinkingMode', 'temperature', 'customTemplates'];
+    const changedFields = Object.keys(dto).filter((k) => (dto as any)[k] !== undefined);
+    if (changedFields.some((f) => configFields.includes(f))) {
+      this.configSyncService?.syncAgentConfig(agentId);
+    }
+
     this.auditService.logAction({
       actorType: 'system',
       actorId: 'system',
@@ -548,7 +569,7 @@ export class AgentsService {
       action: 'agent_updated',
       targetType: 'agent',
       targetId: agentId,
-      details: { changedFields: Object.keys(dto).filter((k) => (dto as any)[k] !== undefined) },
+      details: { changedFields },
       severity: 'info',
       tenantId,
       agentId,
@@ -924,5 +945,241 @@ export class AgentsService {
       policy: newPolicy,
       updatedAt: updated.updatedAt.toISOString(),
     };
+  }
+
+  // ==========================================================================
+  // POST /api/dashboard/agents/preview-templates - Preview hydrated templates
+  // Given a role and optional customizations, returns rendered template previews.
+  // ==========================================================================
+  async previewTemplates(
+    role: string,
+    customTemplates?: { soulTemplate?: string; agentsTemplate?: string; heartbeatTemplate?: string },
+    agentName?: string,
+  ) {
+    const roleConfig = await this.prisma.agentRoleConfig.findUnique({
+      where: { name: role },
+    });
+
+    if (!roleConfig) {
+      throw new BadRequestException(`Invalid role "${role}"`);
+    }
+
+    if (!this.configGeneratorService) {
+      throw new BadRequestException('Config generator not available');
+    }
+
+    // Build a mock agent/tenant for preview hydration
+    const mockAgent = {
+      id: 'preview',
+      name: agentName || 'My Agent',
+      role,
+      modelTier: 'sonnet',
+      thinkingMode: 'standard',
+      temperature: 0.3,
+      personality: 'Friendly and professional',
+      toolPolicy: { allow: roleConfig.defaultToolCategories },
+      customTemplates: customTemplates || null,
+    };
+
+    const mockTenant = {
+      id: 'preview-tenant',
+      companyName: 'Your Company',
+      plan: 'growth',
+    };
+
+    const workspace = this.configGeneratorService.generateWorkspace({
+      agent: mockAgent,
+      tenant: mockTenant,
+      roleConfig: {
+        name: roleConfig.name,
+        label: roleConfig.label,
+        defaultToolCategories: roleConfig.defaultToolCategories,
+        identityEmoji: roleConfig.identityEmoji,
+        soulTemplate: roleConfig.soulTemplate,
+        agentsTemplate: roleConfig.agentsTemplate,
+        heartbeatTemplate: roleConfig.heartbeatTemplate,
+        userTemplate: roleConfig.userTemplate,
+        openclawConfigTemplate: roleConfig.openclawConfigTemplate as Record<string, unknown> | null,
+      },
+      customTemplates,
+    });
+
+    return {
+      soulMd: workspace.soulMd,
+      agentsMd: workspace.agentsMd,
+      heartbeatMd: workspace.heartbeatMd,
+      identityEmoji: roleConfig.identityEmoji,
+    };
+  }
+
+  // ==========================================================================
+  // GET /api/dashboard/agents/:id/channels - Get Agent Channel Routes
+  // Returns all channel connections with their routing rules for this agent.
+  // ==========================================================================
+  async getAgentChannels(tenantId: string, agentId: string) {
+    // Verify agent belongs to tenant
+    const agent = await this.prisma.agent.findFirst({
+      where: { id: agentId, tenantId },
+    });
+
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
+
+    // Find all routing rules for this agent, including connection details
+    const routes = await this.prisma.channelRouting.findMany({
+      where: { agentId },
+      include: {
+        connection: {
+          select: {
+            id: true,
+            platform: true,
+            workspaceName: true,
+            status: true,
+            tenantId: true,
+          },
+        },
+      },
+      orderBy: [{ priority: 'desc' }, { createdAt: 'asc' }],
+    });
+
+    // Filter routes to only those whose connection belongs to this tenant
+    const tenantRoutes = routes.filter(
+      (r) => r.connection.tenantId === tenantId,
+    );
+
+    // Group routes by connection
+    const connectionMap = new Map<
+      string,
+      {
+        id: string;
+        platform: string;
+        workspaceName: string | null;
+        status: string;
+        routes: Array<{
+          id: string;
+          routeType: string;
+          sourceIdentifier: string;
+          priority: number;
+          isActive: boolean;
+          createdAt: string;
+          updatedAt: string;
+        }>;
+      }
+    >();
+
+    for (const route of tenantRoutes) {
+      const conn = route.connection;
+      if (!connectionMap.has(conn.id)) {
+        connectionMap.set(conn.id, {
+          id: conn.id,
+          platform: conn.platform,
+          workspaceName: conn.workspaceName,
+          status: conn.status,
+          routes: [],
+        });
+      }
+      connectionMap.get(conn.id)!.routes.push({
+        id: route.id,
+        routeType: route.routeType,
+        sourceIdentifier: route.sourceIdentifier,
+        priority: route.priority,
+        isActive: route.isActive,
+        createdAt: route.createdAt.toISOString(),
+        updatedAt: route.updatedAt.toISOString(),
+      });
+    }
+
+    return {
+      connections: Array.from(connectionMap.values()),
+    };
+  }
+
+  // ==========================================================================
+  // POST /api/dashboard/agents/:id/channels/:connectionId/route
+  // Create a routing rule for this agent on a specific connection.
+  // ==========================================================================
+  async createAgentChannelRoute(
+    tenantId: string,
+    agentId: string,
+    connectionId: string,
+    dto: CreateAgentRouteDto,
+    userId: string,
+  ) {
+    // Verify agent belongs to tenant
+    const agent = await this.prisma.agent.findFirst({
+      where: { id: agentId, tenantId },
+    });
+
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
+
+    // Verify connection belongs to tenant
+    const connection = await this.prisma.channelConnection.findFirst({
+      where: { id: connectionId, tenantId },
+    });
+
+    if (!connection) {
+      throw new NotFoundException('Channel connection not found');
+    }
+
+    // Delegate to ChannelRoutingService.createRoute
+    // Build the CreateRoutingDto shape expected by the routing service
+    const routingDto = {
+      routeType: dto.routeType,
+      sourceIdentifier: dto.sourceIdentifier,
+      agentId,
+      priority: dto.priority,
+    };
+
+    return this.channelRoutingService.createRoute(
+      connectionId,
+      routingDto as any,
+      tenantId,
+      userId,
+    );
+  }
+
+  // ==========================================================================
+  // DELETE /api/dashboard/agents/:id/channels/:connectionId/route/:ruleId
+  // Delete a routing rule for this agent on a specific connection.
+  // ==========================================================================
+  async deleteAgentChannelRoute(
+    tenantId: string,
+    agentId: string,
+    connectionId: string,
+    ruleId: string,
+    userId: string,
+  ) {
+    // Verify agent belongs to tenant
+    const agent = await this.prisma.agent.findFirst({
+      where: { id: agentId, tenantId },
+    });
+
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
+
+    // Verify the routing rule belongs to this agent and connection
+    const route = await this.prisma.channelRouting.findFirst({
+      where: {
+        id: ruleId,
+        agentId,
+        connectionId,
+      },
+    });
+
+    if (!route) {
+      throw new NotFoundException('Routing rule not found for this agent and connection');
+    }
+
+    // Delegate to ChannelRoutingService.deleteRoute
+    return this.channelRoutingService.deleteRoute(
+      connectionId,
+      ruleId,
+      tenantId,
+      userId,
+    );
   }
 }

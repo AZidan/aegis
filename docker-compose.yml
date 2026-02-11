@@ -70,6 +70,11 @@ services:
       CORS_ORIGINS: http://localhost:3001,http://localhost:3000
       BCRYPT_ROUNDS: 12
       MFA_ISSUER: Aegis Platform
+      SLACK_CLIENT_ID: ${SLACK_CLIENT_ID:-}
+      SLACK_CLIENT_SECRET: ${SLACK_CLIENT_SECRET:-}
+      SLACK_SIGNING_SECRET: ${SLACK_SIGNING_SECRET:-}
+      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN:-}
+      SLACK_REDIRECT_URI: ${SLACK_REDIRECT_URI:-http://localhost:3000/api/integrations/slack/callback}
     volumes:
       - ./backend:/app
       - /app/node_modules

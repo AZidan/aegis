@@ -329,6 +329,9 @@ model Agent {
   // Role-based agent configuration (JSONB)
   assistedUser Json? // { userId: string, userRole: string }
 
+  // Per-agent template customizations (Sprint 9)
+  customTemplates Json? // User's customized template overrides { soulTemplate?, agentsTemplate?, heartbeatTemplate? }
+
   // OpenClaw integration
   openclawAgentId String? // Agent ID in OpenClaw platform
 
@@ -372,6 +375,15 @@ model AgentRoleConfig {
   defaultToolCategories String[] // Default allowed tool categories
   sortOrder             Int      @default(0)
   isSystem              Boolean  @default(true)
+
+  // Per-agent-type setup templates (Sprint 9)
+  soulTemplate           String?  @db.Text   // SOUL.md Handlebars template
+  agentsTemplate         String?  @db.Text   // AGENTS.md template
+  heartbeatTemplate      String?  @db.Text   // HEARTBEAT.md template
+  userTemplate           String?  @db.Text   // USER.md template
+  identityEmoji          String?             // Default emoji (e.g. "clipboard")
+  openclawConfigTemplate Json?               // Default openclaw.json structure
+
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 

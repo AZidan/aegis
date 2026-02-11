@@ -40,6 +40,12 @@ export class RolesService {
         defaultToolCategories: role.defaultToolCategories,
         sortOrder: role.sortOrder,
         isSystem: role.isSystem,
+        // Template fields (Sprint 9)
+        soulTemplate: role.soulTemplate,
+        agentsTemplate: role.agentsTemplate,
+        heartbeatTemplate: role.heartbeatTemplate,
+        userTemplate: role.userTemplate,
+        identityEmoji: role.identityEmoji,
       })),
     };
   }

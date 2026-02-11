@@ -61,6 +61,9 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
    * Initialize the Bolt App in Socket Mode.
    * Socket Mode uses a WebSocket connection instead of HTTP,
    * so no public URL is needed for receiving events.
+   *
+   * Multi-workspace mode: uses authorize callback to resolve
+   * bot tokens per workspace from the registered clients map.
    */
   async initializeApp(): Promise<void> {
     const appToken = this.configService.get<string>(
@@ -69,16 +72,35 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
     const signingSecret = this.configService.get<string>(
       SLACK_CONFIG_KEYS.SIGNING_SECRET,
     );
+    const clientId = this.configService.get<string>(
+      SLACK_CONFIG_KEYS.CLIENT_ID,
+    );
+    const clientSecret = this.configService.get<string>(
+      SLACK_CONFIG_KEYS.CLIENT_SECRET,
+    );
 
     if (!appToken || !signingSecret) {
       return;
     }
 
     this.boltApp = new App({
-      token: undefined, // multi-workspace: no single bot token
       appToken,
       signingSecret,
       socketMode: true,
+      clientId,
+      clientSecret,
+      authorize: async ({ teamId }) => {
+        const client = this.workspaceClients.get(teamId!);
+        if (!client) {
+          throw new Error(
+            `No bot token registered for workspace ${teamId}`,
+          );
+        }
+        return {
+          botToken: client.token,
+          teamId: teamId!,
+        };
+      },
       logLevel:
         this.configService.get<string>('nodeEnv') === 'production'
           ? LogLevel.WARN

@@ -18,8 +18,12 @@ import {
   fetchRecentActivity,
   fetchAgentActivityLog,
   fetchAgentLogs,
+  fetchAgentChannels,
+  createAgentChannelRoute,
+  deleteAgentChannelRoute,
   type AgentFilters,
   type CreateAgentPayload,
+  type CreateAgentRoutePayload,
   type UpdateAgentPayload,
   type ToolItem,
   type LogLevel,
@@ -236,5 +240,54 @@ export function useAgentLogs(id: string, level?: LogLevel) {
     enabled: !!id,
     staleTime: 10_000,
     refetchInterval: 8_000,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Agent Channels
+// ---------------------------------------------------------------------------
+
+export function useAgentChannels(agentId: string) {
+  return useQuery({
+    queryKey: [...agentKeys.detail(agentId), 'channels'] as const,
+    queryFn: () => fetchAgentChannels(agentId),
+    enabled: !!agentId,
+    staleTime: 15_000,
+  });
+}
+
+export function useCreateAgentRoute(agentId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      connectionId,
+      payload,
+    }: {
+      connectionId: string;
+      payload: CreateAgentRoutePayload;
+    }) => createAgentChannelRoute(agentId, connectionId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [...agentKeys.detail(agentId), 'channels'],
+      });
+    },
+  });
+}
+
+export function useDeleteAgentRoute(agentId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      connectionId,
+      ruleId,
+    }: {
+      connectionId: string;
+      ruleId: string;
+    }) => deleteAgentChannelRoute(agentId, connectionId, ruleId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [...agentKeys.detail(agentId), 'channels'],
+      });
+    },
   });
 }

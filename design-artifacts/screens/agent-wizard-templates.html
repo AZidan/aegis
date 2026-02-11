@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aegis Platform - Agent Wizard: Personality & Behavior</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'SF Mono', 'Menlo', 'monospace'],
+          },
+          colors: {
+            primary: {
+              25: '#f5f5ff', 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe',
+              300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5',
+              700: '#4338ca', 800: '#3730a3', 900: '#312e81', 950: '#1e1b4b',
+            },
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 300ms cubic-bezier(0.4,0,0.2,1); }
+    .accordion-content.open { max-height: 1200px; }
+    .step-connector { transition: background-color 300ms ease-out; }
+    #sidebar { transition: width 200ms ease-in-out; overflow: hidden; }
+    #sidebar .sidebar-text { transition: opacity 150ms ease-in-out; white-space: nowrap; }
+    #sidebar.collapsed { width: 64px !important; }
+    #sidebar.collapsed .sidebar-text { opacity: 0; pointer-events: none; }
+    #sidebar.collapsed .sidebar-section-label { display: none; }
+    #sidebar.collapsed .sidebar-nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
+    #sidebar.collapsed .sidebar-nav-item svg { margin: 0; }
+    #sidebar.collapsed .sidebar-logo-text { display: none; }
+    #sidebar.collapsed .sidebar-footer-info { display: none; }
+    #sidebar.collapsed .sidebar-collapse-text { display: none; }
+    #main-content { transition: margin-left 200ms ease-in-out; }
+    .toggle-view-btn { transition: all 150ms; }
+    .placeholder-tag { background: #e0e7ff; color: #4338ca; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 1px 6px; border-radius: 4px; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+  </style>
+</head>
+<body class="font-sans bg-neutral-50 text-neutral-900 antialiased min-h-screen">
+
+  <!-- SIDEBAR - Tenant Admin Standard -->
+  <aside id="sidebar" class="w-64 bg-white border-r border-neutral-200 flex flex-col fixed inset-y-0 left-0 z-30" style="width: 256px;">
+    <!-- Logo -->
+    <div class="h-16 flex items-center px-5 border-b border-neutral-100 shrink-0">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+        </div>
+        <span class="sidebar-logo-text text-lg font-bold text-neutral-900 tracking-tight">Acme Corp</span>
+      </div>
+    </div>
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      <p class="sidebar-section-label px-3 pt-2 pb-1 text-xs font-semibold uppercase tracking-wider text-neutral-400">Workspace</p>
+      <a href="#" class="sidebar-nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors">
+        <svg class="w-5 h-5 text-neutral-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+        <span class="sidebar-text">Dashboard</span>
+      </a>
+      <a href="#" class="sidebar-nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm bg-primary-50 text-primary-600 font-semibold transition-colors">
+        <svg class="w-5 h-5 text-primary-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+        <span class="sidebar-text">Agents</span>
+      </a>
+      <a href="#" class="sidebar-nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors">
+        <svg class="w-5 h-5 text-neutral-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016A3.001 3.001 0 0021 9.349m-18 0a2.999 2.999 0 00.397-1.599V5.25A2.25 2.25 0 015.647 3h12.706A2.25 2.25 0 0120.603 5.25v2.5a3 3 0 00.397 1.599"/></svg>
+        <span class="sidebar-text">Skill Marketplace</span>
+      </a>
+      <p class="sidebar-section-label px-3 pt-5 pb-1 text-xs font-semibold uppercase tracking-wider text-neutral-400">Management</p>
+      <a href="#" class="sidebar-nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors">
+        <svg class="w-5 h-5 text-neutral-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+        <span class="sidebar-text">Team Members</span>
+      </a>
+      <a href="#" class="sidebar-nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors">
+        <svg class="w-5 h-5 text-neutral-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>
+        <span class="sidebar-text">Audit Log</span>
+      </a>
+      <a href="#" class="sidebar-nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors">
+        <svg class="w-5 h-5 text-neutral-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span class="sidebar-text">Settings</span>
+      </a>
+    </nav>
+    <!-- Footer -->
+    <div class="border-t border-neutral-200 px-3 py-3 shrink-0 space-y-2">
+      <button onclick="toggleSidebar()" class="sidebar-nav-item flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 transition-colors w-full">
+        <svg id="collapseIcon" class="w-5 h-5 shrink-0 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5"/></svg>
+        <span class="sidebar-text sidebar-collapse-text">Collapse</span>
+      </button>
+      <div class="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-neutral-50 cursor-pointer transition-colors">
+        <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-sm font-semibold text-primary-700 shrink-0">JD</div>
+        <div class="sidebar-footer-info flex-1 min-w-0">
+          <p class="text-sm font-medium text-neutral-900 truncate">Jane Doe</p>
+          <p class="text-xs text-neutral-500 truncate">Tenant Admin</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content" class="flex flex-col min-h-screen" style="margin-left: 256px;">
+    <!-- Top Bar -->
+    <header class="h-16 bg-white border-b border-neutral-200 flex items-center justify-between px-6 lg:px-8 shrink-0">
+      <nav class="flex items-center gap-2 text-sm">
+        <a href="#" class="text-neutral-500 hover:text-primary-600 transition-colors">Agents</a>
+        <svg class="w-4 h-4 text-neutral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+        <span class="text-neutral-900 font-medium">Create New Agent</span>
+      </nav>
+      <div class="flex items-center gap-3">
+        <button class="p-2 rounded-md text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors" aria-label="Help">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Content area -->
+    <div class="flex-1 overflow-y-auto pb-24">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8 py-8">
+        <div class="mb-8">
+          <h1 class="text-2xl font-bold text-neutral-900 tracking-tight">Create New Agent</h1>
+          <p class="mt-1 text-sm text-neutral-500">Configure your AI agent in 6 simple steps.</p>
+        </div>
+
+        <!-- WIZARD STEPPER - 6 steps, step 2 active -->
+        <div class="mb-10">
+          <div class="flex items-center justify-between">
+            <!-- Step 1: Completed -->
+            <div class="flex flex-col items-center relative z-10">
+              <div class="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center shadow-sm ring-4 ring-primary-100">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+              </div>
+              <span class="mt-2 text-xs font-semibold text-neutral-900">Basic Info</span>
+            </div>
+            <div class="flex-1 h-0.5 bg-primary-500 mx-2 -mt-5 step-connector"></div>
+            <!-- Step 2: Active -->
+            <div class="flex flex-col items-center relative z-10">
+              <div class="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center shadow-sm ring-4 ring-primary-100">
+                <span class="text-xs font-bold text-white">2</span>
+              </div>
+              <span class="mt-2 text-xs font-semibold text-primary-600">Personality</span>
+            </div>
+            <div class="flex-1 h-0.5 bg-neutral-200 mx-2 -mt-5 step-connector"></div>
+            <!-- Step 3 -->
+            <div class="flex flex-col items-center relative z-10">
+              <div class="w-8 h-8 rounded-full bg-neutral-100 border-2 border-neutral-200 flex items-center justify-center">
+                <span class="text-xs font-medium text-neutral-400">3</span>
+              </div>
+              <span class="mt-2 text-xs font-medium text-neutral-400">Model</span>
+            </div>
+            <div class="flex-1 h-0.5 bg-neutral-200 mx-2 -mt-5 step-connector"></div>
+            <!-- Step 4 -->
+            <div class="flex flex-col items-center relative z-10">
+              <div class="w-8 h-8 rounded-full bg-neutral-100 border-2 border-neutral-200 flex items-center justify-center">
+                <span class="text-xs font-medium text-neutral-400">4</span>
+              </div>
+              <span class="mt-2 text-xs font-medium text-neutral-400">Tools</span>
+            </div>
+            <div class="flex-1 h-0.5 bg-neutral-200 mx-2 -mt-5 step-connector"></div>
+            <!-- Step 5 -->
+            <div class="flex flex-col items-center relative z-10">
+              <div class="w-8 h-8 rounded-full bg-neutral-100 border-2 border-neutral-200 flex items-center justify-center">
+                <span class="text-xs font-medium text-neutral-400">5</span>
+              </div>
+              <span class="mt-2 text-xs font-medium text-neutral-400">Channels</span>
+            </div>
+            <div class="flex-1 h-0.5 bg-neutral-200 mx-2 -mt-5 step-connector"></div>
+            <!-- Step 6 -->
+            <div class="flex flex-col items-center relative z-10">
+              <div class="w-8 h-8 rounded-full bg-neutral-100 border-2 border-neutral-200 flex items-center justify-center">
+                <span class="text-xs font-medium text-neutral-400">6</span>
+              </div>
+              <span class="mt-2 text-xs font-medium text-neutral-400">Review</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: PERSONALITY & BEHAVIOR -->
+        <section class="mb-8">
+          <div class="flex items-center justify-between mb-1">
+            <h2 class="text-lg font-semibold text-neutral-900">Personality & Behavior</h2>
+            <div class="flex items-center gap-2">
+              <button onclick="resetToDefaults()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-600 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 hover:border-neutral-300 transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+                Reset to Role Defaults
+              </button>
+              <!-- Preview/Edit Toggle -->
+              <div class="inline-flex rounded-lg border border-neutral-200 p-0.5 bg-neutral-50">
+                <button onclick="setViewMode('edit')" id="editBtn" class="toggle-view-btn px-3 py-1 text-xs font-medium rounded-md bg-primary-500 text-white shadow-sm">Edit</button>
+                <button onclick="setViewMode('preview')" id="previewBtn" class="toggle-view-btn px-3 py-1 text-xs font-medium rounded-md text-neutral-600 hover:text-neutral-900">Preview</button>
+              </div>
+            </div>
+          </div>
+          <p class="text-sm text-neutral-500 mb-6">Customize how your agent communicates and behaves. Templates are pre-filled based on the <span class="font-medium text-neutral-700">Product Manager</span> role.</p>
+
+          <!-- Info Banner -->
+          <div class="bg-primary-50 border border-primary-100 rounded-lg p-3 mb-6 flex items-start gap-3">
+            <svg class="w-5 h-5 text-primary-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+            <div>
+              <p class="text-sm text-primary-800 font-medium">Template Variables</p>
+              <p class="text-xs text-primary-700 mt-0.5">Use placeholders like <span class="placeholder-tag">{{agentName}}</span> <span class="placeholder-tag">{{tenantName}}</span> <span class="placeholder-tag">{{assistedUser}}</span> <span class="placeholder-tag">{{roleName}}</span> and they will be auto-filled when the agent is deployed.</p>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+
+            <!-- Accordion 1: Personality & Tone (Expanded) -->
+            <div class="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+              <button onclick="toggleAccordion('personality')" class="w-full flex items-center justify-between px-5 py-4 hover:bg-neutral-50 transition-colors focus:outline-none" id="accordionToggle-personality">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                  </div>
+                  <div class="text-left">
+                    <h3 class="text-sm font-semibold text-neutral-900">Personality & Tone</h3>
+                    <p class="text-xs text-neutral-500">SOUL.md - Define how your agent communicates</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Customized</span>
+                  <svg class="w-5 h-5 text-neutral-400 transition-transform duration-200" id="chevron-personality" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="transform: rotate(180deg);"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </div>
+              </button>
+              <div class="accordion-content open" id="panel-personality">
+                <div class="px-5 pb-5 border-t border-neutral-100">
+                  <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="text-xs font-medium text-neutral-600">SOUL.md Template</label>
+                      <span class="text-xs text-neutral-400 font-mono">248 chars</span>
+                    </div>
+                    <textarea id="soulEditor" rows="14" class="w-full px-4 py-3 text-sm font-mono bg-neutral-50 border border-neutral-200 rounded-lg text-neutral-800 placeholder-neutral-400 hover:border-neutral-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/15 focus:outline-none transition-colors resize-none leading-relaxed"># {{agentName}} - AI Assistant for {{assistedUser}}
+
+## Identity
+You are {{agentName}}, a dedicated AI assistant supporting {{assistedUser}} in their role as {{roleName}} at {{tenantName}}.
+
+## Communication Style
+- Be professional yet approachable
+- Use concise, data-driven language
+- Prefer bullet points and structured responses
+- Proactively surface relevant metrics and deadlines
+
+## Boundaries
+- Always clarify before taking irreversible actions
+- Escalate security-sensitive requests to human review
+- Never share data across organizational boundaries
+
+## Domain Knowledge
+- Product roadmap planning and prioritization
+- Sprint metrics and velocity tracking
+- Stakeholder communication and alignment
+- Feature requirement documentation (PRDs)</textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Accordion 2: Operating Protocols (Collapsed) -->
+            <div class="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+              <button onclick="toggleAccordion('protocols')" class="w-full flex items-center justify-between px-5 py-4 hover:bg-neutral-50 transition-colors focus:outline-none" id="accordionToggle-protocols">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>
+                  </div>
+                  <div class="text-left">
+                    <h3 class="text-sm font-semibold text-neutral-900">Operating Protocols</h3>
+                    <p class="text-xs text-neutral-500">AGENTS.md - Collaboration rules and tool usage</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-medium text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-full">Default</span>
+                  <svg class="w-5 h-5 text-neutral-400 transition-transform duration-200" id="chevron-protocols" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </div>
+              </button>
+              <div class="accordion-content" id="panel-protocols">
+                <div class="px-5 pb-5 border-t border-neutral-100">
+                  <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="text-xs font-medium text-neutral-600">AGENTS.md Template</label>
+                      <span class="text-xs text-neutral-400 font-mono">156 chars</span>
+                    </div>
+                    <textarea rows="8" class="w-full px-4 py-3 text-sm font-mono bg-neutral-50 border border-neutral-200 rounded-lg text-neutral-800 placeholder-neutral-400 hover:border-neutral-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/15 focus:outline-none transition-colors resize-none leading-relaxed"># Operating Protocols for {{agentName}}
+
+## Tool Usage
+- Use Jira for all ticket operations
+- Use Slack for team communication
+- Check Calendar before scheduling
+
+## Collaboration Rules
+- Respond within the assigned channel
+- Tag {{assistedUser}} for approval-gated actions</textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Accordion 3: Proactive Behavior (Collapsed) -->
+            <div class="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+              <button onclick="toggleAccordion('proactive')" class="w-full flex items-center justify-between px-5 py-4 hover:bg-neutral-50 transition-colors focus:outline-none" id="accordionToggle-proactive">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  </div>
+                  <div class="text-left">
+                    <h3 class="text-sm font-semibold text-neutral-900">Proactive Behavior</h3>
+                    <p class="text-xs text-neutral-500">HEARTBEAT.md - Scheduled tasks and daily routines</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-medium text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-full">Default</span>
+                  <svg class="w-5 h-5 text-neutral-400 transition-transform duration-200" id="chevron-proactive" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </div>
+              </button>
+              <div class="accordion-content" id="panel-proactive">
+                <div class="px-5 pb-5 border-t border-neutral-100">
+                  <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="text-xs font-medium text-neutral-600">HEARTBEAT.md Template</label>
+                      <span class="text-xs text-neutral-400 font-mono">182 chars</span>
+                    </div>
+                    <textarea rows="10" class="w-full px-4 py-3 text-sm font-mono bg-neutral-50 border border-neutral-200 rounded-lg text-neutral-800 placeholder-neutral-400 hover:border-neutral-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/15 focus:outline-none transition-colors resize-none leading-relaxed"># Daily Routine for {{agentName}}
+
+## Morning (9:00 AM)
+- Check Jira board for overdue items
+- Summarize overnight Slack messages for {{assistedUser}}
+- Review sprint burndown chart
+
+## Midday (1:00 PM)
+- Check for blocked tickets and suggest unblocking actions
+
+## End of Day (5:30 PM)
+- Generate daily status summary
+- Highlight items needing {{assistedUser}}'s attention tomorrow</textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Variable Reference -->
+          <div class="mt-6 bg-white border border-neutral-200 rounded-xl p-5">
+            <h3 class="text-sm font-semibold text-neutral-900 mb-3">Available Template Variables</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div class="flex items-center gap-2 p-2 bg-neutral-50 rounded-lg">
+                <code class="placeholder-tag">{{agentName}}</code>
+                <span class="text-xs text-neutral-500">Nadia</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 bg-neutral-50 rounded-lg">
+                <code class="placeholder-tag">{{assistedUser}}</code>
+                <span class="text-xs text-neutral-500">Nesma</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 bg-neutral-50 rounded-lg">
+                <code class="placeholder-tag">{{tenantName}}</code>
+                <span class="text-xs text-neutral-500">Acme Corp</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 bg-neutral-50 rounded-lg">
+                <code class="placeholder-tag">{{roleName}}</code>
+                <span class="text-xs text-neutral-500">Product Manager</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 bg-neutral-50 rounded-lg">
+                <code class="placeholder-tag">{{roleLabel}}</code>
+                <span class="text-xs text-neutral-500">PM Agent</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 bg-neutral-50 rounded-lg">
+                <code class="placeholder-tag">{{today}}</code>
+                <span class="text-xs text-neutral-500">2026-02-11</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- STICKY BOTTOM BAR -->
+    <div class="fixed bottom-0 right-0 bg-white border-t border-neutral-200 px-6 lg:px-8 py-4 z-20" id="bottomBar" style="left: 256px;">
+      <div class="max-w-4xl mx-auto flex items-center justify-between">
+        <button class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 bg-transparent border border-neutral-200 rounded-lg hover:bg-neutral-50 hover:border-neutral-300 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+          Back
+        </button>
+        <span class="text-sm text-neutral-500 font-medium hidden sm:block">Step 2 of 6</span>
+        <button class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-lg shadow-sm hover:bg-primary-600 active:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+          <span>Next: Model & Config</span>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    var sidebarCollapsed = false;
+
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      var sb = document.getElementById('sidebar');
+      var mc = document.getElementById('main-content');
+      var bb = document.getElementById('bottomBar');
+      if (sidebarCollapsed) {
+        sb.classList.add('collapsed');
+        mc.style.marginLeft = '64px';
+        bb.style.left = '64px';
+      } else {
+        sb.classList.remove('collapsed');
+        mc.style.marginLeft = '256px';
+        bb.style.left = '256px';
+      }
+    }
+
+    function toggleAccordion(id) {
+      var panel = document.getElementById('panel-' + id);
+      var chevron = document.getElementById('chevron-' + id);
+      if (panel.classList.contains('open')) {
+        panel.classList.remove('open');
+        chevron.style.transform = 'rotate(0deg)';
+      } else {
+        panel.classList.add('open');
+        chevron.style.transform = 'rotate(180deg)';
+      }
+    }
+
+    function setViewMode(mode) {
+      var editBtn = document.getElementById('editBtn');
+      var previewBtn = document.getElementById('previewBtn');
+      if (mode === 'edit') {
+        editBtn.className = 'toggle-view-btn px-3 py-1 text-xs font-medium rounded-md bg-primary-500 text-white shadow-sm';
+        previewBtn.className = 'toggle-view-btn px-3 py-1 text-xs font-medium rounded-md text-neutral-600 hover:text-neutral-900';
+      } else {
+        previewBtn.className = 'toggle-view-btn px-3 py-1 text-xs font-medium rounded-md bg-primary-500 text-white shadow-sm';
+        editBtn.className = 'toggle-view-btn px-3 py-1 text-xs font-medium rounded-md text-neutral-600 hover:text-neutral-900';
+      }
+    }
+
+    function resetToDefaults() {
+      if (confirm('Reset all templates to the default Product Manager role templates?')) {
+        document.getElementById('soulEditor').value = '# {{agentName}} - AI Assistant for {{assistedUser}}\n\n## Identity\nYou are {{agentName}}, a dedicated AI assistant for {{roleName}} at {{tenantName}}.\n\n## Communication Style\n- Professional and data-driven\n- Concise bullet points\n- Proactive about deadlines';
+      }
+    }
+  </script>
+</body>
+</html>

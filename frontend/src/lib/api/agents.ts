@@ -21,6 +21,11 @@ export interface RoleConfig {
   defaultToolCategories: string[];
   sortOrder: number;
   isSystem: boolean;
+  soulTemplate?: string | null;
+  agentsTemplate?: string | null;
+  heartbeatTemplate?: string | null;
+  userTemplate?: string | null;
+  identityEmoji?: string | null;
 }
 
 export interface AgentSkill {
@@ -153,6 +158,43 @@ export interface ToolDefaults {
   enabledToolIds: string[];
 }
 
+export interface CustomTemplates {
+  soulTemplate?: string;
+  agentsTemplate?: string;
+  heartbeatTemplate?: string;
+}
+
+export interface TemplatePreviewResponse {
+  soulMd: string;
+  agentsMd: string;
+  heartbeatMd: string;
+  identityEmoji: string | null;
+}
+
+export interface AgentChannelConnection {
+  id: string;
+  platform: string;
+  workspaceName: string | null;
+  status: string;
+  routes: AgentChannelRoute[];
+}
+
+export interface AgentChannelRoute {
+  id: string;
+  routeType: string;
+  sourceIdentifier: string;
+  priority: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateAgentRoutePayload {
+  routeType: 'slash_command' | 'channel_mapping' | 'user_mapping' | 'tenant_default';
+  sourceIdentifier: string;
+  priority?: number;
+}
+
 export interface CreateAgentPayload {
   name: string;
   description?: string;
@@ -163,6 +205,7 @@ export interface CreateAgentPayload {
   avatarColor: string;
   personality?: string;
   toolPolicy: { allow: string[] };
+  customTemplates?: CustomTemplates;
 }
 
 export interface UpdateAgentPayload {
@@ -295,6 +338,60 @@ export async function fetchAgentLogs(
   const { data } = await api.get<AgentLogEntry[]>(
     `/dashboard/agents/${id}/logs`,
     { params: { level } }
+  );
+  return data;
+}
+
+// ---------------------------------------------------------------------------
+// Template & Channel API Functions
+// ---------------------------------------------------------------------------
+
+export async function previewAgentTemplates(
+  role: string,
+  customTemplates?: CustomTemplates,
+  agentName?: string
+): Promise<TemplatePreviewResponse> {
+  const { data } = await api.post<TemplatePreviewResponse>(
+    '/dashboard/agents/preview-templates',
+    { role, customTemplates, agentName }
+  );
+  return data;
+}
+
+export async function fetchAgentChannels(
+  agentId: string
+): Promise<{ connections: AgentChannelConnection[] }> {
+  const { data } = await api.get<{ connections: AgentChannelConnection[] }>(
+    `/dashboard/agents/${agentId}/channels`
+  );
+  return data;
+}
+
+export async function createAgentChannelRoute(
+  agentId: string,
+  connectionId: string,
+  payload: CreateAgentRoutePayload
+) {
+  const { data } = await api.post(
+    `/dashboard/agents/${agentId}/channels/${connectionId}/route`,
+    payload
+  );
+  return data;
+}
+
+export async function deleteAgentChannelRoute(
+  agentId: string,
+  connectionId: string,
+  ruleId: string
+) {
+  await api.delete(
+    `/dashboard/agents/${agentId}/channels/${connectionId}/route/${ruleId}`
+  );
+}
+
+export async function fetchSlackInstallUrl(): Promise<{ url: string }> {
+  const { data } = await api.get<{ url: string }>(
+    '/integrations/slack/install'
   );
   return data;
 }

@@ -1,7 +1,7 @@
 # Aegis Platform API Contract
 
-**Version:** 1.3.0
-**Last Updated:** 2026-02-07
+**Version:** 1.4.0
+**Last Updated:** 2026-02-11
 **Status:** Single Source of Truth
 **Framework:** NestJS + TypeScript
 **Database:** PostgreSQL 16 + Redis 7+
@@ -22,6 +22,9 @@
 10. [Tenant: Settings](#10-tenant-settings)
 11. [WebSocket Events](#11-websocket-events)
 12. [Global Types](#12-global-types)
+13. [Admin: Role Config Templates](#13-admin-role-config-templates)
+14. [Agent Templates (Tenant)](#14-agent-templates-tenant)
+15. [Agent Channels (Tenant)](#15-agent-channels-tenant)
 
 ---
 
@@ -2150,10 +2153,275 @@ Last-Modified: Wed, 05 Feb 2026 10:30:00 GMT
 
 ---
 
+## 13. Admin: Role Config Templates
+
+### 14.1 List Role Configs
+- **Path**: `/api/admin/role-configs`
+- **Method**: `GET`
+- **Auth**: Platform Admin (JWT + `assertPlatformAdmin`)
+- **Description**: Retrieve all role configurations with their template content
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  data: RoleConfig[];
+}
+```
+
+```typescript
+interface RoleConfig {
+  id: string;                          // UUID
+  name: string;                        // e.g. "pm", "engineering", "ops"
+  label: string;                       // e.g. "PM Agent", "Engineering Agent"
+  description: string;
+  color: string;                       // Hex color e.g. "#6366f1"
+  defaultToolCategories: string[];     // e.g. ["jira", "slack", "calendar"]
+  soulTemplate: string | null;         // Markdown template with {{placeholders}}
+  agentsTemplate: string | null;       // AGENTS.md template
+  heartbeatTemplate: string | null;    // HEARTBEAT.md template
+  userTemplate: string | null;         // USER.md template
+  identityEmoji: string | null;        // e.g. "clipboard" or emoji character
+  openclawConfigTemplate: Record<string, any> | null; // OpenClaw config defaults
+  createdAt: string;                   // ISO 8601
+  updatedAt: string;                   // ISO 8601
+}
+```
+
+---
+
+### 14.2 Get Role Config
+- **Path**: `/api/admin/role-configs/:id`
+- **Method**: `GET`
+- **Auth**: Platform Admin (JWT + `assertPlatformAdmin`)
+- **Description**: Retrieve a single role configuration with all template fields
+
+#### Response
+- **Success (200)**: Single `RoleConfig` object (same shape as above)
+- **Error (404)**:
+```json
+{
+  "statusCode": 404,
+  "error": "Not Found",
+  "message": "Role config not found",
+  "timestamp": "2026-02-11T10:00:00.000Z",
+  "path": "/api/admin/role-configs/invalid-id"
+}
+```
+
+---
+
+### 14.3 Update Role Config
+- **Path**: `/api/admin/role-configs/:id`
+- **Method**: `PUT`
+- **Auth**: Platform Admin (JWT + `assertPlatformAdmin`)
+- **Description**: Update a role configuration including templates
+
+#### Request
+- **Body**:
+```typescript
+{
+  label?: string;
+  description?: string;
+  color?: string;
+  defaultToolCategories?: string[];
+  soulTemplate?: string;
+  agentsTemplate?: string;
+  heartbeatTemplate?: string;
+  userTemplate?: string;
+  identityEmoji?: string;
+  openclawConfigTemplate?: Record<string, any>;
+}
+```
+
+#### Response
+- **Success (200)**: Updated `RoleConfig` object
+- **Error (404)**:
+```json
+{
+  "statusCode": 404,
+  "error": "Not Found",
+  "message": "Role config not found",
+  "timestamp": "2026-02-11T10:00:00.000Z",
+  "path": "/api/admin/role-configs/invalid-id"
+}
+```
+
+---
+
+### 14.4 Preview Role Template
+- **Path**: `/api/admin/role-configs/:id/preview`
+- **Method**: `POST`
+- **Auth**: Platform Admin (JWT + `assertPlatformAdmin`)
+- **Description**: Render a template field with sample data, replacing `{{placeholders}}` with values
+
+#### Request
+- **Body**:
+```typescript
+{
+  templateField: 'soulTemplate' | 'agentsTemplate' | 'heartbeatTemplate' | 'userTemplate';
+  sampleData?: Record<string, string>;  // e.g. { agentName: "Nadia", assistedUser: "Nesma" }
+}
+```
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  rendered: string;  // Template with all placeholders replaced
+}
+```
+
+---
+
+## 14. Agent Templates (Tenant)
+
+### 15.1 Preview Agent Templates
+- **Path**: `/api/dashboard/agents/preview-templates`
+- **Method**: `POST`
+- **Auth**: JWT (tenant user)
+- **Description**: Preview all rendered templates for a given role, optionally with custom overrides
+
+#### Request
+- **Body**:
+```typescript
+{
+  role: string;                         // Role name e.g. "pm", "engineering"
+  customTemplates?: {
+    soulTemplate?: string;
+    agentsTemplate?: string;
+    heartbeatTemplate?: string;
+  };
+  agentName?: string;                   // For placeholder substitution
+}
+```
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  soulMd: string;                       // Rendered SOUL.md content
+  agentsMd: string;                     // Rendered AGENTS.md content
+  heartbeatMd: string;                  // Rendered HEARTBEAT.md content
+  identityEmoji: string | null;         // From role config
+}
+```
+
+---
+
+## 15. Agent Channels (Tenant)
+
+### 16.1 Get Agent Channel Routes
+- **Path**: `/api/dashboard/agents/:id/channels`
+- **Method**: `GET`
+- **Auth**: JWT (tenant user)
+- **Description**: Retrieve all channel connections and routing rules for an agent
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  connections: AgentChannelConnection[];
+}
+```
+
+```typescript
+interface AgentChannelConnection {
+  id: string;                           // UUID - ChannelConnection ID
+  platform: 'SLACK' | 'TEAMS' | 'DISCORD';
+  workspaceName: string;
+  status: 'active' | 'inactive' | 'error';
+  routes: AgentChannelRoute[];
+}
+
+interface AgentChannelRoute {
+  id: string;                           // UUID
+  routeType: 'slash_command' | 'channel_mapping' | 'user_mapping' | 'tenant_default';
+  sourceIdentifier: string;             // e.g. "/aegis ask", "#product-updates", "@user"
+  priority: number;                     // Lower = higher priority
+  isActive: boolean;
+  createdAt: string;                    // ISO 8601
+  updatedAt: string;                    // ISO 8601
+}
+```
+
+---
+
+### 16.2 Create Agent Channel Route
+- **Path**: `/api/dashboard/agents/:id/channels/:connectionId/route`
+- **Method**: `POST`
+- **Auth**: JWT (tenant user)
+- **Description**: Create a new routing rule for an agent on a specific channel connection
+
+#### Request
+- **Body**:
+```typescript
+{
+  routeType: 'slash_command' | 'channel_mapping' | 'user_mapping' | 'tenant_default';
+  sourceIdentifier: string;             // e.g. "/aegis ask", "#product-updates"
+  priority?: number;                    // Default: next available
+}
+```
+
+#### Response
+- **Success (201)**:
+```typescript
+{
+  id: string;
+  routeType: string;
+  sourceIdentifier: string;
+  priority: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
+- **Error (404)**:
+```json
+{
+  "statusCode": 404,
+  "error": "Not Found",
+  "message": "Agent or channel connection not found",
+  "timestamp": "2026-02-11T10:00:00.000Z",
+  "path": "/api/dashboard/agents/:id/channels/:connectionId/route"
+}
+```
+
+---
+
+### 16.3 Delete Agent Channel Route
+- **Path**: `/api/dashboard/agents/:id/channels/:connectionId/route/:ruleId`
+- **Method**: `DELETE`
+- **Auth**: JWT (tenant user)
+- **Description**: Delete a routing rule
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  deleted: true;
+}
+```
+
+- **Error (404)**:
+```json
+{
+  "statusCode": 404,
+  "error": "Not Found",
+  "message": "Routing rule not found",
+  "timestamp": "2026-02-11T10:00:00.000Z",
+  "path": "/api/dashboard/agents/:id/channels/:connectionId/route/:ruleId"
+}
+```
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.4.0 | 2026-02-11 | Admin role config template CRUD (section 13), tenant agent template preview (section 14), agent channel routes CRUD (section 15) |
 | 1.3.0 | 2026-02-07 | Dynamic roles (AgentRoleConfig), thinkingMode→fast/standard/extended, allow-only toolPolicy (drop deny), new fields: temperature/avatarColor/personality/errorMessage, dashboard stats: plan/skillsInstalled/teamMembers/messageTrend, new endpoint: GET /api/dashboard/roles, channels deferred |
 | 1.1.0 | 2026-02-06 | Added assistedUser fields to agent creation, API key management endpoints, and sorting parameters to list endpoints |
 | 1.0.0 | 2026-02-05 | Initial API contract for MVP |

@@ -1,8 +1,9 @@
-import { PrismaClient } from './generated/client';
+import { PrismaClient, Prisma } from './generated/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import * as bcrypt from 'bcrypt';
 import * as speakeasy from 'speakeasy';
+import { ROLE_TEMPLATES } from './seed-templates';
 
 const BCRYPT_ROUNDS = 12;
 
@@ -126,13 +127,35 @@ async function main() {
     { name: 'custom', label: 'Custom', description: 'Custom agent role with minimal defaults', color: '#6b7280', defaultToolCategories: ['web_search', 'communication'], sortOrder: 7 },
   ];
 
+  // Build a map of role templates for merging
+  const templateMap = new Map(ROLE_TEMPLATES.map((t) => [t.name, t]));
+
   for (const rc of roleConfigs) {
+    const tmpl = templateMap.get(rc.name);
+    const templateFields = tmpl
+      ? {
+          soulTemplate: tmpl.soulTemplate,
+          agentsTemplate: tmpl.agentsTemplate,
+          heartbeatTemplate: tmpl.heartbeatTemplate,
+          userTemplate: tmpl.userTemplate,
+          identityEmoji: tmpl.identityEmoji,
+          openclawConfigTemplate: tmpl.openclawConfigTemplate as Prisma.InputJsonValue,
+        }
+      : {};
+
     await prisma.agentRoleConfig.upsert({
       where: { name: rc.name },
-      update: { label: rc.label, description: rc.description, color: rc.color, defaultToolCategories: rc.defaultToolCategories, sortOrder: rc.sortOrder },
-      create: { ...rc, isSystem: true },
+      update: {
+        label: rc.label,
+        description: rc.description,
+        color: rc.color,
+        defaultToolCategories: rc.defaultToolCategories,
+        sortOrder: rc.sortOrder,
+        ...templateFields,
+      },
+      create: { ...rc, isSystem: true, ...templateFields },
     });
-    console.log(`  Role config: ${rc.name} (${rc.label})`);
+    console.log(`  Role config: ${rc.name} (${rc.label})${tmpl ? ' + templates' : ''}`);
   }
 
   // ---------------------------------------------------------------------------
