@@ -113,18 +113,97 @@ model Agent {
 Create UsageRecord table and a service to track token consumption per agent.
 
 **How Token Tracking Works:**
-We capture token usage from OpenClaw responses in the Channel Proxy - NOT by querying OpenClaw separately.
+We capture token usage from LLM responses in the Channel Proxy - NOT by querying containers separately.
 
-The Claude API (which OpenClaw wraps) returns usage in every response:
-```json
-{
-  "id": "msg_...",
-  "content": [...],
-  "usage": {
-    "input_tokens": 1234,
-    "output_tokens": 567,
-    "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 100
+All major LLM providers return usage in their responses (field names vary):
+
+| Provider | Input Tokens | Output Tokens |
+|----------|--------------|---------------|
+| Anthropic | `usage.input_tokens` | `usage.output_tokens` |
+| OpenAI | `usage.prompt_tokens` | `usage.completion_tokens` |
+| Google Gemini | `usageMetadata.promptTokenCount` | `usageMetadata.candidatesTokenCount` |
+| Qwen/Kimi | `usage.input_tokens` or `usage.prompt_tokens` | varies |
+
+**Provider-Agnostic Usage Extractor:**
+```typescript
+// backend/src/billing/usage-extractor.service.ts
+export interface NormalizedUsage {
+  inputTokens: number;
+  outputTokens: number;
+  thinkingTokens?: number;
+  cacheReadTokens?: number;
+  provider: LlmProvider;
+  model: string;
+}
+
+export enum LlmProvider {
+  ANTHROPIC = 'anthropic',
+  OPENAI = 'openai',
+  GOOGLE = 'google',
+  QWEN = 'qwen',
+  KIMI = 'kimi',
+}
+
+@Injectable()
+export class UsageExtractorService {
+  /**
+   * Extract normalized usage from any LLM provider response.
+   * The provider is determined by the model string or response structure.
+   */
+  extractUsage(response: any, model: string): NormalizedUsage | null {
+    const provider = this.detectProvider(model);
+
+    switch (provider) {
+      case LlmProvider.ANTHROPIC:
+        return this.extractAnthropicUsage(response, model);
+      case LlmProvider.OPENAI:
+        return this.extractOpenAIUsage(response, model);
+      case LlmProvider.GOOGLE:
+        return this.extractGoogleUsage(response, model);
+      default:
+        return this.extractGenericUsage(response, model, provider);
+    }
+  }
+
+  private extractAnthropicUsage(response: any, model: string): NormalizedUsage {
+    const usage = response.usage;
+    return {
+      inputTokens: usage?.input_tokens ?? 0,
+      outputTokens: usage?.output_tokens ?? 0,
+      thinkingTokens: usage?.thinking_tokens ?? 0,
+      cacheReadTokens: usage?.cache_read_input_tokens ?? 0,
+      provider: LlmProvider.ANTHROPIC,
+      model,
+    };
+  }
+
+  private extractOpenAIUsage(response: any, model: string): NormalizedUsage {
+    const usage = response.usage;
+    return {
+      inputTokens: usage?.prompt_tokens ?? 0,
+      outputTokens: usage?.completion_tokens ?? 0,
+      provider: LlmProvider.OPENAI,
+      model,
+    };
+  }
+
+  private extractGoogleUsage(response: any, model: string): NormalizedUsage {
+    const usage = response.usageMetadata;
+    return {
+      inputTokens: usage?.promptTokenCount ?? 0,
+      outputTokens: usage?.candidatesTokenCount ?? 0,
+      provider: LlmProvider.GOOGLE,
+      model,
+    };
+  }
+
+  private detectProvider(model: string): LlmProvider {
+    if (model.includes('claude') || model.includes('anthropic')) return LlmProvider.ANTHROPIC;
+    if (model.includes('gpt') || model.includes('openai')) return LlmProvider.OPENAI;
+    if (model.includes('gemini') || model.includes('google')) return LlmProvider.GOOGLE;
+    if (model.includes('qwen')) return LlmProvider.QWEN;
+    if (model.includes('moonshot') || model.includes('kimi')) return LlmProvider.KIMI;
+    return LlmProvider.ANTHROPIC; // Default
   }
 }
 ```
@@ -138,14 +217,15 @@ private async handleForwardToContainer(job: Job<ForwardToContainerJob>): Promise
   const response = await fetch(url, { ... });
   const data = await response.json();
 
-  // Extract token usage from response
-  const usage = data.usage;
+  // Extract normalized usage (works with any LLM provider)
+  const usage = this.usageExtractor.extractUsage(data, model);
   if (usage) {
     await this.usageTrackingService.recordUsage(sessionContext.agentId, {
-      inputTokens: usage.input_tokens,
-      outputTokens: usage.output_tokens,
-      // Extended thinking tokens are billed at output rates
-      thinkingTokens: usage.thinking_tokens ?? 0,
+      inputTokens: usage.inputTokens,
+      outputTokens: usage.outputTokens,
+      thinkingTokens: usage.thinkingTokens,
+      provider: usage.provider,
+      model: usage.model,
     });
   }
 
@@ -165,18 +245,43 @@ model UsageRecord {
   tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   date            DateTime @db.Date  // Day of usage
+
+  // Token counts (provider-agnostic normalized values)
   inputTokens     BigInt   @default(0)
   outputTokens    BigInt   @default(0)
   thinkingTokens  BigInt   @default(0)
+  cacheReadTokens BigInt   @default(0)
   toolInvocations Int      @default(0)
+
+  // Provider info (for cost calculation - different providers have different pricing)
+  provider        String   @default("anthropic")  // anthropic, openai, google, qwen, kimi
+  model           String?  // e.g., "claude-sonnet-4-5", "gpt-4o", "gemini-pro"
+
+  // Cost (calculated based on provider pricing)
   estimatedCostUsd Decimal @db.Decimal(10, 4)
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  @@unique([agentId, date])
+  @@unique([agentId, date, provider])  // Allow multiple providers per day
   @@index([tenantId, date])
+  @@index([provider])
   @@map("usage_records")
+}
+
+// Provider pricing configuration (seed data or config)
+model ProviderPricing {
+  id              String   @id @default(uuid())
+  provider        String   // anthropic, openai, google, etc.
+  model           String   // claude-sonnet-4-5, gpt-4o, etc.
+  inputPer1M      Decimal  @db.Decimal(10, 4)  // Cost per 1M input tokens
+  outputPer1M     Decimal  @db.Decimal(10, 4)  // Cost per 1M output tokens
+  thinkingPer1M   Decimal? @db.Decimal(10, 4)  // Cost per 1M thinking tokens (if different)
+  effectiveFrom   DateTime @default(now())
+  effectiveTo     DateTime?
+
+  @@unique([provider, model, effectiveFrom])
+  @@map("provider_pricing")
 }
 ```
 
@@ -185,42 +290,74 @@ model UsageRecord {
 // backend/src/billing/usage-tracking.service.ts
 @Injectable()
 export class UsageTrackingService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly pricingService: ProviderPricingService,
+  ) {}
+
   // Record token usage (called after each agent interaction)
   async recordUsage(agentId: string, usage: {
     inputTokens: number;
     outputTokens: number;
     thinkingTokens?: number;
+    cacheReadTokens?: number;
     toolInvocations?: number;
+    provider: string;  // 'anthropic', 'openai', 'google', etc.
+    model: string;     // 'claude-sonnet-4-5', 'gpt-4o', etc.
   }): Promise<void>;
 
   // Get usage for an agent (current billing period)
   async getAgentUsage(agentId: string): Promise<AgentUsageSummary>;
 
-  // Get usage for a tenant (all agents)
+  // Get usage for a tenant (all agents, all providers)
   async getTenantUsage(tenantId: string): Promise<TenantUsageSummary>;
 
   // Reset monthly counters (BullMQ scheduled job)
   async resetMonthlyCounters(): Promise<void>;
 }
+
+// backend/src/billing/provider-pricing.service.ts
+@Injectable()
+export class ProviderPricingService {
+  // Calculate cost based on provider pricing
+  async calculateCost(usage: {
+    inputTokens: number;
+    outputTokens: number;
+    thinkingTokens?: number;
+    provider: string;
+    model: string;
+  }): Promise<number>;
+
+  // Get current pricing for a provider/model
+  async getPricing(provider: string, model: string): Promise<ProviderPricing>;
+}
 ```
 
 **Acceptance Criteria:**
 - [ ] Create UsageRecord model in Prisma schema
+- [ ] Create ProviderPricing model for cost calculation
+- [ ] Create UsageExtractorService (provider-agnostic)
 - [ ] Create UsageTrackingService with methods above
-- [ ] **Integrate into ChannelProxyProcessor** to capture usage from OpenClaw responses
+- [ ] Create ProviderPricingService for cost calculation
+- [ ] **Integrate into ChannelProxyProcessor** to capture usage from any LLM response
+- [ ] Seed ProviderPricing with Anthropic, OpenAI, Google rates
 - [ ] Add BullMQ job to aggregate daily usage
 - [ ] Add BullMQ job to reset monthly counters on 1st of month
 - [ ] Create BillingModule to house billing services
-- [ ] Write unit tests (target: 20+ tests)
+- [ ] Write unit tests (target: 25+ tests)
 
 **Files to Create:**
 - `backend/src/billing/billing.module.ts`
+- `backend/src/billing/usage-extractor.service.ts`
 - `backend/src/billing/usage-tracking.service.ts`
+- `backend/src/billing/provider-pricing.service.ts`
 - `backend/src/billing/usage-tracking.processor.ts`
+- `backend/prisma/seed-pricing.ts`
+- `backend/test/billing/usage-extractor.service.spec.ts`
 - `backend/test/billing/usage-tracking.service.spec.ts`
 
 **Files to Modify:**
-- `backend/src/channel-proxy/channel-proxy.processor.ts` (inject UsageTrackingService, capture usage)
+- `backend/src/channel-proxy/channel-proxy.processor.ts` (inject UsageExtractorService, capture usage)
 - `backend/src/channel-proxy/channel-proxy.module.ts` (import BillingModule)
 
 ---
