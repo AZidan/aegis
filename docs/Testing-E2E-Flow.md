@@ -45,10 +45,10 @@
   6. Collect Your Credentials
 
   Go to Settings > Basic Information:
-  - Client ID → SLACK_CLIENT_ID - (copy from Slack app settings)
-  - Client Secret → SLACK_CLIENT_SECRET - (copy from Slack app settings)
-  - Signing Secret → SLACK_SIGNING_SECRET - (copy from Slack app settings)
-  - From step 2: App Token → SLACK_APP_TOKEN - (the xapp-... token you generated)
+  - Client ID → SLACK_CLIENT_ID (copy from Slack app settings)
+  - Client Secret → SLACK_CLIENT_SECRET (copy from Slack app settings)
+  - Signing Secret → SLACK_SIGNING_SECRET (copy from Slack app settings)
+  - From step 2: App Token → SLACK_APP_TOKEN (the xapp-... token you generated)
 
 
   7. Install to Workspace
