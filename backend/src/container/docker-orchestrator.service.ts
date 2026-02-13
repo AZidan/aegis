@@ -243,6 +243,59 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
     await container.putArchive(archive, { path: '/home/node/.openclaw' });
   }
 
+  /**
+   * Push per-agent workspace files (SOUL.md, AGENTS.md, etc.) into a running container.
+   * Creates the agent workspace directory and writes each file via exec.
+   */
+  async pushAgentWorkspace(
+    containerId: string,
+    agentId: string,
+    files: {
+      soulMd: string;
+      agentsMd: string;
+      heartbeatMd: string;
+      userMd: string;
+      identityMd: string;
+    },
+  ): Promise<void> {
+    // OpenClaw resolves per-agent workspaces at ~/.openclaw/workspace-{agentId}/
+    const workspaceDir = `/home/node/.openclaw/workspace-${agentId}`;
+
+    await this.writeFileViaExec(containerId, `${workspaceDir}/SOUL.md`, files.soulMd);
+    await this.writeFileViaExec(containerId, `${workspaceDir}/AGENTS.md`, files.agentsMd);
+    await this.writeFileViaExec(containerId, `${workspaceDir}/HEARTBEAT.md`, files.heartbeatMd);
+    await this.writeFileViaExec(containerId, `${workspaceDir}/USER.md`, files.userMd);
+    await this.writeFileViaExec(containerId, `${workspaceDir}/IDENTITY.md`, files.identityMd);
+
+    this.logger.log(`Pushed workspace files for agent ${agentId} to container ${containerId}`);
+  }
+
+  /**
+   * Push auth-profiles.json for a specific agent into a running container.
+   */
+  async pushAuthProfiles(
+    containerId: string,
+    agentId: string,
+    authProfilesJson: string,
+  ): Promise<void> {
+    const agentDir = `/home/node/.openclaw/agents/${agentId}/agent`;
+    await this.writeFileViaExec(containerId, `${agentDir}/auth-profiles.json`, authProfilesJson);
+    this.logger.log(`Pushed auth-profiles.json for agent ${agentId} to container ${containerId}`);
+  }
+
+  /**
+   * Remove per-agent workspace and agent directories from a running container.
+   */
+  async removeAgentWorkspace(
+    containerId: string,
+    agentId: string,
+  ): Promise<void> {
+    const workspaceDir = `/home/node/.openclaw/workspace-${agentId}`;
+    const agentDir = `/home/node/.openclaw/agents/${agentId}`;
+    await this.runContainerCommand(containerId, `rm -rf ${workspaceDir} ${agentDir}`);
+    this.logger.log(`Removed workspace for agent ${agentId} from container ${containerId}`);
+  }
+
   private async ensureNetwork(
     networkName: string,
     labels?: Record<string, string>,

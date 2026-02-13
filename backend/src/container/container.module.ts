@@ -52,6 +52,7 @@ import { ContainerConfigSyncService } from './container-config-sync.service';
   ],
   exports: [
     CONTAINER_ORCHESTRATOR,
+    DockerOrchestratorService,
     ContainerPortAllocatorService,
     ContainerConfigGeneratorService,
     SecretsManagerService,
