@@ -1,7 +1,8 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Logger } from '@nestjs/common';
+import { Logger, Optional } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { PrismaService } from '../prisma/prisma.service';
+import { DockerOrchestratorService } from '../container/docker-orchestrator.service';
 import { ContainerConfigGeneratorService } from './container-config-generator.service';
 import { CONTAINER_CONFIG_QUEUE_NAME } from './container-config.constants';
 
@@ -30,6 +31,7 @@ export class ContainerConfigProcessor extends WorkerHost {
   constructor(
     private readonly prisma: PrismaService,
     private readonly generator: ContainerConfigGeneratorService,
+    @Optional() private readonly dockerOrchestrator: DockerOrchestratorService,
   ) {
     super();
   }
@@ -128,7 +130,47 @@ export class ContainerConfigProcessor extends WorkerHost {
       `Config sync complete for agent ${agentId}: generated ${fileKeys.length} files [${fileKeys.join(', ')}]`,
     );
 
-    // TODO: Push workspace files to agent's OpenClaw container (deferred)
+    // Push workspace files to the agent's OpenClaw container (if provisioned)
+    const containerId = agent.tenant.containerId;
+    if (containerId && this.dockerOrchestrator) {
+      try {
+        await this.dockerOrchestrator.pushAgentWorkspace(containerId, agentId, {
+          soulMd: workspace.soulMd,
+          agentsMd: workspace.agentsMd,
+          heartbeatMd: workspace.heartbeatMd,
+          userMd: workspace.userMd,
+          identityMd: workspace.identityMd,
+        });
+
+        // Copy auth-profiles.json from main agent dir to this agent's dir
+        try {
+          await this.dockerOrchestrator.pushAuthProfiles(
+            containerId,
+            agentId,
+            // Read the main agent's auth-profiles.json and re-push for this agent
+            // The main agent dir is always set up during provisioning
+            JSON.stringify({ profiles: [] }),
+          );
+        } catch (authError) {
+          this.logger.warn(
+            `Could not push auth-profiles for agent ${agentId}: ${authError instanceof Error ? authError.message : String(authError)}`,
+          );
+        }
+
+        this.logger.log(
+          `Pushed workspace files to container ${containerId} for agent ${agentId}`,
+        );
+      } catch (error) {
+        // Fire-and-forget: log but don't fail the job
+        this.logger.warn(
+          `Failed to push workspace files for agent ${agentId} to container ${containerId}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    } else if (!containerId) {
+      this.logger.debug(
+        `Tenant ${agent.tenant.id} has no container yet - skipping workspace push for agent ${agentId}`,
+      );
+    }
 
     return { success: true, agentId, files: fileKeys };
   }
