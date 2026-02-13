@@ -78,6 +78,13 @@ export class SlackEventHandler implements OnModuleInit {
       return;
     }
 
+    // Skip @mentions — these are handled by the app_mention listener.
+    // Without this check, mentions fire both 'message' and 'app_mention',
+    // causing duplicate replies.
+    if (context.botUserId && message.text?.includes(`<@${context.botUserId}>`)) {
+      return;
+    }
+
     const workspaceId = message.team || context.teamId || '';
     if (!workspaceId) {
       this.logger.warn('Message received without workspace ID, ignoring');

@@ -292,6 +292,67 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
   /**
    * Graceful shutdown: stop the Bolt app and clear all clients.
    */
+
+  /**
+   * Lists channels from a Slack workspace using the cached WebClient.
+   */
+  async listChannels(
+    workspaceId: string,
+  ): Promise<Array<{ id: string; name: string }>> {
+    const client = this.workspaceClients.get(workspaceId);
+    if (!client) {
+      this.logger.warn(
+        `No WebClient registered for workspace ${workspaceId}`,
+      );
+      return [];
+    }
+
+    try {
+      const result = await client.conversations.list({
+        types: 'public_channel,private_channel',
+        exclude_archived: true,
+        limit: 200,
+      });
+
+      return (result.channels || [])
+        .filter((ch) => ch.id && ch.name)
+        .map((ch) => ({ id: ch.id!, name: ch.name! }));
+    } catch (error: any) {
+      this.handleSlackError(error, workspaceId, 'listChannels');
+      return [];
+    }
+  }
+
+  /**
+   * Lists users from a Slack workspace, excluding bots and deactivated users.
+   */
+  async listUsers(
+    workspaceId: string,
+  ): Promise<Array<{ id: string; name: string; realName: string }>> {
+    const client = this.workspaceClients.get(workspaceId);
+    if (!client) {
+      this.logger.warn(
+        `No WebClient registered for workspace ${workspaceId}`,
+      );
+      return [];
+    }
+
+    try {
+      const result = await client.users.list({ limit: 200 });
+
+      return (result.members || [])
+        .filter((u) => u.id && !u.is_bot && !u.deleted && u.id !== 'USLACKBOT')
+        .map((u) => ({
+          id: u.id!,
+          name: u.name || u.id!,
+          realName: u.real_name || u.name || u.id!,
+        }));
+    } catch (error: any) {
+      this.handleSlackError(error, workspaceId, 'listUsers');
+      return [];
+    }
+  }
+
   async shutdown(): Promise<void> {
     if (this.boltApp && this.isStarted) {
       try {
