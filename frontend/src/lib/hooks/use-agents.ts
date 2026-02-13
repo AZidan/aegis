@@ -21,6 +21,8 @@ import {
   fetchAgentChannels,
   createAgentChannelRoute,
   deleteAgentChannelRoute,
+  fetchSlackChannels,
+  fetchSlackUsers,
   type AgentFilters,
   type CreateAgentPayload,
   type CreateAgentRoutePayload,
@@ -289,5 +291,23 @@ export function useDeleteAgentRoute(agentId: string) {
         queryKey: [...agentKeys.detail(agentId), 'channels'],
       });
     },
+  });
+}
+
+export function useSlackChannels(agentId: string, connectionId: string) {
+  return useQuery({
+    queryKey: [...agentKeys.detail(agentId), 'slack-channels', connectionId] as const,
+    queryFn: () => fetchSlackChannels(agentId, connectionId),
+    enabled: !!agentId && !!connectionId,
+    staleTime: 60_000,
+  });
+}
+
+export function useSlackUsers(agentId: string, connectionId: string) {
+  return useQuery({
+    queryKey: [...agentKeys.detail(agentId), 'slack-users', connectionId] as const,
+    queryFn: () => fetchSlackUsers(agentId, connectionId),
+    enabled: !!agentId && !!connectionId,
+    staleTime: 60_000,
   });
 }

@@ -7,6 +7,8 @@ import {
   useAgentChannels,
   useCreateAgentRoute,
   useDeleteAgentRoute,
+  useSlackChannels,
+  useSlackUsers,
 } from '@/lib/hooks/use-agents';
 import type { CreateAgentRoutePayload } from '@/lib/api/agents';
 
@@ -34,14 +36,19 @@ export function AgentChannelsTab({ agentId }: AgentChannelsTabProps) {
   const [sourceId, setSourceId] = React.useState('');
   const [priority, setPriority] = React.useState(0);
 
+  const slackChannelsQuery = useSlackChannels(agentId, selectedConnectionId);
+  const slackUsersQuery = useSlackUsers(agentId, selectedConnectionId);
+
   const handleAddRoute = () => {
-    if (!selectedConnectionId || !sourceId.trim()) return;
+    if (!selectedConnectionId) return;
+    if (routeType !== 'tenant_default' && !sourceId.trim()) return;
     createRoute.mutate(
       {
         connectionId: selectedConnectionId,
         payload: {
           routeType,
-          sourceIdentifier: sourceId.trim(),
+          sourceIdentifier:
+            routeType === 'tenant_default' ? '*' : sourceId.trim(),
           priority,
         },
       },
@@ -236,11 +243,12 @@ export function AgentChannelsTab({ agentId }: AgentChannelsTabProps) {
               </label>
               <select
                 value={routeType}
-                onChange={(e) =>
+                onChange={(e) => {
                   setRouteType(
                     e.target.value as CreateAgentRoutePayload['routeType']
-                  )
-                }
+                  );
+                  setSourceId('');
+                }}
                 className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
               >
                 <option value="channel_mapping">Channel Mapping</option>
@@ -250,17 +258,79 @@ export function AgentChannelsTab({ agentId }: AgentChannelsTabProps) {
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-1">
-                Source Identifier
-              </label>
-              <input
-                value={sourceId}
-                onChange={(e) => setSourceId(e.target.value)}
-                placeholder="e.g., #general, /ask, @user123"
-                className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
-              />
-            </div>
+            {routeType === 'channel_mapping' && (
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Slack Channel
+                </label>
+                {slackChannelsQuery.isLoading ? (
+                  <div className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-400">
+                    Loading channels...
+                  </div>
+                ) : (
+                  <select
+                    value={sourceId}
+                    onChange={(e) => setSourceId(e.target.value)}
+                    className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
+                  >
+                    <option value="">Select a channel</option>
+                    {(slackChannelsQuery.data?.items || []).map((ch) => (
+                      <option key={ch.id} value={ch.id}>
+                        #{ch.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
+
+            {routeType === 'user_mapping' && (
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Slack User
+                </label>
+                {slackUsersQuery.isLoading ? (
+                  <div className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-400">
+                    Loading users...
+                  </div>
+                ) : (
+                  <select
+                    value={sourceId}
+                    onChange={(e) => setSourceId(e.target.value)}
+                    className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
+                  >
+                    <option value="">Select a user</option>
+                    {(slackUsersQuery.data?.items || []).map((u) => (
+                      <option key={u.id} value={u.id}>
+                        @{u.realName} ({u.name})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
+
+            {routeType === 'slash_command' && (
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Slash Command
+                </label>
+                <input
+                  value={sourceId}
+                  onChange={(e) => setSourceId(e.target.value)}
+                  placeholder="e.g., /ask"
+                  className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
+                />
+              </div>
+            )}
+
+            {routeType === 'tenant_default' && (
+              <div>
+                <p className="text-sm text-neutral-500">
+                  Tenant default routes catch all unmatched messages. No source identifier needed.
+                </p>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1">
@@ -285,7 +355,10 @@ export function AgentChannelsTab({ agentId }: AgentChannelsTabProps) {
               </button>
               <button
                 onClick={handleAddRoute}
-                disabled={!sourceId.trim() || createRoute.isPending}
+                disabled={
+                  (routeType !== 'tenant_default' && !sourceId.trim()) ||
+                  createRoute.isPending
+                }
                 className="px-4 py-2 text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 rounded-lg disabled:opacity-50"
               >
                 {createRoute.isPending ? 'Adding...' : 'Add Rule'}

@@ -389,6 +389,37 @@ export async function deleteAgentChannelRoute(
   );
 }
 
+export interface SlackChannelItem {
+  id: string;
+  name: string;
+}
+
+export interface SlackUserItem {
+  id: string;
+  name: string;
+  realName: string;
+}
+
+export async function fetchSlackChannels(
+  agentId: string,
+  connectionId: string
+): Promise<{ items: SlackChannelItem[] }> {
+  const { data } = await api.get<{ items: SlackChannelItem[] }>(
+    `/dashboard/agents/${agentId}/channels/${connectionId}/slack-channels`
+  );
+  return data;
+}
+
+export async function fetchSlackUsers(
+  agentId: string,
+  connectionId: string
+): Promise<{ items: SlackUserItem[] }> {
+  const { data } = await api.get<{ items: SlackUserItem[] }>(
+    `/dashboard/agents/${agentId}/channels/${connectionId}/slack-users`
+  );
+  return data;
+}
+
 export async function fetchSlackInstallUrl(): Promise<{ url: string }> {
   const { data } = await api.get<{ url: string }>(
     '/integrations/slack/install'
