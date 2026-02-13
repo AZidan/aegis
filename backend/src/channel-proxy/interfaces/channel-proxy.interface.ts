@@ -38,6 +38,7 @@ export interface ForwardToContainerJob {
   sessionContext: SessionContext;
   event: InboundPlatformEvent;
   containerUrl: string;
+  agentModelTier?: string;
 }
 
 export interface DispatchToPlatformJob {

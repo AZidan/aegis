@@ -20,6 +20,7 @@ describe('ChannelProxyService', () => {
   let auditService: { logAction: jest.Mock };
   let prisma: {
     tenant: { findUnique: jest.Mock };
+    agent: { findUnique: jest.Mock };
     channelConnection: { findFirst: jest.Mock };
   };
   let queue: { add: jest.Mock };
@@ -50,6 +51,7 @@ describe('ChannelProxyService', () => {
     auditService = { logAction: jest.fn() };
     prisma = {
       tenant: { findUnique: jest.fn() },
+      agent: { findUnique: jest.fn() },
       channelConnection: { findFirst: jest.fn() },
     };
     queue = { add: jest.fn() };
@@ -104,6 +106,9 @@ describe('ChannelProxyService', () => {
       });
       prisma.tenant.findUnique.mockResolvedValue({
         containerUrl: 'http://container:8080',
+      });
+      prisma.agent.findUnique.mockResolvedValue({
+        modelTier: 'sonnet',
       });
       queue.add.mockResolvedValue({});
     };

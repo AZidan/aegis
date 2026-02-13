@@ -93,13 +93,18 @@ export class ChannelProxyService {
       userId: event.userId,
     });
 
-    // 5. Get container URL for the tenant
+    // 5. Get container URL for the tenant and agent's model tier
     const tenant = await this.prisma.tenant.findUnique({
       where: { id: resolution.tenantId },
       select: { containerUrl: true },
     });
 
     const containerUrl = tenant?.containerUrl ?? 'http://localhost:8080';
+
+    const agent = await this.prisma.agent.findUnique({
+      where: { id: route.agentId },
+      select: { modelTier: true },
+    });
 
     // 6. Enqueue forward job
     await this.proxyQueue.add(
@@ -108,6 +113,7 @@ export class ChannelProxyService {
         sessionContext: session,
         event,
         containerUrl,
+        agentModelTier: agent?.modelTier,
       },
       {
         attempts: FORWARD_RETRY_ATTEMPTS,

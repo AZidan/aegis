@@ -46,24 +46,37 @@ export class ChannelProxyProcessor extends WorkerHost {
     }
   }
 
+  /** Map from Aegis model tier to OpenClaw model identifier. */
+  private static readonly MODEL_MAP: Record<string, string> = {
+    haiku: 'anthropic/claude-haiku-4-5',
+    sonnet: 'anthropic/claude-sonnet-4-5',
+    opus: 'anthropic/claude-opus-4-5',
+  };
+
   private async handleForwardToContainer(
     job: Job<ForwardToContainerJob>,
   ): Promise<void> {
-    const { sessionContext, event, containerUrl } = job.data;
+    const { sessionContext, event, containerUrl, agentModelTier } = job.data;
     const gatewayToken = this.secretsManager.getGatewayTokenForTenant(
       sessionContext.tenantId,
     );
 
+    const model =
+      ChannelProxyProcessor.MODEL_MAP[agentModelTier ?? 'sonnet'] ??
+      'anthropic/claude-sonnet-4-5';
+
     // Call OpenClaw Responses API (synchronous request-response)
+    // Agent routing is done via X-OpenClaw-Agent-Id header (not body field)
     const url = `${containerUrl}/v1/responses`;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${gatewayToken}`,
+        'X-OpenClaw-Agent-Id': sessionContext.agentId,
       },
       body: JSON.stringify({
-        model: 'anthropic/claude-sonnet-4-5',
+        model,
         input: event.text,
         stream: false,
       }),
