@@ -4,6 +4,7 @@ import { AgentsService } from './agents.service';
 import { ChannelsModule } from '../../channels/channels.module';
 import { ProvisioningModule } from '../../provisioning/provisioning.module';
 import { ContainerModule } from '../../container/container.module';
+import { SlackModule } from '../../slack/slack.module';
 
 /**
  * Agents Module - Tenant: Agents
@@ -15,7 +16,7 @@ import { ContainerModule } from '../../container/container.module';
  * PrismaService is globally available via PrismaModule.
  */
 @Module({
-  imports: [ChannelsModule, ProvisioningModule, ContainerModule],
+  imports: [ChannelsModule, ProvisioningModule, ContainerModule, SlackModule],
   controllers: [AgentsController],
   providers: [AgentsService],
   exports: [AgentsService],

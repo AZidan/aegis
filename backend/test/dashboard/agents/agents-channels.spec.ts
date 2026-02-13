@@ -7,6 +7,7 @@ import { ChannelRoutingService } from '../../../src/channels/channel-routing.ser
 import { ContainerConfigSyncService } from '../../../src/provisioning/container-config-sync.service';
 import { ContainerConfigSyncService as TenantConfigSyncService } from '../../../src/container/container-config-sync.service';
 import { ContainerConfigGeneratorService } from '../../../src/provisioning/container-config-generator.service';
+import { DockerOrchestratorService } from '../../../src/container/docker-orchestrator.service';
 
 // ---------------------------------------------------------------------------
 // Test Data Factories
@@ -89,6 +90,7 @@ const mockPrisma = {
   },
   channelConnection: {
     findFirst: jest.fn(),
+    findMany: jest.fn().mockResolvedValue([]),
   },
 };
 
@@ -125,6 +127,7 @@ describe('AgentsService - Channel Endpoints', () => {
         { provide: ContainerConfigSyncService, useValue: mockConfigSyncService },
         { provide: TenantConfigSyncService, useValue: { syncTenantConfig: jest.fn().mockResolvedValue(undefined) } },
         { provide: ContainerConfigGeneratorService, useValue: mockConfigGeneratorService },
+        { provide: DockerOrchestratorService, useValue: { removeAgentWorkspace: jest.fn().mockResolvedValue(undefined) } },
       ],
     }).compile();
 
@@ -149,6 +152,7 @@ describe('AgentsService - Channel Endpoints', () => {
 
     it('should return connections grouped by connection', async () => {
       mockPrisma.agent.findFirst.mockResolvedValue(createMockAgent());
+      mockPrisma.channelConnection.findMany.mockResolvedValue([createMockConnection()]);
 
       const routes = [
         createMockRoute(),
@@ -180,6 +184,8 @@ describe('AgentsService - Channel Endpoints', () => {
 
     it('should filter out routes from other tenants (tenant isolation)', async () => {
       mockPrisma.agent.findFirst.mockResolvedValue(createMockAgent());
+      // Only the tenant's own connection is returned by findMany (query is scoped to tenantId)
+      mockPrisma.channelConnection.findMany.mockResolvedValue([createMockConnection()]);
 
       // Route with connection belonging to a different tenant
       const routes = [
@@ -200,7 +206,8 @@ describe('AgentsService - Channel Endpoints', () => {
 
       const result = await service.getAgentChannels(TENANT_ID, AGENT_ID);
 
-      // Only the route belonging to TENANT_ID should appear
+      // Only the connection belonging to TENANT_ID should appear
+      // (conn-other's route references a connection not in the tenant's connection set)
       expect(result.connections).toHaveLength(1);
       expect(result.connections[0].id).toBe(CONNECTION_ID);
     });

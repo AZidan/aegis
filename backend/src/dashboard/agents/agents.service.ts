@@ -19,6 +19,8 @@ import { TOOL_CATEGORIES } from '../tools/tool-categories';
 import { ROLE_DEFAULT_POLICIES } from '../tools/role-defaults';
 import { ChannelRoutingService } from '../../channels/channel-routing.service';
 import { ContainerConfigSyncService as TenantConfigSyncService } from '../../container/container-config-sync.service';
+import { DockerOrchestratorService } from '../../container/docker-orchestrator.service';
+import { SlackService } from '../../slack/slack.service';
 
 /**
  * Plan-based agent limits.
@@ -59,6 +61,8 @@ export class AgentsService {
     @Optional() private readonly configSyncService: PerAgentConfigSyncService,
     @Optional() private readonly configGeneratorService: ContainerConfigGeneratorService,
     private readonly configSync: TenantConfigSyncService,
+    @Optional() private readonly dockerOrchestrator: DockerOrchestratorService,
+    @Optional() private readonly slackService: SlackService,
   ) {}
 
   // ==========================================================================
@@ -608,6 +612,12 @@ export class AgentsService {
       throw new NotFoundException('Agent not found');
     }
 
+    // Look up tenant container ID before deleting the agent
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { containerId: true },
+    });
+
     // Cascading deletes handle channels, activities, metrics, skill installations
     await this.prisma.agent.delete({
       where: { id: agentId },
@@ -628,6 +638,17 @@ export class AgentsService {
 
     // Push updated config to running container (fire-and-forget)
     this.configSync.syncTenantConfig(tenantId);
+
+    // Clean up agent workspace files from container (fire-and-forget)
+    if (tenant?.containerId && this.dockerOrchestrator) {
+      this.dockerOrchestrator
+        .removeAgentWorkspace(tenant.containerId, agentId)
+        .catch((error) => {
+          this.logger.warn(
+            `Failed to remove workspace for agent ${agentId}: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        });
+    }
 
     this.logger.log(`Agent deleted: ${agentId} for tenant ${tenantId}`);
   }
@@ -1181,5 +1202,73 @@ export class AgentsService {
       tenantId,
       userId,
     );
+  }
+
+  /**
+   * Lists Slack channels for a connection's workspace.
+   */
+  async getSlackChannels(
+    tenantId: string,
+    agentId: string,
+    connectionId: string,
+  ): Promise<{ items: Array<{ id: string; name: string }> }> {
+    // Verify agent belongs to tenant
+    const agent = await this.prisma.agent.findFirst({
+      where: { id: agentId, tenantId },
+    });
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
+
+    // Look up the connection
+    const connection = await this.prisma.channelConnection.findFirst({
+      where: { id: connectionId, tenantId },
+    });
+    if (!connection) {
+      throw new NotFoundException('Channel connection not found');
+    }
+
+    if (!this.slackService) {
+      return { items: [] };
+    }
+
+    const channels = await this.slackService.listChannels(
+      connection.workspaceId,
+    );
+    return { items: channels };
+  }
+
+  /**
+   * Lists Slack users for a connection's workspace.
+   */
+  async getSlackUsers(
+    tenantId: string,
+    agentId: string,
+    connectionId: string,
+  ): Promise<{
+    items: Array<{ id: string; name: string; realName: string }>;
+  }> {
+    // Verify agent belongs to tenant
+    const agent = await this.prisma.agent.findFirst({
+      where: { id: agentId, tenantId },
+    });
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
+
+    // Look up the connection
+    const connection = await this.prisma.channelConnection.findFirst({
+      where: { id: connectionId, tenantId },
+    });
+    if (!connection) {
+      throw new NotFoundException('Channel connection not found');
+    }
+
+    if (!this.slackService) {
+      return { items: [] };
+    }
+
+    const users = await this.slackService.listUsers(connection.workspaceId);
+    return { items: users };
   }
 }

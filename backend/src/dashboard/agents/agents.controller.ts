@@ -169,6 +169,28 @@ export class AgentsController {
     );
   }
 
+  @Get(':id/channels/:connectionId/slack-channels')
+  @HttpCode(HttpStatus.OK)
+  async getSlackChannels(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Param('connectionId') connectionId: string,
+  ) {
+    const tenantId = this.getTenantId(req);
+    return this.agentsService.getSlackChannels(tenantId, id, connectionId);
+  }
+
+  @Get(':id/channels/:connectionId/slack-users')
+  @HttpCode(HttpStatus.OK)
+  async getSlackUsers(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Param('connectionId') connectionId: string,
+  ) {
+    const tenantId = this.getTenantId(req);
+    return this.agentsService.getSlackUsers(tenantId, id, connectionId);
+  }
+
   // ==========================================================================
   // GET /api/dashboard/agents/:id - Get Agent Detail
   // Contract: 200 OK
