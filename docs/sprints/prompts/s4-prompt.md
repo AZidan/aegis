@@ -112,6 +112,47 @@ model Agent {
 **Task:**
 Create UsageRecord table and a service to track token consumption per agent.
 
+**How Token Tracking Works:**
+We capture token usage from OpenClaw responses in the Channel Proxy - NOT by querying OpenClaw separately.
+
+The Claude API (which OpenClaw wraps) returns usage in every response:
+```json
+{
+  "id": "msg_...",
+  "content": [...],
+  "usage": {
+    "input_tokens": 1234,
+    "output_tokens": 567,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 100
+  }
+}
+```
+
+**Integration Point - Modify ChannelProxyProcessor:**
+```typescript
+// backend/src/channel-proxy/channel-proxy.processor.ts
+private async handleForwardToContainer(job: Job<ForwardToContainerJob>): Promise<void> {
+  // ... existing code to call OpenClaw ...
+
+  const response = await fetch(url, { ... });
+  const data = await response.json();
+
+  // Extract token usage from response
+  const usage = data.usage;
+  if (usage) {
+    await this.usageTrackingService.recordUsage(sessionContext.agentId, {
+      inputTokens: usage.input_tokens,
+      outputTokens: usage.output_tokens,
+      // Extended thinking tokens are billed at output rates
+      thinkingTokens: usage.thinking_tokens ?? 0,
+    });
+  }
+
+  // ... rest of processing ...
+}
+```
+
 **Schema:**
 ```prisma
 model UsageRecord {
@@ -166,6 +207,7 @@ export class UsageTrackingService {
 **Acceptance Criteria:**
 - [ ] Create UsageRecord model in Prisma schema
 - [ ] Create UsageTrackingService with methods above
+- [ ] **Integrate into ChannelProxyProcessor** to capture usage from OpenClaw responses
 - [ ] Add BullMQ job to aggregate daily usage
 - [ ] Add BullMQ job to reset monthly counters on 1st of month
 - [ ] Create BillingModule to house billing services
@@ -176,6 +218,10 @@ export class UsageTrackingService {
 - `backend/src/billing/usage-tracking.service.ts`
 - `backend/src/billing/usage-tracking.processor.ts`
 - `backend/test/billing/usage-tracking.service.spec.ts`
+
+**Files to Modify:**
+- `backend/src/channel-proxy/channel-proxy.processor.ts` (inject UsageTrackingService, capture usage)
+- `backend/src/channel-proxy/channel-proxy.module.ts` (import BillingModule)
 
 ---
 
