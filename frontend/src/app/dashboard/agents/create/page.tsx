@@ -12,8 +12,9 @@ import type {
   ThinkingMode,
   CreateAgentPayload,
   CustomTemplates,
+  TenantPlan,
 } from '@/lib/api/agents';
-import { useCreateAgent, useRoles } from '@/lib/hooks/use-agents';
+import { useCreateAgent, useRoles, useTenantBilling } from '@/lib/hooks/use-agents';
 
 import { WizardStepper } from '@/components/dashboard/agents/agent-wizard/wizard-stepper';
 import { StepBasicInfo } from '@/components/dashboard/agents/agent-wizard/step-basic-info';
@@ -44,6 +45,7 @@ export default function AgentCreatePage() {
   const router = useRouter();
   const createMutation = useCreateAgent();
   const { data: roles } = useRoles();
+  const { data: billing } = useTenantBilling();
 
   // Wizard state
   const [step, setStep] = React.useState(1);
@@ -208,6 +210,8 @@ export default function AgentCreatePage() {
             onThinkingModeChange={setThinkingMode}
             temperature={temperature}
             onTemperatureChange={setTemperature}
+            tenantPlan={billing?.plan}
+            agentCount={billing?.agentCount}
           />
         )}
         {step === 4 && (
@@ -233,6 +237,7 @@ export default function AgentCreatePage() {
             temperature={temperature}
             categories={categories}
             onStepClick={goToStep}
+            tenantPlan={billing?.plan}
           />
         )}
       </div>

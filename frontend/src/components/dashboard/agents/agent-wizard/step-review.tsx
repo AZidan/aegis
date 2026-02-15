@@ -4,10 +4,13 @@ import * as React from 'react';
 import { cn } from '@/lib/utils/cn';
 import {
   MODEL_LABELS,
+  MODEL_MONTHLY_COST,
+  THINKING_SURCHARGE,
   FALLBACK_ROLE_COLOR,
   type AgentRole,
   type ModelTier,
   type ThinkingMode,
+  type TenantPlan,
   type RoleConfig,
 } from '@/lib/api/agents';
 import { useRoles } from '@/lib/hooks/use-agents';
@@ -27,6 +30,7 @@ interface StepReviewProps {
   temperature: number;
   categories: WizardToolCategory[];
   onStepClick: (step: number) => void;
+  tenantPlan?: TenantPlan;
 }
 
 // ---------------------------------------------------------------------------
@@ -59,6 +63,7 @@ export function StepReview({
   temperature,
   categories,
   onStepClick,
+  tenantPlan = 'starter',
 }: StepReviewProps) {
   const { data: roles } = useRoles();
   const roleDisplay = role ? getRoleDisplay(role, roles) : { label: '', color: '' };
@@ -225,6 +230,52 @@ export function StepReview({
                 );
               })}
             </div>
+          </div>
+        </div>
+
+        {/* Estimated Cost Summary */}
+        <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-neutral-100">
+            <span className="text-sm font-semibold text-neutral-900">
+              Estimated Monthly Cost
+            </span>
+          </div>
+          <div className="px-5 py-4 space-y-3">
+            {(() => {
+              const baseCost = MODEL_MONTHLY_COST[modelTier];
+              const surcharge = THINKING_SURCHARGE[thinkingMode];
+              const total = baseCost + surcharge;
+              return (
+                <>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-neutral-600">
+                      {MODEL_LABELS[modelTier]} base fee
+                    </span>
+                    <span className="font-mono font-medium text-neutral-800">
+                      ${baseCost}/mo
+                    </span>
+                  </div>
+                  {surcharge > 0 && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-neutral-600">
+                        {THINKING_LABELS[thinkingMode]} thinking surcharge
+                      </span>
+                      <span className="font-mono font-medium text-amber-600">
+                        +${surcharge}/mo
+                      </span>
+                    </div>
+                  )}
+                  <div className="border-t border-neutral-100 pt-3 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-neutral-900">
+                      Total per agent
+                    </span>
+                    <span className="text-lg font-mono font-bold text-neutral-900">
+                      ${total}/mo
+                    </span>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       </div>

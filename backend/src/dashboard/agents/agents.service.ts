@@ -17,6 +17,7 @@ import { ListAgentsQueryDto } from './dto/list-agents-query.dto';
 import { CreateAgentRouteDto } from './dto/create-agent-route.dto';
 import { TOOL_CATEGORIES } from '../tools/tool-categories';
 import { ROLE_DEFAULT_POLICIES } from '../tools/role-defaults';
+import { validateModelTierForPlan } from './validators/model-tier.validator';
 import { ChannelRoutingService } from '../../channels/channel-routing.service';
 import { ContainerConfigSyncService as TenantConfigSyncService } from '../../container/container-config-sync.service';
 import { DockerOrchestratorService } from '../../container/docker-orchestrator.service';
@@ -248,6 +249,16 @@ export class AgentsService {
       });
     }
 
+    // Validate model tier and thinking mode against plan
+    const tierValidation = validateModelTierForPlan(
+      tenant.plan,
+      dto.modelTier,
+      dto.thinkingMode,
+    );
+    if (!tierValidation.valid) {
+      throw new BadRequestException(tierValidation.error);
+    }
+
     // Validate role against AgentRoleConfig table
     const roleConfig = await this.prisma.agentRoleConfig.findUnique({
       where: { name: dto.role },
@@ -282,6 +293,10 @@ export class AgentsService {
           }
         : null;
 
+    // Calculate token quota reset date (1st of next month)
+    const now = new Date();
+    const tokenQuotaResetAt = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
     // Create agent
     const agent = await this.prisma.agent.create({
       data: {
@@ -300,6 +315,7 @@ export class AgentsService {
           ? (dto.customTemplates as Prisma.InputJsonValue)
           : Prisma.JsonNull,
         tenantId,
+        tokenQuotaResetAt,
       },
     });
 
@@ -515,6 +531,24 @@ export class AgentsService {
 
     if (!existing) {
       throw new NotFoundException('Agent not found');
+    }
+
+    // Validate model tier/thinking mode changes against plan
+    if (dto.modelTier !== undefined || dto.thinkingMode !== undefined) {
+      const tenant = await this.prisma.tenant.findUnique({
+        where: { id: tenantId },
+        select: { plan: true },
+      });
+      if (tenant) {
+        const tierValidation = validateModelTierForPlan(
+          tenant.plan,
+          dto.modelTier ?? existing.modelTier,
+          dto.thinkingMode ?? existing.thinkingMode,
+        );
+        if (!tierValidation.valid) {
+          throw new BadRequestException(tierValidation.error);
+        }
+      }
     }
 
     // Build update data
