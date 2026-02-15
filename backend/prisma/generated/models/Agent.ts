@@ -28,10 +28,14 @@ export type AggregateAgent = {
 
 export type AgentAvgAggregateOutputType = {
   temperature: number | null
+  monthlyTokensUsed: number | null
+  monthlyTokenQuotaOverride: number | null
 }
 
 export type AgentSumAggregateOutputType = {
   temperature: number | null
+  monthlyTokensUsed: bigint | null
+  monthlyTokenQuotaOverride: bigint | null
 }
 
 export type AgentMinAggregateOutputType = {
@@ -47,6 +51,9 @@ export type AgentMinAggregateOutputType = {
   avatarColor: string | null
   personality: string | null
   openclawAgentId: string | null
+  monthlyTokensUsed: bigint | null
+  monthlyTokenQuotaOverride: bigint | null
+  tokenQuotaResetAt: Date | null
   lastActive: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -65,6 +72,9 @@ export type AgentMaxAggregateOutputType = {
   avatarColor: string | null
   personality: string | null
   openclawAgentId: string | null
+  monthlyTokensUsed: bigint | null
+  monthlyTokenQuotaOverride: bigint | null
+  tokenQuotaResetAt: Date | null
   lastActive: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -86,6 +96,9 @@ export type AgentCountAggregateOutputType = {
   assistedUser: number
   customTemplates: number
   openclawAgentId: number
+  monthlyTokensUsed: number
+  monthlyTokenQuotaOverride: number
+  tokenQuotaResetAt: number
   lastActive: number
   createdAt: number
   updatedAt: number
@@ -95,10 +108,14 @@ export type AgentCountAggregateOutputType = {
 
 export type AgentAvgAggregateInputType = {
   temperature?: true
+  monthlyTokensUsed?: true
+  monthlyTokenQuotaOverride?: true
 }
 
 export type AgentSumAggregateInputType = {
   temperature?: true
+  monthlyTokensUsed?: true
+  monthlyTokenQuotaOverride?: true
 }
 
 export type AgentMinAggregateInputType = {
@@ -114,6 +131,9 @@ export type AgentMinAggregateInputType = {
   avatarColor?: true
   personality?: true
   openclawAgentId?: true
+  monthlyTokensUsed?: true
+  monthlyTokenQuotaOverride?: true
+  tokenQuotaResetAt?: true
   lastActive?: true
   createdAt?: true
   updatedAt?: true
@@ -132,6 +152,9 @@ export type AgentMaxAggregateInputType = {
   avatarColor?: true
   personality?: true
   openclawAgentId?: true
+  monthlyTokensUsed?: true
+  monthlyTokenQuotaOverride?: true
+  tokenQuotaResetAt?: true
   lastActive?: true
   createdAt?: true
   updatedAt?: true
@@ -153,6 +176,9 @@ export type AgentCountAggregateInputType = {
   assistedUser?: true
   customTemplates?: true
   openclawAgentId?: true
+  monthlyTokensUsed?: true
+  monthlyTokenQuotaOverride?: true
+  tokenQuotaResetAt?: true
   lastActive?: true
   createdAt?: true
   updatedAt?: true
@@ -261,6 +287,9 @@ export type AgentGroupByOutputType = {
   assistedUser: runtime.JsonValue | null
   customTemplates: runtime.JsonValue | null
   openclawAgentId: string | null
+  monthlyTokensUsed: bigint
+  monthlyTokenQuotaOverride: bigint | null
+  tokenQuotaResetAt: Date | null
   lastActive: Date | null
   createdAt: Date
   updatedAt: Date
@@ -305,6 +334,9 @@ export type AgentWhereInput = {
   assistedUser?: Prisma.JsonNullableFilter<"Agent">
   customTemplates?: Prisma.JsonNullableFilter<"Agent">
   openclawAgentId?: Prisma.StringNullableFilter<"Agent"> | string | null
+  monthlyTokensUsed?: Prisma.BigIntFilter<"Agent"> | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.BigIntNullableFilter<"Agent"> | bigint | number | null
+  tokenQuotaResetAt?: Prisma.DateTimeNullableFilter<"Agent"> | Date | string | null
   lastActive?: Prisma.DateTimeNullableFilter<"Agent"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Agent"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Agent"> | Date | string
@@ -314,6 +346,7 @@ export type AgentWhereInput = {
   metrics?: Prisma.AgentMetricsListRelationFilter
   installedSkills?: Prisma.SkillInstallationListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  usageRecords?: Prisma.UsageRecordListRelationFilter
   messagesSent?: Prisma.AgentMessageListRelationFilter
   messagesReceived?: Prisma.AgentMessageListRelationFilter
   allowlistOwner?: Prisma.AgentAllowlistListRelationFilter
@@ -337,6 +370,9 @@ export type AgentOrderByWithRelationInput = {
   assistedUser?: Prisma.SortOrderInput | Prisma.SortOrder
   customTemplates?: Prisma.SortOrderInput | Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  monthlyTokensUsed?: Prisma.SortOrder
+  monthlyTokenQuotaOverride?: Prisma.SortOrderInput | Prisma.SortOrder
+  tokenQuotaResetAt?: Prisma.SortOrderInput | Prisma.SortOrder
   lastActive?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -346,6 +382,7 @@ export type AgentOrderByWithRelationInput = {
   metrics?: Prisma.AgentMetricsOrderByRelationAggregateInput
   installedSkills?: Prisma.SkillInstallationOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
+  usageRecords?: Prisma.UsageRecordOrderByRelationAggregateInput
   messagesSent?: Prisma.AgentMessageOrderByRelationAggregateInput
   messagesReceived?: Prisma.AgentMessageOrderByRelationAggregateInput
   allowlistOwner?: Prisma.AgentAllowlistOrderByRelationAggregateInput
@@ -372,6 +409,9 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   assistedUser?: Prisma.JsonNullableFilter<"Agent">
   customTemplates?: Prisma.JsonNullableFilter<"Agent">
   openclawAgentId?: Prisma.StringNullableFilter<"Agent"> | string | null
+  monthlyTokensUsed?: Prisma.BigIntFilter<"Agent"> | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.BigIntNullableFilter<"Agent"> | bigint | number | null
+  tokenQuotaResetAt?: Prisma.DateTimeNullableFilter<"Agent"> | Date | string | null
   lastActive?: Prisma.DateTimeNullableFilter<"Agent"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Agent"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Agent"> | Date | string
@@ -381,6 +421,7 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   metrics?: Prisma.AgentMetricsListRelationFilter
   installedSkills?: Prisma.SkillInstallationListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  usageRecords?: Prisma.UsageRecordListRelationFilter
   messagesSent?: Prisma.AgentMessageListRelationFilter
   messagesReceived?: Prisma.AgentMessageListRelationFilter
   allowlistOwner?: Prisma.AgentAllowlistListRelationFilter
@@ -404,6 +445,9 @@ export type AgentOrderByWithAggregationInput = {
   assistedUser?: Prisma.SortOrderInput | Prisma.SortOrder
   customTemplates?: Prisma.SortOrderInput | Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  monthlyTokensUsed?: Prisma.SortOrder
+  monthlyTokenQuotaOverride?: Prisma.SortOrderInput | Prisma.SortOrder
+  tokenQuotaResetAt?: Prisma.SortOrderInput | Prisma.SortOrder
   lastActive?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -433,6 +477,9 @@ export type AgentScalarWhereWithAggregatesInput = {
   assistedUser?: Prisma.JsonNullableWithAggregatesFilter<"Agent">
   customTemplates?: Prisma.JsonNullableWithAggregatesFilter<"Agent">
   openclawAgentId?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
+  monthlyTokensUsed?: Prisma.BigIntWithAggregatesFilter<"Agent"> | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.BigIntNullableWithAggregatesFilter<"Agent"> | bigint | number | null
+  tokenQuotaResetAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Agent"> | Date | string | null
   lastActive?: Prisma.DateTimeNullableWithAggregatesFilter<"Agent"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Agent"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Agent"> | Date | string
@@ -453,6 +500,9 @@ export type AgentCreateInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -462,6 +512,7 @@ export type AgentCreateInput = {
   metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
@@ -485,6 +536,9 @@ export type AgentUncheckedCreateInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -493,6 +547,7 @@ export type AgentUncheckedCreateInput = {
   metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
@@ -515,6 +570,9 @@ export type AgentUpdateInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -524,6 +582,7 @@ export type AgentUpdateInput = {
   metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
@@ -547,6 +606,9 @@ export type AgentUncheckedUpdateInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -555,6 +617,7 @@ export type AgentUncheckedUpdateInput = {
   metrics?: Prisma.AgentMetricsUncheckedUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUncheckedUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
@@ -578,6 +641,9 @@ export type AgentCreateManyInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -598,6 +664,9 @@ export type AgentUpdateManyMutationInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -619,6 +688,9 @@ export type AgentUncheckedUpdateManyInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -650,6 +722,9 @@ export type AgentCountOrderByAggregateInput = {
   assistedUser?: Prisma.SortOrder
   customTemplates?: Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrder
+  monthlyTokensUsed?: Prisma.SortOrder
+  monthlyTokenQuotaOverride?: Prisma.SortOrder
+  tokenQuotaResetAt?: Prisma.SortOrder
   lastActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -657,6 +732,8 @@ export type AgentCountOrderByAggregateInput = {
 
 export type AgentAvgOrderByAggregateInput = {
   temperature?: Prisma.SortOrder
+  monthlyTokensUsed?: Prisma.SortOrder
+  monthlyTokenQuotaOverride?: Prisma.SortOrder
 }
 
 export type AgentMaxOrderByAggregateInput = {
@@ -672,6 +749,9 @@ export type AgentMaxOrderByAggregateInput = {
   avatarColor?: Prisma.SortOrder
   personality?: Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrder
+  monthlyTokensUsed?: Prisma.SortOrder
+  monthlyTokenQuotaOverride?: Prisma.SortOrder
+  tokenQuotaResetAt?: Prisma.SortOrder
   lastActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -690,6 +770,9 @@ export type AgentMinOrderByAggregateInput = {
   avatarColor?: Prisma.SortOrder
   personality?: Prisma.SortOrder
   openclawAgentId?: Prisma.SortOrder
+  monthlyTokensUsed?: Prisma.SortOrder
+  monthlyTokenQuotaOverride?: Prisma.SortOrder
+  tokenQuotaResetAt?: Prisma.SortOrder
   lastActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -697,6 +780,8 @@ export type AgentMinOrderByAggregateInput = {
 
 export type AgentSumOrderByAggregateInput = {
   temperature?: Prisma.SortOrder
+  monthlyTokensUsed?: Prisma.SortOrder
+  monthlyTokenQuotaOverride?: Prisma.SortOrder
 }
 
 export type AgentScalarRelationFilter = {
@@ -769,6 +854,14 @@ export type FloatFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type BigIntFieldUpdateOperationsInput = {
+  set?: bigint | number
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
 }
 
 export type AgentCreateNestedOneWithoutChannelsInput = {
@@ -913,6 +1006,20 @@ export type AgentUpdateOneRequiredWithoutChannelRoutingNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AgentUpdateToOneWithWhereWithoutChannelRoutingInput, Prisma.AgentUpdateWithoutChannelRoutingInput>, Prisma.AgentUncheckedUpdateWithoutChannelRoutingInput>
 }
 
+export type AgentCreateNestedOneWithoutUsageRecordsInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutUsageRecordsInput, Prisma.AgentUncheckedCreateWithoutUsageRecordsInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutUsageRecordsInput
+  connect?: Prisma.AgentWhereUniqueInput
+}
+
+export type AgentUpdateOneRequiredWithoutUsageRecordsNestedInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutUsageRecordsInput, Prisma.AgentUncheckedCreateWithoutUsageRecordsInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutUsageRecordsInput
+  upsert?: Prisma.AgentUpsertWithoutUsageRecordsInput
+  connect?: Prisma.AgentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AgentUpdateToOneWithWhereWithoutUsageRecordsInput, Prisma.AgentUpdateWithoutUsageRecordsInput>, Prisma.AgentUncheckedUpdateWithoutUsageRecordsInput>
+}
+
 export type AgentCreateWithoutTenantInput = {
   id?: string
   name: string
@@ -928,6 +1035,9 @@ export type AgentCreateWithoutTenantInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -936,6 +1046,7 @@ export type AgentCreateWithoutTenantInput = {
   metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
@@ -958,6 +1069,9 @@ export type AgentUncheckedCreateWithoutTenantInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -966,6 +1080,7 @@ export type AgentUncheckedCreateWithoutTenantInput = {
   metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
@@ -1018,6 +1133,9 @@ export type AgentScalarWhereInput = {
   assistedUser?: Prisma.JsonNullableFilter<"Agent">
   customTemplates?: Prisma.JsonNullableFilter<"Agent">
   openclawAgentId?: Prisma.StringNullableFilter<"Agent"> | string | null
+  monthlyTokensUsed?: Prisma.BigIntFilter<"Agent"> | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.BigIntNullableFilter<"Agent"> | bigint | number | null
+  tokenQuotaResetAt?: Prisma.DateTimeNullableFilter<"Agent"> | Date | string | null
   lastActive?: Prisma.DateTimeNullableFilter<"Agent"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Agent"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Agent"> | Date | string
@@ -1038,6 +1156,9 @@ export type AgentCreateWithoutChannelsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1046,6 +1167,7 @@ export type AgentCreateWithoutChannelsInput = {
   metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
@@ -1069,6 +1191,9 @@ export type AgentUncheckedCreateWithoutChannelsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1076,6 +1201,7 @@ export type AgentUncheckedCreateWithoutChannelsInput = {
   metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
@@ -1114,6 +1240,9 @@ export type AgentUpdateWithoutChannelsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1122,6 +1251,7 @@ export type AgentUpdateWithoutChannelsInput = {
   metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
@@ -1145,6 +1275,9 @@ export type AgentUncheckedUpdateWithoutChannelsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1152,6 +1285,7 @@ export type AgentUncheckedUpdateWithoutChannelsInput = {
   metrics?: Prisma.AgentMetricsUncheckedUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUncheckedUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
@@ -1174,6 +1308,9 @@ export type AgentCreateWithoutActivitiesInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1182,6 +1319,7 @@ export type AgentCreateWithoutActivitiesInput = {
   metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
@@ -1205,6 +1343,9 @@ export type AgentUncheckedCreateWithoutActivitiesInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1212,6 +1353,7 @@ export type AgentUncheckedCreateWithoutActivitiesInput = {
   metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
@@ -1250,6 +1392,9 @@ export type AgentUpdateWithoutActivitiesInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1258,6 +1403,7 @@ export type AgentUpdateWithoutActivitiesInput = {
   metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
@@ -1281,6 +1427,9 @@ export type AgentUncheckedUpdateWithoutActivitiesInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1288,6 +1437,7 @@ export type AgentUncheckedUpdateWithoutActivitiesInput = {
   metrics?: Prisma.AgentMetricsUncheckedUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUncheckedUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
@@ -1310,6 +1460,9 @@ export type AgentCreateWithoutMetricsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1318,6 +1471,7 @@ export type AgentCreateWithoutMetricsInput = {
   activities?: Prisma.AgentActivityCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
@@ -1341,6 +1495,9 @@ export type AgentUncheckedCreateWithoutMetricsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1348,6 +1505,7 @@ export type AgentUncheckedCreateWithoutMetricsInput = {
   activities?: Prisma.AgentActivityUncheckedCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
@@ -1386,6 +1544,9 @@ export type AgentUpdateWithoutMetricsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1394,6 +1555,7 @@ export type AgentUpdateWithoutMetricsInput = {
   activities?: Prisma.AgentActivityUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
@@ -1417,6 +1579,9 @@ export type AgentUncheckedUpdateWithoutMetricsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1424,6 +1589,7 @@ export type AgentUncheckedUpdateWithoutMetricsInput = {
   activities?: Prisma.AgentActivityUncheckedUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUncheckedUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
@@ -1446,6 +1612,9 @@ export type AgentCreateWithoutInstalledSkillsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1454,6 +1623,7 @@ export type AgentCreateWithoutInstalledSkillsInput = {
   activities?: Prisma.AgentActivityCreateNestedManyWithoutAgentInput
   metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
@@ -1477,6 +1647,9 @@ export type AgentUncheckedCreateWithoutInstalledSkillsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1484,6 +1657,7 @@ export type AgentUncheckedCreateWithoutInstalledSkillsInput = {
   activities?: Prisma.AgentActivityUncheckedCreateNestedManyWithoutAgentInput
   metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
@@ -1522,6 +1696,9 @@ export type AgentUpdateWithoutInstalledSkillsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1530,6 +1707,7 @@ export type AgentUpdateWithoutInstalledSkillsInput = {
   activities?: Prisma.AgentActivityUpdateManyWithoutAgentNestedInput
   metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
@@ -1553,6 +1731,9 @@ export type AgentUncheckedUpdateWithoutInstalledSkillsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1560,6 +1741,7 @@ export type AgentUncheckedUpdateWithoutInstalledSkillsInput = {
   activities?: Prisma.AgentActivityUncheckedUpdateManyWithoutAgentNestedInput
   metrics?: Prisma.AgentMetricsUncheckedUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
@@ -1582,6 +1764,9 @@ export type AgentCreateWithoutAuditLogsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1590,6 +1775,7 @@ export type AgentCreateWithoutAuditLogsInput = {
   activities?: Prisma.AgentActivityCreateNestedManyWithoutAgentInput
   metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
@@ -1613,6 +1799,9 @@ export type AgentUncheckedCreateWithoutAuditLogsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1620,6 +1809,7 @@ export type AgentUncheckedCreateWithoutAuditLogsInput = {
   activities?: Prisma.AgentActivityUncheckedCreateNestedManyWithoutAgentInput
   metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
@@ -1658,6 +1848,9 @@ export type AgentUpdateWithoutAuditLogsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1666,6 +1859,7 @@ export type AgentUpdateWithoutAuditLogsInput = {
   activities?: Prisma.AgentActivityUpdateManyWithoutAgentNestedInput
   metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
@@ -1689,6 +1883,9 @@ export type AgentUncheckedUpdateWithoutAuditLogsInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1696,6 +1893,7 @@ export type AgentUncheckedUpdateWithoutAuditLogsInput = {
   activities?: Prisma.AgentActivityUncheckedUpdateManyWithoutAgentNestedInput
   metrics?: Prisma.AgentMetricsUncheckedUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUncheckedUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
@@ -1718,6 +1916,9 @@ export type AgentCreateWithoutMessagesSentInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1727,6 +1928,7 @@ export type AgentCreateWithoutMessagesSentInput = {
   metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutAgentInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
@@ -1749,6 +1951,9 @@ export type AgentUncheckedCreateWithoutMessagesSentInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1757,6 +1962,7 @@ export type AgentUncheckedCreateWithoutMessagesSentInput = {
   metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutAgentInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
@@ -1783,6 +1989,9 @@ export type AgentCreateWithoutMessagesReceivedInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1792,6 +2001,7 @@ export type AgentCreateWithoutMessagesReceivedInput = {
   metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
@@ -1814,6 +2024,9 @@ export type AgentUncheckedCreateWithoutMessagesReceivedInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1822,6 +2035,7 @@ export type AgentUncheckedCreateWithoutMessagesReceivedInput = {
   metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
@@ -1859,6 +2073,9 @@ export type AgentUpdateWithoutMessagesSentInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1868,6 +2085,7 @@ export type AgentUpdateWithoutMessagesSentInput = {
   metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutAgentNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
@@ -1890,6 +2108,9 @@ export type AgentUncheckedUpdateWithoutMessagesSentInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1898,6 +2119,7 @@ export type AgentUncheckedUpdateWithoutMessagesSentInput = {
   metrics?: Prisma.AgentMetricsUncheckedUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUncheckedUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutAgentNestedInput
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
@@ -1930,6 +2152,9 @@ export type AgentUpdateWithoutMessagesReceivedInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1939,6 +2164,7 @@ export type AgentUpdateWithoutMessagesReceivedInput = {
   metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
@@ -1961,6 +2187,9 @@ export type AgentUncheckedUpdateWithoutMessagesReceivedInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1969,6 +2198,7 @@ export type AgentUncheckedUpdateWithoutMessagesReceivedInput = {
   metrics?: Prisma.AgentMetricsUncheckedUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUncheckedUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
@@ -1990,6 +2220,9 @@ export type AgentCreateWithoutAllowlistOwnerInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1999,6 +2232,7 @@ export type AgentCreateWithoutAllowlistOwnerInput = {
   metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
@@ -2021,6 +2255,9 @@ export type AgentUncheckedCreateWithoutAllowlistOwnerInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2029,6 +2266,7 @@ export type AgentUncheckedCreateWithoutAllowlistOwnerInput = {
   metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
@@ -2055,6 +2293,9 @@ export type AgentCreateWithoutAllowlistTargetInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2064,6 +2305,7 @@ export type AgentCreateWithoutAllowlistTargetInput = {
   metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
@@ -2086,6 +2328,9 @@ export type AgentUncheckedCreateWithoutAllowlistTargetInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2094,6 +2339,7 @@ export type AgentUncheckedCreateWithoutAllowlistTargetInput = {
   metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
@@ -2131,6 +2377,9 @@ export type AgentUpdateWithoutAllowlistOwnerInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2140,6 +2389,7 @@ export type AgentUpdateWithoutAllowlistOwnerInput = {
   metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
@@ -2162,6 +2412,9 @@ export type AgentUncheckedUpdateWithoutAllowlistOwnerInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2170,6 +2423,7 @@ export type AgentUncheckedUpdateWithoutAllowlistOwnerInput = {
   metrics?: Prisma.AgentMetricsUncheckedUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUncheckedUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
@@ -2202,6 +2456,9 @@ export type AgentUpdateWithoutAllowlistTargetInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2211,6 +2468,7 @@ export type AgentUpdateWithoutAllowlistTargetInput = {
   metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
@@ -2233,6 +2491,9 @@ export type AgentUncheckedUpdateWithoutAllowlistTargetInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2241,6 +2502,7 @@ export type AgentUncheckedUpdateWithoutAllowlistTargetInput = {
   metrics?: Prisma.AgentMetricsUncheckedUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUncheckedUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
@@ -2262,6 +2524,9 @@ export type AgentCreateWithoutChannelRoutingInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2271,6 +2536,7 @@ export type AgentCreateWithoutChannelRoutingInput = {
   metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
@@ -2293,6 +2559,9 @@ export type AgentUncheckedCreateWithoutChannelRoutingInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2301,6 +2570,7 @@ export type AgentUncheckedCreateWithoutChannelRoutingInput = {
   metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
   installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutAgentInput
   messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
   messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
@@ -2338,6 +2608,9 @@ export type AgentUpdateWithoutChannelRoutingInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2347,6 +2620,7 @@ export type AgentUpdateWithoutChannelRoutingInput = {
   metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
@@ -2369,6 +2643,161 @@ export type AgentUncheckedUpdateWithoutChannelRoutingInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  channels?: Prisma.AgentChannelUncheckedUpdateManyWithoutAgentNestedInput
+  activities?: Prisma.AgentActivityUncheckedUpdateManyWithoutAgentNestedInput
+  metrics?: Prisma.AgentMetricsUncheckedUpdateManyWithoutAgentNestedInput
+  installedSkills?: Prisma.SkillInstallationUncheckedUpdateManyWithoutAgentNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutAgentNestedInput
+  messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
+  messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
+  allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
+  allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
+}
+
+export type AgentCreateWithoutUsageRecordsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  role: string
+  status?: $Enums.AgentStatus
+  modelTier: $Enums.ModelTier
+  thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
+  toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
+  lastActive?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutAgentsInput
+  channels?: Prisma.AgentChannelCreateNestedManyWithoutAgentInput
+  activities?: Prisma.AgentActivityCreateNestedManyWithoutAgentInput
+  metrics?: Prisma.AgentMetricsCreateNestedManyWithoutAgentInput
+  installedSkills?: Prisma.SkillInstallationCreateNestedManyWithoutAgentInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutAgentInput
+  messagesSent?: Prisma.AgentMessageCreateNestedManyWithoutSenderInput
+  messagesReceived?: Prisma.AgentMessageCreateNestedManyWithoutRecipientInput
+  allowlistOwner?: Prisma.AgentAllowlistCreateNestedManyWithoutAgentInput
+  allowlistTarget?: Prisma.AgentAllowlistCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingCreateNestedManyWithoutAgentInput
+}
+
+export type AgentUncheckedCreateWithoutUsageRecordsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  role: string
+  status?: $Enums.AgentStatus
+  tenantId: string
+  modelTier: $Enums.ModelTier
+  thinkingMode: $Enums.ThinkingMode
+  temperature?: number
+  avatarColor?: string
+  personality?: string | null
+  toolPolicy: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
+  lastActive?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  channels?: Prisma.AgentChannelUncheckedCreateNestedManyWithoutAgentInput
+  activities?: Prisma.AgentActivityUncheckedCreateNestedManyWithoutAgentInput
+  metrics?: Prisma.AgentMetricsUncheckedCreateNestedManyWithoutAgentInput
+  installedSkills?: Prisma.SkillInstallationUncheckedCreateNestedManyWithoutAgentInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutAgentInput
+  messagesSent?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutSenderInput
+  messagesReceived?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutRecipientInput
+  allowlistOwner?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAgentInput
+  allowlistTarget?: Prisma.AgentAllowlistUncheckedCreateNestedManyWithoutAllowedAgentInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedCreateNestedManyWithoutAgentInput
+}
+
+export type AgentCreateOrConnectWithoutUsageRecordsInput = {
+  where: Prisma.AgentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgentCreateWithoutUsageRecordsInput, Prisma.AgentUncheckedCreateWithoutUsageRecordsInput>
+}
+
+export type AgentUpsertWithoutUsageRecordsInput = {
+  update: Prisma.XOR<Prisma.AgentUpdateWithoutUsageRecordsInput, Prisma.AgentUncheckedUpdateWithoutUsageRecordsInput>
+  create: Prisma.XOR<Prisma.AgentCreateWithoutUsageRecordsInput, Prisma.AgentUncheckedCreateWithoutUsageRecordsInput>
+  where?: Prisma.AgentWhereInput
+}
+
+export type AgentUpdateToOneWithWhereWithoutUsageRecordsInput = {
+  where?: Prisma.AgentWhereInput
+  data: Prisma.XOR<Prisma.AgentUpdateWithoutUsageRecordsInput, Prisma.AgentUncheckedUpdateWithoutUsageRecordsInput>
+}
+
+export type AgentUpdateWithoutUsageRecordsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
+  modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
+  thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutAgentsNestedInput
+  channels?: Prisma.AgentChannelUpdateManyWithoutAgentNestedInput
+  activities?: Prisma.AgentActivityUpdateManyWithoutAgentNestedInput
+  metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
+  installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
+  messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
+  allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
+  allowlistTarget?: Prisma.AgentAllowlistUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentUncheckedUpdateWithoutUsageRecordsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  modelTier?: Prisma.EnumModelTierFieldUpdateOperationsInput | $Enums.ModelTier
+  thinkingMode?: Prisma.EnumThinkingModeFieldUpdateOperationsInput | $Enums.ThinkingMode
+  temperature?: Prisma.FloatFieldUpdateOperationsInput | number
+  avatarColor?: Prisma.StringFieldUpdateOperationsInput | string
+  personality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toolPolicy?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2381,6 +2810,7 @@ export type AgentUncheckedUpdateWithoutChannelRoutingInput = {
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
   allowlistTarget?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAllowedAgentNestedInput
+  channelRouting?: Prisma.ChannelRoutingUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateManyTenantInput = {
@@ -2398,6 +2828,9 @@ export type AgentCreateManyTenantInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: string | null
+  monthlyTokensUsed?: bigint | number
+  monthlyTokenQuotaOverride?: bigint | number | null
+  tokenQuotaResetAt?: Date | string | null
   lastActive?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2418,6 +2851,9 @@ export type AgentUpdateWithoutTenantInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2426,6 +2862,7 @@ export type AgentUpdateWithoutTenantInput = {
   metrics?: Prisma.AgentMetricsUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUpdateManyWithoutAgentNestedInput
@@ -2448,6 +2885,9 @@ export type AgentUncheckedUpdateWithoutTenantInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2456,6 +2896,7 @@ export type AgentUncheckedUpdateWithoutTenantInput = {
   metrics?: Prisma.AgentMetricsUncheckedUpdateManyWithoutAgentNestedInput
   installedSkills?: Prisma.SkillInstallationUncheckedUpdateManyWithoutAgentNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutAgentNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutAgentNestedInput
   messagesSent?: Prisma.AgentMessageUncheckedUpdateManyWithoutSenderNestedInput
   messagesReceived?: Prisma.AgentMessageUncheckedUpdateManyWithoutRecipientNestedInput
   allowlistOwner?: Prisma.AgentAllowlistUncheckedUpdateManyWithoutAgentNestedInput
@@ -2478,6 +2919,9 @@ export type AgentUncheckedUpdateManyWithoutTenantInput = {
   assistedUser?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   customTemplates?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   openclawAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  monthlyTokensUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  monthlyTokenQuotaOverride?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  tokenQuotaResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastActive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2494,6 +2938,7 @@ export type AgentCountOutputType = {
   metrics: number
   installedSkills: number
   auditLogs: number
+  usageRecords: number
   messagesSent: number
   messagesReceived: number
   allowlistOwner: number
@@ -2507,6 +2952,7 @@ export type AgentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   metrics?: boolean | AgentCountOutputTypeCountMetricsArgs
   installedSkills?: boolean | AgentCountOutputTypeCountInstalledSkillsArgs
   auditLogs?: boolean | AgentCountOutputTypeCountAuditLogsArgs
+  usageRecords?: boolean | AgentCountOutputTypeCountUsageRecordsArgs
   messagesSent?: boolean | AgentCountOutputTypeCountMessagesSentArgs
   messagesReceived?: boolean | AgentCountOutputTypeCountMessagesReceivedArgs
   allowlistOwner?: boolean | AgentCountOutputTypeCountAllowlistOwnerArgs
@@ -2562,6 +3008,13 @@ export type AgentCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types
 /**
  * AgentCountOutputType without action
  */
+export type AgentCountOutputTypeCountUsageRecordsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UsageRecordWhereInput
+}
+
+/**
+ * AgentCountOutputType without action
+ */
 export type AgentCountOutputTypeCountMessagesSentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AgentMessageWhereInput
 }
@@ -2611,6 +3064,9 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   assistedUser?: boolean
   customTemplates?: boolean
   openclawAgentId?: boolean
+  monthlyTokensUsed?: boolean
+  monthlyTokenQuotaOverride?: boolean
+  tokenQuotaResetAt?: boolean
   lastActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -2620,6 +3076,7 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   metrics?: boolean | Prisma.Agent$metricsArgs<ExtArgs>
   installedSkills?: boolean | Prisma.Agent$installedSkillsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.Agent$auditLogsArgs<ExtArgs>
+  usageRecords?: boolean | Prisma.Agent$usageRecordsArgs<ExtArgs>
   messagesSent?: boolean | Prisma.Agent$messagesSentArgs<ExtArgs>
   messagesReceived?: boolean | Prisma.Agent$messagesReceivedArgs<ExtArgs>
   allowlistOwner?: boolean | Prisma.Agent$allowlistOwnerArgs<ExtArgs>
@@ -2644,6 +3101,9 @@ export type AgentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   assistedUser?: boolean
   customTemplates?: boolean
   openclawAgentId?: boolean
+  monthlyTokensUsed?: boolean
+  monthlyTokenQuotaOverride?: boolean
+  tokenQuotaResetAt?: boolean
   lastActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -2666,6 +3126,9 @@ export type AgentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   assistedUser?: boolean
   customTemplates?: boolean
   openclawAgentId?: boolean
+  monthlyTokensUsed?: boolean
+  monthlyTokenQuotaOverride?: boolean
+  tokenQuotaResetAt?: boolean
   lastActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -2688,12 +3151,15 @@ export type AgentSelectScalar = {
   assistedUser?: boolean
   customTemplates?: boolean
   openclawAgentId?: boolean
+  monthlyTokensUsed?: boolean
+  monthlyTokenQuotaOverride?: boolean
+  tokenQuotaResetAt?: boolean
   lastActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "role" | "status" | "tenantId" | "modelTier" | "thinkingMode" | "temperature" | "avatarColor" | "personality" | "toolPolicy" | "assistedUser" | "customTemplates" | "openclawAgentId" | "lastActive" | "createdAt" | "updatedAt", ExtArgs["result"]["agent"]>
+export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "role" | "status" | "tenantId" | "modelTier" | "thinkingMode" | "temperature" | "avatarColor" | "personality" | "toolPolicy" | "assistedUser" | "customTemplates" | "openclawAgentId" | "monthlyTokensUsed" | "monthlyTokenQuotaOverride" | "tokenQuotaResetAt" | "lastActive" | "createdAt" | "updatedAt", ExtArgs["result"]["agent"]>
 export type AgentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   channels?: boolean | Prisma.Agent$channelsArgs<ExtArgs>
@@ -2701,6 +3167,7 @@ export type AgentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   metrics?: boolean | Prisma.Agent$metricsArgs<ExtArgs>
   installedSkills?: boolean | Prisma.Agent$installedSkillsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.Agent$auditLogsArgs<ExtArgs>
+  usageRecords?: boolean | Prisma.Agent$usageRecordsArgs<ExtArgs>
   messagesSent?: boolean | Prisma.Agent$messagesSentArgs<ExtArgs>
   messagesReceived?: boolean | Prisma.Agent$messagesReceivedArgs<ExtArgs>
   allowlistOwner?: boolean | Prisma.Agent$allowlistOwnerArgs<ExtArgs>
@@ -2724,6 +3191,7 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     metrics: Prisma.$AgentMetricsPayload<ExtArgs>[]
     installedSkills: Prisma.$SkillInstallationPayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+    usageRecords: Prisma.$UsageRecordPayload<ExtArgs>[]
     messagesSent: Prisma.$AgentMessagePayload<ExtArgs>[]
     messagesReceived: Prisma.$AgentMessagePayload<ExtArgs>[]
     allowlistOwner: Prisma.$AgentAllowlistPayload<ExtArgs>[]
@@ -2746,6 +3214,9 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     assistedUser: runtime.JsonValue | null
     customTemplates: runtime.JsonValue | null
     openclawAgentId: string | null
+    monthlyTokensUsed: bigint
+    monthlyTokenQuotaOverride: bigint | null
+    tokenQuotaResetAt: Date | null
     lastActive: Date | null
     createdAt: Date
     updatedAt: Date
@@ -3149,6 +3620,7 @@ export interface Prisma__AgentClient<T, Null = never, ExtArgs extends runtime.Ty
   metrics<T extends Prisma.Agent$metricsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$metricsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentMetricsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   installedSkills<T extends Prisma.Agent$installedSkillsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$installedSkillsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SkillInstallationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.Agent$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  usageRecords<T extends Prisma.Agent$usageRecordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$usageRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messagesSent<T extends Prisma.Agent$messagesSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$messagesSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messagesReceived<T extends Prisma.Agent$messagesReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$messagesReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   allowlistOwner<T extends Prisma.Agent$allowlistOwnerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$allowlistOwnerArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentAllowlistPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3198,6 +3670,9 @@ export interface AgentFieldRefs {
   readonly assistedUser: Prisma.FieldRef<"Agent", 'Json'>
   readonly customTemplates: Prisma.FieldRef<"Agent", 'Json'>
   readonly openclawAgentId: Prisma.FieldRef<"Agent", 'String'>
+  readonly monthlyTokensUsed: Prisma.FieldRef<"Agent", 'BigInt'>
+  readonly monthlyTokenQuotaOverride: Prisma.FieldRef<"Agent", 'BigInt'>
+  readonly tokenQuotaResetAt: Prisma.FieldRef<"Agent", 'DateTime'>
   readonly lastActive: Prisma.FieldRef<"Agent", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Agent", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Agent", 'DateTime'>
@@ -3714,6 +4189,30 @@ export type Agent$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+}
+
+/**
+ * Agent.usageRecords
+ */
+export type Agent$usageRecordsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UsageRecord
+   */
+  select?: Prisma.UsageRecordSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UsageRecord
+   */
+  omit?: Prisma.UsageRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsageRecordInclude<ExtArgs> | null
+  where?: Prisma.UsageRecordWhereInput
+  orderBy?: Prisma.UsageRecordOrderByWithRelationInput | Prisma.UsageRecordOrderByWithRelationInput[]
+  cursor?: Prisma.UsageRecordWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UsageRecordScalarFieldEnum | Prisma.UsageRecordScalarFieldEnum[]
 }
 
 /**

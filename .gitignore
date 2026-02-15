@@ -11,6 +11,10 @@ redis_data/
 # Database backups
 backup_*.sql
 *.dump
+backend/backups/
+
+# Dependencies
+**/node_modules/
 
 # Logs
 logs/

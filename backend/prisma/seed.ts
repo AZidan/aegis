@@ -4,6 +4,7 @@ import { Pool } from 'pg';
 import * as bcrypt from 'bcrypt';
 import * as speakeasy from 'speakeasy';
 import { ROLE_TEMPLATES } from './seed-templates';
+import { seedPricing } from './seed-pricing';
 
 const BCRYPT_ROUNDS = 12;
 
@@ -611,6 +612,11 @@ async function main() {
   console.log(
     `  Installed "${notificationRouter.name}" on "${agent3.name}"`,
   );
+
+  // ---------------------------------------------------------------------------
+  // Provider Pricing (Sprint 4 — E12)
+  // ---------------------------------------------------------------------------
+  await seedPricing(prisma);
 
   // ---------------------------------------------------------------------------
   // Done
