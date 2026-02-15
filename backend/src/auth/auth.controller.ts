@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Body,
+  Param,
   HttpCode,
   HttpStatus,
   UseGuards,
@@ -21,6 +22,10 @@ import {
   LogoutDto,
 } from './dto/refresh-token.dto';
 import { mfaVerifySchema, MfaVerifyDto } from './dto/mfa-verify.dto';
+import {
+  acceptInviteSchema,
+  AcceptInviteDto,
+} from './dto/accept-invite.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -96,5 +101,29 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async getCurrentUser(@CurrentUser('id') userId: string) {
     return this.authService.getCurrentUser(userId);
+  }
+
+  /**
+   * GET /api/auth/invite/:token
+   * Get invite details (public - no auth required)
+   * Returns email, company name, expiry for the invite acceptance page
+   */
+  @Get('invite/:token')
+  async getInviteInfo(@Param('token') token: string) {
+    return this.authService.getInviteInfo(token);
+  }
+
+  /**
+   * POST /api/auth/invite/:token/accept
+   * Accept an invitation and set up account (public - no auth required)
+   * Contract: Section 8 - Accept Team Invite
+   */
+  @Post('invite/:token/accept')
+  @HttpCode(HttpStatus.OK)
+  async acceptInvite(
+    @Param('token') token: string,
+    @Body(new ZodValidationPipe(acceptInviteSchema)) dto: AcceptInviteDto,
+  ) {
+    return this.authService.acceptInvite(token, dto);
   }
 }

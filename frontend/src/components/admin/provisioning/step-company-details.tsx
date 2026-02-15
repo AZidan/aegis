@@ -17,6 +17,7 @@ interface StepCompanyDetailsProps {
   data: Step1FormData;
   errors: Partial<Record<keyof Step1FormData, string>>;
   onChange: (field: keyof Step1FormData, value: string) => void;
+  onBlur?: (field: keyof Step1FormData) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -35,6 +36,7 @@ export function StepCompanyDetails({
   data,
   errors,
   onChange,
+  onBlur,
 }: StepCompanyDetailsProps) {
   const notesLength = data.notes?.length ?? 0;
 
@@ -63,6 +65,7 @@ export function StepCompanyDetails({
             placeholder="e.g. Acme Corporation"
             value={data.companyName}
             onChange={(e) => onChange('companyName', e.target.value)}
+            onBlur={() => onBlur?.('companyName')}
             className={cn(
               inputBaseClasses,
               errors.companyName
@@ -91,6 +94,7 @@ export function StepCompanyDetails({
             placeholder="admin@company.com"
             value={data.adminEmail}
             onChange={(e) => onChange('adminEmail', e.target.value)}
+            onBlur={() => onBlur?.('adminEmail')}
             className={cn(
               inputBaseClasses,
               errors.adminEmail
@@ -166,6 +170,7 @@ export function StepCompanyDetails({
             id="deploymentRegion"
             value={data.deploymentRegion}
             onChange={(e) => onChange('deploymentRegion', e.target.value)}
+            onBlur={() => onBlur?.('deploymentRegion')}
             className={cn(
               selectBaseClasses,
               errors.deploymentRegion

@@ -67,6 +67,8 @@ export const createTenantSchema = z.object({
       maxSkills: z.number().int().positive().optional(),
     })
     .optional(),
+  overageBillingEnabled: z.boolean().optional(),
+  monthlyTokenQuota: z.number().int().positive().optional(),
 });
 
 export type CreateTenantDto = z.infer<typeof createTenantSchema>;

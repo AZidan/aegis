@@ -5,6 +5,8 @@ import {
   Logger,
   Inject,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import * as crypto from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/audit.service';
 import { ProvisioningService } from '../../provisioning/provisioning.service';
@@ -15,6 +17,7 @@ import { Prisma } from '../../../prisma/generated/client';
 import { PLAN_MAX_SKILLS } from '../../provisioning/provisioning.constants';
 import { CONTAINER_ORCHESTRATOR } from '../../container/container.constants';
 import { ContainerOrchestrator } from '../../container/interfaces/container-orchestrator.interface';
+import { ContainerConfigSyncService } from '../../container/container-config-sync.service';
 
 /**
  * Tenants Service - Platform Admin: Tenants
@@ -60,6 +63,17 @@ const PLAN_DEFAULTS: Record<
   },
 };
 
+/**
+ * Default monthly token quotas per plan (in tokens).
+ * Based on pricing-model.md: ~2M input + ~500K output per agent.
+ * Quota = (input + output) * included agents.
+ */
+const PLAN_TOKEN_QUOTAS: Record<string, bigint> = {
+  starter: BigInt(5_000_000),    // 2 included agents × 2.5M tokens
+  growth: BigInt(12_500_000),    // 5 included agents × 2.5M tokens
+  enterprise: BigInt(50_000_000), // Negotiated, generous default
+};
+
 /** Default model defaults per plan */
 const MODEL_DEFAULTS: Record<
   string,
@@ -92,6 +106,8 @@ export class TenantsService {
     private readonly auditService: AuditService,
     @Inject(CONTAINER_ORCHESTRATOR)
     private readonly containerOrchestrator: ContainerOrchestrator,
+    private readonly configSync: ContainerConfigSyncService,
+    private readonly configService: ConfigService,
   ) {}
 
   // ==========================================================================
@@ -253,6 +269,11 @@ export class TenantsService {
         planDefaults.maxSkills,
     };
 
+    // Resolve billing defaults
+    const monthlyTokenQuota = dto.monthlyTokenQuota
+      ? BigInt(dto.monthlyTokenQuota)
+      : PLAN_TOKEN_QUOTAS[dto.plan] ?? PLAN_TOKEN_QUOTAS.starter;
+
     const tenant = await this.prisma.tenant.create({
       data: {
         companyName: dto.companyName,
@@ -267,11 +288,51 @@ export class TenantsService {
         billingCycle: dto.billingCycle || 'monthly',
         modelDefaults: modelDefaults as Prisma.InputJsonValue,
         resourceLimits: resourceLimits as Prisma.InputJsonValue,
+        overageBillingEnabled: dto.overageBillingEnabled ?? false,
+        monthlyTokenQuota,
       },
     });
 
-    // Generate a placeholder invite link (actual email sending is Sprint 2)
-    const inviteLink = `https://app.aegis.ai/invite/${tenant.id}`;
+    // Create admin user account (password null until they accept the invite)
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: dto.adminEmail },
+    });
+
+    if (!existingUser) {
+      await this.prisma.user.create({
+        data: {
+          email: dto.adminEmail,
+          name: dto.adminEmail,
+          role: 'tenant_admin',
+          tenantId: tenant.id,
+          password: null,
+        },
+      });
+    } else if (!existingUser.tenantId) {
+      // User exists but isn't assigned to a tenant yet — assign them
+      await this.prisma.user.update({
+        where: { id: existingUser.id },
+        data: { tenantId: tenant.id, role: 'tenant_admin' },
+      });
+    }
+
+    // Generate invite token and create invitation record
+    const inviteToken = crypto.randomUUID();
+    const appUrl =
+      this.configService.get<string>('APP_URL') || 'http://localhost:3001';
+    const inviteLink = `${appUrl}/invite/${inviteToken}`;
+
+    await this.prisma.teamInvite.create({
+      data: {
+        email: dto.adminEmail,
+        role: 'tenant_admin',
+        tenantId: tenant.id,
+        token: inviteToken,
+        inviteLink,
+        invitedBy: userId || 'system',
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      },
+    });
 
     this.logger.log(
       `Tenant created: ${tenant.id} (${tenant.companyName}) - status: provisioning`,
@@ -479,6 +540,14 @@ export class TenantsService {
       } as Prisma.InputJsonValue;
     }
 
+    if (dto.overageBillingEnabled !== undefined) {
+      updateData.overageBillingEnabled = dto.overageBillingEnabled;
+    }
+
+    if (dto.monthlyTokenQuota !== undefined) {
+      updateData.monthlyTokenQuota = BigInt(dto.monthlyTokenQuota);
+    }
+
     const updated = await this.prisma.tenant.update({
       where: { id },
       data: updateData,
@@ -511,6 +580,13 @@ export class TenantsService {
     });
 
     this.logger.log(`Tenant config updated: ${id}`);
+
+    // Fire-and-forget: push updated config to running container
+    this.configSync.syncTenantConfig(id).catch((err) =>
+      this.logger.warn(
+        `Config sync after tenant update failed: ${err instanceof Error ? err.message : String(err)}`,
+      ),
+    );
 
     // Contract response
     return {

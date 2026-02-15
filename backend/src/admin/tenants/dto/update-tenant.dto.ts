@@ -22,6 +22,8 @@ export const updateTenantSchema = z.object({
       thinkingMode: z.enum(['off', 'low', 'high']).optional(),
     })
     .optional(),
+  overageBillingEnabled: z.boolean().optional(),
+  monthlyTokenQuota: z.number().int().positive().optional(),
 });
 
 export type UpdateTenantDto = z.infer<typeof updateTenantSchema>;
