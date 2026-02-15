@@ -12,6 +12,7 @@ import { RateLimiterService } from './rate-limiter.service';
 import { ChannelRoutingService } from '../channels/channel-routing.service';
 import { AuditService } from '../audit/audit.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { UsageWarningService } from '../billing/usage-warning.service';
 import {
   InboundPlatformEvent,
   OutboundAgentMessage,
@@ -33,6 +34,7 @@ export class ChannelProxyService {
     private readonly routingService: ChannelRoutingService,
     private readonly auditService: AuditService,
     private readonly prisma: PrismaService,
+    private readonly usageWarningService: UsageWarningService,
     @InjectQueue(CHANNEL_PROXY_QUEUE_NAME) private readonly proxyQueue: Queue,
   ) {}
 
@@ -80,6 +82,21 @@ export class ChannelProxyService {
     if (!route) {
       throw new NotFoundException(
         `No routing rule matches for this event in tenant ${resolution.tenantId}`,
+      );
+    }
+
+    // 3b. Check agent quota
+    const quotaCheck = await this.usageWarningService.checkAgentQuota(
+      route.agentId,
+    );
+    if (quotaCheck.threshold === 'paused') {
+      throw new BadRequestException(
+        `Agent ${route.agentId} is paused due to token quota exceeded (${quotaCheck.percentUsed}% used). Acknowledge the warning to resume.`,
+      );
+    }
+    if (quotaCheck.threshold === 'rate_limited') {
+      throw new BadRequestException(
+        `Agent ${route.agentId} is rate-limited due to high token usage (${quotaCheck.percentUsed}% of quota). Enable overage billing or wait for quota reset.`,
       );
     }
 

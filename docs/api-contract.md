@@ -2417,10 +2417,189 @@ interface AgentChannelRoute {
 
 ---
 
+## 17. Billing (Sprint 5)
+
+### 17.1 Get Billing Overview
+- **Path**: `/api/dashboard/billing/overview`
+- **Method**: `GET`
+- **Auth**: JWT (tenant user)
+- **Description**: Returns billing overview with cost breakdown for the current billing period
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  tenantId: string;
+  plan: "starter" | "growth" | "enterprise";
+  billingCycle: string;
+  overageBillingEnabled: boolean;
+  platformFee: number;
+  includedAgents: number;
+  totalAgents: number;
+  agents: Array<{
+    agentId: string;
+    agentName: string;
+    modelTier: "haiku" | "sonnet" | "opus";
+    thinkingMode: string;
+    status: string;
+    included: boolean;
+    baseFee: number;
+    thinkingSurcharge: number;
+    totalFee: number;
+  }>;
+  subtotals: {
+    platform: number;
+    additionalAgents: number;
+    thinkingSurcharges: number;
+    overageEstimate: number;
+  };
+  totalEstimate: number;
+}
+```
+
+### 17.2 Get Billing Usage
+- **Path**: `/api/dashboard/billing/usage`
+- **Method**: `GET`
+- **Auth**: JWT (tenant user)
+- **Description**: Returns usage analytics by period, optionally filtered by agent
+
+#### Query Parameters
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `period` | `"current" \| "previous"` | `"current"` | Billing period |
+| `agentId` | `string (uuid)` | — | Optional agent filter |
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  tenantId: string;
+  period: "current" | "previous";
+  from: string; // ISO date
+  to: string;   // ISO date
+  overageBillingEnabled: boolean;
+  agents: Array<{
+    agentId: string;
+    agentName: string;
+    modelTier: string;
+    quota: number;
+    used: number;
+    percentUsed: number;
+    quotaStatus: "normal" | "warning" | "grace" | "overage" | "rate_limited" | "paused";
+    inputTokens: number;
+    outputTokens: number;
+    thinkingTokens: number;
+    estimatedCostUsd: number;
+  }>;
+  totals: {
+    totalInputTokens: number;
+    totalOutputTokens: number;
+    totalThinkingTokens: number;
+    totalTokens: number;
+    estimatedCostUsd: number;
+  };
+  dailyBreakdown: Array<{
+    date: string;
+    totalTokens: number;
+    estimatedCostUsd: number;
+  }>;
+}
+```
+
+### 17.3 Get Overage Status
+- **Path**: `/api/dashboard/billing/overage`
+- **Method**: `GET`
+- **Auth**: JWT (tenant user)
+- **Description**: Returns current overage billing status and rates
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  tenantId: string;
+  plan: string;
+  overageBillingEnabled: boolean;
+  monthlyTokenQuota: number | null;
+  overageRates: {
+    haiku: { input: number; output: number };
+    sonnet: { input: number; output: number };
+    opus: { input: number; output: number };
+  };
+}
+```
+
+### 17.4 Toggle Overage Billing
+- **Path**: `/api/dashboard/billing/overage`
+- **Method**: `PUT`
+- **Auth**: JWT (tenant user)
+- **Description**: Enable or disable overage billing
+
+#### Request Body
+```typescript
+{
+  enabled: boolean;
+}
+```
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  tenantId: string;
+  overageBillingEnabled: boolean;
+  plan: string;
+}
+```
+
+- **Error (403)** — Starter plan restriction:
+```json
+{
+  "statusCode": 403,
+  "error": "Forbidden",
+  "message": "Overage billing is not available on the Starter plan. Please upgrade to Growth or Enterprise."
+}
+```
+
+### 17.5 Acknowledge Quota Warning
+- **Path**: `/api/dashboard/billing/agents/:agentId/acknowledge`
+- **Method**: `POST`
+- **Auth**: JWT (tenant user)
+- **Description**: Acknowledge a quota warning and resume a paused agent
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  resumed: boolean;
+  agentId: string;
+}
+```
+
+- **Error (400)** — Agent not paused:
+```json
+{
+  "statusCode": 400,
+  "error": "Bad Request",
+  "message": "Agent <agentId> is not paused (current status: active)"
+}
+```
+
+- **Error (404)** — Agent not found:
+```json
+{
+  "statusCode": 404,
+  "error": "Not Found",
+  "message": "Agent <agentId> not found in tenant <tenantId>"
+}
+```
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.5.0 | 2026-02-15 | Billing APIs: overview, usage analytics, overage toggle, quota warnings (section 17) |
 | 1.4.0 | 2026-02-11 | Admin role config template CRUD (section 13), tenant agent template preview (section 14), agent channel routes CRUD (section 15) |
 | 1.3.0 | 2026-02-07 | Dynamic roles (AgentRoleConfig), thinkingMode→fast/standard/extended, allow-only toolPolicy (drop deny), new fields: temperature/avatarColor/personality/errorMessage, dashboard stats: plan/skillsInstalled/teamMembers/messageTrend, new endpoint: GET /api/dashboard/roles, channels deferred |
 | 1.1.0 | 2026-02-06 | Added assistedUser fields to agent creation, API key management endpoints, and sorting parameters to list endpoints |

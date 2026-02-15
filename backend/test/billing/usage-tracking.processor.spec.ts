@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsageTrackingProcessor } from '../../src/billing/usage-tracking.processor';
 import { UsageTrackingService } from '../../src/billing/usage-tracking.service';
+import { UsageWarningService } from '../../src/billing/usage-warning.service';
 
 // ---------------------------------------------------------------------------
 // Test Helpers
@@ -26,6 +27,7 @@ describe('UsageTrackingProcessor', () => {
       providers: [
         UsageTrackingProcessor,
         { provide: UsageTrackingService, useValue: usageTrackingService },
+        { provide: UsageWarningService, useValue: { runDailyWarningCheck: jest.fn() } },
       ],
     }).compile();
 

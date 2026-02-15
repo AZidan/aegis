@@ -12,7 +12,7 @@ export class CreateAuditLogDto {
   targetType!: 'agent' | 'skill' | 'tenant' | 'user' | 'team_member' | 'api_key' | 'channel';
   targetId!: string;
   details?: Record<string, unknown> | null;
-  severity?: 'info' | 'warning' | 'error';
+  severity?: 'info' | 'warning' | 'error' | 'high' | 'critical';
   ipAddress?: string | null;
   userAgent?: string | null;
   tenantId?: string | null;

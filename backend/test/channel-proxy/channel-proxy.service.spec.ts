@@ -8,6 +8,7 @@ import { RateLimiterService } from '../../src/channel-proxy/rate-limiter.service
 import { ChannelRoutingService } from '../../src/channels/channel-routing.service';
 import { AuditService } from '../../src/audit/audit.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
+import { UsageWarningService } from '../../src/billing/usage-warning.service';
 import { CHANNEL_PROXY_QUEUE_NAME } from '../../src/channel-proxy/channel-proxy.constants';
 import { InboundPlatformEvent, OutboundAgentMessage } from '../../src/channel-proxy/interfaces/channel-proxy.interface';
 
@@ -18,6 +19,7 @@ describe('ChannelProxyService', () => {
   let rateLimiter: { checkRateLimit: jest.Mock };
   let routingService: { resolveAgent: jest.Mock };
   let auditService: { logAction: jest.Mock };
+  let usageWarningService: { checkAgentQuota: jest.Mock };
   let prisma: {
     tenant: { findUnique: jest.Mock };
     agent: { findUnique: jest.Mock };
@@ -49,6 +51,14 @@ describe('ChannelProxyService', () => {
     rateLimiter = { checkRateLimit: jest.fn() };
     routingService = { resolveAgent: jest.fn() };
     auditService = { logAction: jest.fn() };
+    usageWarningService = {
+      checkAgentQuota: jest.fn().mockResolvedValue({
+        threshold: 'normal',
+        percentUsed: 10,
+        quota: 2500000,
+        used: 250000,
+      }),
+    };
     prisma = {
       tenant: { findUnique: jest.fn() },
       agent: { findUnique: jest.fn() },
@@ -64,6 +74,7 @@ describe('ChannelProxyService', () => {
         { provide: RateLimiterService, useValue: rateLimiter },
         { provide: ChannelRoutingService, useValue: routingService },
         { provide: AuditService, useValue: auditService },
+        { provide: UsageWarningService, useValue: usageWarningService },
         { provide: PrismaService, useValue: prisma },
         { provide: getQueueToken(CHANNEL_PROXY_QUEUE_NAME), useValue: queue },
       ],

@@ -18,7 +18,7 @@ export const queryAuditLogSchema = z.object({
   targetType: z
     .enum(['agent', 'skill', 'tenant', 'user', 'team_member', 'api_key'])
     .optional(),
-  severity: z.enum(['info', 'warning', 'error']).optional(),
+  severity: z.enum(['info', 'warning', 'error', 'high', 'critical']).optional(),
   search: z.string().max(200).optional(),
   dateFrom: z.coerce.date().optional(),
   dateTo: z.coerce.date().optional(),
@@ -44,7 +44,7 @@ export class QueryAuditLogDtoClass {
     | 'user'
     | 'team_member'
     | 'api_key';
-  severity?: 'info' | 'warning' | 'error';
+  severity?: 'info' | 'warning' | 'error' | 'high' | 'critical';
   search?: string;
   dateFrom?: Date;
   dateTo?: Date;
