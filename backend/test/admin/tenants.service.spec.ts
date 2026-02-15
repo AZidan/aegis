@@ -3,11 +3,13 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { TenantsService } from '../../src/admin/tenants/tenants.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { ProvisioningService } from '../../src/provisioning/provisioning.service';
 import { AuditService } from '../../src/audit/audit.service';
 import { CONTAINER_ORCHESTRATOR } from '../../src/container/container.constants';
+import { ContainerConfigSyncService } from '../../src/container/container-config-sync.service';
 
 // ---------------------------------------------------------------------------
 // Test Data Factories
@@ -96,6 +98,12 @@ describe('TenantsService', () => {
       findMany: jest.Mock;
       count: jest.Mock;
     };
+    user: {
+      create: jest.Mock;
+    };
+    teamInvite: {
+      create: jest.Mock;
+    };
     tenantConfigHistory: {
       create: jest.Mock;
       findMany: jest.Mock;
@@ -121,6 +129,12 @@ describe('TenantsService', () => {
       agent: {
         findMany: jest.fn(),
         count: jest.fn(),
+      },
+      user: {
+        create: jest.fn().mockResolvedValue({ id: 'user-uuid-1', email: 'admin@acme.com' }),
+      },
+      teamInvite: {
+        create: jest.fn().mockResolvedValue({ id: 'invite-uuid-1', token: 'test-token' }),
       },
       tenantConfigHistory: {
         create: jest.fn().mockResolvedValue({}),
@@ -156,6 +170,21 @@ describe('TenantsService', () => {
             getStatus: jest
               .fn()
               .mockResolvedValue({ state: 'running', health: 'healthy', uptimeSeconds: 0 }),
+          },
+        },
+        {
+          provide: ContainerConfigSyncService,
+          useValue: {
+            syncTenantConfig: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string) => {
+              if (key === 'APP_URL') return 'http://localhost:3001';
+              return undefined;
+            }),
           },
         },
       ],

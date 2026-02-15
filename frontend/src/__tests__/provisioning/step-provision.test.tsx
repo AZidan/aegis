@@ -55,6 +55,7 @@ function renderProvision(
   options?: {
     provisioningStatus?: TenantProvisioningStatus | null;
     tenantId?: string | null;
+    inviteLink?: string | null;
     errorMessage?: string | null;
     formData?: Partial<ProvisioningFormData>;
   }
@@ -67,6 +68,7 @@ function renderProvision(
       state={state}
       provisioningStatus={options?.provisioningStatus ?? null}
       tenantId={options?.tenantId ?? null}
+      inviteLink={options?.inviteLink ?? null}
       errorMessage={options?.errorMessage ?? null}
     />
   );
@@ -239,6 +241,19 @@ describe('StepProvision - Success', () => {
     expect(screen.getByTestId('tenant-id-value')).toHaveTextContent(
       'tnt_abc123def456'
     );
+  });
+
+  it('should display the invite link when provided', () => {
+    renderProvision('success', {
+      tenantId: 'tnt_abc123def456',
+      inviteLink: 'http://localhost:3001/invite/test-token-123',
+    });
+
+    expect(screen.getByTestId('invite-link-value')).toHaveTextContent(
+      'http://localhost:3001/invite/test-token-123'
+    );
+    expect(screen.getByText('Admin Invite Link')).toBeInTheDocument();
+    expect(screen.getByText('Copy Link')).toBeInTheDocument();
   });
 
   it('should show View Tenant and Provision Another links', () => {

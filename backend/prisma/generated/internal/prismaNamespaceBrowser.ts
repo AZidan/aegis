@@ -71,7 +71,9 @@ export const ModelName = {
   AgentMessage: 'AgentMessage',
   AgentAllowlist: 'AgentAllowlist',
   ChannelConnection: 'ChannelConnection',
-  ChannelRouting: 'ChannelRouting'
+  ChannelRouting: 'ChannelRouting',
+  UsageRecord: 'UsageRecord',
+  ProviderPricing: 'ProviderPricing'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -131,6 +133,8 @@ export const TenantScalarFieldEnum = {
   resourceLimits: 'resourceLimits',
   containerId: 'containerId',
   containerUrl: 'containerUrl',
+  overageBillingEnabled: 'overageBillingEnabled',
+  monthlyTokenQuota: 'monthlyTokenQuota',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -166,6 +170,9 @@ export const AgentScalarFieldEnum = {
   assistedUser: 'assistedUser',
   customTemplates: 'customTemplates',
   openclawAgentId: 'openclawAgentId',
+  monthlyTokensUsed: 'monthlyTokensUsed',
+  monthlyTokenQuotaOverride: 'monthlyTokenQuotaOverride',
+  tokenQuotaResetAt: 'tokenQuotaResetAt',
   lastActive: 'lastActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -444,6 +451,41 @@ export const ChannelRoutingScalarFieldEnum = {
 } as const
 
 export type ChannelRoutingScalarFieldEnum = (typeof ChannelRoutingScalarFieldEnum)[keyof typeof ChannelRoutingScalarFieldEnum]
+
+
+export const UsageRecordScalarFieldEnum = {
+  id: 'id',
+  agentId: 'agentId',
+  tenantId: 'tenantId',
+  date: 'date',
+  inputTokens: 'inputTokens',
+  outputTokens: 'outputTokens',
+  thinkingTokens: 'thinkingTokens',
+  cacheReadTokens: 'cacheReadTokens',
+  toolInvocations: 'toolInvocations',
+  provider: 'provider',
+  model: 'model',
+  estimatedCostUsd: 'estimatedCostUsd',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UsageRecordScalarFieldEnum = (typeof UsageRecordScalarFieldEnum)[keyof typeof UsageRecordScalarFieldEnum]
+
+
+export const ProviderPricingScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  model: 'model',
+  inputPer1M: 'inputPer1M',
+  outputPer1M: 'outputPer1M',
+  thinkingPer1M: 'thinkingPer1M',
+  effectiveFrom: 'effectiveFrom',
+  effectiveTo: 'effectiveTo',
+  createdAt: 'createdAt'
+} as const
+
+export type ProviderPricingScalarFieldEnum = (typeof ProviderPricingScalarFieldEnum)[keyof typeof ProviderPricingScalarFieldEnum]
 
 
 export const SortOrder = {

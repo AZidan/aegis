@@ -142,20 +142,9 @@ export class ContainerConfigProcessor extends WorkerHost {
           identityMd: workspace.identityMd,
         });
 
-        // Copy auth-profiles.json from main agent dir to this agent's dir
-        try {
-          await this.dockerOrchestrator.pushAuthProfiles(
-            containerId,
-            agentId,
-            // Read the main agent's auth-profiles.json and re-push for this agent
-            // The main agent dir is always set up during provisioning
-            JSON.stringify({ profiles: [] }),
-          );
-        } catch (authError) {
-          this.logger.warn(
-            `Could not push auth-profiles for agent ${agentId}: ${authError instanceof Error ? authError.message : String(authError)}`,
-          );
-        }
+        // NOTE: auth-profiles.json is NOT overwritten during config sync.
+        // It contains provider API keys set during provisioning or credential management.
+        // Pushing an empty profiles array here would wipe the Anthropic key.
 
         this.logger.log(
           `Pushed workspace files to container ${containerId} for agent ${agentId}`,

@@ -30,12 +30,14 @@ export type TenantAvgAggregateOutputType = {
   expectedAgentCount: number | null
   provisioningProgress: number | null
   provisioningAttempt: number | null
+  monthlyTokenQuota: number | null
 }
 
 export type TenantSumAggregateOutputType = {
   expectedAgentCount: number | null
   provisioningProgress: number | null
   provisioningAttempt: number | null
+  monthlyTokenQuota: bigint | null
 }
 
 export type TenantMinAggregateOutputType = {
@@ -58,6 +60,8 @@ export type TenantMinAggregateOutputType = {
   provisioningFailedReason: string | null
   containerId: string | null
   containerUrl: string | null
+  overageBillingEnabled: boolean | null
+  monthlyTokenQuota: bigint | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -82,6 +86,8 @@ export type TenantMaxAggregateOutputType = {
   provisioningFailedReason: string | null
   containerId: string | null
   containerUrl: string | null
+  overageBillingEnabled: boolean | null
+  monthlyTokenQuota: bigint | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -108,6 +114,8 @@ export type TenantCountAggregateOutputType = {
   resourceLimits: number
   containerId: number
   containerUrl: number
+  overageBillingEnabled: number
+  monthlyTokenQuota: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -118,12 +126,14 @@ export type TenantAvgAggregateInputType = {
   expectedAgentCount?: true
   provisioningProgress?: true
   provisioningAttempt?: true
+  monthlyTokenQuota?: true
 }
 
 export type TenantSumAggregateInputType = {
   expectedAgentCount?: true
   provisioningProgress?: true
   provisioningAttempt?: true
+  monthlyTokenQuota?: true
 }
 
 export type TenantMinAggregateInputType = {
@@ -146,6 +156,8 @@ export type TenantMinAggregateInputType = {
   provisioningFailedReason?: true
   containerId?: true
   containerUrl?: true
+  overageBillingEnabled?: true
+  monthlyTokenQuota?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -170,6 +182,8 @@ export type TenantMaxAggregateInputType = {
   provisioningFailedReason?: true
   containerId?: true
   containerUrl?: true
+  overageBillingEnabled?: true
+  monthlyTokenQuota?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -196,6 +210,8 @@ export type TenantCountAggregateInputType = {
   resourceLimits?: true
   containerId?: true
   containerUrl?: true
+  overageBillingEnabled?: true
+  monthlyTokenQuota?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -309,6 +325,8 @@ export type TenantGroupByOutputType = {
   resourceLimits: runtime.JsonValue | null
   containerId: string | null
   containerUrl: string | null
+  overageBillingEnabled: boolean
+  monthlyTokenQuota: bigint | null
   createdAt: Date
   updatedAt: Date
   _count: TenantCountAggregateOutputType | null
@@ -358,6 +376,8 @@ export type TenantWhereInput = {
   resourceLimits?: Prisma.JsonNullableFilter<"Tenant">
   containerId?: Prisma.StringNullableFilter<"Tenant"> | string | null
   containerUrl?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  overageBillingEnabled?: Prisma.BoolFilter<"Tenant"> | boolean
+  monthlyTokenQuota?: Prisma.BigIntNullableFilter<"Tenant"> | bigint | number | null
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   users?: Prisma.UserListRelationFilter
@@ -371,6 +391,7 @@ export type TenantWhereInput = {
   configHistory?: Prisma.TenantConfigHistoryListRelationFilter
   channelConnections?: Prisma.ChannelConnectionListRelationFilter
   skills?: Prisma.SkillListRelationFilter
+  usageRecords?: Prisma.UsageRecordListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -395,6 +416,8 @@ export type TenantOrderByWithRelationInput = {
   resourceLimits?: Prisma.SortOrderInput | Prisma.SortOrder
   containerId?: Prisma.SortOrderInput | Prisma.SortOrder
   containerUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  overageBillingEnabled?: Prisma.SortOrder
+  monthlyTokenQuota?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   users?: Prisma.UserOrderByRelationAggregateInput
@@ -408,6 +431,7 @@ export type TenantOrderByWithRelationInput = {
   configHistory?: Prisma.TenantConfigHistoryOrderByRelationAggregateInput
   channelConnections?: Prisma.ChannelConnectionOrderByRelationAggregateInput
   skills?: Prisma.SkillOrderByRelationAggregateInput
+  usageRecords?: Prisma.UsageRecordOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
@@ -435,6 +459,8 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   resourceLimits?: Prisma.JsonNullableFilter<"Tenant">
   containerId?: Prisma.StringNullableFilter<"Tenant"> | string | null
   containerUrl?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  overageBillingEnabled?: Prisma.BoolFilter<"Tenant"> | boolean
+  monthlyTokenQuota?: Prisma.BigIntNullableFilter<"Tenant"> | bigint | number | null
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   users?: Prisma.UserListRelationFilter
@@ -448,6 +474,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   configHistory?: Prisma.TenantConfigHistoryListRelationFilter
   channelConnections?: Prisma.ChannelConnectionListRelationFilter
   skills?: Prisma.SkillListRelationFilter
+  usageRecords?: Prisma.UsageRecordListRelationFilter
 }, "id" | "companyName">
 
 export type TenantOrderByWithAggregationInput = {
@@ -472,6 +499,8 @@ export type TenantOrderByWithAggregationInput = {
   resourceLimits?: Prisma.SortOrderInput | Prisma.SortOrder
   containerId?: Prisma.SortOrderInput | Prisma.SortOrder
   containerUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  overageBillingEnabled?: Prisma.SortOrder
+  monthlyTokenQuota?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.TenantCountOrderByAggregateInput
@@ -506,6 +535,8 @@ export type TenantScalarWhereWithAggregatesInput = {
   resourceLimits?: Prisma.JsonNullableWithAggregatesFilter<"Tenant">
   containerId?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   containerUrl?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  overageBillingEnabled?: Prisma.BoolWithAggregatesFilter<"Tenant"> | boolean
+  monthlyTokenQuota?: Prisma.BigIntNullableWithAggregatesFilter<"Tenant"> | bigint | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Tenant"> | Date | string
 }
@@ -532,6 +563,8 @@ export type TenantCreateInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
@@ -545,6 +578,7 @@ export type TenantCreateInput = {
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -569,6 +603,8 @@ export type TenantUncheckedCreateInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
@@ -582,6 +618,7 @@ export type TenantUncheckedCreateInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -606,6 +643,8 @@ export type TenantUpdateInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
@@ -619,6 +658,7 @@ export type TenantUpdateInput = {
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -643,6 +683,8 @@ export type TenantUncheckedUpdateInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
@@ -656,6 +698,7 @@ export type TenantUncheckedUpdateInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -680,6 +723,8 @@ export type TenantCreateManyInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -706,6 +751,8 @@ export type TenantUpdateManyMutationInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -732,6 +779,8 @@ export type TenantUncheckedUpdateManyInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -763,6 +812,8 @@ export type TenantCountOrderByAggregateInput = {
   resourceLimits?: Prisma.SortOrder
   containerId?: Prisma.SortOrder
   containerUrl?: Prisma.SortOrder
+  overageBillingEnabled?: Prisma.SortOrder
+  monthlyTokenQuota?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -771,6 +822,7 @@ export type TenantAvgOrderByAggregateInput = {
   expectedAgentCount?: Prisma.SortOrder
   provisioningProgress?: Prisma.SortOrder
   provisioningAttempt?: Prisma.SortOrder
+  monthlyTokenQuota?: Prisma.SortOrder
 }
 
 export type TenantMaxOrderByAggregateInput = {
@@ -793,6 +845,8 @@ export type TenantMaxOrderByAggregateInput = {
   provisioningFailedReason?: Prisma.SortOrder
   containerId?: Prisma.SortOrder
   containerUrl?: Prisma.SortOrder
+  overageBillingEnabled?: Prisma.SortOrder
+  monthlyTokenQuota?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -817,6 +871,8 @@ export type TenantMinOrderByAggregateInput = {
   provisioningFailedReason?: Prisma.SortOrder
   containerId?: Prisma.SortOrder
   containerUrl?: Prisma.SortOrder
+  overageBillingEnabled?: Prisma.SortOrder
+  monthlyTokenQuota?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -825,6 +881,7 @@ export type TenantSumOrderByAggregateInput = {
   expectedAgentCount?: Prisma.SortOrder
   provisioningProgress?: Prisma.SortOrder
   provisioningAttempt?: Prisma.SortOrder
+  monthlyTokenQuota?: Prisma.SortOrder
 }
 
 export type TenantScalarRelationFilter = {
@@ -870,6 +927,14 @@ export type IntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type NullableBigIntFieldUpdateOperationsInput = {
+  set?: bigint | number | null
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
 }
 
 export type TenantCreateNestedOneWithoutConfigHistoryInput = {
@@ -1018,6 +1083,20 @@ export type TenantUpdateOneRequiredWithoutChannelConnectionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutChannelConnectionsInput, Prisma.TenantUpdateWithoutChannelConnectionsInput>, Prisma.TenantUncheckedUpdateWithoutChannelConnectionsInput>
 }
 
+export type TenantCreateNestedOneWithoutUsageRecordsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutUsageRecordsInput, Prisma.TenantUncheckedCreateWithoutUsageRecordsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutUsageRecordsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutUsageRecordsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutUsageRecordsInput, Prisma.TenantUncheckedCreateWithoutUsageRecordsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutUsageRecordsInput
+  upsert?: Prisma.TenantUpsertWithoutUsageRecordsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutUsageRecordsInput, Prisma.TenantUpdateWithoutUsageRecordsInput>, Prisma.TenantUncheckedUpdateWithoutUsageRecordsInput>
+}
+
 export type TenantCreateWithoutUsersInput = {
   id?: string
   companyName: string
@@ -1040,6 +1119,8 @@ export type TenantCreateWithoutUsersInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   agents?: Prisma.AgentCreateNestedManyWithoutTenantInput
@@ -1052,6 +1133,7 @@ export type TenantCreateWithoutUsersInput = {
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutUsersInput = {
@@ -1076,6 +1158,8 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutTenantInput
@@ -1088,6 +1172,7 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutUsersInput = {
@@ -1128,6 +1213,8 @@ export type TenantUpdateWithoutUsersInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   agents?: Prisma.AgentUpdateManyWithoutTenantNestedInput
@@ -1140,6 +1227,7 @@ export type TenantUpdateWithoutUsersInput = {
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutUsersInput = {
@@ -1164,6 +1252,8 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   agents?: Prisma.AgentUncheckedUpdateManyWithoutTenantNestedInput
@@ -1176,6 +1266,7 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutConfigHistoryInput = {
@@ -1200,6 +1291,8 @@ export type TenantCreateWithoutConfigHistoryInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
@@ -1212,6 +1305,7 @@ export type TenantCreateWithoutConfigHistoryInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutConfigHistoryInput = {
@@ -1236,6 +1330,8 @@ export type TenantUncheckedCreateWithoutConfigHistoryInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
@@ -1248,6 +1344,7 @@ export type TenantUncheckedCreateWithoutConfigHistoryInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutConfigHistoryInput = {
@@ -1288,6 +1385,8 @@ export type TenantUpdateWithoutConfigHistoryInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
@@ -1300,6 +1399,7 @@ export type TenantUpdateWithoutConfigHistoryInput = {
   alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutConfigHistoryInput = {
@@ -1324,6 +1424,8 @@ export type TenantUncheckedUpdateWithoutConfigHistoryInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
@@ -1336,6 +1438,7 @@ export type TenantUncheckedUpdateWithoutConfigHistoryInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAgentsInput = {
@@ -1360,6 +1463,8 @@ export type TenantCreateWithoutAgentsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
@@ -1372,6 +1477,7 @@ export type TenantCreateWithoutAgentsInput = {
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAgentsInput = {
@@ -1396,6 +1502,8 @@ export type TenantUncheckedCreateWithoutAgentsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
@@ -1408,6 +1516,7 @@ export type TenantUncheckedCreateWithoutAgentsInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAgentsInput = {
@@ -1448,6 +1557,8 @@ export type TenantUpdateWithoutAgentsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
@@ -1460,6 +1571,7 @@ export type TenantUpdateWithoutAgentsInput = {
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAgentsInput = {
@@ -1484,6 +1596,8 @@ export type TenantUncheckedUpdateWithoutAgentsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
@@ -1496,6 +1610,7 @@ export type TenantUncheckedUpdateWithoutAgentsInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutSkillsInput = {
@@ -1520,6 +1635,8 @@ export type TenantCreateWithoutSkillsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
@@ -1532,6 +1649,7 @@ export type TenantCreateWithoutSkillsInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSkillsInput = {
@@ -1556,6 +1674,8 @@ export type TenantUncheckedCreateWithoutSkillsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
@@ -1568,6 +1688,7 @@ export type TenantUncheckedCreateWithoutSkillsInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSkillsInput = {
@@ -1608,6 +1729,8 @@ export type TenantUpdateWithoutSkillsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
@@ -1620,6 +1743,7 @@ export type TenantUpdateWithoutSkillsInput = {
   alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSkillsInput = {
@@ -1644,6 +1768,8 @@ export type TenantUncheckedUpdateWithoutSkillsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
@@ -1656,6 +1782,7 @@ export type TenantUncheckedUpdateWithoutSkillsInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutApiKeysInput = {
@@ -1680,6 +1807,8 @@ export type TenantCreateWithoutApiKeysInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
@@ -1692,6 +1821,7 @@ export type TenantCreateWithoutApiKeysInput = {
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutApiKeysInput = {
@@ -1716,6 +1846,8 @@ export type TenantUncheckedCreateWithoutApiKeysInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
@@ -1728,6 +1860,7 @@ export type TenantUncheckedCreateWithoutApiKeysInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutApiKeysInput = {
@@ -1768,6 +1901,8 @@ export type TenantUpdateWithoutApiKeysInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
@@ -1780,6 +1915,7 @@ export type TenantUpdateWithoutApiKeysInput = {
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutApiKeysInput = {
@@ -1804,6 +1940,8 @@ export type TenantUncheckedUpdateWithoutApiKeysInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
@@ -1816,6 +1954,7 @@ export type TenantUncheckedUpdateWithoutApiKeysInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutTeamMembersInput = {
@@ -1840,6 +1979,8 @@ export type TenantCreateWithoutTeamMembersInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
@@ -1852,6 +1993,7 @@ export type TenantCreateWithoutTeamMembersInput = {
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutTeamMembersInput = {
@@ -1876,6 +2018,8 @@ export type TenantUncheckedCreateWithoutTeamMembersInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
@@ -1888,6 +2032,7 @@ export type TenantUncheckedCreateWithoutTeamMembersInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutTeamMembersInput = {
@@ -1928,6 +2073,8 @@ export type TenantUpdateWithoutTeamMembersInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
@@ -1940,6 +2087,7 @@ export type TenantUpdateWithoutTeamMembersInput = {
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutTeamMembersInput = {
@@ -1964,6 +2112,8 @@ export type TenantUncheckedUpdateWithoutTeamMembersInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
@@ -1976,6 +2126,7 @@ export type TenantUncheckedUpdateWithoutTeamMembersInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutTeamInvitesInput = {
@@ -2000,6 +2151,8 @@ export type TenantCreateWithoutTeamInvitesInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
@@ -2012,6 +2165,7 @@ export type TenantCreateWithoutTeamInvitesInput = {
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutTeamInvitesInput = {
@@ -2036,6 +2190,8 @@ export type TenantUncheckedCreateWithoutTeamInvitesInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
@@ -2048,6 +2204,7 @@ export type TenantUncheckedCreateWithoutTeamInvitesInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutTeamInvitesInput = {
@@ -2088,6 +2245,8 @@ export type TenantUpdateWithoutTeamInvitesInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
@@ -2100,6 +2259,7 @@ export type TenantUpdateWithoutTeamInvitesInput = {
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutTeamInvitesInput = {
@@ -2124,6 +2284,8 @@ export type TenantUncheckedUpdateWithoutTeamInvitesInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
@@ -2136,6 +2298,7 @@ export type TenantUncheckedUpdateWithoutTeamInvitesInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutContainerHealthInput = {
@@ -2160,6 +2323,8 @@ export type TenantCreateWithoutContainerHealthInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
@@ -2172,6 +2337,7 @@ export type TenantCreateWithoutContainerHealthInput = {
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutContainerHealthInput = {
@@ -2196,6 +2362,8 @@ export type TenantUncheckedCreateWithoutContainerHealthInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
@@ -2208,6 +2376,7 @@ export type TenantUncheckedCreateWithoutContainerHealthInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutContainerHealthInput = {
@@ -2248,6 +2417,8 @@ export type TenantUpdateWithoutContainerHealthInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
@@ -2260,6 +2431,7 @@ export type TenantUpdateWithoutContainerHealthInput = {
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutContainerHealthInput = {
@@ -2284,6 +2456,8 @@ export type TenantUncheckedUpdateWithoutContainerHealthInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
@@ -2296,6 +2470,7 @@ export type TenantUncheckedUpdateWithoutContainerHealthInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAlertsInput = {
@@ -2320,6 +2495,8 @@ export type TenantCreateWithoutAlertsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
@@ -2332,6 +2509,7 @@ export type TenantCreateWithoutAlertsInput = {
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAlertsInput = {
@@ -2356,6 +2534,8 @@ export type TenantUncheckedCreateWithoutAlertsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
@@ -2368,6 +2548,7 @@ export type TenantUncheckedCreateWithoutAlertsInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAlertsInput = {
@@ -2408,6 +2589,8 @@ export type TenantUpdateWithoutAlertsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
@@ -2420,6 +2603,7 @@ export type TenantUpdateWithoutAlertsInput = {
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAlertsInput = {
@@ -2444,6 +2628,8 @@ export type TenantUncheckedUpdateWithoutAlertsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
@@ -2456,6 +2642,7 @@ export type TenantUncheckedUpdateWithoutAlertsInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAuditLogsInput = {
@@ -2480,6 +2667,8 @@ export type TenantCreateWithoutAuditLogsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
@@ -2492,6 +2681,7 @@ export type TenantCreateWithoutAuditLogsInput = {
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAuditLogsInput = {
@@ -2516,6 +2706,8 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
@@ -2528,6 +2720,7 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAuditLogsInput = {
@@ -2568,6 +2761,8 @@ export type TenantUpdateWithoutAuditLogsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
@@ -2580,6 +2775,7 @@ export type TenantUpdateWithoutAuditLogsInput = {
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAuditLogsInput = {
@@ -2604,6 +2800,8 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
@@ -2616,6 +2814,7 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutChannelConnectionsInput = {
@@ -2640,6 +2839,8 @@ export type TenantCreateWithoutChannelConnectionsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
@@ -2652,6 +2853,7 @@ export type TenantCreateWithoutChannelConnectionsInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutChannelConnectionsInput = {
@@ -2676,6 +2878,8 @@ export type TenantUncheckedCreateWithoutChannelConnectionsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: string | null
   containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
@@ -2688,6 +2892,7 @@ export type TenantUncheckedCreateWithoutChannelConnectionsInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutChannelConnectionsInput = {
@@ -2728,6 +2933,8 @@ export type TenantUpdateWithoutChannelConnectionsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
@@ -2740,6 +2947,7 @@ export type TenantUpdateWithoutChannelConnectionsInput = {
   alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutChannelConnectionsInput = {
@@ -2764,6 +2972,8 @@ export type TenantUncheckedUpdateWithoutChannelConnectionsInput = {
   resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
@@ -2775,6 +2985,179 @@ export type TenantUncheckedUpdateWithoutChannelConnectionsInput = {
   containerHealth?: Prisma.ContainerHealthUncheckedUpdateManyWithoutTenantNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
+  skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutUsageRecordsInput = {
+  id?: string
+  companyName: string
+  adminEmail: string
+  status?: $Enums.TenantStatus
+  plan?: $Enums.TenantPlan
+  industry?: string | null
+  expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: string | null
+  containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  agents?: Prisma.AgentCreateNestedManyWithoutTenantInput
+  teamMembers?: Prisma.TeamMemberCreateNestedManyWithoutTenantInput
+  teamInvites?: Prisma.TeamInviteCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
+  containerHealth?: Prisma.ContainerHealthCreateNestedManyWithoutTenantInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
+  channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
+  skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutUsageRecordsInput = {
+  id?: string
+  companyName: string
+  adminEmail: string
+  status?: $Enums.TenantStatus
+  plan?: $Enums.TenantPlan
+  industry?: string | null
+  expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: string | null
+  containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutTenantInput
+  teamMembers?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutTenantInput
+  teamInvites?: Prisma.TeamInviteUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
+  containerHealth?: Prisma.ContainerHealthUncheckedCreateNestedManyWithoutTenantInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
+  channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
+  skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutUsageRecordsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutUsageRecordsInput, Prisma.TenantUncheckedCreateWithoutUsageRecordsInput>
+}
+
+export type TenantUpsertWithoutUsageRecordsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutUsageRecordsInput, Prisma.TenantUncheckedUpdateWithoutUsageRecordsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutUsageRecordsInput, Prisma.TenantUncheckedCreateWithoutUsageRecordsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutUsageRecordsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutUsageRecordsInput, Prisma.TenantUncheckedUpdateWithoutUsageRecordsInput>
+}
+
+export type TenantUpdateWithoutUsageRecordsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  adminEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutTenantNestedInput
+  teamMembers?: Prisma.TeamMemberUpdateManyWithoutTenantNestedInput
+  teamInvites?: Prisma.TeamInviteUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
+  containerHealth?: Prisma.ContainerHealthUpdateManyWithoutTenantNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
+  channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
+  skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutUsageRecordsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  adminEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutTenantNestedInput
+  teamMembers?: Prisma.TeamMemberUncheckedUpdateManyWithoutTenantNestedInput
+  teamInvites?: Prisma.TeamInviteUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
+  containerHealth?: Prisma.ContainerHealthUncheckedUpdateManyWithoutTenantNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
+  channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
 }
 
@@ -2795,6 +3178,7 @@ export type TenantCountOutputType = {
   configHistory: number
   channelConnections: number
   skills: number
+  usageRecords: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2809,6 +3193,7 @@ export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   configHistory?: boolean | TenantCountOutputTypeCountConfigHistoryArgs
   channelConnections?: boolean | TenantCountOutputTypeCountChannelConnectionsArgs
   skills?: boolean | TenantCountOutputTypeCountSkillsArgs
+  usageRecords?: boolean | TenantCountOutputTypeCountUsageRecordsArgs
 }
 
 /**
@@ -2898,6 +3283,13 @@ export type TenantCountOutputTypeCountSkillsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.SkillWhereInput
 }
 
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountUsageRecordsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UsageRecordWhereInput
+}
+
 
 export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2921,6 +3313,8 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   resourceLimits?: boolean
   containerId?: boolean
   containerUrl?: boolean
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   users?: boolean | Prisma.Tenant$usersArgs<ExtArgs>
@@ -2934,6 +3328,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   configHistory?: boolean | Prisma.Tenant$configHistoryArgs<ExtArgs>
   channelConnections?: boolean | Prisma.Tenant$channelConnectionsArgs<ExtArgs>
   skills?: boolean | Prisma.Tenant$skillsArgs<ExtArgs>
+  usageRecords?: boolean | Prisma.Tenant$usageRecordsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -2959,6 +3354,8 @@ export type TenantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   resourceLimits?: boolean
   containerId?: boolean
   containerUrl?: boolean
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["tenant"]>
@@ -2985,6 +3382,8 @@ export type TenantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   resourceLimits?: boolean
   containerId?: boolean
   containerUrl?: boolean
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["tenant"]>
@@ -3011,11 +3410,13 @@ export type TenantSelectScalar = {
   resourceLimits?: boolean
   containerId?: boolean
   containerUrl?: boolean
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyName" | "adminEmail" | "status" | "plan" | "industry" | "expectedAgentCount" | "companySize" | "deploymentRegion" | "notes" | "billingCycle" | "provisioningStep" | "provisioningProgress" | "provisioningAttempt" | "provisioningMessage" | "provisioningStartedAt" | "provisioningFailedReason" | "modelDefaults" | "resourceLimits" | "containerId" | "containerUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["tenant"]>
+export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyName" | "adminEmail" | "status" | "plan" | "industry" | "expectedAgentCount" | "companySize" | "deploymentRegion" | "notes" | "billingCycle" | "provisioningStep" | "provisioningProgress" | "provisioningAttempt" | "provisioningMessage" | "provisioningStartedAt" | "provisioningFailedReason" | "modelDefaults" | "resourceLimits" | "containerId" | "containerUrl" | "overageBillingEnabled" | "monthlyTokenQuota" | "createdAt" | "updatedAt", ExtArgs["result"]["tenant"]>
 export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Tenant$usersArgs<ExtArgs>
   agents?: boolean | Prisma.Tenant$agentsArgs<ExtArgs>
@@ -3028,6 +3429,7 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   configHistory?: boolean | Prisma.Tenant$configHistoryArgs<ExtArgs>
   channelConnections?: boolean | Prisma.Tenant$channelConnectionsArgs<ExtArgs>
   skills?: boolean | Prisma.Tenant$skillsArgs<ExtArgs>
+  usageRecords?: boolean | Prisma.Tenant$usageRecordsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3047,6 +3449,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     configHistory: Prisma.$TenantConfigHistoryPayload<ExtArgs>[]
     channelConnections: Prisma.$ChannelConnectionPayload<ExtArgs>[]
     skills: Prisma.$SkillPayload<ExtArgs>[]
+    usageRecords: Prisma.$UsageRecordPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3070,6 +3473,8 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     resourceLimits: runtime.JsonValue | null
     containerId: string | null
     containerUrl: string | null
+    overageBillingEnabled: boolean
+    monthlyTokenQuota: bigint | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["tenant"]>
@@ -3477,6 +3882,7 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   configHistory<T extends Prisma.Tenant$configHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$configHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TenantConfigHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   channelConnections<T extends Prisma.Tenant$channelConnectionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$channelConnectionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChannelConnectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   skills<T extends Prisma.Tenant$skillsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$skillsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SkillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  usageRecords<T extends Prisma.Tenant$usageRecordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$usageRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3527,6 +3933,8 @@ export interface TenantFieldRefs {
   readonly resourceLimits: Prisma.FieldRef<"Tenant", 'Json'>
   readonly containerId: Prisma.FieldRef<"Tenant", 'String'>
   readonly containerUrl: Prisma.FieldRef<"Tenant", 'String'>
+  readonly overageBillingEnabled: Prisma.FieldRef<"Tenant", 'Boolean'>
+  readonly monthlyTokenQuota: Prisma.FieldRef<"Tenant", 'BigInt'>
   readonly createdAt: Prisma.FieldRef<"Tenant", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Tenant", 'DateTime'>
 }
@@ -4178,6 +4586,30 @@ export type Tenant$skillsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.SkillScalarFieldEnum | Prisma.SkillScalarFieldEnum[]
+}
+
+/**
+ * Tenant.usageRecords
+ */
+export type Tenant$usageRecordsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UsageRecord
+   */
+  select?: Prisma.UsageRecordSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UsageRecord
+   */
+  omit?: Prisma.UsageRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsageRecordInclude<ExtArgs> | null
+  where?: Prisma.UsageRecordWhereInput
+  orderBy?: Prisma.UsageRecordOrderByWithRelationInput | Prisma.UsageRecordOrderByWithRelationInput[]
+  cursor?: Prisma.UsageRecordWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UsageRecordScalarFieldEnum | Prisma.UsageRecordScalarFieldEnum[]
 }
 
 /**

@@ -30,6 +30,7 @@ interface StepProvisionProps {
   state: ProvisionState;
   provisioningStatus: TenantProvisioningStatus | null;
   tenantId: string | null;
+  inviteLink: string | null;
   errorMessage: string | null;
 }
 
@@ -311,21 +312,39 @@ function ProvisioningProgress({
 // Subcomponent: Success State
 // ---------------------------------------------------------------------------
 
-function ProvisionSuccess({ tenantId }: { tenantId: string }) {
-  const [copied, setCopied] = React.useState(false);
+function ProvisionSuccess({
+  tenantId,
+  inviteLink,
+}: {
+  tenantId: string;
+  inviteLink: string | null;
+}) {
+  const [copiedId, setCopiedId] = React.useState(false);
+  const [copiedLink, setCopiedLink] = React.useState(false);
 
-  const handleCopy = async () => {
+  const handleCopyId = async () => {
     try {
       await navigator.clipboard.writeText(tenantId);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+    } catch {
+      // Fallback for older browsers
+    }
+  };
+
+  const handleCopyLink = async () => {
+    if (!inviteLink) return;
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
     } catch {
       // Fallback for older browsers
     }
   };
 
   return (
-    <div className="animate-fadeIn">
+    <div className="animate-fadeIn space-y-4">
       <div className="bg-white rounded-xl border border-emerald-200 shadow-sm">
         <div className="px-6 py-8 text-center">
           <div className="w-16 h-16 mx-auto rounded-full bg-emerald-50 flex items-center justify-center mb-4">
@@ -347,12 +366,12 @@ function ProvisionSuccess({ tenantId }: { tenantId: string }) {
             Tenant Provisioned Successfully
           </h3>
           <p className="text-[14px] text-neutral-500 mb-6">
-            The tenant environment is ready. An invitation email has been sent to
-            the admin.
+            The tenant environment is ready. Share the invite link below with the
+            tenant admin to set up their account.
           </p>
 
           {/* Tenant ID */}
-          <div className="inline-flex items-center gap-2 bg-neutral-50 rounded-lg px-4 py-2.5 mb-6">
+          <div className="inline-flex items-center gap-2 bg-neutral-50 rounded-lg px-4 py-2.5 mb-4">
             <span className="text-[12px] text-neutral-400">Tenant ID</span>
             <span
               className="text-[14px] font-mono font-semibold text-primary-600"
@@ -362,11 +381,11 @@ function ProvisionSuccess({ tenantId }: { tenantId: string }) {
             </span>
             <button
               type="button"
-              onClick={handleCopy}
+              onClick={handleCopyId}
               className="ml-1 p-1 rounded hover:bg-neutral-200 transition-colors"
-              title="Copy to clipboard"
+              title="Copy Tenant ID"
             >
-              {copied ? (
+              {copiedId ? (
                 <svg
                   className="w-4 h-4 text-emerald-500 transition-colors"
                   fill="none"
@@ -403,6 +422,83 @@ function ProvisionSuccess({ tenantId }: { tenantId: string }) {
           </div>
         </div>
       </div>
+
+      {/* Invite Link Card */}
+      {inviteLink && (
+        <div className="bg-white rounded-xl border border-primary-200 shadow-sm">
+          <div className="px-6 py-5">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
+                <svg
+                  className="w-4 h-4 text-primary-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-[14px] font-semibold text-neutral-900">
+                  Admin Invite Link
+                </h4>
+                <p className="text-[12px] text-neutral-500 mt-0.5">
+                  Copy and send this link to the tenant admin. Expires in 7 days.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 bg-neutral-50 rounded-lg px-3 py-2.5 border border-neutral-200 overflow-hidden">
+                <span
+                  className="text-[13px] font-mono text-neutral-600 block truncate"
+                  data-testid="invite-link-value"
+                >
+                  {inviteLink}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className={cn(
+                  'flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-[13px] font-semibold transition-all',
+                  copiedLink
+                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                    : 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm shadow-primary-500/20',
+                )}
+              >
+                {copiedLink ? (
+                  <>
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 12.75l6 6 9-13.5"
+                      />
+                    </svg>
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    Copy Link
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -454,10 +550,11 @@ export function StepProvision({
   state,
   provisioningStatus,
   tenantId,
+  inviteLink,
   errorMessage,
 }: StepProvisionProps) {
   if (state === 'success' && tenantId) {
-    return <ProvisionSuccess tenantId={tenantId} />;
+    return <ProvisionSuccess tenantId={tenantId} inviteLink={inviteLink} />;
   }
 
   if (state === 'error') {

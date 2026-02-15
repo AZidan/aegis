@@ -258,6 +258,10 @@ model Tenant {
   containerId  String? // Docker container ID
   containerUrl String? // Private container URL
 
+  // Billing (Sprint 4 — E12)
+  overageBillingEnabled Boolean @default(false)
+  monthlyTokenQuota    BigInt?
+
   // Metadata
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -275,6 +279,7 @@ model Tenant {
   configHistory      TenantConfigHistory[]
   channelConnections ChannelConnection[]
   skills             Skill[]
+  usageRecords       UsageRecord[]
 
   @@index([companyName])
   @@index([status])
@@ -335,6 +340,11 @@ model Agent {
   // OpenClaw integration
   openclawAgentId String? // Agent ID in OpenClaw platform
 
+  // Token tracking (Sprint 4 — E12)
+  monthlyTokensUsed      BigInt    @default(0)
+  monthlyTokenQuotaOverride BigInt?
+  tokenQuotaResetAt      DateTime?
+
   // Activity tracking
   lastActive DateTime?
 
@@ -348,6 +358,7 @@ model Agent {
   metrics         AgentMetrics[]
   installedSkills SkillInstallation[]
   auditLogs       AuditLog[]
+  usageRecords    UsageRecord[]
 
   // Inter-agent messaging (Sprint 6)
   messagesSent     AgentMessage[]    @relation("MessagesSent")
@@ -847,6 +858,61 @@ model ChannelRouting {
   @@index([connectionId])
   @@index([agentId])
   @@map("channel_routing")
+}
+
+// ============================================================================
+// BILLING & USAGE TRACKING (Sprint 4 — E12)
+// ============================================================================
+
+/// UsageRecord - Daily token usage per agent per provider
+model UsageRecord {
+  id              String   @id @default(uuid())
+
+  agentId         String
+  agent           Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  date            DateTime @db.Date
+  inputTokens     BigInt   @default(0)
+  outputTokens    BigInt   @default(0)
+  thinkingTokens  BigInt   @default(0)
+  cacheReadTokens BigInt   @default(0)
+  toolInvocations Int      @default(0)
+
+  provider        String   // "anthropic", "openai", "google", "qwen", "kimi"
+  model           String   // Full model name e.g. "claude-sonnet-4-5"
+
+  estimatedCostUsd Float  @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([agentId, date, provider])
+  @@index([agentId, date])
+  @@index([tenantId, date])
+  @@map("usage_records")
+}
+
+/// ProviderPricing - LLM provider pricing rates with date-range validity
+model ProviderPricing {
+  id             String    @id @default(uuid())
+
+  provider       String    // "anthropic", "openai", "google"
+  model          String    // "claude-haiku-4-5", "gpt-4o", etc.
+  inputPer1M     Float     // Cost per 1M input tokens in USD
+  outputPer1M    Float     // Cost per 1M output tokens in USD
+  thinkingPer1M  Float     @default(0) // Cost per 1M thinking tokens (often same as output)
+
+  effectiveFrom  DateTime  @db.Date
+  effectiveTo    DateTime? @db.Date // null = currently active
+
+  createdAt      DateTime  @default(now())
+
+  @@unique([provider, model, effectiveFrom])
+  @@index([provider, model])
+  @@map("provider_pricing")
 }
 
 // ============================================================================

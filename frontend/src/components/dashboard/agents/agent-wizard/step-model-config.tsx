@@ -1,14 +1,20 @@
 'use client';
 
 import * as React from 'react';
-import { Zap, Brain, Sparkles, Check } from 'lucide-react';
+import { Zap, Brain, Sparkles, Check, Lock, BadgeCheck } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
-import type { ModelTier, ThinkingMode } from '@/lib/api/agents';
+import type { ModelTier, ThinkingMode, TenantPlan } from '@/lib/api/agents';
+import {
+  MODEL_MONTHLY_COST,
+  THINKING_SURCHARGE,
+  getModelAvailability,
+  getThinkingAvailability,
+  isAgentIncludedInPlan,
+} from '@/lib/api/agents';
 
 const MODELS: {
   tier: ModelTier;
   name: string;
-  price: string;
   speedLabel: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -16,8 +22,7 @@ const MODELS: {
 }[] = [
   {
     tier: 'haiku',
-    name: 'Haiku 3.5',
-    price: '$3-5/mo',
+    name: 'Haiku 4.5',
     speedLabel: 'Speed Tier',
     description: 'Best for simple Q&A, ticket updates, notifications',
     icon: Zap,
@@ -26,7 +31,6 @@ const MODELS: {
   {
     tier: 'sonnet',
     name: 'Sonnet 4.5',
-    price: '$15-25/mo',
     speedLabel: 'Balanced Tier',
     description: 'Best for multi-step reasoning, analysis, coding tasks',
     icon: Brain,
@@ -34,8 +38,7 @@ const MODELS: {
   },
   {
     tier: 'opus',
-    name: 'Opus 4',
-    price: '$50-80/mo',
+    name: 'Opus 4.5',
     speedLabel: 'Power Tier',
     description: 'Best for complex strategy, research, creative output',
     icon: Sparkles,
@@ -50,6 +53,8 @@ interface StepModelConfigProps {
   onThinkingModeChange: (v: ThinkingMode) => void;
   temperature: number;
   onTemperatureChange: (v: number) => void;
+  tenantPlan?: TenantPlan;
+  agentCount?: number;
 }
 
 export function StepModelConfig({
@@ -59,7 +64,11 @@ export function StepModelConfig({
   onThinkingModeChange,
   temperature,
   onTemperatureChange,
+  tenantPlan = 'starter',
+  agentCount = 0,
 }: StepModelConfigProps) {
+  const included = isAgentIncludedInPlan(tenantPlan, agentCount);
+
   return (
     <section className="mb-8">
       <h2 className="text-lg font-semibold text-neutral-900 mb-1">
@@ -75,13 +84,20 @@ export function StepModelConfig({
         {MODELS.map((m) => {
           const Icon = m.icon;
           const isSelected = modelTier === m.tier;
+          const availability = getModelAvailability(m.tier, tenantPlan);
+          const monthlyCost = MODEL_MONTHLY_COST[m.tier];
+
           return (
             <button
               key={m.tier}
               type="button"
-              onClick={() => onModelTierChange(m.tier)}
+              disabled={!availability.available}
+              onClick={() => availability.available && onModelTierChange(m.tier)}
               className={cn(
-                'text-left rounded-xl border-2 bg-white p-5 transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer relative',
+                'text-left rounded-xl border-2 bg-white p-5 transition-all relative',
+                availability.available
+                  ? 'hover:-translate-y-0.5 hover:shadow-md cursor-pointer'
+                  : 'opacity-50 cursor-not-allowed',
                 isSelected
                   ? 'border-primary-500 shadow-md'
                   : 'border-neutral-200 hover:border-neutral-300'
@@ -90,6 +106,11 @@ export function StepModelConfig({
               {isSelected && (
                 <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center">
                   <Check className="w-3.5 h-3.5 text-white" />
+                </div>
+              )}
+              {!availability.available && (
+                <div className="absolute top-3 right-3" title={availability.reason}>
+                  <Lock className="w-4 h-4 text-neutral-400" />
                 </div>
               )}
               <div
@@ -103,15 +124,28 @@ export function StepModelConfig({
               <h3 className="text-base font-semibold text-neutral-900 mb-1">
                 {m.name}
               </h3>
-              <p className="text-sm font-mono font-medium text-neutral-600 mb-2">
-                {m.price}
-              </p>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-sm font-mono font-medium text-neutral-600">
+                  ${monthlyCost}/mo
+                </span>
+                {included && availability.available && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">
+                    <BadgeCheck className="w-3 h-3" />
+                    Included
+                  </span>
+                )}
+              </div>
               <p className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-2">
                 {m.speedLabel}
               </p>
               <p className="text-sm text-neutral-500 leading-relaxed">
                 {m.description}
               </p>
+              {!availability.available && (
+                <p className="mt-2 text-xs text-neutral-400 italic">
+                  Upgrade to {m.tier === 'haiku' ? 'Enterprise' : 'Growth'} plan to unlock
+                </p>
+              )}
             </button>
           );
         })}
@@ -130,12 +164,31 @@ export function StepModelConfig({
             }
             className="w-full h-10 px-3 text-sm bg-white border border-neutral-200 rounded-lg text-neutral-900 hover:border-neutral-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/15 focus:outline-none transition-colors"
           >
-            <option value="extended">Extended Thinking</option>
-            <option value="standard">Standard</option>
-            <option value="fast">Fast</option>
+            {(['extended', 'standard', 'fast'] as ThinkingMode[]).map((mode) => {
+              const ta = getThinkingAvailability(mode, tenantPlan);
+              const surcharge = THINKING_SURCHARGE[mode];
+              const label =
+                mode === 'extended'
+                  ? 'Extended Thinking'
+                  : mode === 'standard'
+                    ? 'Standard'
+                    : 'Fast';
+              return (
+                <option key={mode} value={mode} disabled={!ta.available}>
+                  {label}
+                  {surcharge > 0 ? ` (+$${surcharge}/mo)` : ''}
+                  {!ta.available ? ' (Upgrade plan)' : ''}
+                </option>
+              );
+            })}
           </select>
           <p className="mt-1 text-xs text-neutral-400">
             Extended thinking gives the agent more time to reason through complex problems.
+            {THINKING_SURCHARGE[thinkingMode] > 0 && (
+              <span className="text-amber-600 font-medium">
+                {' '}+${THINKING_SURCHARGE[thinkingMode]}/mo surcharge
+              </span>
+            )}
           </p>
         </div>
         <div>

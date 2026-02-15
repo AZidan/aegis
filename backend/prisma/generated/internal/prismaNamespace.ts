@@ -404,7 +404,9 @@ export const ModelName = {
   AgentMessage: 'AgentMessage',
   AgentAllowlist: 'AgentAllowlist',
   ChannelConnection: 'ChannelConnection',
-  ChannelRouting: 'ChannelRouting'
+  ChannelRouting: 'ChannelRouting',
+  UsageRecord: 'UsageRecord',
+  ProviderPricing: 'ProviderPricing'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -420,7 +422,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "tenant" | "tenantConfigHistory" | "agent" | "agentRoleConfig" | "skill" | "refreshToken" | "apiKey" | "teamMember" | "teamInvite" | "agentChannel" | "agentActivity" | "agentMetrics" | "skillInstallation" | "containerHealth" | "alert" | "auditLog" | "agentMessage" | "agentAllowlist" | "channelConnection" | "channelRouting"
+    modelProps: "user" | "tenant" | "tenantConfigHistory" | "agent" | "agentRoleConfig" | "skill" | "refreshToken" | "apiKey" | "teamMember" | "teamInvite" | "agentChannel" | "agentActivity" | "agentMetrics" | "skillInstallation" | "containerHealth" | "alert" | "auditLog" | "agentMessage" | "agentAllowlist" | "channelConnection" | "channelRouting" | "usageRecord" | "providerPricing"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1978,6 +1980,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    UsageRecord: {
+      payload: Prisma.$UsageRecordPayload<ExtArgs>
+      fields: Prisma.UsageRecordFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UsageRecordFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageRecordPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UsageRecordFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageRecordPayload>
+        }
+        findFirst: {
+          args: Prisma.UsageRecordFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageRecordPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UsageRecordFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageRecordPayload>
+        }
+        findMany: {
+          args: Prisma.UsageRecordFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageRecordPayload>[]
+        }
+        create: {
+          args: Prisma.UsageRecordCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageRecordPayload>
+        }
+        createMany: {
+          args: Prisma.UsageRecordCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UsageRecordCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageRecordPayload>[]
+        }
+        delete: {
+          args: Prisma.UsageRecordDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageRecordPayload>
+        }
+        update: {
+          args: Prisma.UsageRecordUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageRecordPayload>
+        }
+        deleteMany: {
+          args: Prisma.UsageRecordDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UsageRecordUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UsageRecordUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageRecordPayload>[]
+        }
+        upsert: {
+          args: Prisma.UsageRecordUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageRecordPayload>
+        }
+        aggregate: {
+          args: Prisma.UsageRecordAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUsageRecord>
+        }
+        groupBy: {
+          args: Prisma.UsageRecordGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UsageRecordGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UsageRecordCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UsageRecordCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProviderPricing: {
+      payload: Prisma.$ProviderPricingPayload<ExtArgs>
+      fields: Prisma.ProviderPricingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProviderPricingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderPricingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProviderPricingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderPricingPayload>
+        }
+        findFirst: {
+          args: Prisma.ProviderPricingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderPricingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProviderPricingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderPricingPayload>
+        }
+        findMany: {
+          args: Prisma.ProviderPricingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderPricingPayload>[]
+        }
+        create: {
+          args: Prisma.ProviderPricingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderPricingPayload>
+        }
+        createMany: {
+          args: Prisma.ProviderPricingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProviderPricingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderPricingPayload>[]
+        }
+        delete: {
+          args: Prisma.ProviderPricingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderPricingPayload>
+        }
+        update: {
+          args: Prisma.ProviderPricingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderPricingPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProviderPricingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProviderPricingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProviderPricingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderPricingPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProviderPricingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderPricingPayload>
+        }
+        aggregate: {
+          args: Prisma.ProviderPricingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProviderPricing>
+        }
+        groupBy: {
+          args: Prisma.ProviderPricingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderPricingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProviderPricingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderPricingCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2058,6 +2208,8 @@ export const TenantScalarFieldEnum = {
   resourceLimits: 'resourceLimits',
   containerId: 'containerId',
   containerUrl: 'containerUrl',
+  overageBillingEnabled: 'overageBillingEnabled',
+  monthlyTokenQuota: 'monthlyTokenQuota',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2093,6 +2245,9 @@ export const AgentScalarFieldEnum = {
   assistedUser: 'assistedUser',
   customTemplates: 'customTemplates',
   openclawAgentId: 'openclawAgentId',
+  monthlyTokensUsed: 'monthlyTokensUsed',
+  monthlyTokenQuotaOverride: 'monthlyTokenQuotaOverride',
+  tokenQuotaResetAt: 'tokenQuotaResetAt',
   lastActive: 'lastActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -2373,6 +2528,41 @@ export const ChannelRoutingScalarFieldEnum = {
 export type ChannelRoutingScalarFieldEnum = (typeof ChannelRoutingScalarFieldEnum)[keyof typeof ChannelRoutingScalarFieldEnum]
 
 
+export const UsageRecordScalarFieldEnum = {
+  id: 'id',
+  agentId: 'agentId',
+  tenantId: 'tenantId',
+  date: 'date',
+  inputTokens: 'inputTokens',
+  outputTokens: 'outputTokens',
+  thinkingTokens: 'thinkingTokens',
+  cacheReadTokens: 'cacheReadTokens',
+  toolInvocations: 'toolInvocations',
+  provider: 'provider',
+  model: 'model',
+  estimatedCostUsd: 'estimatedCostUsd',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UsageRecordScalarFieldEnum = (typeof UsageRecordScalarFieldEnum)[keyof typeof UsageRecordScalarFieldEnum]
+
+
+export const ProviderPricingScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  model: 'model',
+  inputPer1M: 'inputPer1M',
+  outputPer1M: 'outputPer1M',
+  thinkingPer1M: 'thinkingPer1M',
+  effectiveFrom: 'effectiveFrom',
+  effectiveTo: 'effectiveTo',
+  createdAt: 'createdAt'
+} as const
+
+export type ProviderPricingScalarFieldEnum = (typeof ProviderPricingScalarFieldEnum)[keyof typeof ProviderPricingScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2529,6 +2719,20 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt'
+ */
+export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt[]'
+ */
+export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
     
 
 
@@ -2927,6 +3131,8 @@ export type GlobalOmitConfig = {
   agentAllowlist?: Prisma.AgentAllowlistOmit
   channelConnection?: Prisma.ChannelConnectionOmit
   channelRouting?: Prisma.ChannelRoutingOmit
+  usageRecord?: Prisma.UsageRecordOmit
+  providerPricing?: Prisma.ProviderPricingOmit
 }
 
 /* Types for Logging */

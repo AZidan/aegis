@@ -23,6 +23,7 @@ import {
   deleteAgentChannelRoute,
   fetchSlackChannels,
   fetchSlackUsers,
+  fetchTenantBillingInfo,
   type AgentFilters,
   type CreateAgentPayload,
   type CreateAgentRoutePayload,
@@ -308,6 +309,18 @@ export function useSlackUsers(agentId: string, connectionId: string) {
     queryKey: [...agentKeys.detail(agentId), 'slack-users', connectionId] as const,
     queryFn: () => fetchSlackUsers(agentId, connectionId),
     enabled: !!agentId && !!connectionId,
+    staleTime: 60_000,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Tenant Billing Info
+// ---------------------------------------------------------------------------
+
+export function useTenantBilling() {
+  return useQuery({
+    queryKey: ['tenant', 'billing'] as const,
+    queryFn: fetchTenantBillingInfo,
     staleTime: 60_000,
   });
 }

@@ -71,6 +71,7 @@ export default function ProvisionTenantPage() {
   const [provisionState, setProvisionState] =
     React.useState<ProvisionState>('summary');
   const [tenantId, setTenantId] = React.useState<string | null>(null);
+  const [inviteLink, setInviteLink] = React.useState<string | null>(null);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   // ---- Mutations & queries ----
@@ -113,6 +114,21 @@ export default function ProvisionTenantPage() {
       }
     },
     [step1Errors]
+  );
+
+  const handleStep1Blur = React.useCallback(
+    (field: keyof Step1FormData) => {
+      const result = step1Schema.safeParse(step1Data);
+      if (!result.success) {
+        const issue = result.error.issues.find(
+          (i) => i.path[0] === field,
+        );
+        if (issue) {
+          setStep1Errors((prev) => ({ ...prev, [field]: issue.message }));
+        }
+      }
+    },
+    [step1Data]
   );
 
   const handleStep2Change = React.useCallback(
@@ -211,6 +227,7 @@ export default function ProvisionTenantPage() {
     try {
       const response = await createMutation.mutateAsync(request);
       setTenantId(response.id);
+      setInviteLink(response.inviteLink);
     } catch (err) {
       setProvisionState('error');
       setErrorMessage(
@@ -281,6 +298,7 @@ export default function ProvisionTenantPage() {
               data={step1Data}
               errors={step1Errors}
               onChange={handleStep1Change}
+              onBlur={handleStep1Blur}
             />
           )}
 
@@ -294,6 +312,7 @@ export default function ProvisionTenantPage() {
               state={provisionState}
               provisioningStatus={tenantDetail?.provisioning ?? null}
               tenantId={tenantId}
+              inviteLink={inviteLink}
               errorMessage={errorMessage}
             />
           )}

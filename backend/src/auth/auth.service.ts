@@ -2,6 +2,8 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
+  NotFoundException,
+  GoneException,
   Logger,
   HttpException,
 } from '@nestjs/common';
@@ -18,6 +20,7 @@ import { OAuthLoginDto } from './dto/oauth-login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { LogoutDto } from './dto/refresh-token.dto';
 import { MfaVerifyDto } from './dto/mfa-verify.dto';
+import { AcceptInviteDto } from './dto/accept-invite.dto';
 
 @Injectable()
 export class AuthService {
@@ -177,6 +180,13 @@ export class AuthService {
     if (!user.tenantId) {
       throw new BadRequestException(
         'Your account is not assigned to any tenant. Please contact your tenant admin for an invitation.',
+      );
+    }
+
+    // Block unactivated users — they must accept their invite first
+    if (!user.password && !user.oauthProvider) {
+      throw new BadRequestException(
+        'Please accept your invitation first using the invite link provided by your admin.',
       );
     }
 
@@ -405,6 +415,160 @@ export class AuthService {
       tenantId: user.tenantId || undefined,
       permissions: this.getPermissionsForRole(user.role),
       createdAt: user.createdAt.toISOString(),
+    };
+  }
+
+  // ==========================================================================
+  // GET /api/auth/invite/:token - Get Invite Info (Public)
+  // ==========================================================================
+  async getInviteInfo(token: string) {
+    const invite = await this.prisma.teamInvite.findUnique({
+      where: { token },
+      include: { tenant: true },
+    });
+
+    if (!invite) {
+      throw new NotFoundException('Invalid invitation');
+    }
+
+    if (invite.status !== 'pending') {
+      throw new GoneException('This invitation has already been used');
+    }
+
+    if (new Date() > invite.expiresAt) {
+      throw new GoneException('Invite link has expired');
+    }
+
+    return {
+      email: invite.email,
+      companyName: invite.tenant.companyName,
+      expiresAt: invite.expiresAt.toISOString(),
+    };
+  }
+
+  // ==========================================================================
+  // POST /api/auth/invite/:token/accept - Accept Invite (Public)
+  // Contract: Section 8 - Accept Team Invite
+  // ==========================================================================
+  async acceptInvite(token: string, dto: AcceptInviteDto) {
+    const invite = await this.prisma.teamInvite.findUnique({
+      where: { token },
+      include: { tenant: true },
+    });
+
+    if (!invite) {
+      throw new NotFoundException('Invalid invitation');
+    }
+
+    if (invite.status !== 'pending') {
+      throw new BadRequestException('This invitation has already been used');
+    }
+
+    if (new Date() > invite.expiresAt) {
+      throw new GoneException('Invite link has expired');
+    }
+
+    // Find the user created during tenant provisioning
+    const user = await this.prisma.user.findFirst({
+      where: { email: invite.email, tenantId: invite.tenantId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User account not found for this invitation');
+    }
+
+    // Set up credentials based on chosen flow
+    if (dto.password) {
+      // Password flow
+      const hashedPassword = await bcrypt.hash(dto.password, 12);
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          name: dto.name,
+          password: hashedPassword,
+        },
+      });
+    } else if (dto.oauthProvider && dto.oauthCode) {
+      // OAuth flow
+      let oauthProfile: { email: string; name: string; oauthId: string };
+
+      if (dto.oauthProvider === 'google') {
+        oauthProfile = await this.verifyGoogleOAuth(
+          dto.oauthCode,
+          dto.redirectUri || '',
+        );
+      } else {
+        oauthProfile = await this.verifyGithubOAuth(
+          dto.oauthCode,
+          dto.redirectUri || '',
+        );
+      }
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          name: dto.name,
+          oauthProvider: dto.oauthProvider,
+          oauthId: oauthProfile.oauthId,
+        },
+      });
+    } else {
+      throw new BadRequestException(
+        'Either password or OAuth credentials are required',
+      );
+    }
+
+    // Mark invite as accepted
+    await this.prisma.teamInvite.update({
+      where: { id: invite.id },
+      data: {
+        status: 'accepted',
+        acceptedAt: new Date(),
+      },
+    });
+
+    // Generate auth tokens
+    const tokens = await this.generateTokens({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      tenantId: user.tenantId,
+    });
+
+    await this.storeRefreshToken(tokens.refreshToken, user.id);
+
+    // Update last login
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    });
+
+    this.auditService.logAction({
+      actorType: 'user',
+      actorId: user.id,
+      actorName: user.email,
+      action: 'invite_accepted',
+      targetType: 'user',
+      targetId: user.id,
+      details: {
+        method: dto.password ? 'password' : 'oauth',
+        tenantId: invite.tenantId,
+      },
+      severity: 'info',
+      tenantId: invite.tenantId,
+    });
+
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      expiresIn: 900,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: dto.name,
+        role: user.role,
+        tenantId: user.tenantId,
+      },
     };
   }
 

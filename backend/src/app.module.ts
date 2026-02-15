@@ -15,6 +15,7 @@ import { AuditModule } from './audit/audit.module';
 import { ContainerModule } from './container/container.module';
 import { AlertModule } from './alert/alert.module';
 import { ChannelProxyModule } from './channel-proxy/channel-proxy.module';
+import { BillingModule } from './billing/billing.module';
 import { SlackModule } from './slack/slack.module';
 import configuration from './config/configuration';
 import { validateEnv } from './config/validation';
@@ -69,6 +70,7 @@ import { validateEnv } from './config/validation';
     ProvisioningModule,
     ContainerModule,
     ChannelProxyModule,
+    BillingModule,
     SlackModule,
   ],
   controllers: [AppController],

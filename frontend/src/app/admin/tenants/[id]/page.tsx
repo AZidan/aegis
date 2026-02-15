@@ -425,9 +425,11 @@ function ConfigurationTab({ tenantId }: { tenantId: string }) {
   const rollbackMutation = useRollbackConfig(tenantId);
 
   const [editMode, setEditMode] = React.useState(false);
+  const [viewMode, setViewMode] = React.useState<'form' | 'json'>('form');
   const [successMsg, setSuccessMsg] = React.useState('');
   const [rollbackTarget, setRollbackTarget] =
     React.useState<ConfigHistoryEntry | null>(null);
+  const [showSaveConfirm, setShowSaveConfirm] = React.useState(false);
 
   // Form state
   const [plan, setPlan] = React.useState<TenantPlan>('starter');
@@ -438,19 +440,57 @@ function ConfigurationTab({ tenantId }: { tenantId: string }) {
   const [modelTier, setModelTier] = React.useState('');
   const [thinkingMode, setThinkingMode] = React.useState('');
 
+  // Original values for revert and diff
+  const [originalValues, setOriginalValues] = React.useState({
+    plan: 'starter' as TenantPlan,
+    cpuCores: 0,
+    memoryMb: 0,
+    diskGb: 0,
+    maxAgents: 0,
+    modelTier: '',
+    thinkingMode: '',
+  });
+
   // Sync form with tenant data
   React.useEffect(() => {
     if (!tenant) return;
-    setPlan(tenant.plan);
-    setCpuCores(tenant.resourceLimits.cpuCores);
-    setMemoryMb(tenant.resourceLimits.memoryMb);
-    setDiskGb(tenant.resourceLimits.diskGb);
-    setMaxAgents(tenant.resourceLimits.maxAgents);
-    setModelTier(tenant.config.modelDefaults.tier);
-    setThinkingMode(tenant.config.modelDefaults.thinkingMode);
+    const vals = {
+      plan: tenant.plan,
+      cpuCores: tenant.resourceLimits.cpuCores,
+      memoryMb: tenant.resourceLimits.memoryMb,
+      diskGb: tenant.resourceLimits.diskGb,
+      maxAgents: tenant.resourceLimits.maxAgents,
+      modelTier: tenant.config.modelDefaults.tier,
+      thinkingMode: tenant.config.modelDefaults.thinkingMode,
+    };
+    setPlan(vals.plan);
+    setCpuCores(vals.cpuCores);
+    setMemoryMb(vals.memoryMb);
+    setDiskGb(vals.diskGb);
+    setMaxAgents(vals.maxAgents);
+    setModelTier(vals.modelTier);
+    setThinkingMode(vals.thinkingMode);
+    setOriginalValues(vals);
   }, [tenant]);
 
   if (!tenant) return null;
+
+  // Compute diff between original and current form values
+  const currentValues = { plan, cpuCores, memoryMb, diskGb, maxAgents, modelTier, thinkingMode };
+  const diffEntries = Object.entries(currentValues).filter(
+    ([key, val]) => val !== originalValues[key as keyof typeof originalValues],
+  );
+  const hasChanges = diffEntries.length > 0;
+
+  const handleRevert = () => {
+    setPlan(originalValues.plan);
+    setCpuCores(originalValues.cpuCores);
+    setMemoryMb(originalValues.memoryMb);
+    setDiskGb(originalValues.diskGb);
+    setMaxAgents(originalValues.maxAgents);
+    setModelTier(originalValues.modelTier);
+    setThinkingMode(originalValues.thinkingMode);
+  };
 
   const handleSave = () => {
     const payload: UpdateTenantConfigPayload = {
@@ -461,6 +501,7 @@ function ConfigurationTab({ tenantId }: { tenantId: string }) {
     updateMutation.mutate(payload, {
       onSuccess: () => {
         setEditMode(false);
+        setShowSaveConfirm(false);
         setSuccessMsg(
           'Config updated. Changes propagate within 60 seconds.'
         );
@@ -468,6 +509,17 @@ function ConfigurationTab({ tenantId }: { tenantId: string }) {
       },
     });
   };
+
+  // JSON representation of config for JSON view
+  const configJson = JSON.stringify(
+    {
+      plan,
+      resourceLimits: { cpuCores, memoryMb, diskGb, maxAgents },
+      modelDefaults: { tier: modelTier, thinkingMode },
+    },
+    null,
+    2,
+  );
 
   const handleRollback = () => {
     if (!rollbackTarget) return;
@@ -502,21 +554,61 @@ function ConfigurationTab({ tenantId }: { tenantId: string }) {
         </div>
       )}
 
-      {/* Plan Tier */}
-      <div className="bg-white rounded-xl border border-neutral-200/60 p-6">
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-[14px] font-semibold text-neutral-900">
-            Plan Tier
-          </h3>
-          {!editMode && (
-            <button
-              onClick={() => setEditMode(true)}
-              className="text-[12px] font-medium text-primary-600 hover:text-primary-700 bg-primary-50 px-3 py-1.5 rounded-lg transition-colors"
-            >
-              Edit Config
-            </button>
-          )}
+      {/* View toggle + edit actions */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-1 bg-neutral-100 rounded-lg p-0.5">
+          <button
+            onClick={() => setViewMode('form')}
+            className={cn(
+              'px-3 py-1.5 text-[12px] font-medium rounded-md transition-colors',
+              viewMode === 'form'
+                ? 'bg-white text-neutral-900 shadow-sm'
+                : 'text-neutral-500 hover:text-neutral-700',
+            )}
+          >
+            Form
+          </button>
+          <button
+            onClick={() => setViewMode('json')}
+            className={cn(
+              'px-3 py-1.5 text-[12px] font-medium rounded-md transition-colors',
+              viewMode === 'json'
+                ? 'bg-white text-neutral-900 shadow-sm'
+                : 'text-neutral-500 hover:text-neutral-700',
+            )}
+          >
+            JSON
+          </button>
         </div>
+        {!editMode && (
+          <button
+            onClick={() => setEditMode(true)}
+            className="text-[12px] font-medium text-primary-600 hover:text-primary-700 bg-primary-50 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            Edit Config
+          </button>
+        )}
+      </div>
+
+      {/* JSON View */}
+      {viewMode === 'json' && (
+        <div className="bg-white rounded-xl border border-neutral-200/60 p-6 mb-6">
+          <h3 className="text-[14px] font-semibold text-neutral-900 mb-3">
+            Configuration (JSON)
+          </h3>
+          <pre className="bg-neutral-50 rounded-lg p-4 text-[12px] font-mono text-neutral-700 overflow-x-auto whitespace-pre">
+            {configJson}
+          </pre>
+        </div>
+      )}
+
+      {/* Plan Tier */}
+      {viewMode === 'form' && (
+      <>
+      <div className="bg-white rounded-xl border border-neutral-200/60 p-6">
+        <h3 className="text-[14px] font-semibold text-neutral-900 mb-5">
+          Plan Tier
+        </h3>
         {editMode ? (
           <div className="space-y-3">
             <label className="block">
@@ -656,18 +748,86 @@ function ConfigurationTab({ tenantId }: { tenantId: string }) {
       {editMode && (
         <div className="flex items-center gap-3">
           <button
-            onClick={handleSave}
-            disabled={updateMutation.isPending}
+            onClick={() => hasChanges ? setShowSaveConfirm(true) : undefined}
+            disabled={updateMutation.isPending || !hasChanges}
             className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors disabled:opacity-50"
           >
             {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
           </button>
+          {hasChanges && (
+            <button
+              onClick={handleRevert}
+              className="px-4 py-2.5 text-[13px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
+            >
+              Revert
+            </button>
+          )}
           <button
-            onClick={() => setEditMode(false)}
+            onClick={() => { handleRevert(); setEditMode(false); }}
             className="px-4 py-2.5 text-[13px] font-medium text-neutral-600 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
           >
             Cancel
           </button>
+        </div>
+      )}
+      </>
+      )}
+
+      {/* Save Confirmation Modal with Diff Preview */}
+      {showSaveConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
+            <h4 className="text-[15px] font-semibold text-neutral-900 mb-3">
+              Confirm Changes
+            </h4>
+            <p className="text-[13px] text-neutral-500 mb-4">
+              Review the changes below before saving:
+            </p>
+            <div className="bg-neutral-50 rounded-lg p-3 space-y-2 mb-4 max-h-60 overflow-y-auto">
+              {diffEntries.map(([key, val]) => {
+                const fieldLabels: Record<string, string> = {
+                  plan: 'Plan',
+                  cpuCores: 'CPU Cores',
+                  memoryMb: 'Memory (MB)',
+                  diskGb: 'Disk (GB)',
+                  maxAgents: 'Max Agents',
+                  modelTier: 'Model Tier',
+                  thinkingMode: 'Thinking Mode',
+                };
+                return (
+                  <div key={key} className="flex items-center justify-between text-[12px]">
+                    <span className="font-medium text-neutral-600">
+                      {fieldLabels[key] ?? key}
+                    </span>
+                    <div className="flex items-center gap-2 font-mono">
+                      <span className="text-red-500 line-through">
+                        {String(originalValues[key as keyof typeof originalValues])}
+                      </span>
+                      <span className="text-neutral-400">&rarr;</span>
+                      <span className="text-emerald-600 font-semibold">
+                        {String(val)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex items-center gap-3 justify-end">
+              <button
+                onClick={() => setShowSaveConfirm(false)}
+                className="px-4 py-2 text-[13px] font-medium text-neutral-600 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={updateMutation.isPending}
+                className="px-4 py-2 text-[13px] font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors disabled:opacity-50"
+              >
+                {updateMutation.isPending ? 'Saving...' : 'Confirm & Save'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

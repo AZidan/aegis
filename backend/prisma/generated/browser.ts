@@ -122,3 +122,13 @@ export type ChannelConnection = Prisma.ChannelConnectionModel
  * ChannelRouting - Routing rules that map platform events to agents
  */
 export type ChannelRouting = Prisma.ChannelRoutingModel
+/**
+ * Model UsageRecord
+ * UsageRecord - Daily token usage per agent per provider
+ */
+export type UsageRecord = Prisma.UsageRecordModel
+/**
+ * Model ProviderPricing
+ * ProviderPricing - LLM provider pricing rates with date-range validity
+ */
+export type ProviderPricing = Prisma.ProviderPricingModel

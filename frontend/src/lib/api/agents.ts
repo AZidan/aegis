@@ -428,6 +428,93 @@ export async function fetchSlackInstallUrl(): Promise<{ url: string }> {
 }
 
 // ---------------------------------------------------------------------------
+// Billing / Plan Info
+// ---------------------------------------------------------------------------
+
+export type TenantPlan = 'starter' | 'growth' | 'enterprise';
+
+export interface TenantBillingInfo {
+  plan: TenantPlan;
+  agentCount: number;
+  includedAgents: number;
+  overageBillingEnabled: boolean;
+}
+
+/** Plan-based model availability */
+const PLAN_ALLOWED_MODELS: Record<TenantPlan, ModelTier[]> = {
+  starter: ['sonnet'],
+  growth: ['sonnet', 'opus'],
+  enterprise: ['haiku', 'sonnet', 'opus'],
+};
+
+/** Plan-based thinking mode availability */
+const PLAN_ALLOWED_THINKING: Record<TenantPlan, ThinkingMode[]> = {
+  starter: ['fast', 'standard'],
+  growth: ['fast', 'standard', 'extended'],
+  enterprise: ['fast', 'standard', 'extended'],
+};
+
+/** Included agents per plan (from pricing-model.md) */
+const PLAN_INCLUDED_AGENTS: Record<TenantPlan, number> = {
+  starter: 2,
+  growth: 5,
+  enterprise: 50,
+};
+
+/** Per-agent monthly cost by model tier (from pricing-model.md) */
+export const MODEL_MONTHLY_COST: Record<ModelTier, number> = {
+  haiku: 19,
+  sonnet: 49,
+  opus: 99,
+};
+
+/** Thinking mode surcharge per agent per month */
+export const THINKING_SURCHARGE: Record<ThinkingMode, number> = {
+  fast: 0,
+  standard: 0,
+  extended: 20,
+};
+
+export function getModelAvailability(
+  modelTier: ModelTier,
+  plan: TenantPlan,
+): { available: boolean; reason?: string } {
+  const allowed = PLAN_ALLOWED_MODELS[plan];
+  if (allowed.includes(modelTier)) return { available: true };
+  return {
+    available: false,
+    reason: `${modelTier} is not available on the ${plan} plan`,
+  };
+}
+
+export function getThinkingAvailability(
+  mode: ThinkingMode,
+  plan: TenantPlan,
+): { available: boolean; reason?: string } {
+  const allowed = PLAN_ALLOWED_THINKING[plan];
+  if (allowed.includes(mode)) return { available: true };
+  return {
+    available: false,
+    reason: `${mode} thinking is not available on the ${plan} plan`,
+  };
+}
+
+export function isAgentIncludedInPlan(plan: TenantPlan, currentCount: number): boolean {
+  return currentCount < PLAN_INCLUDED_AGENTS[plan];
+}
+
+export async function fetchTenantBillingInfo(): Promise<TenantBillingInfo> {
+  const { data: stats } = await api.get<DashboardStatsResponse>('/dashboard/stats');
+  const plan = (stats.plan.name || 'starter') as TenantPlan;
+  return {
+    plan,
+    agentCount: stats.agents.total,
+    includedAgents: PLAN_INCLUDED_AGENTS[plan],
+    overageBillingEnabled: false, // Will be populated from tenant detail in future
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Helper Utilities
 // ---------------------------------------------------------------------------
 

@@ -1,9 +1,11 @@
 import { Processor, WorkerHost, InjectQueue } from '@nestjs/bullmq';
-import { Logger } from '@nestjs/common';
+import { Logger, Optional } from '@nestjs/common';
 import { Job, Queue } from 'bullmq';
 import { PlatformDispatcherService } from './platform-dispatcher.service';
 import { SecretsManagerService } from '../container/secrets-manager.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { UsageExtractorService } from '../billing/usage-extractor.service';
+import { UsageTrackingService } from '../billing/usage-tracking.service';
 import {
   ForwardToContainerJob,
   DispatchToPlatformJob,
@@ -20,6 +22,8 @@ export class ChannelProxyProcessor extends WorkerHost {
     private readonly secretsManager: SecretsManagerService,
     private readonly prisma: PrismaService,
     @InjectQueue(CHANNEL_PROXY_QUEUE_NAME) private readonly proxyQueue: Queue,
+    @Optional() private readonly usageExtractor: UsageExtractorService,
+    @Optional() private readonly usageTracking: UsageTrackingService,
   ) {
     super();
   }
@@ -95,6 +99,21 @@ export class ChannelProxyProcessor extends WorkerHost {
       }>;
       usage?: { input_tokens: number; output_tokens: number };
     };
+
+    // Record token usage for billing (fire-and-forget)
+    if (this.usageExtractor && this.usageTracking && data.usage) {
+      const normalizedUsage = this.usageExtractor.extractUsage(
+        data as Record<string, unknown>,
+        model,
+      );
+      if (normalizedUsage) {
+        this.usageTracking
+          .recordUsage(sessionContext.agentId, sessionContext.tenantId, normalizedUsage)
+          .catch((err) =>
+            this.logger.warn(`Usage recording failed: ${err instanceof Error ? err.message : String(err)}`),
+          );
+      }
+    }
 
     const responseText =
       data.output
