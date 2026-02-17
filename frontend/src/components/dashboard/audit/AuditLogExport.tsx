@@ -2,13 +2,15 @@
 
 import { useCallback, useState } from 'react';
 import { Download } from 'lucide-react';
-import { exportAuditLogs, type AuditLogFilters } from '@/lib/api/audit';
+import { exportAuditLogs, type AuditLogFilters, type AuditExportParams } from '@/lib/api/audit';
 
 interface AuditLogExportProps {
   filters: AuditLogFilters;
+  /** Optional override for the export function — used by admin audit page */
+  exportFn?: (params: AuditExportParams) => Promise<Blob>;
 }
 
-export function AuditLogExport({ filters }: AuditLogExportProps) {
+export function AuditLogExport({ filters, exportFn }: AuditLogExportProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -18,7 +20,8 @@ export function AuditLogExport({ filters }: AuditLogExportProps) {
       setOpen(false);
       try {
         const { cursor, limit, ...exportFilters } = filters;
-        const blob = await exportAuditLogs({ ...exportFilters, format });
+        const doExport = exportFn ?? exportAuditLogs;
+        const blob = await doExport({ ...exportFilters, format });
         const dateStr = new Date().toISOString().split('T')[0];
         const filename = `audit-log-${dateStr}.${format}`;
 
