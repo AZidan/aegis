@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { BullModule } from '@nestjs/bullmq';
+import { ScheduleModule } from '@nestjs/schedule';
 import { redisStore } from 'cache-manager-ioredis-yet';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -43,6 +44,9 @@ import { validateEnv } from './config/validation';
         return { store };
       },
     }),
+
+    // Scheduled Tasks (cron jobs)
+    ScheduleModule.forRoot(),
 
     // BullMQ (Job Queues)
     BullModule.forRoot({
