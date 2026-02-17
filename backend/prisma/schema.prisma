@@ -280,6 +280,8 @@ model Tenant {
   channelConnections ChannelConnection[]
   skills             Skill[]
   usageRecords       UsageRecord[]
+  workflowTemplates  WorkflowTemplate[]
+  workflowInstances  WorkflowInstance[]
 
   @@index([companyName])
   @@index([status])
@@ -913,6 +915,76 @@ model ProviderPricing {
   @@unique([provider, model, effectiveFrom])
   @@index([provider, model])
   @@map("provider_pricing")
+}
+
+// ============================================================================
+// WORKFLOW TEMPLATES (Sprint 7 — S7-01)
+// ============================================================================
+
+enum WorkflowStatus {
+  pending
+  running
+  completed
+  failed
+  timed_out
+
+  @@map("workflow_status")
+}
+
+/// WorkflowTemplate - Reusable coordination workflow definitions
+model WorkflowTemplate {
+  id          String  @id @default(uuid())
+  name        String  @unique // e.g. "daily_sync", "weekly_standup"
+  label       String  // Human-readable label
+  description String?
+  isSystem    Boolean @default(false) // Built-in templates cannot be deleted
+
+  // Multi-tenancy: null = built-in (available to all), set = tenant-specific
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Step definitions (JSONB array)
+  // Each step: { name: string, type: "notification"|"data_request"|"status_update"|"task_handoff", agentRole?: string, timeoutMs?: number, config?: Record<string, any> }
+  steps Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  instances WorkflowInstance[]
+
+  @@index([tenantId])
+  @@index([isSystem])
+  @@map("workflow_templates")
+}
+
+/// WorkflowInstance - Running or completed workflow execution
+model WorkflowInstance {
+  id         String @id @default(uuid())
+  templateId String
+  tenantId   String
+  template   WorkflowTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  tenant     Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  status      WorkflowStatus @default(pending)
+  currentStep Int            @default(0) // 0-based index into template.steps
+
+  triggeredBy String // userId who triggered the workflow
+
+  inputData     Json?    // Optional input data (e.g. { agentIds: [...] })
+  stepLogs      Json     @default("[]") // Array of { step, status, startedAt, completedAt?, error? }
+  completedAt   DateTime?
+  failedAt      DateTime?
+  failureReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([templateId])
+  @@index([status])
+  @@index([triggeredBy])
+  @@map("workflow_instances")
 }
 
 // ============================================================================

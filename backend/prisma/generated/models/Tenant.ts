@@ -392,6 +392,8 @@ export type TenantWhereInput = {
   channelConnections?: Prisma.ChannelConnectionListRelationFilter
   skills?: Prisma.SkillListRelationFilter
   usageRecords?: Prisma.UsageRecordListRelationFilter
+  workflowTemplates?: Prisma.WorkflowTemplateListRelationFilter
+  workflowInstances?: Prisma.WorkflowInstanceListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -432,6 +434,8 @@ export type TenantOrderByWithRelationInput = {
   channelConnections?: Prisma.ChannelConnectionOrderByRelationAggregateInput
   skills?: Prisma.SkillOrderByRelationAggregateInput
   usageRecords?: Prisma.UsageRecordOrderByRelationAggregateInput
+  workflowTemplates?: Prisma.WorkflowTemplateOrderByRelationAggregateInput
+  workflowInstances?: Prisma.WorkflowInstanceOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
@@ -475,6 +479,8 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   channelConnections?: Prisma.ChannelConnectionListRelationFilter
   skills?: Prisma.SkillListRelationFilter
   usageRecords?: Prisma.UsageRecordListRelationFilter
+  workflowTemplates?: Prisma.WorkflowTemplateListRelationFilter
+  workflowInstances?: Prisma.WorkflowInstanceListRelationFilter
 }, "id" | "companyName">
 
 export type TenantOrderByWithAggregationInput = {
@@ -579,6 +585,8 @@ export type TenantCreateInput = {
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -619,6 +627,8 @@ export type TenantUncheckedCreateInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -659,6 +669,8 @@ export type TenantUpdateInput = {
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -699,6 +711,8 @@ export type TenantUncheckedUpdateInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -1097,6 +1111,36 @@ export type TenantUpdateOneRequiredWithoutUsageRecordsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutUsageRecordsInput, Prisma.TenantUpdateWithoutUsageRecordsInput>, Prisma.TenantUncheckedUpdateWithoutUsageRecordsInput>
 }
 
+export type TenantCreateNestedOneWithoutWorkflowTemplatesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutWorkflowTemplatesInput, Prisma.TenantUncheckedCreateWithoutWorkflowTemplatesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutWorkflowTemplatesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneWithoutWorkflowTemplatesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutWorkflowTemplatesInput, Prisma.TenantUncheckedCreateWithoutWorkflowTemplatesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutWorkflowTemplatesInput
+  upsert?: Prisma.TenantUpsertWithoutWorkflowTemplatesInput
+  disconnect?: Prisma.TenantWhereInput | boolean
+  delete?: Prisma.TenantWhereInput | boolean
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutWorkflowTemplatesInput, Prisma.TenantUpdateWithoutWorkflowTemplatesInput>, Prisma.TenantUncheckedUpdateWithoutWorkflowTemplatesInput>
+}
+
+export type TenantCreateNestedOneWithoutWorkflowInstancesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutWorkflowInstancesInput, Prisma.TenantUncheckedCreateWithoutWorkflowInstancesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutWorkflowInstancesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutWorkflowInstancesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutWorkflowInstancesInput, Prisma.TenantUncheckedCreateWithoutWorkflowInstancesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutWorkflowInstancesInput
+  upsert?: Prisma.TenantUpsertWithoutWorkflowInstancesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutWorkflowInstancesInput, Prisma.TenantUpdateWithoutWorkflowInstancesInput>, Prisma.TenantUncheckedUpdateWithoutWorkflowInstancesInput>
+}
+
 export type TenantCreateWithoutUsersInput = {
   id?: string
   companyName: string
@@ -1134,6 +1178,8 @@ export type TenantCreateWithoutUsersInput = {
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutUsersInput = {
@@ -1173,6 +1219,8 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutUsersInput = {
@@ -1228,6 +1276,8 @@ export type TenantUpdateWithoutUsersInput = {
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutUsersInput = {
@@ -1267,6 +1317,8 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutConfigHistoryInput = {
@@ -1306,6 +1358,8 @@ export type TenantCreateWithoutConfigHistoryInput = {
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutConfigHistoryInput = {
@@ -1345,6 +1399,8 @@ export type TenantUncheckedCreateWithoutConfigHistoryInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutConfigHistoryInput = {
@@ -1400,6 +1456,8 @@ export type TenantUpdateWithoutConfigHistoryInput = {
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutConfigHistoryInput = {
@@ -1439,6 +1497,8 @@ export type TenantUncheckedUpdateWithoutConfigHistoryInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAgentsInput = {
@@ -1478,6 +1538,8 @@ export type TenantCreateWithoutAgentsInput = {
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAgentsInput = {
@@ -1517,6 +1579,8 @@ export type TenantUncheckedCreateWithoutAgentsInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAgentsInput = {
@@ -1572,6 +1636,8 @@ export type TenantUpdateWithoutAgentsInput = {
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAgentsInput = {
@@ -1611,6 +1677,8 @@ export type TenantUncheckedUpdateWithoutAgentsInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutSkillsInput = {
@@ -1650,6 +1718,8 @@ export type TenantCreateWithoutSkillsInput = {
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSkillsInput = {
@@ -1689,6 +1759,8 @@ export type TenantUncheckedCreateWithoutSkillsInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSkillsInput = {
@@ -1744,6 +1816,8 @@ export type TenantUpdateWithoutSkillsInput = {
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSkillsInput = {
@@ -1783,6 +1857,8 @@ export type TenantUncheckedUpdateWithoutSkillsInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutApiKeysInput = {
@@ -1822,6 +1898,8 @@ export type TenantCreateWithoutApiKeysInput = {
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutApiKeysInput = {
@@ -1861,6 +1939,8 @@ export type TenantUncheckedCreateWithoutApiKeysInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutApiKeysInput = {
@@ -1916,6 +1996,8 @@ export type TenantUpdateWithoutApiKeysInput = {
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutApiKeysInput = {
@@ -1955,6 +2037,8 @@ export type TenantUncheckedUpdateWithoutApiKeysInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutTeamMembersInput = {
@@ -1994,6 +2078,8 @@ export type TenantCreateWithoutTeamMembersInput = {
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutTeamMembersInput = {
@@ -2033,6 +2119,8 @@ export type TenantUncheckedCreateWithoutTeamMembersInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutTeamMembersInput = {
@@ -2088,6 +2176,8 @@ export type TenantUpdateWithoutTeamMembersInput = {
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutTeamMembersInput = {
@@ -2127,6 +2217,8 @@ export type TenantUncheckedUpdateWithoutTeamMembersInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutTeamInvitesInput = {
@@ -2166,6 +2258,8 @@ export type TenantCreateWithoutTeamInvitesInput = {
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutTeamInvitesInput = {
@@ -2205,6 +2299,8 @@ export type TenantUncheckedCreateWithoutTeamInvitesInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutTeamInvitesInput = {
@@ -2260,6 +2356,8 @@ export type TenantUpdateWithoutTeamInvitesInput = {
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutTeamInvitesInput = {
@@ -2299,6 +2397,8 @@ export type TenantUncheckedUpdateWithoutTeamInvitesInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutContainerHealthInput = {
@@ -2338,6 +2438,8 @@ export type TenantCreateWithoutContainerHealthInput = {
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutContainerHealthInput = {
@@ -2377,6 +2479,8 @@ export type TenantUncheckedCreateWithoutContainerHealthInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutContainerHealthInput = {
@@ -2432,6 +2536,8 @@ export type TenantUpdateWithoutContainerHealthInput = {
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutContainerHealthInput = {
@@ -2471,6 +2577,8 @@ export type TenantUncheckedUpdateWithoutContainerHealthInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAlertsInput = {
@@ -2510,6 +2618,8 @@ export type TenantCreateWithoutAlertsInput = {
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAlertsInput = {
@@ -2549,6 +2659,8 @@ export type TenantUncheckedCreateWithoutAlertsInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAlertsInput = {
@@ -2604,6 +2716,8 @@ export type TenantUpdateWithoutAlertsInput = {
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAlertsInput = {
@@ -2643,6 +2757,8 @@ export type TenantUncheckedUpdateWithoutAlertsInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAuditLogsInput = {
@@ -2682,6 +2798,8 @@ export type TenantCreateWithoutAuditLogsInput = {
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAuditLogsInput = {
@@ -2721,6 +2839,8 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAuditLogsInput = {
@@ -2776,6 +2896,8 @@ export type TenantUpdateWithoutAuditLogsInput = {
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAuditLogsInput = {
@@ -2815,6 +2937,8 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutChannelConnectionsInput = {
@@ -2854,6 +2978,8 @@ export type TenantCreateWithoutChannelConnectionsInput = {
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutChannelConnectionsInput = {
@@ -2893,6 +3019,8 @@ export type TenantUncheckedCreateWithoutChannelConnectionsInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutChannelConnectionsInput = {
@@ -2948,6 +3076,8 @@ export type TenantUpdateWithoutChannelConnectionsInput = {
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutChannelConnectionsInput = {
@@ -2987,6 +3117,8 @@ export type TenantUncheckedUpdateWithoutChannelConnectionsInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutUsageRecordsInput = {
@@ -3026,6 +3158,8 @@ export type TenantCreateWithoutUsageRecordsInput = {
   configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutUsageRecordsInput = {
@@ -3065,6 +3199,8 @@ export type TenantUncheckedCreateWithoutUsageRecordsInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
   channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
   skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutUsageRecordsInput = {
@@ -3120,6 +3256,8 @@ export type TenantUpdateWithoutUsageRecordsInput = {
   configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutUsageRecordsInput = {
@@ -3159,6 +3297,368 @@ export type TenantUncheckedUpdateWithoutUsageRecordsInput = {
   configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
   channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
   skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutWorkflowTemplatesInput = {
+  id?: string
+  companyName: string
+  adminEmail: string
+  status?: $Enums.TenantStatus
+  plan?: $Enums.TenantPlan
+  industry?: string | null
+  expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: string | null
+  containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  agents?: Prisma.AgentCreateNestedManyWithoutTenantInput
+  teamMembers?: Prisma.TeamMemberCreateNestedManyWithoutTenantInput
+  teamInvites?: Prisma.TeamInviteCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
+  containerHealth?: Prisma.ContainerHealthCreateNestedManyWithoutTenantInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
+  channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
+  skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutWorkflowTemplatesInput = {
+  id?: string
+  companyName: string
+  adminEmail: string
+  status?: $Enums.TenantStatus
+  plan?: $Enums.TenantPlan
+  industry?: string | null
+  expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: string | null
+  containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutTenantInput
+  teamMembers?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutTenantInput
+  teamInvites?: Prisma.TeamInviteUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
+  containerHealth?: Prisma.ContainerHealthUncheckedCreateNestedManyWithoutTenantInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
+  channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
+  skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutWorkflowTemplatesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutWorkflowTemplatesInput, Prisma.TenantUncheckedCreateWithoutWorkflowTemplatesInput>
+}
+
+export type TenantUpsertWithoutWorkflowTemplatesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutWorkflowTemplatesInput, Prisma.TenantUncheckedUpdateWithoutWorkflowTemplatesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutWorkflowTemplatesInput, Prisma.TenantUncheckedCreateWithoutWorkflowTemplatesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutWorkflowTemplatesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutWorkflowTemplatesInput, Prisma.TenantUncheckedUpdateWithoutWorkflowTemplatesInput>
+}
+
+export type TenantUpdateWithoutWorkflowTemplatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  adminEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutTenantNestedInput
+  teamMembers?: Prisma.TeamMemberUpdateManyWithoutTenantNestedInput
+  teamInvites?: Prisma.TeamInviteUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
+  containerHealth?: Prisma.ContainerHealthUpdateManyWithoutTenantNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
+  channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
+  skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutWorkflowTemplatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  adminEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutTenantNestedInput
+  teamMembers?: Prisma.TeamMemberUncheckedUpdateManyWithoutTenantNestedInput
+  teamInvites?: Prisma.TeamInviteUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
+  containerHealth?: Prisma.ContainerHealthUncheckedUpdateManyWithoutTenantNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
+  channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
+  skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowInstances?: Prisma.WorkflowInstanceUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutWorkflowInstancesInput = {
+  id?: string
+  companyName: string
+  adminEmail: string
+  status?: $Enums.TenantStatus
+  plan?: $Enums.TenantPlan
+  industry?: string | null
+  expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: string | null
+  containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  agents?: Prisma.AgentCreateNestedManyWithoutTenantInput
+  teamMembers?: Prisma.TeamMemberCreateNestedManyWithoutTenantInput
+  teamInvites?: Prisma.TeamInviteCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
+  containerHealth?: Prisma.ContainerHealthCreateNestedManyWithoutTenantInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryCreateNestedManyWithoutTenantInput
+  channelConnections?: Prisma.ChannelConnectionCreateNestedManyWithoutTenantInput
+  skills?: Prisma.SkillCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutWorkflowInstancesInput = {
+  id?: string
+  companyName: string
+  adminEmail: string
+  status?: $Enums.TenantStatus
+  plan?: $Enums.TenantPlan
+  industry?: string | null
+  expectedAgentCount?: number | null
+  companySize?: string | null
+  deploymentRegion?: string | null
+  notes?: string | null
+  billingCycle?: string
+  provisioningStep?: string | null
+  provisioningProgress?: number
+  provisioningAttempt?: number
+  provisioningMessage?: string | null
+  provisioningStartedAt?: Date | string | null
+  provisioningFailedReason?: string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: string | null
+  containerUrl?: string | null
+  overageBillingEnabled?: boolean
+  monthlyTokenQuota?: bigint | number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutTenantInput
+  teamMembers?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutTenantInput
+  teamInvites?: Prisma.TeamInviteUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
+  containerHealth?: Prisma.ContainerHealthUncheckedCreateNestedManyWithoutTenantInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutTenantInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedCreateNestedManyWithoutTenantInput
+  channelConnections?: Prisma.ChannelConnectionUncheckedCreateNestedManyWithoutTenantInput
+  skills?: Prisma.SkillUncheckedCreateNestedManyWithoutTenantInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutWorkflowInstancesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutWorkflowInstancesInput, Prisma.TenantUncheckedCreateWithoutWorkflowInstancesInput>
+}
+
+export type TenantUpsertWithoutWorkflowInstancesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutWorkflowInstancesInput, Prisma.TenantUncheckedUpdateWithoutWorkflowInstancesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutWorkflowInstancesInput, Prisma.TenantUncheckedCreateWithoutWorkflowInstancesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutWorkflowInstancesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutWorkflowInstancesInput, Prisma.TenantUncheckedUpdateWithoutWorkflowInstancesInput>
+}
+
+export type TenantUpdateWithoutWorkflowInstancesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  adminEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutTenantNestedInput
+  teamMembers?: Prisma.TeamMemberUpdateManyWithoutTenantNestedInput
+  teamInvites?: Prisma.TeamInviteUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
+  containerHealth?: Prisma.ContainerHealthUpdateManyWithoutTenantNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUpdateManyWithoutTenantNestedInput
+  channelConnections?: Prisma.ChannelConnectionUpdateManyWithoutTenantNestedInput
+  skills?: Prisma.SkillUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutWorkflowInstancesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  adminEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  plan?: Prisma.EnumTenantPlanFieldUpdateOperationsInput | $Enums.TenantPlan
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expectedAgentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  companySize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deploymentRegion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingCycle?: Prisma.StringFieldUpdateOperationsInput | string
+  provisioningStep?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  provisioningMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  provisioningStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provisioningFailedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modelDefaults?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  resourceLimits?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  containerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  containerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overageBillingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  monthlyTokenQuota?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutTenantNestedInput
+  teamMembers?: Prisma.TeamMemberUncheckedUpdateManyWithoutTenantNestedInput
+  teamInvites?: Prisma.TeamInviteUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
+  containerHealth?: Prisma.ContainerHealthUncheckedUpdateManyWithoutTenantNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutTenantNestedInput
+  configHistory?: Prisma.TenantConfigHistoryUncheckedUpdateManyWithoutTenantNestedInput
+  channelConnections?: Prisma.ChannelConnectionUncheckedUpdateManyWithoutTenantNestedInput
+  skills?: Prisma.SkillUncheckedUpdateManyWithoutTenantNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  workflowTemplates?: Prisma.WorkflowTemplateUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 
@@ -3179,6 +3679,8 @@ export type TenantCountOutputType = {
   channelConnections: number
   skills: number
   usageRecords: number
+  workflowTemplates: number
+  workflowInstances: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3194,6 +3696,8 @@ export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   channelConnections?: boolean | TenantCountOutputTypeCountChannelConnectionsArgs
   skills?: boolean | TenantCountOutputTypeCountSkillsArgs
   usageRecords?: boolean | TenantCountOutputTypeCountUsageRecordsArgs
+  workflowTemplates?: boolean | TenantCountOutputTypeCountWorkflowTemplatesArgs
+  workflowInstances?: boolean | TenantCountOutputTypeCountWorkflowInstancesArgs
 }
 
 /**
@@ -3290,6 +3794,20 @@ export type TenantCountOutputTypeCountUsageRecordsArgs<ExtArgs extends runtime.T
   where?: Prisma.UsageRecordWhereInput
 }
 
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountWorkflowTemplatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkflowTemplateWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountWorkflowInstancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkflowInstanceWhereInput
+}
+
 
 export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3329,6 +3847,8 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   channelConnections?: boolean | Prisma.Tenant$channelConnectionsArgs<ExtArgs>
   skills?: boolean | Prisma.Tenant$skillsArgs<ExtArgs>
   usageRecords?: boolean | Prisma.Tenant$usageRecordsArgs<ExtArgs>
+  workflowTemplates?: boolean | Prisma.Tenant$workflowTemplatesArgs<ExtArgs>
+  workflowInstances?: boolean | Prisma.Tenant$workflowInstancesArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -3430,6 +3950,8 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   channelConnections?: boolean | Prisma.Tenant$channelConnectionsArgs<ExtArgs>
   skills?: boolean | Prisma.Tenant$skillsArgs<ExtArgs>
   usageRecords?: boolean | Prisma.Tenant$usageRecordsArgs<ExtArgs>
+  workflowTemplates?: boolean | Prisma.Tenant$workflowTemplatesArgs<ExtArgs>
+  workflowInstances?: boolean | Prisma.Tenant$workflowInstancesArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3450,6 +3972,8 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     channelConnections: Prisma.$ChannelConnectionPayload<ExtArgs>[]
     skills: Prisma.$SkillPayload<ExtArgs>[]
     usageRecords: Prisma.$UsageRecordPayload<ExtArgs>[]
+    workflowTemplates: Prisma.$WorkflowTemplatePayload<ExtArgs>[]
+    workflowInstances: Prisma.$WorkflowInstancePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3883,6 +4407,8 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   channelConnections<T extends Prisma.Tenant$channelConnectionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$channelConnectionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChannelConnectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   skills<T extends Prisma.Tenant$skillsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$skillsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SkillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   usageRecords<T extends Prisma.Tenant$usageRecordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$usageRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  workflowTemplates<T extends Prisma.Tenant$workflowTemplatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$workflowTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkflowTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  workflowInstances<T extends Prisma.Tenant$workflowInstancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$workflowInstancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkflowInstancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4610,6 +5136,54 @@ export type Tenant$usageRecordsArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.UsageRecordScalarFieldEnum | Prisma.UsageRecordScalarFieldEnum[]
+}
+
+/**
+ * Tenant.workflowTemplates
+ */
+export type Tenant$workflowTemplatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkflowTemplate
+   */
+  select?: Prisma.WorkflowTemplateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkflowTemplate
+   */
+  omit?: Prisma.WorkflowTemplateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkflowTemplateInclude<ExtArgs> | null
+  where?: Prisma.WorkflowTemplateWhereInput
+  orderBy?: Prisma.WorkflowTemplateOrderByWithRelationInput | Prisma.WorkflowTemplateOrderByWithRelationInput[]
+  cursor?: Prisma.WorkflowTemplateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WorkflowTemplateScalarFieldEnum | Prisma.WorkflowTemplateScalarFieldEnum[]
+}
+
+/**
+ * Tenant.workflowInstances
+ */
+export type Tenant$workflowInstancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkflowInstance
+   */
+  select?: Prisma.WorkflowInstanceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkflowInstance
+   */
+  omit?: Prisma.WorkflowInstanceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkflowInstanceInclude<ExtArgs> | null
+  where?: Prisma.WorkflowInstanceWhereInput
+  orderBy?: Prisma.WorkflowInstanceOrderByWithRelationInput | Prisma.WorkflowInstanceOrderByWithRelationInput[]
+  cursor?: Prisma.WorkflowInstanceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WorkflowInstanceScalarFieldEnum | Prisma.WorkflowInstanceScalarFieldEnum[]
 }
 
 /**

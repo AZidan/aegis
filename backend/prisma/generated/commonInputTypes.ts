@@ -786,6 +786,23 @@ export type EnumRouteTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumRouteTypeFilter<$PrismaModel>
 }
 
+export type EnumWorkflowStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.WorkflowStatus | Prisma.EnumWorkflowStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.WorkflowStatus[] | Prisma.ListEnumWorkflowStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WorkflowStatus[] | Prisma.ListEnumWorkflowStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWorkflowStatusFilter<$PrismaModel> | $Enums.WorkflowStatus
+}
+
+export type EnumWorkflowStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.WorkflowStatus | Prisma.EnumWorkflowStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.WorkflowStatus[] | Prisma.ListEnumWorkflowStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WorkflowStatus[] | Prisma.ListEnumWorkflowStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWorkflowStatusWithAggregatesFilter<$PrismaModel> | $Enums.WorkflowStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumWorkflowStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumWorkflowStatusFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -1493,6 +1510,23 @@ export type NestedEnumRouteTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumRouteTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumRouteTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumWorkflowStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.WorkflowStatus | Prisma.EnumWorkflowStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.WorkflowStatus[] | Prisma.ListEnumWorkflowStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WorkflowStatus[] | Prisma.ListEnumWorkflowStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWorkflowStatusFilter<$PrismaModel> | $Enums.WorkflowStatus
+}
+
+export type NestedEnumWorkflowStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.WorkflowStatus | Prisma.EnumWorkflowStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.WorkflowStatus[] | Prisma.ListEnumWorkflowStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WorkflowStatus[] | Prisma.ListEnumWorkflowStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWorkflowStatusWithAggregatesFilter<$PrismaModel> | $Enums.WorkflowStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumWorkflowStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumWorkflowStatusFilter<$PrismaModel>
 }
 
 

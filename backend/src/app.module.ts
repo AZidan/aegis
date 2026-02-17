@@ -18,6 +18,7 @@ import { AlertModule } from './alert/alert.module';
 import { ChannelProxyModule } from './channel-proxy/channel-proxy.module';
 import { BillingModule } from './billing/billing.module';
 import { SlackModule } from './slack/slack.module';
+import { WorkflowModule } from './workflow/workflow.module';
 import configuration from './config/configuration';
 import { validateEnv } from './config/validation';
 
@@ -76,6 +77,7 @@ import { validateEnv } from './config/validation';
     ChannelProxyModule,
     BillingModule,
     SlackModule,
+    WorkflowModule,
   ],
   controllers: [AppController],
   providers: [AppService],

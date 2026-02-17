@@ -73,7 +73,9 @@ export const ModelName = {
   ChannelConnection: 'ChannelConnection',
   ChannelRouting: 'ChannelRouting',
   UsageRecord: 'UsageRecord',
-  ProviderPricing: 'ProviderPricing'
+  ProviderPricing: 'ProviderPricing',
+  WorkflowTemplate: 'WorkflowTemplate',
+  WorkflowInstance: 'WorkflowInstance'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -486,6 +488,40 @@ export const ProviderPricingScalarFieldEnum = {
 } as const
 
 export type ProviderPricingScalarFieldEnum = (typeof ProviderPricingScalarFieldEnum)[keyof typeof ProviderPricingScalarFieldEnum]
+
+
+export const WorkflowTemplateScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  label: 'label',
+  description: 'description',
+  isSystem: 'isSystem',
+  tenantId: 'tenantId',
+  steps: 'steps',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkflowTemplateScalarFieldEnum = (typeof WorkflowTemplateScalarFieldEnum)[keyof typeof WorkflowTemplateScalarFieldEnum]
+
+
+export const WorkflowInstanceScalarFieldEnum = {
+  id: 'id',
+  templateId: 'templateId',
+  tenantId: 'tenantId',
+  status: 'status',
+  currentStep: 'currentStep',
+  triggeredBy: 'triggeredBy',
+  inputData: 'inputData',
+  stepLogs: 'stepLogs',
+  completedAt: 'completedAt',
+  failedAt: 'failedAt',
+  failureReason: 'failureReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkflowInstanceScalarFieldEnum = (typeof WorkflowInstanceScalarFieldEnum)[keyof typeof WorkflowInstanceScalarFieldEnum]
 
 
 export const SortOrder = {

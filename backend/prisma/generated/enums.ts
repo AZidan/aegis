@@ -225,3 +225,14 @@ export const AllowlistDirection = {
 } as const
 
 export type AllowlistDirection = (typeof AllowlistDirection)[keyof typeof AllowlistDirection]
+
+
+export const WorkflowStatus = {
+  pending: 'pending',
+  running: 'running',
+  completed: 'completed',
+  failed: 'failed',
+  timed_out: 'timed_out'
+} as const
+
+export type WorkflowStatus = (typeof WorkflowStatus)[keyof typeof WorkflowStatus]

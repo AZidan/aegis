@@ -152,3 +152,13 @@ export type UsageRecord = Prisma.UsageRecordModel
  * ProviderPricing - LLM provider pricing rates with date-range validity
  */
 export type ProviderPricing = Prisma.ProviderPricingModel
+/**
+ * Model WorkflowTemplate
+ * WorkflowTemplate - Reusable coordination workflow definitions
+ */
+export type WorkflowTemplate = Prisma.WorkflowTemplateModel
+/**
+ * Model WorkflowInstance
+ * WorkflowInstance - Running or completed workflow execution
+ */
+export type WorkflowInstance = Prisma.WorkflowInstanceModel
