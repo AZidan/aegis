@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Shield,
+  FileText,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils/cn';
@@ -74,6 +75,11 @@ const NAV_SECTIONS: NavSection[] = [
         label: 'System Health',
         href: '/admin/health',
         icon: Activity,
+      },
+      {
+        label: 'Audit Logs',
+        href: ROUTES.ADMIN_AUDIT,
+        icon: FileText,
       },
     ],
   },

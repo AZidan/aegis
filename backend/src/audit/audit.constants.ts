@@ -31,6 +31,13 @@ export const AUDIT_PAGE_SIZE_MAX = 100;
 export const AUDIT_EXPORT_MAX_ROWS = 10_000;
 
 /**
+ * Retention job constants.
+ */
+export const AUDIT_RETENTION_QUEUE_NAME = 'audit-retention';
+export const AUDIT_RETENTION_DAYS = 90;
+export const AUDIT_RETENTION_BATCH_SIZE = 1000;
+
+/**
  * CSV column headers for audit log exports.
  */
 export const AUDIT_CSV_HEADERS = [

@@ -16,6 +16,7 @@ import {
   ChevronDown,
   LogOut,
   Layers,
+  CreditCard,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils/cn';
@@ -82,6 +83,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { label: 'Team Members', href: ROUTES.TEAM, icon: Users },
       { label: 'Audit Log', href: ROUTES.AUDIT, icon: FileText },
+      { label: 'Billing', href: ROUTES.BILLING, icon: CreditCard },
       { label: 'Settings', href: ROUTES.SETTINGS, icon: Settings },
     ],
   },

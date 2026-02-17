@@ -176,6 +176,7 @@ export const ROUTES = {
   ADMIN_TENANT_DETAIL: (id: string) => `/admin/tenants/${id}`,
   ADMIN_SKILLS_REVIEW: '/admin/skills',
   ADMIN_SKILL_REVIEW_DETAIL: (id: string) => `/admin/skills/${id}`,
+  ADMIN_AUDIT: '/admin/audit',
 
   // Tenant routes
   DASHBOARD: '/dashboard',
@@ -187,6 +188,7 @@ export const ROUTES = {
   SKILL_DETAIL: (id: string) => `/dashboard/skills/${id}`,
   TEAM: '/dashboard/team',
   AUDIT: '/dashboard/audit',
+  BILLING: '/dashboard/billing',
   SETTINGS: '/dashboard/settings',
 } as const;
 
