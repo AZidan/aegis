@@ -187,6 +187,7 @@ export const ROUTES = {
   SKILLS: '/dashboard/skills',
   SKILL_DETAIL: (id: string) => `/dashboard/skills/${id}`,
   TEAM: '/dashboard/team',
+  MESSAGES: '/dashboard/messages',
   AUDIT: '/dashboard/audit',
   BILLING: '/dashboard/billing',
   SETTINGS: '/dashboard/settings',

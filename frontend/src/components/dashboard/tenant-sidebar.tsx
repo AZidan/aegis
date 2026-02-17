@@ -17,6 +17,7 @@ import {
   LogOut,
   Layers,
   CreditCard,
+  MessageSquare,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils/cn';
@@ -76,6 +77,7 @@ const NAV_SECTIONS: NavSection[] = [
         ],
       },
       { label: 'Skill Marketplace', href: ROUTES.SKILLS, icon: Puzzle },
+      { label: 'Messages', href: ROUTES.MESSAGES, icon: MessageSquare },
     ],
   },
   {
