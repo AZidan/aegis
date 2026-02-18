@@ -44,7 +44,8 @@ export function useMessagesSocket(enabled: boolean) {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) return;
 
-    const socket = io(`${WS_URL}/messaging`, {
+    const socket = io(WS_URL, {
+      path: '/ws/messages',
       auth: { token },
       transports: ['websocket'],
     });
@@ -59,9 +60,14 @@ export function useMessagesSocket(enabled: boolean) {
       setIsConnected(false);
     });
 
-    socket.on('message_event', (event: LiveMessageEvent) => {
-      setLiveMessages((prev) => [event, ...prev]);
-    });
+    // Backend emits each event type directly (not wrapped in a single event)
+    const handleEvent = (type: LiveMessageEvent['type']) => (data: LiveMessageEvent['data']) => {
+      setLiveMessages((prev) => [{ type, data }, ...prev]);
+    };
+
+    socket.on('message_sent', handleEvent('message_sent'));
+    socket.on('message_delivered', handleEvent('message_delivered'));
+    socket.on('message_failed', handleEvent('message_failed'));
 
     return () => {
       socket.disconnect();

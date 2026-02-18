@@ -39,7 +39,7 @@ export class AuditProcessor extends WorkerHost {
           targetType: event.targetType as any,
           targetId: event.targetId,
           details: (event.details as any) ?? undefined,
-          severity: event.severity,
+          severity: event.severity as any,
           ipAddress: event.ipAddress ?? undefined,
           userAgent: event.userAgent ?? undefined,
           tenantId: event.tenantId ?? undefined,
