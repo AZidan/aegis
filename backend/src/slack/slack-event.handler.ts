@@ -102,6 +102,9 @@ export class SlackEventHandler implements OnModuleInit {
       rawEvent: message as unknown as Record<string, unknown>,
     };
 
+    // Add eyes reaction to acknowledge receipt
+    this.addReaction(workspaceId, message.channel, message.ts, 'eyes');
+
     try {
       await this.channelProxyService.processInbound('SLACK', event);
     } catch (error) {
@@ -146,6 +149,9 @@ export class SlackEventHandler implements OnModuleInit {
       rawEvent: event as unknown as Record<string, unknown>,
     };
 
+    // Add eyes reaction to acknowledge receipt
+    this.addReaction(workspaceId, event.channel, event.ts, 'eyes');
+
     try {
       await this.channelProxyService.processInbound('SLACK', inboundEvent);
     } catch (error) {
@@ -153,5 +159,24 @@ export class SlackEventHandler implements OnModuleInit {
         `Failed to process Slack app_mention: ${(error as Error).message}`,
       );
     }
+  }
+
+  /**
+   * Add an emoji reaction to a message (fire-and-forget).
+   */
+  private addReaction(
+    workspaceId: string,
+    channel?: string,
+    timestamp?: string,
+    emoji = 'eyes',
+  ): void {
+    if (!channel || !timestamp) return;
+    const client = this.slackService.getWorkspaceClient(workspaceId);
+    if (!client) return;
+    client.reactions.add({ channel, timestamp, name: emoji }).catch((err) => {
+      this.logger.debug(
+        `Failed to add :${emoji}: reaction: ${err?.data?.error || err?.message}`,
+      );
+    });
   }
 }

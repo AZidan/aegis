@@ -88,6 +88,7 @@ export class ContainerConfigGeneratorService {
 
       agentList.push({
         id: agent.id,
+        workspace: `/home/node/.openclaw/workspace-${agent.id}`,
         identity: {
           name: agent.name,
         },
@@ -106,20 +107,16 @@ export class ContainerConfigGeneratorService {
     const channels: OpenClawConfig['channels'] = {};
     for (const connection of connections) {
       const key = connection.platform.toLowerCase();
-      channels[key] = {
-        connectionId: connection.id,
-        workspaceId: connection.workspaceId,
-        workspaceName: connection.workspaceName,
-        dmPolicy: 'allowlist',
-      };
+      // Only include OpenClaw-recognized fields in channels config.
+      // Aegis-specific metadata (connectionId, workspaceName, dmPolicy) is
+      // managed by Aegis's own routing service, not OpenClaw.
+      channels[key] = {};
       for (const rule of connection.routingRules) {
         bindings.push({
           agentId: rule.agentId,
           match: {
             channel: key,
             accountId: connection.workspaceId,
-            routeType: rule.routeType,
-            sourceIdentifier: rule.sourceIdentifier,
           },
         });
       }

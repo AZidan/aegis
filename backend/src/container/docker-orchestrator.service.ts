@@ -284,6 +284,61 @@ export class DockerOrchestratorService implements ContainerOrchestrator {
   }
 
   /**
+   * Read auth-profiles.json from an existing agent inside the container.
+   * Returns the JSON string or null if the file doesn't exist.
+   */
+  async readAgentAuthProfiles(
+    containerId: string,
+    agentId: string,
+  ): Promise<string | null> {
+    const agentDir = `/home/node/.openclaw/agents/${agentId}/agent`;
+    const filePath = `${agentDir}/auth-profiles.json`;
+    try {
+      const container = this.docker.getContainer(containerId);
+      const exec = await container.exec({
+        Cmd: ['sh', '-c', `cat ${filePath} 2>/dev/null || echo '__NOT_FOUND__'`],
+        AttachStdout: true,
+        AttachStderr: true,
+      });
+      const stream = await exec.start({ Tty: false });
+      const chunks: Buffer[] = [];
+      stream.on('data', (chunk: Buffer) => chunks.push(chunk));
+
+      let timeoutHandle: NodeJS.Timeout | undefined;
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutHandle = setTimeout(
+          () => reject(new Error('readAgentAuthProfiles timed out')),
+          10_000,
+        );
+        timeoutHandle.unref();
+      });
+      try {
+        await Promise.race([
+          once(stream, 'end'),
+          once(stream, 'close'),
+          once(stream, 'finish'),
+          once(stream, 'error').then(([error]) => { throw error; }),
+          timeoutPromise,
+        ]);
+      } finally {
+        if (timeoutHandle) clearTimeout(timeoutHandle);
+      }
+
+      const output = Buffer.concat(chunks).toString('utf8').trim();
+      // Docker multiplexed stream: strip 8-byte header frames if present
+      const cleaned = output.replace(/[\x00-\x08]/g, '').trim();
+      if (cleaned === '__NOT_FOUND__' || cleaned.includes('__NOT_FOUND__')) {
+        return null;
+      }
+      // Validate it's valid JSON before returning
+      JSON.parse(cleaned);
+      return cleaned;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Remove per-agent workspace and agent directories from a running container.
    */
   async removeAgentWorkspace(

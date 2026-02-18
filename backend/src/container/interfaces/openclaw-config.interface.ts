@@ -18,6 +18,7 @@ export interface OpenClawGatewayConfig {
 
 export interface OpenClawAgentConfig {
   id: string;
+  workspace?: string;
   identity?: {
     name: string;
     emoji?: string;
@@ -56,19 +57,9 @@ export interface OpenClawConfig {
     match: {
       channel: string;
       accountId: string;
-      routeType: string;
-      sourceIdentifier: string;
     };
   }>;
-  channels: Record<
-    string,
-    {
-      connectionId: string;
-      workspaceId: string;
-      workspaceName: string;
-      dmPolicy: 'allowlist';
-    }
-  >;
+  channels: Record<string, Record<string, unknown>>;
   skills: Record<
     string,
     Array<{

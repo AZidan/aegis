@@ -142,9 +142,11 @@ export class ContainerConfigProcessor extends WorkerHost {
           identityMd: workspace.identityMd,
         });
 
-        // NOTE: auth-profiles.json is NOT overwritten during config sync.
-        // It contains provider API keys set during provisioning or credential management.
-        // Pushing an empty profiles array here would wipe the Anthropic key.
+        // Ensure new agents get auth-profiles.json copied from a sibling agent.
+        // We never overwrite an existing auth-profiles.json (it may have been
+        // customised), but if none exists yet we clone from another agent in
+        // the same tenant so the new agent can call the AI provider immediately.
+        await this.ensureAuthProfiles(containerId, agentId, agent.tenantId);
 
         this.logger.log(
           `Pushed workspace files to container ${containerId} for agent ${agentId}`,
@@ -162,5 +164,47 @@ export class ContainerConfigProcessor extends WorkerHost {
     }
 
     return { success: true, agentId, files: fileKeys };
+  }
+
+  /**
+   * Ensure the given agent has auth-profiles.json inside its container directory.
+   * If it doesn't exist yet, copy from any sibling agent in the same tenant.
+   */
+  private async ensureAuthProfiles(
+    containerId: string,
+    agentId: string,
+    tenantId: string,
+  ): Promise<void> {
+    if (!this.dockerOrchestrator) return;
+
+    // Check if this agent already has auth-profiles.json
+    const existing = await this.dockerOrchestrator.readAgentAuthProfiles(containerId, agentId);
+    if (existing) {
+      this.logger.debug(`Agent ${agentId} already has auth-profiles.json — skipping copy`);
+      return;
+    }
+
+    // Find sibling agents in the same tenant that might have auth credentials
+    const siblings = await this.prisma.agent.findMany({
+      where: { tenantId, id: { not: agentId } },
+      select: { id: true },
+      take: 10,
+    });
+
+    for (const sibling of siblings) {
+      const siblingAuth = await this.dockerOrchestrator.readAgentAuthProfiles(containerId, sibling.id);
+      if (siblingAuth) {
+        await this.dockerOrchestrator.pushAuthProfiles(containerId, agentId, siblingAuth);
+        this.logger.log(
+          `Copied auth-profiles.json from sibling agent ${sibling.id} to new agent ${agentId}`,
+        );
+        return;
+      }
+    }
+
+    this.logger.warn(
+      `No sibling agents with auth-profiles.json found for agent ${agentId} in tenant ${tenantId}. ` +
+      `The agent will not be able to call AI providers until credentials are configured.`,
+    );
   }
 }

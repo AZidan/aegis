@@ -129,21 +129,28 @@ export class ChannelProxyProcessor extends WorkerHost {
       return;
     }
 
-    // Find active channel connection to enqueue outbound reply
-    const connection = await this.prisma.channelConnection.findFirst({
-      where: {
-        tenantId: sessionContext.tenantId,
-        platform: sessionContext.platform as ChannelPlatform,
-        status: 'active',
-      },
-      select: { id: true, credentials: true },
-    });
+    // Find active channel connection and agent name to enqueue outbound reply
+    const [connection, agent] = await Promise.all([
+      this.prisma.channelConnection.findFirst({
+        where: {
+          tenantId: sessionContext.tenantId,
+          platform: sessionContext.platform as ChannelPlatform,
+          status: 'active',
+        },
+        select: { id: true, credentials: true },
+      }),
+      this.prisma.agent.findUnique({
+        where: { id: sessionContext.agentId },
+        select: { name: true },
+      }),
+    ]);
 
     if (connection) {
       await this.proxyQueue.add('dispatch-to-platform', {
         message: {
           tenantId: sessionContext.tenantId,
           agentId: sessionContext.agentId,
+          agentName: agent?.name,
           platform: sessionContext.platform,
           workspaceId: sessionContext.workspaceId,
           channelId: sessionContext.channelId ?? event.channelId ?? '',

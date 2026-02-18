@@ -31,6 +31,7 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(SlackService.name);
   private boltApp: App | null = null;
   private readonly workspaceClients = new Map<string, WebClient>();
+  private readonly workspaceBotUserIds = new Map<string, string>();
   private isStarted = false;
 
   constructor(
@@ -103,6 +104,7 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
         }
         return {
           botToken: client.token,
+          botUserId: this.workspaceBotUserIds.get(teamId!) ?? '',
           teamId: teamId!,
         };
       },
@@ -181,6 +183,16 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
     const client = new WebClient(botToken);
     this.workspaceClients.set(workspaceId, client);
     this.logger.log(`Registered WebClient for workspace ${workspaceId}`);
+
+    // Resolve botUserId in the background for dedup in event handler
+    client.auth.test().then((res) => {
+      if (res.user_id) {
+        this.workspaceBotUserIds.set(workspaceId, res.user_id);
+        this.logger.debug(`Resolved botUserId=${res.user_id} for workspace ${workspaceId}`);
+      }
+    }).catch((err) => {
+      this.logger.warn(`Failed to resolve botUserId for workspace ${workspaceId}: ${err?.message}`);
+    });
   }
 
   /**
@@ -204,6 +216,7 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
     channelId: string,
     text: string,
     threadId?: string,
+    username?: string,
   ): Promise<{ success: boolean; messageId?: string }> {
     const client = this.workspaceClients.get(workspaceId);
     if (!client) {
@@ -214,11 +227,21 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
     }
 
     try {
-      const result: ChatPostMessageResponse = await client.chat.postMessage({
+      const slackText = SlackService.markdownToMrkdwn(text);
+      const payload: Record<string, unknown> = {
         channel: channelId,
-        text,
+        text: slackText,
         thread_ts: threadId,
-      });
+      };
+      if (username) {
+        payload.username = username;
+      }
+      this.logger.debug(
+        `sendMessage payload: channel=${channelId}, username=${username ?? '(none)'}, textLen=${slackText.length}`,
+      );
+      const result: ChatPostMessageResponse = await client.chat.postMessage(
+        payload as any,
+      );
 
       return { success: true, messageId: result.ts };
     } catch (error: any) {
@@ -353,6 +376,41 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  /**
+   * Convert standard Markdown to Slack mrkdwn format.
+   *
+   * Conversions:
+   *  - **bold** / __bold__ → *bold*
+   *  - *italic* / _italic_ → _italic_  (already compatible)
+   *  - ~~strike~~ → ~strike~
+   *  - [text](url) → <url|text>
+   *  - `code` → `code`  (already compatible)
+   *  - ### headings → *headings* (bold)
+   *  - > blockquote → > blockquote (already compatible)
+   */
+  static markdownToMrkdwn(text: string): string {
+    let result = text;
+
+    // Links: [text](url) → <url|text>
+    result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<$2|$1>');
+
+    // Bold: **text** or __text__ → *text*
+    // Must run before italic to avoid conflicts
+    result = result.replace(/\*\*(.+?)\*\*/g, '*$1*');
+    result = result.replace(/__(.+?)__/g, '*$1*');
+
+    // Strikethrough: ~~text~~ → ~text~
+    result = result.replace(/~~(.+?)~~/g, '~$1~');
+
+    // Headings: # Heading → *Heading*
+    result = result.replace(/^#{1,6}\s+(.+)$/gm, '*$1*');
+
+    // Images: ![alt](url) → <url|alt> (Slack can't embed images inline, just show link)
+    result = result.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<$2|$1>');
+
+    return result;
+  }
+
   async shutdown(): Promise<void> {
     if (this.boltApp && this.isStarted) {
       try {
@@ -366,6 +424,7 @@ export class SlackService implements OnModuleInit, OnModuleDestroy {
       }
     }
     this.workspaceClients.clear();
+    this.workspaceBotUserIds.clear();
   }
 
   /**

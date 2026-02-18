@@ -75,6 +75,7 @@ export class PlatformDispatcherService {
       message.channelId,
       message.text,
       message.threadId,
+      message.agentName,
     );
 
     if (!result.success) {

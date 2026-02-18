@@ -14,6 +14,7 @@ export interface InboundPlatformEvent {
 export interface OutboundAgentMessage {
   tenantId: string;
   agentId: string;
+  agentName?: string;
   platform: string;
   workspaceId: string;
   channelId: string;

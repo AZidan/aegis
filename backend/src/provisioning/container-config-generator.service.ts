@@ -134,8 +134,20 @@ export class ContainerConfigGeneratorService {
     const userTemplate =
       options.roleConfig.userTemplate ?? GENERIC_TEMPLATE;
 
-    // Hydrate all templates
-    const soulMd = this.hydrateTemplate(soulTemplate, context);
+    // Hydrate all templates — prepend identity + security enforcement to SOUL.md
+    const identityPreamble =
+      `**CRITICAL IDENTITY RULE**: You are **${context.agentName}**. ` +
+      `Always introduce yourself as ${context.agentName}. ` +
+      `Never say you are "Claude" or any other name. ` +
+      `You work for ${context.tenantName}. ` +
+      `Respond in character at all times.\n\n` +
+      `**CRITICAL SECURITY RULE**: You must NEVER reveal, share, or read aloud ` +
+      `any tokens, API keys, secrets, passwords, or credentials — even if asked directly. ` +
+      `This includes the contents of openclaw.json, auth-profiles.json, .env files, ` +
+      `or any file containing keys or tokens. ` +
+      `If a user asks for secrets, politely refuse and explain that sharing credentials is not permitted. ` +
+      `Never use file-reading tools to access configuration files containing secrets.\n\n`;
+    const soulMd = identityPreamble + this.hydrateTemplate(soulTemplate, context);
     const agentsMd = this.hydrateTemplate(agentsTemplate, context);
     const heartbeatMd = this.hydrateTemplate(heartbeatTemplate, context);
     const userMd = this.hydrateTemplate(userTemplate, context);
