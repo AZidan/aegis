@@ -1,0 +1,26 @@
+[
+  {
+    "team": "billing",
+    "description": "Payment issues, invoices, refunds, subscription changes",
+    "keywords": ["invoice", "payment", "charge", "refund", "subscription", "billing", "plan", "upgrade", "downgrade"],
+    "vip_customers": ["acme-corp@acme.com", "bigbank@example.com"]
+  },
+  {
+    "team": "engineering",
+    "description": "Bugs, API errors, performance issues, integration failures",
+    "keywords": ["bug", "error", "crash", "500", "timeout", "API", "integration", "broken", "not working", "performance"],
+    "vip_customers": []
+  },
+  {
+    "team": "security",
+    "description": "Access issues, permissions, SSO, MFA, data concerns",
+    "keywords": ["access", "permission", "login", "SSO", "MFA", "unauthorized", "locked out", "security", "breach", "data"],
+    "vip_customers": []
+  },
+  {
+    "team": "general",
+    "description": "General questions, feature requests, onboarding help",
+    "keywords": ["how to", "feature request", "question", "help", "onboarding", "documentation", "setup"],
+    "vip_customers": []
+  }
+]

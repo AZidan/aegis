@@ -1,0 +1,59 @@
+{
+  "name": "ticket-triage",
+  "version": "1.0.0",
+  "description": "Automatically triages incoming support tickets by priority and routes them to the right team based on content analysis and historical patterns.",
+  "category": "productivity",
+  "author": "ops-team@acme.com",
+  "runtime": "markdown",
+  "compatibleRoles": ["support-lead", "ops-manager"],
+  "permissions": {
+    "network": {
+      "allowedDomains": ["api.linear.app", "hooks.slack.com"]
+    },
+    "files": {
+      "readPaths": ["assets/*", "templates/*"],
+      "writePaths": []
+    },
+    "env": {
+      "required": ["LINEAR_API_KEY"],
+      "optional": ["SLACK_WEBHOOK_URL"]
+    }
+  },
+  "config": [
+    {
+      "key": "default_priority",
+      "label": "Default Priority",
+      "description": "Priority assigned when confidence is below threshold",
+      "type": "select",
+      "required": true,
+      "options": ["low", "medium", "high"],
+      "defaultValue": "medium"
+    },
+    {
+      "key": "confidence_threshold",
+      "label": "Confidence Threshold",
+      "description": "Minimum confidence (0-1) to auto-assign priority",
+      "type": "number",
+      "required": true,
+      "defaultValue": 0.7
+    },
+    {
+      "key": "notify_slack",
+      "label": "Notify Slack",
+      "description": "Post high-priority tickets to Slack",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": true
+    }
+  ],
+  "validation": {
+    "strict": true,
+    "fileRules": {
+      "skill.md": { "required": true, "type": "skill-definition" },
+      "manifest.json": { "required": true, "type": "json-schema" },
+      "scripts/*.js": { "type": "javascript", "maxSizeKb": 50, "sandbox": true },
+      "templates/*.hbs": { "type": "handlebars", "maxSizeKb": 10 },
+      "assets/*": { "type": "data", "maxSizeKb": 500, "allowedExtensions": [".csv", ".json", ".txt"] }
+    }
+  }
+}

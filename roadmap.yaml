@@ -1502,6 +1502,120 @@ epics:
           - "Custom report builder for ad-hoc queries"
           - "Year-over-year comparison"
 
+  - id: E18
+    title: "Skill Package System"
+    phase: "phase_2"
+    priority: "P1"
+    description: >
+      Replace TypeScript-only skill authoring with a native SKILL.md package format
+      compatible with Claude/OpenClaw agent skills. Skills are packaged as .skill ZIP
+      files containing SKILL.md (native format pushed to container), manifest.json
+      (Aegis security sidecar — NEVER pushed to container), scripts/, templates/,
+      references/, and assets/. The manifest.json configures container-level security
+      policy (network allowlist, file mounts, env vars) while SKILL.md drives agent
+      behavior inside the container. 5-layer security: manifest schema validation →
+      LLM-based SKILL.md review → scripts AST analysis → admin human review →
+      container runtime enforcement. Non-engineer authoring solved via UI visual
+      builder that generates native SKILL.md.
+    dependencies: ["E10", "E9"]
+    estimated_effort: "3 sprints (6 weeks)"
+    success_metrics:
+      - "Skill packages upload, validate, and deploy to containers in under 60 seconds"
+      - "Non-engineers can create skills via visual builder without writing code"
+      - "Community Claude skills import with zero format transformation"
+      - "5-layer security pipeline catches 100% of policy violations before container deployment"
+      - "Container-mounted skills are read-only and isolated per tenant"
+    features:
+      - id: E18-F1
+        title: "Skill Package Parser & Validator"
+        priority: "P0"
+        user_story: >
+          As a tenant admin, I want to upload a .skill ZIP package so that
+          the platform validates its structure (SKILL.md, manifest.json,
+          scripts/, templates/, assets/) and reports any issues before submission.
+        acceptance_criteria:
+          - "ZIP extraction with file-type validation (md, json, js, hbs, txt, csv, png, jpg)"
+          - "manifest.json schema validation (permissions, allowedDomains, config options)"
+          - "SKILL.md YAML frontmatter parsing (name, description, triggers, tools)"
+          - "Per-file-type validators: scripts → AST analysis (no child_process, no fs escape), templates → Handlebars compile check, assets → size/type limits"
+          - "Validation report with errors, warnings, and info messages"
+          - "Max package size: 5MB compressed, 20MB uncompressed"
+
+      - id: E18-F2
+        title: "LLM-Based Skill Review Pipeline"
+        priority: "P0"
+        user_story: >
+          As a platform admin, I want an AI-assisted review of submitted skills
+          so that dangerous instructions in SKILL.md are flagged before human
+          approval, reducing review burden while maintaining security.
+        acceptance_criteria:
+          - "LLM reviews SKILL.md for dangerous instructions (data exfiltration, prompt injection, unauthorized access)"
+          - "LLM reviews scripts/ for suspicious patterns beyond AST (obfuscation, encoded payloads)"
+          - "Review produces risk score (low/medium/high/critical) with detailed findings"
+          - "Auto-approve low-risk skills (configurable per tenant)"
+          - "Medium+ risk skills queued for human review with LLM findings attached"
+          - "Review results stored in skill submission record"
+
+      - id: E18-F3
+        title: "Container Skill Deployment"
+        priority: "P0"
+        user_story: >
+          As the platform, I want to deploy approved skill packages to agent
+          containers as read-only mounts so that agents can use skills without
+          any ability to modify them, ensuring security isolation.
+        acceptance_criteria:
+          - "Approved skills mounted read-only at /home/node/.aegis/skills/{skill-name}/"
+          - "SKILL.md + scripts/ + templates/ + references/ + assets/ pushed to container"
+          - "manifest.json NEVER pushed to container — stays on Aegis server"
+          - "manifest.json configures container network policy (allowedDomains → iptables rules)"
+          - "manifest.json configures env var injection (config options → container env)"
+          - "Skill updates: new version → admin approval → unmount old → mount new (zero downtime)"
+          - "Per-tenant isolation: tenant A skills never visible to tenant B containers"
+
+      - id: E18-F4
+        title: "Admin Skill Review UI"
+        priority: "P1"
+        user_story: >
+          As a platform admin, I want a review interface showing the skill
+          contents, LLM findings, and manifest permissions so that I can
+          make informed approve/reject decisions efficiently.
+        acceptance_criteria:
+          - "Skill review queue with pending submissions sorted by risk score"
+          - "Detail view: SKILL.md rendered preview, manifest.json permissions summary, LLM findings"
+          - "Side-by-side diff for version updates (old vs new SKILL.md)"
+          - "Approve/reject with required comment for rejections"
+          - "Bulk approve for low-risk skills (admin opt-in)"
+          - "Email/webhook notification to submitter on approval/rejection"
+
+      - id: E18-F5
+        title: "Visual Skill Builder"
+        priority: "P2"
+        user_story: >
+          As a non-engineer tenant user, I want a visual drag-and-drop builder
+          that generates a valid SKILL.md and manifest.json so that I can create
+          skills without writing code or understanding the file format.
+        acceptance_criteria:
+          - "Step-by-step wizard: name/description → triggers → tools → steps → review"
+          - "Step editor: add LLM prompt steps, script steps, HTTP steps, conditional branches"
+          - "Template library: pre-built step patterns (classify, summarize, route, alert)"
+          - "Live preview: renders SKILL.md as user builds"
+          - "Export: generates .skill ZIP package for download or direct submission"
+          - "Import: load existing .skill package into builder for editing"
+
+      - id: E18-F6
+        title: "Community Skill Import"
+        priority: "P2"
+        user_story: >
+          As a tenant admin, I want to import community Claude skills (from
+          GitHub or skill directories) so that I can leverage existing skills
+          without rebuilding them, only adding Aegis security policy.
+        acceptance_criteria:
+          - "Import from URL (GitHub raw content) or file upload"
+          - "Auto-detect Claude skill format (SKILL.md + optional scripts/)"
+          - "Prompt user to create manifest.json (permissions, allowed domains)"
+          - "Imported skills go through same review pipeline as custom skills"
+          - "Version tracking: link to upstream source for update notifications"
+
 # =============================================================================
 # SPRINT PLAN -- MVP Phase (Weeks 1-8)
 # =============================================================================
@@ -1756,6 +1870,40 @@ sprint_plan:
         - "Phase 2 E2E test suite"
       notes: "E9-F5 and E10-F3 are P2 -- deferrable if velocity drops (saves 10pts)"
 
+    - id: S10
+      name: "Sprint 10: Skill Package System — Core Pipeline"
+      duration: "2 weeks"
+      goal: >
+        Deliver the core skill package pipeline: ZIP upload with per-file-type
+        validation, LLM-based security review, container read-only deployment,
+        and admin review UI. Non-engineer authoring (visual builder) and community
+        import deferred to Sprint 11.
+      stories:
+        - feature: "E18-F1"
+          description: "Skill package parser & validator (ZIP extraction, manifest schema, AST analysis, per-file-type validators)"
+          points: 13
+        - feature: "E18-F2"
+          description: "LLM-based skill review pipeline (risk scoring, auto-approve low-risk, human queue for medium+)"
+          points: 8
+        - feature: "E18-F3"
+          description: "Container skill deployment (read-only mount, network policy from manifest, env injection)"
+          points: 8
+        - feature: "E18-F4"
+          description: "Admin skill review UI (review queue, SKILL.md preview, LLM findings, approve/reject)"
+          points: 8
+      total_points: 37
+      deliverables:
+        - ".skill ZIP upload endpoint with validation report"
+        - "LLM security review with risk scoring"
+        - "Container read-only skill mounting with manifest-driven network policy"
+        - "Admin review queue UI with SKILL.md preview and LLM findings"
+        - "Sample skill package (ticket-triage) validated end-to-end"
+      notes: >
+        E18-F5 (Visual Skill Builder) and E18-F6 (Community Import) are P2 —
+        deferred to Sprint 11. Focus on the security pipeline and deployment
+        mechanics first. The ticket-triage sample skill (docs/skill-samples/)
+        serves as the validation fixture.
+
 # =============================================================================
 # PHASE SUMMARY
 # =============================================================================
@@ -1788,7 +1936,7 @@ phases:
   - id: phase_2
     name: "Phase 2: Coordination & Security"
     timeline: "Weeks 9-16 (8 weeks)"
-    epics: ["E7", "E8", "E9", "E10"]
+    epics: ["E7", "E8", "E9", "E10", "E18"]
     sprint_plan: "docs/phase-2-sprint-plan.yaml"
     priority_analysis: "docs/phase-2-priority-analysis.md"
     risk_register: "docs/phase-2-risk-register.md"
@@ -1940,6 +2088,22 @@ dependency_map:
     - from: "E10-F1"
       to: "E10-F2"
       reason: "Private registry stores skills built with SDK"
+    # Skill Package System dependencies (added 2026-02-19)
+    - from: "E10"
+      to: "E18"
+      reason: "Skill package system extends SDK and private registry infrastructure"
+    - from: "E9"
+      to: "E18"
+      reason: "Permission manifests and network policies feed into manifest.json validation"
+    - from: "E18-F1"
+      to: "E18-F2"
+      reason: "LLM review requires validated package structure"
+    - from: "E18-F2"
+      to: "E18-F3"
+      reason: "Container deployment only after security review approval"
+    - from: "E18-F1"
+      to: "E18-F4"
+      reason: "Admin review UI displays validation and review results"
 
 # =============================================================================
 # RISK REGISTER

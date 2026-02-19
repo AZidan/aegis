@@ -77,6 +77,11 @@ const NAV_SECTIONS: NavSection[] = [
         icon: Activity,
       },
       {
+        label: 'Security',
+        href: ROUTES.ADMIN_SECURITY,
+        icon: Shield,
+      },
+      {
         label: 'Audit Logs',
         href: ROUTES.ADMIN_AUDIT,
         icon: FileText,

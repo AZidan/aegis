@@ -177,6 +177,7 @@ export const ROUTES = {
   ADMIN_SKILLS_REVIEW: '/admin/skills',
   ADMIN_SKILL_REVIEW_DETAIL: (id: string) => `/admin/skills/${id}`,
   ADMIN_AUDIT: '/admin/audit',
+  ADMIN_SECURITY: '/admin/security',
 
   // Tenant routes
   DASHBOARD: '/dashboard',
@@ -185,6 +186,7 @@ export const ROUTES = {
   AGENT_DETAIL: (id: string) => `/dashboard/agents/${id}`,
   AGENT_CREATE: '/dashboard/agents/create',
   SKILLS: '/dashboard/skills',
+  PRIVATE_SKILLS: '/dashboard/skills/private',
   SKILL_DETAIL: (id: string) => `/dashboard/skills/${id}`,
   TEAM: '/dashboard/team',
   MESSAGES: '/dashboard/messages',

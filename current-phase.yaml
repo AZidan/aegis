@@ -31,20 +31,10 @@ phase_2_5:
   completed_at: "2026-02-06"
   outputs:
     - docs/api-contract.md
-    - design-artifacts/screens/ (18 HTML screens)
-    - design-artifacts/styled-dsl.yaml (complete with all 18 screens)
+    - design-artifacts/screens/ (21 HTML screens)
+    - design-artifacts/styled-dsl.yaml (complete with all 21 screens)
     - design-artifacts/prototypes/platform-admin-prototype.html (7-screen interactive flow)
     - design-artifacts/prototypes/tenant-admin-prototype.html (11-screen interactive flow)
-    - design-artifacts/superdesign/design_iterations/ (all 18 screen copies for gallery)
-  improvements:
-    - Fixed sidebar layout gaps (all white sidebars, consistent 256px width)
-    - Added collapsible sidebar toggle (256px → 64px icon-only)
-    - Fixed agent card overflow issues (flex-wrap, truncation)
-    - Completed agent wizard with all 5 steps (role-based creation per 3-layer architecture)
-    - Added all 5 tabs to tenant detail (Overview, Configuration, Agents, Resources, Audit Log)
-    - Removed conversation content from admin views (only action logs/metrics/events)
-    - Fixed team members dropdown z-index
-    - Implemented navigation bridge (postMessage API) for interactive prototypes
 
 phase_3:
   status: in_progress
@@ -76,49 +66,236 @@ phase_3:
       - id: E2-F5
         name: "Platform Admin Login with MFA"
         status: completed
-        notes: "Admin auth controller, separate /admin/auth endpoints"
       - id: E1-F5
         name: "Container Health Monitoring"
         status: completed
         points: 8
-        notes: "BullMQ scheduling, mock probes, circuit breaker auto-restart, 52 tests"
       - id: E2-F1
         name: "Tenant List View"
         status: completed
         points: 5
-        notes: "Admin sidebar, 8 UI components, tenant table with search/filters/sort, 72 tests"
       - id: E1-F2
         name: "Container Provisioning"
         status: completed
         points: 13
-        notes: "BullMQ provisioning processor, 5 mock steps, retry logic, 3-step wizard, 168 tests"
 
-  # Sprint 3 - Agent Management & Tenant Dashboard (IN PROGRESS)
+  # Sprint 3 - Agent Management & Tenant Dashboard (COMPLETE)
   sprint_3:
-    status: in_progress
+    status: completed
     stories:
       - id: E3-F1
         name: "Agent CRUD API"
         status: completed
         points: 8
-        notes: "8 endpoints, TenantGuard, plan limit enforcement, seed data, 169 tests"
       - id: E3-F2
         name: "Agent Tool Policy Configuration"
         status: completed
         points: 5
-        notes: "8 tool categories, role defaults, per-agent policy CRUD, 65 tests"
       - id: E5-F2
         name: "Agent Dashboard + Activity Feed"
-        status: pending
+        status: completed
         points: 8
-        notes: "Tenant sidebar, dashboard stats, agent cards, detail page, creation wizard"
       - id: E5-F1
         name: "Tenant Login OAuth"
-        status: pending
+        status: completed
         points: 5
-        notes: "Google + GitHub OAuth via Passport"
       - id: E4-F1
         name: "Skill Catalog & Browsing UI"
-        status: pending
+        status: completed
         points: 5
-        notes: "Skill marketplace, browse, detail, install/uninstall"
+
+  # Sprint 4 - Final MVP (COMPLETE - merged to main)
+  sprint_4:
+    status: completed
+    merged_at: "2026-02-10"
+    stories:
+      - id: E4-F4
+        name: "Core Skill Bundle"
+        status: completed
+        points: 5
+      - id: E2-F2
+        name: "Tenant Provisioning Wizard"
+        status: completed
+        points: 5
+      - id: E1-F3
+        name: "Tenant Configuration Management"
+        status: completed
+        points: 5
+      - id: E2-F3
+        name: "Tenant Detail & Configuration Panel"
+        status: completed
+        points: 5
+      - id: E12-01/02/03
+        name: "Billing Foundation"
+        status: completed
+        points: 8
+      - id: E12-04/05
+        name: "Model Tier Validation & Cost Display"
+        status: completed
+        points: 5
+      - id: E2E
+        name: "End-to-End Testing"
+        status: completed
+        points: 5
+
+  # Sprint 5 - Audit Trail & Billing APIs (COMPLETE - merged to main)
+  sprint_5:
+    status: completed
+    merged_at: "2026-02-15"
+    total_points: 47
+    stories:
+      - id: S5-01/02/03/04
+        name: "Audit Trail (service, interceptor, processor, controllers)"
+        status: completed
+        points: 21
+        notes: "Built in earlier sprint, already on main"
+      - id: E12-08
+        name: "Billing Overview API"
+        status: completed
+        points: 8
+      - id: E12-09
+        name: "Billing Usage API"
+        status: completed
+        points: 8
+      - id: E12-07
+        name: "Overage Billing Toggle"
+        status: completed
+        points: 5
+      - id: E12-06
+        name: "Token Usage Warning System"
+        status: completed
+        points: 5
+
+  # Sprint 6 - Inter-Agent Messaging, Channels & Remaining Stories (COMPLETE)
+  sprint_6:
+    status: completed
+    merged_at: "2026-02-18"
+    total_points: 32
+    stories:
+      - id: E7-F1/F2
+        name: "Inter-Agent Messaging & Channels"
+        status: completed
+        points: 13
+      - id: E6-F2
+        name: "Message Thread API"
+        status: completed
+        points: 8
+      - id: E11-F1
+        name: "Channel Connection CRUD"
+        status: completed
+        points: 5
+      - id: S6-01
+        name: "Audit Log Retention Job"
+        status: completed
+        points: 3
+        tests: 21
+      - id: S6-04
+        name: "Platform Admin Audit Log Page"
+        status: completed
+        points: 3
+      - id: E12-10
+        name: "Billing Dashboard UI"
+        status: completed
+        points: 8
+
+  # Sprint 7 - Dashboards, Security & Channel Proxy (COMPLETE)
+  sprint_7:
+    status: completed
+    total_points: 34
+    stories:
+      - id: E9-F1
+        name: "Skill Permission Manifests"
+        status: completed
+        points: 8
+      - id: E8-F4
+        name: "Security Event Alerting"
+        status: completed
+        points: 5
+      - id: E7-F4
+        name: "Allowlist Graph Editor"
+        status: completed
+        points: 8
+      - id: E11-F2
+        name: "Channel Proxy Core"
+        status: completed
+        points: 13
+
+  # Sprint 8 - Custom Skills SDK, Network Security & Slack (COMPLETE)
+  sprint_8:
+    status: completed
+    total_points: 60
+    stories:
+      - id: E10-F1
+        name: "Skill Development SDK"
+        status: completed
+        points: 8
+      - id: E10-F2
+        name: "Private Skill Registry"
+        status: completed
+        points: 8
+      - id: E9-F2
+        name: "Network Policy Enforcement"
+        status: completed
+        points: 8
+      - id: E10-F3
+        name: "Skill Validation & Dry-Run"
+        status: completed
+        points: 5
+      - id: E9-F5
+        name: "Security Posture Dashboard"
+        status: completed
+        points: 5
+      - id: E7-F3
+        name: "Message Dashboard API"
+        status: completed
+        points: 8
+      - id: E11-F3
+        name: "Slack App Integration"
+        status: completed
+        points: 13
+      - id: E2E-Phase2
+        name: "E2E Tests Phase 2"
+        status: completed
+        points: 5
+
+  # Sprint 9 - Per-Agent Setup & Deep Channel UI (COMPLETE)
+  sprint_9:
+    status: completed
+    total_points: 13
+    stories:
+      - id: S9-PhaseA-K
+        name: "Per-Agent Setup + Deep Channel UI"
+        status: completed
+        points: 13
+        notes: "Schema migration, config generator/sync, role templates, channel endpoints, frontend wizard, 52 tests"
+
+  # Sprint 10 - Skill Package System: Core Pipeline (PLANNED)
+  sprint_10:
+    status: planned
+    total_points: 37
+    stories:
+      - id: E18-F1
+        name: "Skill Package Parser & Validator"
+        status: planned
+        points: 13
+      - id: E18-F2
+        name: "LLM-Based Skill Review Pipeline"
+        status: planned
+        points: 8
+      - id: E18-F3
+        name: "Container Skill Deployment"
+        status: planned
+        points: 8
+      - id: E18-F4
+        name: "Admin Skill Review UI"
+        status: planned
+        points: 8
+
+# Cumulative stats
+cumulative:
+  total_sprints_completed: 9
+  total_backend_tests: "~1216 (79 suites) + 20 SDK tests"
+  total_e2e_tests: 43
+  api_contract_version: "1.5.0"
+  frontend_screens: 21
+  sprint_6_remaining_merged: "2026-02-18"
