@@ -6,7 +6,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Building2,
-  Activity,
   PackageCheck,
   Settings,
   LogOut,
@@ -71,12 +70,7 @@ const NAV_SECTIONS: NavSection[] = [
         href: ROUTES.ADMIN_TENANTS,
         icon: Building2,
       },
-      {
-        label: 'System Health',
-        href: '/admin/health',
-        icon: Activity,
-      },
-      {
+{
         label: 'Security',
         href: ROUTES.ADMIN_SECURITY,
         icon: Shield,
