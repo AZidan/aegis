@@ -2,13 +2,17 @@
 # Tracks active development scope and requirements per CLAUDE.md
 
 feature:
-  name: "Sprint 4 — Integration, Config & Polish"
-  sprint: "Sprint 4 - Integration, Skills & Polish"
+  name: "Sprint 6 Remaining — Audit Retention, Admin Audit, Billing UI"
+  sprint: "Sprint 6 Remaining Stories"
   priority: P0
-  started_at: "2026-02-08"
-  status: planning
+  started_at: "2026-02-18"
+  completed_at: "2026-02-18"
+  status: completed
+  branch: "sprint-6-remaining (merged to main)"
+  commit_range: "6b432c8..fb3d13a"
 
 previous_completed:
+  # Sprint 3
   - epic: E3-F1
     name: "Agent CRUD API"
     points: 8
@@ -30,29 +34,177 @@ previous_completed:
     points: 5
     notes: "Includes E4-F2 install/uninstall — 91 backend tests"
 
-sprint_4_stories:
-  - id: E4-F4
+  # Sprint 4
+  - epic: E4-F4
     name: "Core Skill Bundle"
     points: 5
-    scope: backend
-    notes: "Auto-install core skills on tenant provisioning"
-  - id: E2-F2
+  - epic: E2-F2
     name: "Tenant Provisioning Wizard"
     points: 5
-    scope: full-stack
-    notes: "3-step admin wizard: Company → Plan → Review & Provision"
-  - id: E1-F3
+  - epic: E1-F3
     name: "Tenant Configuration Management"
     points: 5
-    scope: backend
-    notes: "Config API with validation and hot-reload"
-  - id: E2-F3
+  - epic: E2-F3
     name: "Tenant Detail & Configuration Panel"
     points: 5
-    scope: full-stack
-    notes: "Tabbed detail page with config editor"
-  - id: E2E
-    name: "End-to-End Testing"
+  - epic: E12-01/02/03
+    name: "Billing Foundation (schema, usage tracking, provider pricing)"
+    points: 8
+    tests: 48
+  - epic: E12-04/05
+    name: "Model Tier Validation & Cost Display"
     points: 5
-    scope: testing
-    notes: "Happy path integration tests"
+  - epic: E2E
+    name: "End-to-End Testing (Happy Path)"
+    points: 5
+    tests: 18
+
+  # Sprint 5 — Audit Trail (pre-existing)
+  - epic: S5-01/02/03/04
+    name: "Audit Trail (service, interceptor, processor, controllers)"
+    points: 21
+    tests: 80
+    notes: "Built in earlier sprint, already merged to main"
+
+  # Sprint 5 — Billing APIs
+  - epic: E12-08
+    name: "Billing Overview API"
+    points: 8
+    tests: 27
+  - epic: E12-09
+    name: "Billing Usage API"
+    points: 8
+    tests: 8
+  - epic: E12-07
+    name: "Overage Billing Toggle"
+    points: 5
+    tests: 7
+  - epic: E12-06
+    name: "Token Usage Warning System"
+    points: 5
+    tests: 25
+
+  # Sprint 6
+  - epic: E7-F1/F2
+    name: "Inter-Agent Messaging & Channels"
+    points: 13
+  - epic: E6-F2
+    name: "Message Thread API"
+    points: 8
+  - epic: E11-F1
+    name: "Channel Connection CRUD"
+    points: 5
+
+  # Sprint 6 Remaining
+  - epic: S6-01
+    name: "Audit Log Retention Job"
+    points: 3
+    tests: 21
+    notes: "Nightly cron, archive to JSON, batch delete with immutability trigger bypass"
+  - epic: S6-04
+    name: "Platform Admin Audit Log Page"
+    points: 3
+    notes: "Cross-tenant filter, reuses tenant audit components, exportFn prop"
+  - epic: E12-10
+    name: "Billing Dashboard UI"
+    points: 8
+    notes: "recharts AreaChart, 5 components, 5 API hooks wired to contract section 17"
+
+  # Sprint 7
+  - epic: E9-F1
+    name: "Skill Permission Manifests"
+    points: 8
+  - epic: E8-F4
+    name: "Security Event Alerting"
+    points: 5
+  - epic: E7-F4
+    name: "Allowlist Graph Editor"
+    points: 8
+  - epic: E11-F2
+    name: "Channel Proxy Core"
+    points: 13
+
+  # Sprint 8
+  - epic: E10-F1
+    name: "Skill Development SDK"
+    points: 8
+    tests: 20
+  - epic: E10-F2
+    name: "Private Skill Registry"
+    points: 8
+  - epic: E9-F2
+    name: "Network Policy Enforcement"
+    points: 8
+  - epic: E10-F3
+    name: "Skill Validation & Dry-Run"
+    points: 5
+  - epic: E9-F5
+    name: "Security Posture Dashboard"
+    points: 5
+  - epic: E7-F3
+    name: "Message Dashboard API"
+    points: 8
+    tests: 25
+  - epic: E11-F3
+    name: "Slack App Integration"
+    points: 13
+    tests: 35
+  - epic: E2E-Phase2
+    name: "E2E Tests Phase 2"
+    points: 5
+    tests: 14
+
+  # Sprint 9
+  - epic: S9-PhaseA-K
+    name: "Per-Agent Setup + Deep Channel UI"
+    points: 13
+    tests: 52
+    notes: "Schema migration, config generator, sync, role templates, channel endpoints, frontend wizard"
+
+  # Sprint 8 Gap Closure
+  - epic: S8-SDK-CLI
+    name: "SDK CLI Commands (validate, build, publish)"
+    points: 5
+    tests: 14
+    notes: "Added validate/build/publish commands to @aegis/skill-sdk CLI"
+  - epic: S8-Security-Dashboard
+    name: "Security Posture Dashboard Frontend"
+    points: 3
+    notes: "/admin/security page with alerts, trends, compliance"
+  - epic: S8-Private-Skills-UI
+    name: "Private Skills Upload Frontend"
+    points: 3
+    notes: "/dashboard/skills/private page with submit modal"
+
+# Sprint 10 (Upcoming)
+next_sprint:
+  name: "Sprint 10: Skill Package System — Core Pipeline"
+  epic: E18
+  planned_points: 37
+  stories:
+    - id: E18-F1
+      name: "Skill Package Parser & Validator"
+      points: 13
+    - id: E18-F2
+      name: "LLM-Based Skill Review Pipeline"
+      points: 8
+    - id: E18-F3
+      name: "Container Skill Deployment"
+      points: 8
+    - id: E18-F4
+      name: "Admin Skill Review UI"
+      points: 8
+  key_decisions:
+    - "Native SKILL.md format (Claude/OpenClaw compatible) — no proprietary format"
+    - "manifest.json as security sidecar — NEVER pushed to container"
+    - "5-layer security: schema → LLM review → AST → human review → container runtime"
+    - "Visual builder (E18-F5) and community import (E18-F6) deferred to Sprint 11"
+  sample_skill: "docs/skill-samples/ticket-triage/"
+
+sprint_5_billing_summary:
+  total_points: 26
+  total_new_tests: 77
+  endpoints_added: 5
+  api_contract_version: "1.5.0"
+  branch: "sprint-5/billing-apis (merged to main)"
+  commit: "f6d192d"

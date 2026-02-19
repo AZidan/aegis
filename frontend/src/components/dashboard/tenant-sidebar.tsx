@@ -76,7 +76,14 @@ const NAV_SECTIONS: NavSection[] = [
           { label: 'Communication', href: ROUTES.ALLOWLIST, icon: Network },
         ],
       },
-      { label: 'Skill Marketplace', href: ROUTES.SKILLS, icon: Puzzle },
+      {
+        label: 'Skill Marketplace',
+        href: ROUTES.SKILLS,
+        icon: Puzzle,
+        children: [
+          { label: 'Private Skills', href: ROUTES.PRIVATE_SKILLS, icon: Puzzle },
+        ],
+      },
       { label: 'Messages', href: ROUTES.MESSAGES, icon: MessageSquare },
     ],
   },

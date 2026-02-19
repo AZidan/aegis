@@ -1,0 +1,27 @@
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "🚨 High Priority Ticket"
+      }
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Ticket:*\n{{ticket.id}}" },
+        { "type": "mrkdwn", "text": "*Team:*\n{{classification.team}}" },
+        { "type": "mrkdwn", "text": "*Customer:*\n{{ticket.customer}}" },
+        { "type": "mrkdwn", "text": "*Tier:*\n{{customer.tier}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*{{ticket.title}}*\n{{classification.reasoning}}"
+      }
+    }
+  ]
+}
