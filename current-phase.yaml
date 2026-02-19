@@ -272,7 +272,7 @@ phase_3:
   # Sprint 10 - Skill Package System: Core Pipeline (PLANNED)
   sprint_10:
     status: planned
-    total_points: 37
+    total_points: 42
     stories:
       - id: E18-F1
         name: "Skill Package Parser & Validator"
@@ -290,6 +290,11 @@ phase_3:
         name: "Admin Skill Review UI"
         status: planned
         points: 8
+      - id: E2-F4
+        name: "Platform Admin Dashboard Home"
+        status: planned
+        points: 5
+        notes: "MVP gap — backend + frontend stubs exist, needs full implementation"
 
 # Cumulative stats
 cumulative:

@@ -180,7 +180,7 @@ previous_completed:
 next_sprint:
   name: "Sprint 10: Skill Package System — Core Pipeline"
   epic: E18
-  planned_points: 37
+  planned_points: 42
   stories:
     - id: E18-F1
       name: "Skill Package Parser & Validator"
@@ -194,6 +194,10 @@ next_sprint:
     - id: E18-F4
       name: "Admin Skill Review UI"
       points: 8
+    - id: E2-F4
+      name: "Platform Admin Dashboard Home"
+      points: 5
+      notes: "MVP gap — stats cards, alerts table, health indicators, recent activity"
   key_decisions:
     - "Native SKILL.md format (Claude/OpenClaw compatible) — no proprietary format"
     - "manifest.json as security sidecar — NEVER pushed to container"

@@ -565,6 +565,126 @@ GET  /api/dashboard/skills/private           # List tenant's skills (existing)
 
 ---
 
+### S10-05: Platform Admin Dashboard Home (5 pts)
+**Scope:** Full-stack
+**Feature:** E2-F4
+**Dependencies:** None (independent of E18 stories)
+
+**Task:**
+Implement the platform admin dashboard home page with aggregate stats, active alerts, health indicators, and recent activity. Both backend and frontend are currently stubs.
+
+**Backend — DashboardService:**
+```typescript
+// backend/src/admin/dashboard/dashboard.service.ts
+// Replace existing stub with real implementation
+@Injectable()
+export class DashboardService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async getStats(): Promise<AdminDashboardStats> {
+    // Query Prisma for:
+    // - Tenant counts by status (active, suspended, provisioning)
+    // - Agent counts (total, activeToday based on last activity)
+    // - Health counts (healthy, degraded, down based on container status)
+    // - Platform uptime + version
+  }
+
+  async getAlerts(severity?: string, limit?: number): Promise<AdminAlert[]> {
+    // Query alerts table (already exists from AlertModule)
+    // Filter by severity, limit results
+    // Include tenant name via join
+  }
+
+  async getRecentActivity(limit?: number): Promise<RecentActivity[]> {
+    // Query audit_logs for recent admin actions
+    // Last 10 events: tenant created, agent provisioned, skill approved, etc.
+  }
+}
+```
+
+**Backend — DashboardController:**
+```typescript
+// Replace existing stub
+@Controller('admin/dashboard')
+@UseGuards(JwtAuthGuard)
+export class DashboardController {
+  @Get('stats')
+  async getStats(@Req() req) {
+    assertPlatformAdmin(req.user);
+    return this.dashboardService.getStats();
+  }
+
+  @Get('alerts')
+  async getAlerts(
+    @Query('severity') severity?: string,
+    @Query('limit') limit?: number,
+    @Req() req,
+  ) {
+    assertPlatformAdmin(req.user);
+    return { alerts: await this.dashboardService.getAlerts(severity, limit) };
+  }
+
+  @Get('recent-activity')
+  async getRecentActivity(@Query('limit') limit?: number, @Req() req) {
+    assertPlatformAdmin(req.user);
+    return { activity: await this.dashboardService.getRecentActivity(limit) };
+  }
+}
+```
+
+**API Contract (Section 2 — already defined):**
+```
+GET /api/admin/dashboard/stats      → { tenants, agents, health, platform }
+GET /api/admin/dashboard/alerts     → { alerts: [...] }
+GET /api/admin/dashboard/recent-activity → { activity: [...] }  (new, not in contract yet)
+```
+
+**Frontend Page:**
+```
+/admin/dashboard
+├── StatsCards (4-col grid)
+│   ├── Total Tenants (with active/suspended/provisioning breakdown)
+│   ├── Active Agents (total + active today)
+│   ├── System Health (healthy/degraded/down with color indicators)
+│   └── Platform Uptime (formatted duration + version)
+├── AlertsSection
+│   ├── Alert count by severity (critical=red, warning=amber, info=blue)
+│   └── AlertsTable (last 10, with severity badge, title, tenant, time)
+├── RecentActivityFeed
+│   └── Timeline of last 10 admin actions from audit log
+└── HealthOverview (optional mini-chart or status grid)
+```
+
+**Design Reference:**
+- HTML prototype: `design-artifacts/screens/admin-dashboard.html`
+- Existing components: `StatsCard`, `ProgressRing`, `Trend` from `stats-card.tsx`
+
+**Acceptance Criteria:**
+- [ ] `GET /api/admin/dashboard/stats` returns real tenant/agent/health counts
+- [ ] `GET /api/admin/dashboard/alerts` returns alerts with severity filter
+- [ ] Frontend stats cards show live data with auto-refresh (30s)
+- [ ] Alerts table with severity badges and tenant name
+- [ ] Recent activity feed from audit logs
+- [ ] Loading skeletons while data fetches
+- [ ] Error state with retry button
+- [ ] Page matches admin-dashboard.html prototype layout
+- [ ] Write 8+ backend tests (service + controller)
+
+**Files to Create:**
+- `backend/src/admin/dashboard/interfaces/dashboard.interface.ts`
+- `backend/src/admin/dashboard/__tests__/dashboard.service.spec.ts`
+- `backend/src/admin/dashboard/__tests__/dashboard.controller.spec.ts`
+- `frontend/src/lib/api/admin-dashboard.ts`
+- `frontend/src/lib/hooks/use-admin-dashboard.ts`
+
+**Files to Modify:**
+- `backend/src/admin/dashboard/dashboard.controller.ts` — replace stub with real endpoints
+- `backend/src/admin/dashboard/dashboard.service.ts` — replace stub with real queries
+- `frontend/src/app/admin/dashboard/page.tsx` — replace "Coming Soon" with real page
+- `docs/api-contract.md` — add `recent-activity` endpoint to Section 2
+
+---
+
 ## Dependencies Diagram
 
 ```
@@ -577,11 +697,13 @@ S10-01 (Package Parser) ────────> S10-02 (LLM Review)
                                          v
                                   S10-04 (Admin Review UI)
                                   [also needs S10-01 + S10-02]
+
+S10-05 (Admin Dashboard) ─────── independent, can run in parallel with all above
 ```
 
 **Recommended execution order:**
-1. S10-01 first (all other stories depend on it)
-2. S10-02 + S10-04 frontend scaffolding in parallel (S10-04 can start API types + admin page layout while S10-02 backend is built)
+1. S10-01 + S10-05 in parallel (S10-05 is fully independent)
+2. S10-02 + S10-04 frontend scaffolding in parallel
 3. S10-03 after S10-02 (needs review pipeline to trigger deployment)
 4. S10-04 final wiring after all backend endpoints exist
 
@@ -605,7 +727,8 @@ Before marking Sprint 10 complete, verify:
 - [ ] SKILL.md preview renders correctly in review modal
 - [ ] Tenant can upload .skill ZIP via drag-and-drop
 - [ ] Tenant sees validation report before submission
-- [ ] All new code has unit tests (35+ total)
+- [ ] Admin dashboard shows live stats, alerts, and recent activity
+- [ ] All new code has unit tests (43+ total)
 - [ ] No TypeScript errors (backend + frontend)
 - [ ] All existing tests still pass
 

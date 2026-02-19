@@ -1891,18 +1891,21 @@ sprint_plan:
         - feature: "E18-F4"
           description: "Admin skill review UI (review queue, SKILL.md preview, LLM findings, approve/reject)"
           points: 8
-      total_points: 37
+        - feature: "E2-F4"
+          description: "Platform admin dashboard home (stats cards, alerts table, health indicators, recent activity)"
+          points: 5
+      total_points: 42
       deliverables:
         - ".skill ZIP upload endpoint with validation report"
         - "LLM security review with risk scoring"
         - "Container read-only skill mounting with manifest-driven network policy"
         - "Admin review queue UI with SKILL.md preview and LLM findings"
         - "Sample skill package (ticket-triage) validated end-to-end"
+        - "Platform admin dashboard with live stats and alerts"
       notes: >
         E18-F5 (Visual Skill Builder) and E18-F6 (Community Import) are P2 —
-        deferred to Sprint 11. Focus on the security pipeline and deployment
-        mechanics first. The ticket-triage sample skill (docs/skill-samples/)
-        serves as the validation fixture.
+        deferred to Sprint 11. E2-F4 (Admin Dashboard) is a gap from MVP phase
+        that was never implemented — both backend and frontend are stubs.
 
 # =============================================================================
 # PHASE SUMMARY
