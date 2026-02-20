@@ -75,6 +75,7 @@ services:
       SLACK_SIGNING_SECRET: ${SLACK_SIGNING_SECRET:-}
       SLACK_APP_TOKEN: ${SLACK_APP_TOKEN:-}
       SLACK_REDIRECT_URI: ${SLACK_REDIRECT_URI:-http://localhost:3000/api/integrations/slack/callback}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       CONTAINER_RUNTIME: ${CONTAINER_RUNTIME:-docker}
       CONTAINER_DOCKER_HOST: unix:///var/run/docker.sock
       CONTAINER_OPENCLAW_IMAGE: ${CONTAINER_OPENCLAW_IMAGE:-openclaw/openclaw:latest}

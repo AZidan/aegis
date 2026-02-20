@@ -73,6 +73,7 @@ enum SkillStatus {
   in_review
   approved
   rejected
+  changes_requested
 }
 
 enum ChannelType {
@@ -450,7 +451,8 @@ model Skill {
   // Review
   reviewNotes String?   @db.Text
   reviewedAt  DateTime?
-  reviewedBy  String?
+  reviewedBy      String?
+  rejectionReason String?   @db.Text
 
   // Marketplace metrics
   rating       Float @default(0)

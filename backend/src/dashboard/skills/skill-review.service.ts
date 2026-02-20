@@ -127,15 +127,26 @@ ${params.compatibleRoles.join(', ')}`;
       throw new Error('ANTHROPIC_API_KEY not configured');
     }
 
+    // OAuth tokens (sk-ant-oat*) use Bearer auth + oauth beta header (same as OpenClaw);
+    // standard API keys use x-api-key
+    const isOAuthToken = this.apiKey.startsWith('sk-ant-oat');
+    const authHeaders: Record<string, string> = isOAuthToken
+      ? {
+          Authorization: `Bearer ${this.apiKey}`,
+          'anthropic-beta': 'oauth-2025-04-20',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        }
+      : { 'x-api-key': this.apiKey };
+
     const response = await fetch(this.apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': this.apiKey,
+        ...authHeaders,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20241022',
+        model: 'claude-sonnet-4-6',
         max_tokens: 2048,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: userPrompt }],

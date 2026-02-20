@@ -5,6 +5,7 @@ import {
   Patch,
   Body,
   Param,
+  Query,
   HttpCode,
   HttpStatus,
   UseGuards,
@@ -16,6 +17,7 @@ import { TenantGuard } from '../../common/guards/tenant.guard';
 import { ZodValidationPipe } from '../../common/pipes/validation.pipe';
 import { PrivateSkillsService } from './private-skills.service';
 import { SkillValidatorService } from './skill-validator.service';
+import { GitHubSkillImportService } from '../../shared/github-skill-import';
 import {
   submitPrivateSkillSchema,
   SubmitPrivateSkillDto,
@@ -28,6 +30,7 @@ import {
   validateSkillSchema,
   ValidateSkillDto,
 } from './dto/validate-skill.dto';
+import { githubImportSchema, GitHubImportDto } from '../../admin/skills/dto/github-import.dto';
 
 /**
  * Private Skills Controller - Tenant: Private Skill Registry
@@ -51,6 +54,7 @@ export class PrivateSkillsController {
   constructor(
     private readonly privateSkillsService: PrivateSkillsService,
     private readonly skillValidator: SkillValidatorService,
+    private readonly gitHubImportService: GitHubSkillImportService,
   ) {}
 
   private getTenantId(req: Request): string {
@@ -79,13 +83,18 @@ export class PrivateSkillsController {
 
   // ==========================================================================
   // GET /api/dashboard/skills/private - List own private skills
+  // Query: ?status=pending,approved,rejected,changes_requested
   // Response: 200 OK, { data: Skill[] }
   // ==========================================================================
   @Get()
   @HttpCode(HttpStatus.OK)
-  async listOwnPrivateSkills(@Req() req: Request) {
+  async listOwnPrivateSkills(
+    @Req() req: Request,
+    @Query('status') status: string | undefined,
+  ) {
     const tenantId = this.getTenantId(req);
-    return this.privateSkillsService.listOwnPrivateSkills(tenantId);
+    const statusFilter = status ? status.split(',').map((s) => s.trim()) : undefined;
+    return this.privateSkillsService.listOwnPrivateSkills(tenantId, statusFilter);
   }
 
   // ==========================================================================
@@ -99,6 +108,30 @@ export class PrivateSkillsController {
     dto: ValidateSkillDto,
   ) {
     return this.skillValidator.validate(dto.sourceCode, dto.dryRun);
+  }
+
+  // ==========================================================================
+  // POST /api/dashboard/skills/private/import/github - Fetch skills from GitHub
+  // Response: 200 OK
+  // ==========================================================================
+  @Post('import/github')
+  @HttpCode(HttpStatus.OK)
+  async fetchGitHubSkills(
+    @Body(new ZodValidationPipe(githubImportSchema))
+    dto: GitHubImportDto,
+  ) {
+    return this.gitHubImportService.fetchSkillsFromGitHub(dto.url);
+  }
+
+  // ==========================================================================
+  // GET /api/dashboard/skills/private/:id - Get skill detail
+  // Response: 200 OK
+  // ==========================================================================
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  async getSkillDetail(@Req() req: Request, @Param('id') id: string) {
+    const tenantId = this.getTenantId(req);
+    return this.privateSkillsService.getSkillDetail(tenantId, id);
   }
 
   // ==========================================================================

@@ -21,7 +21,7 @@ export interface SkillReviewResult {
 
 export interface ReviewJobPayload {
   skillId: string;
-  tenantId: string;
+  tenantId: string | null;
   skillName: string;
   skillVersion: string;
   sourceCode: string;

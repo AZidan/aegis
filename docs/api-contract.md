@@ -887,6 +887,7 @@ Array<{
 **Notes:**
 - Submitter receives rejection notification with feedback
 - Skill can be revised and resubmitted
+- The frontend **Request Changes** action also uses this endpoint with a descriptive reason. Both "reject" and "request changes" result in the skill being sent back to the submitter; the distinction is in the messaging/reason text only.
 
 ---
 
@@ -2750,15 +2751,15 @@ interface AgentChannelRoute {
 
 ---
 
-### Admin: Get Skills Pending Review
+### Admin: List Skills (with Status Filter)
 - **Path**: `/api/admin/skills/review`
 - **Method**: `GET`
-- **Description**: List all skills pending admin review with LLM analysis results
+- **Description**: List skills with optional status filter. Default returns pending + in_review + changes_requested.
 
 #### Request
 - **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin)
 - **Query Params**:
-  - `status` (optional): `pending` | `in_review` — default: both
+  - `status` (optional): Comma-separated list of statuses. Values: `pending`, `in_review`, `approved`, `rejected`, `changes_requested`. Default: `pending,in_review,changes_requested`
   - `limit` (optional): number, default 20
 
 #### Response
@@ -2772,10 +2773,13 @@ interface AgentChannelRoute {
     description: string;
     category: string;
     author: string;
-    tenantId: string;
+    tenantId: string | null;
     tenantName: string;
-    status: "pending" | "in_review";
-    submittedAt: string;
+    type: "private" | "marketplace";
+    status: "pending" | "in_review" | "approved" | "rejected" | "changes_requested";
+    submittedAt: string;           // ISO 8601
+    reviewedAt: string | null;     // ISO 8601
+    rejectionReason: string | null;
     llmReview?: {
       riskScore: number;             // 0-100
       riskLevel: "low" | "medium" | "high" | "critical";
@@ -2789,6 +2793,7 @@ interface AgentChannelRoute {
       reviewedAt: string;
     };
   }>;
+  total: number;
 }
 ```
 
@@ -2815,27 +2820,53 @@ interface AgentChannelRoute {
   documentation: string;
   permissions: object;
   compatibleRoles: string[];
-  llmReview?: { /* same as above */ };
-  tenantId: string;
+  status: "pending" | "in_review" | "approved" | "rejected" | "changes_requested";
+  reviewedAt: string | null;
+  rejectionReason: string | null;
+  llmReview?: { /* same as list response */ };
+  tenantId: string | null;
   tenantName: string;
+  type: "private" | "marketplace";
   submittedAt: string;
 }
 ```
 
 ---
 
-### Admin: Approve/Reject Skill
-- **Path**: `/api/admin/skills/review/:skillId`
+### Admin: Approve Skill
+- **Path**: `/api/admin/skills/review/:skillId/approve`
 - **Method**: `PUT`
-- **Description**: Approve or reject a skill after admin review
+- **Description**: Approve a skill after admin review
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin)
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  id: string;
+  name: string;
+  version: string;
+  status: "approved";
+  reviewedAt: string;
+  reviewedBy: string;
+}
+```
+
+---
+
+### Admin: Reject Skill
+- **Path**: `/api/admin/skills/review/:skillId/reject`
+- **Method**: `PUT`
+- **Description**: Reject a skill with a reason
 
 #### Request
 - **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin)
 - **Body**:
 ```typescript
 {
-  action: "approve" | "reject";
-  reviewNotes?: string;               // Required for rejection
+  reason: string;   // Required — rejection reason visible to submitter
 }
 ```
 
@@ -2844,10 +2875,42 @@ interface AgentChannelRoute {
 ```typescript
 {
   id: string;
-  status: "approved" | "rejected";
+  name: string;
+  version: string;
+  status: "rejected";
+  rejectionReason: string;
   reviewedAt: string;
   reviewedBy: string;
-  reviewNotes?: string;
+}
+```
+
+---
+
+### Admin: Request Changes on Skill
+- **Path**: `/api/admin/skills/review/:skillId/request-changes`
+- **Method**: `PUT`
+- **Description**: Request changes on a skill. Status becomes `changes_requested`, and the reason is visible to the submitter.
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin)
+- **Body**:
+```typescript
+{
+  reason: string;   // Required — description of requested changes
+}
+```
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  id: string;
+  name: string;
+  version: string;
+  status: "changes_requested";
+  rejectionReason: string;
+  reviewedAt: string;
+  reviewedBy: string;
 }
 ```
 
@@ -2901,10 +2964,218 @@ interface AgentChannelRoute {
 
 ---
 
+### Admin Marketplace Import — Upload ZIP
+
+- **Path**: `/api/admin/skills/review/import/upload`
+- **Method**: `POST`
+- **Description**: Upload a skill package ZIP for marketplace import (platform admin only). Validates and stores the package.
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (platform_admin), `Content-Type: multipart/form-data`
+- **Body**: Form data with `file` field (.zip or .skill)
+
+#### Response
+- **Success (201)**:
+```typescript
+{
+  valid: boolean;
+  packageId?: string;
+  packagePath?: string;
+  manifest: Record<string, unknown> | null;
+  skillMd: { title: string; description: string; rawContent: string } | null;
+  files: { path: string; size: number; type: string }[];
+  issues: { severity: "error" | "warning" | "info"; file?: string; message: string }[];
+}
+```
+
+---
+
+### Admin Marketplace Import — Submit
+
+- **Path**: `/api/admin/skills/review/import`
+- **Method**: `POST`
+- **Description**: Import a skill to the global marketplace (tenantId=null). Creates skill record and enqueues LLM review.
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (platform_admin)
+- **Body**:
+```typescript
+{
+  name: string;           // kebab-case, 3-64 chars
+  version: string;        // semver (e.g., "1.0.0")
+  description: string;    // 10-500 chars
+  category: "productivity" | "communication" | "analytics" | "engineering" | "security" | "integration" | "custom";
+  compatibleRoles: string[];  // min 1
+  sourceCode: string;     // 1-100K chars
+  permissions: {
+    network: { allowedDomains: string[] };
+    files: { readPaths: string[]; writePaths: string[] };
+    env: { required: string[]; optional: string[] };
+  };
+  documentation?: string; // max 50K chars
+  packageId?: string;     // UUID from upload step
+}
+```
+
+#### Response
+- **Success (201)**:
+```typescript
+{
+  id: string;
+  name: string;
+  version: string;
+  status: "pending";
+  submittedAt: string; // ISO 8601
+}
+```
+- **Error (409)**: Marketplace skill with same name+version already exists.
+
+### Import Skills from GitHub URL
+
+Discover and preview skills from a GitHub repository containing SKILL.md files (Agent Skills spec).
+
+```
+POST /api/admin/skills/review/import/github
+Authorization: Bearer <platform_admin JWT>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "url": "https://github.com/owner/repo"
+}
+```
+
+- `url` — Required. GitHub URL. Supports:
+  - `https://github.com/owner/repo`
+  - `https://github.com/owner/repo/tree/branch/path/to/skill`
+  - `github.com/owner/repo` (protocol optional)
+
+**Response (200):**
+```ts
+{
+  repoUrl: string;
+  skills: Array<{
+    name: string;
+    version: string;
+    description: string;
+    category: string;
+    compatibleRoles: string[];
+    sourceCode: string;
+    documentation: string;
+    permissions: {
+      network: { allowedDomains: string[] };
+      files: { readPaths: string[]; writePaths: string[] };
+      env: { required: string[]; optional: string[] };
+    };
+    skillPath: string; // relative path within repo
+  }>;
+}
+```
+
+- **Error (400)**: Invalid or non-GitHub URL, clone failed, repo too large (>100MB).
+- **Error (404)**: No valid SKILL.md files found in repository.
+
+**Usage Flow:** Admin fetches preview → selects skills → submits each via `POST /api/admin/skills/review/import` (existing endpoint).
+
+---
+
+### Tenant: List Private Skills (with Status Filter)
+- **Path**: `/api/dashboard/skills/private`
+- **Method**: `GET`
+- **Description**: List tenant's own private skills with optional status filter
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (tenant user)
+- **Query Params**:
+  - `status` (optional): Comma-separated list. Values: `pending`, `in_review`, `approved`, `rejected`, `changes_requested`. Default: all statuses.
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  data: Array<{
+    id: string;
+    name: string;
+    version: string;
+    description: string;
+    category: string;
+    status: "pending" | "in_review" | "approved" | "rejected" | "changes_requested";
+    compatibleRoles: string[];
+    submittedAt: string;
+    reviewedAt: string | null;
+    rejectionReason: string | null;
+    reviewNotes: string | null;
+  }>;
+}
+```
+
+---
+
+### Tenant: Get Private Skill Detail
+- **Path**: `/api/dashboard/skills/private/:skillId`
+- **Method**: `GET`
+- **Description**: Get full detail of a tenant's own private skill including source code and LLM review
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (tenant user)
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  id: string;
+  name: string;
+  version: string;
+  description: string;
+  category: string;
+  status: "pending" | "in_review" | "approved" | "rejected" | "changes_requested";
+  compatibleRoles: string[];
+  author: string;
+  submittedAt: string;
+  reviewedAt: string | null;
+  rejectionReason: string | null;
+  sourceCode: string | null;
+  documentation: string | null;
+  permissions: object;
+  llmReview?: object;
+}
+```
+- **Error (404)**: Skill not found in this tenant
+
+---
+
+### Tenant: Import Skills from GitHub URL
+- **Path**: `/api/dashboard/skills/private/import/github`
+- **Method**: `POST`
+- **Description**: Discover and preview skills from a GitHub repository. Same functionality as admin GitHub import but scoped to tenant context.
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (tenant user)
+- **Body**:
+```json
+{
+  "url": "https://github.com/owner/repo"
+}
+```
+
+#### Response
+- **Success (200)**: Same shape as admin GitHub import response (repoUrl + skills array)
+- **Error (400)**: Invalid URL
+- **Error (404)**: No SKILL.md files found
+
+**Usage Flow:** Tenant fetches preview → selects skills → submits each via `POST /api/dashboard/skills/private` (existing submit endpoint).
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.9.0 | 2026-02-21 | Skills lifecycle: status filter on admin review + tenant private list, request-changes endpoint, tenant skill detail, tenant GitHub import. New `changes_requested` status, `rejectionReason` field. |
+| 1.8.0 | 2026-02-20 | GitHub URL skill import (section 18): discover and preview SKILL.md files from GitHub repos for marketplace import. |
+| 1.7.0 | 2026-02-20 | Admin marketplace skill import (section 18): upload ZIP + submit endpoints. Review queue now includes both private and marketplace skills with type field. |
 | 1.6.0 | 2026-02-20 | Skill Packages (section 18): upload, validate, submit, admin review, install/uninstall. Admin dashboard recent-activity endpoint (section 2). |
 | 1.5.0 | 2026-02-15 | Billing APIs: overview, usage analytics, overage toggle, quota warnings (section 17) |
 | 1.4.0 | 2026-02-11 | Admin role config template CRUD (section 13), tenant agent template preview (section 14), agent channel routes CRUD (section 15) |

@@ -121,7 +121,7 @@ function OverviewTab({ skill }: { skill: SkillReviewDetail }) {
         <Field label="Version" value={skill.version} mono />
         <Field label="Author" value={skill.author} />
         <Field label="Category" value={skill.category} />
-        <Field label="Tenant" value={skill.tenantName} />
+        <Field label="Tenant" value={skill.type === 'marketplace' ? 'Marketplace (Global)' : skill.tenantName} />
         <Field
           label="Submitted"
           value={new Date(skill.submittedAt).toLocaleDateString('en-US', {
@@ -465,9 +465,9 @@ export function SkillReviewModal({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
-      <DialogContent className="max-h-[85vh] max-w-3xl overflow-hidden p-0">
+      <DialogContent className="flex max-h-[85vh] max-w-3xl flex-col overflow-hidden p-0">
         {/* Header */}
-        <DialogHeader className="border-b border-neutral-200 px-6 pt-6 pb-4">
+        <DialogHeader className="shrink-0 border-b border-neutral-200 px-6 pt-6 pb-4">
           <DialogTitle className="text-lg font-semibold text-neutral-900">
             {isLoading
               ? 'Loading skill...'
@@ -477,7 +477,7 @@ export function SkillReviewModal({
           </DialogTitle>
           <DialogDescription className="text-sm text-neutral-500">
             {skill
-              ? `v${skill.version} by ${skill.author} - ${skill.tenantName}`
+              ? `v${skill.version} by ${skill.author} - ${skill.type === 'marketplace' ? 'Marketplace (Global)' : skill.tenantName}`
               : 'Review skill details, source code, and risk assessment'}
           </DialogDescription>
         </DialogHeader>
@@ -493,7 +493,7 @@ export function SkillReviewModal({
         ) : (
           <>
             {/* Tabs */}
-            <div className="border-b border-neutral-200 px-6">
+            <div className="shrink-0 border-b border-neutral-200 px-6">
               <nav className="-mb-px flex gap-1" aria-label="Review tabs">
                 {TABS.map((tab) => (
                   <button
@@ -513,7 +513,7 @@ export function SkillReviewModal({
             </div>
 
             {/* Tab Content */}
-            <div className="max-h-[50vh] overflow-y-auto px-6 py-4">
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
               {activeTab === 'overview' && <OverviewTab skill={skill} />}
               {activeTab === 'skillmd' && <SkillMdTab skill={skill} />}
               {activeTab === 'scripts' && <ScriptsTab skill={skill} />}
@@ -522,7 +522,7 @@ export function SkillReviewModal({
             </div>
 
             {/* Footer / Actions */}
-            <div className="border-t border-neutral-200 px-6 py-4">
+            <div className="shrink-0 border-t border-neutral-200 px-6 py-4">
               {showApproveConfirm ? (
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-neutral-600">

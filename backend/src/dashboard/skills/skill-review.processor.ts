@@ -130,7 +130,7 @@ export class SkillReviewProcessor extends WorkerHost {
    * Check if tenant has auto-approve enabled for low-risk skills.
    * Default: false (require manual admin review).
    */
-  private async isAutoApproveEnabled(_tenantId: string): Promise<boolean> {
+  private async isAutoApproveEnabled(_tenantId: string | null): Promise<boolean> {
     // TODO: Implement tenant settings (no settings field on Tenant model yet).
     // For now, always require manual admin review.
     return false;

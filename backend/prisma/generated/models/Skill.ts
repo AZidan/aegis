@@ -56,6 +56,7 @@ export type SkillMinAggregateOutputType = {
   reviewNotes: string | null
   reviewedAt: Date | null
   reviewedBy: string | null
+  rejectionReason: string | null
   rating: number | null
   installCount: number | null
   createdAt: Date | null
@@ -82,6 +83,7 @@ export type SkillMaxAggregateOutputType = {
   reviewNotes: string | null
   reviewedAt: Date | null
   reviewedBy: string | null
+  rejectionReason: string | null
   rating: number | null
   installCount: number | null
   createdAt: Date | null
@@ -112,6 +114,7 @@ export type SkillCountAggregateOutputType = {
   reviewNotes: number
   reviewedAt: number
   reviewedBy: number
+  rejectionReason: number
   rating: number
   installCount: number
   createdAt: number
@@ -150,6 +153,7 @@ export type SkillMinAggregateInputType = {
   reviewNotes?: true
   reviewedAt?: true
   reviewedBy?: true
+  rejectionReason?: true
   rating?: true
   installCount?: true
   createdAt?: true
@@ -176,6 +180,7 @@ export type SkillMaxAggregateInputType = {
   reviewNotes?: true
   reviewedAt?: true
   reviewedBy?: true
+  rejectionReason?: true
   rating?: true
   installCount?: true
   createdAt?: true
@@ -206,6 +211,7 @@ export type SkillCountAggregateInputType = {
   reviewNotes?: true
   reviewedAt?: true
   reviewedBy?: true
+  rejectionReason?: true
   rating?: true
   installCount?: true
   createdAt?: true
@@ -323,6 +329,7 @@ export type SkillGroupByOutputType = {
   reviewNotes: string | null
   reviewedAt: Date | null
   reviewedBy: string | null
+  rejectionReason: string | null
   rating: number
   installCount: number
   createdAt: Date
@@ -376,6 +383,7 @@ export type SkillWhereInput = {
   reviewNotes?: Prisma.StringNullableFilter<"Skill"> | string | null
   reviewedAt?: Prisma.DateTimeNullableFilter<"Skill"> | Date | string | null
   reviewedBy?: Prisma.StringNullableFilter<"Skill"> | string | null
+  rejectionReason?: Prisma.StringNullableFilter<"Skill"> | string | null
   rating?: Prisma.FloatFilter<"Skill"> | number
   installCount?: Prisma.IntFilter<"Skill"> | number
   createdAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
@@ -409,6 +417,7 @@ export type SkillOrderByWithRelationInput = {
   reviewNotes?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedBy?: Prisma.SortOrderInput | Prisma.SortOrder
+  rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
   rating?: Prisma.SortOrder
   installCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -446,6 +455,7 @@ export type SkillWhereUniqueInput = Prisma.AtLeast<{
   reviewNotes?: Prisma.StringNullableFilter<"Skill"> | string | null
   reviewedAt?: Prisma.DateTimeNullableFilter<"Skill"> | Date | string | null
   reviewedBy?: Prisma.StringNullableFilter<"Skill"> | string | null
+  rejectionReason?: Prisma.StringNullableFilter<"Skill"> | string | null
   rating?: Prisma.FloatFilter<"Skill"> | number
   installCount?: Prisma.IntFilter<"Skill"> | number
   createdAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
@@ -479,6 +489,7 @@ export type SkillOrderByWithAggregationInput = {
   reviewNotes?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewedBy?: Prisma.SortOrderInput | Prisma.SortOrder
+  rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
   rating?: Prisma.SortOrder
   installCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -517,6 +528,7 @@ export type SkillScalarWhereWithAggregatesInput = {
   reviewNotes?: Prisma.StringNullableWithAggregatesFilter<"Skill"> | string | null
   reviewedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Skill"> | Date | string | null
   reviewedBy?: Prisma.StringNullableWithAggregatesFilter<"Skill"> | string | null
+  rejectionReason?: Prisma.StringNullableWithAggregatesFilter<"Skill"> | string | null
   rating?: Prisma.FloatWithAggregatesFilter<"Skill"> | number
   installCount?: Prisma.IntWithAggregatesFilter<"Skill"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Skill"> | Date | string
@@ -545,6 +557,7 @@ export type SkillCreateInput = {
   reviewNotes?: string | null
   reviewedAt?: Date | string | null
   reviewedBy?: string | null
+  rejectionReason?: string | null
   rating?: number
   installCount?: number
   createdAt?: Date | string
@@ -578,6 +591,7 @@ export type SkillUncheckedCreateInput = {
   reviewNotes?: string | null
   reviewedAt?: Date | string | null
   reviewedBy?: string | null
+  rejectionReason?: string | null
   rating?: number
   installCount?: number
   createdAt?: Date | string
@@ -607,6 +621,7 @@ export type SkillUpdateInput = {
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -640,6 +655,7 @@ export type SkillUncheckedUpdateInput = {
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -671,6 +687,7 @@ export type SkillCreateManyInput = {
   reviewNotes?: string | null
   reviewedAt?: Date | string | null
   reviewedBy?: string | null
+  rejectionReason?: string | null
   rating?: number
   installCount?: number
   createdAt?: Date | string
@@ -699,6 +716,7 @@ export type SkillUpdateManyMutationInput = {
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -729,6 +747,7 @@ export type SkillUncheckedUpdateManyInput = {
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -775,6 +794,7 @@ export type SkillCountOrderByAggregateInput = {
   reviewNotes?: Prisma.SortOrder
   reviewedAt?: Prisma.SortOrder
   reviewedBy?: Prisma.SortOrder
+  rejectionReason?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   installCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -806,6 +826,7 @@ export type SkillMaxOrderByAggregateInput = {
   reviewNotes?: Prisma.SortOrder
   reviewedAt?: Prisma.SortOrder
   reviewedBy?: Prisma.SortOrder
+  rejectionReason?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   installCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -832,6 +853,7 @@ export type SkillMinOrderByAggregateInput = {
   reviewNotes?: Prisma.SortOrder
   reviewedAt?: Prisma.SortOrder
   reviewedBy?: Prisma.SortOrder
+  rejectionReason?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   installCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -985,6 +1007,7 @@ export type SkillCreateWithoutAuthorInput = {
   reviewNotes?: string | null
   reviewedAt?: Date | string | null
   reviewedBy?: string | null
+  rejectionReason?: string | null
   rating?: number
   installCount?: number
   createdAt?: Date | string
@@ -1016,6 +1039,7 @@ export type SkillUncheckedCreateWithoutAuthorInput = {
   reviewNotes?: string | null
   reviewedAt?: Date | string | null
   reviewedBy?: string | null
+  rejectionReason?: string | null
   rating?: number
   installCount?: number
   createdAt?: Date | string
@@ -1076,6 +1100,7 @@ export type SkillScalarWhereInput = {
   reviewNotes?: Prisma.StringNullableFilter<"Skill"> | string | null
   reviewedAt?: Prisma.DateTimeNullableFilter<"Skill"> | Date | string | null
   reviewedBy?: Prisma.StringNullableFilter<"Skill"> | string | null
+  rejectionReason?: Prisma.StringNullableFilter<"Skill"> | string | null
   rating?: Prisma.FloatFilter<"Skill"> | number
   installCount?: Prisma.IntFilter<"Skill"> | number
   createdAt?: Prisma.DateTimeFilter<"Skill"> | Date | string
@@ -1104,6 +1129,7 @@ export type SkillCreateWithoutTenantInput = {
   reviewNotes?: string | null
   reviewedAt?: Date | string | null
   reviewedBy?: string | null
+  rejectionReason?: string | null
   rating?: number
   installCount?: number
   createdAt?: Date | string
@@ -1135,6 +1161,7 @@ export type SkillUncheckedCreateWithoutTenantInput = {
   reviewNotes?: string | null
   reviewedAt?: Date | string | null
   reviewedBy?: string | null
+  rejectionReason?: string | null
   rating?: number
   installCount?: number
   createdAt?: Date | string
@@ -1190,6 +1217,7 @@ export type SkillCreateWithoutInstallationsInput = {
   reviewNotes?: string | null
   reviewedAt?: Date | string | null
   reviewedBy?: string | null
+  rejectionReason?: string | null
   rating?: number
   installCount?: number
   createdAt?: Date | string
@@ -1222,6 +1250,7 @@ export type SkillUncheckedCreateWithoutInstallationsInput = {
   reviewNotes?: string | null
   reviewedAt?: Date | string | null
   reviewedBy?: string | null
+  rejectionReason?: string | null
   rating?: number
   installCount?: number
   createdAt?: Date | string
@@ -1266,6 +1295,7 @@ export type SkillUpdateWithoutInstallationsInput = {
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1298,6 +1328,7 @@ export type SkillUncheckedUpdateWithoutInstallationsInput = {
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1327,6 +1358,7 @@ export type SkillCreateManyAuthorInput = {
   reviewNotes?: string | null
   reviewedAt?: Date | string | null
   reviewedBy?: string | null
+  rejectionReason?: string | null
   rating?: number
   installCount?: number
   createdAt?: Date | string
@@ -1355,6 +1387,7 @@ export type SkillUpdateWithoutAuthorInput = {
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1386,6 +1419,7 @@ export type SkillUncheckedUpdateWithoutAuthorInput = {
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1416,6 +1450,7 @@ export type SkillUncheckedUpdateManyWithoutAuthorInput = {
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1445,6 +1480,7 @@ export type SkillCreateManyTenantInput = {
   reviewNotes?: string | null
   reviewedAt?: Date | string | null
   reviewedBy?: string | null
+  rejectionReason?: string | null
   rating?: number
   installCount?: number
   createdAt?: Date | string
@@ -1473,6 +1509,7 @@ export type SkillUpdateWithoutTenantInput = {
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1504,6 +1541,7 @@ export type SkillUncheckedUpdateWithoutTenantInput = {
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1534,6 +1572,7 @@ export type SkillUncheckedUpdateManyWithoutTenantInput = {
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reviewedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   installCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1595,6 +1634,7 @@ export type SkillSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   reviewNotes?: boolean
   reviewedAt?: boolean
   reviewedBy?: boolean
+  rejectionReason?: boolean
   rating?: boolean
   installCount?: boolean
   createdAt?: boolean
@@ -1629,6 +1669,7 @@ export type SkillSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   reviewNotes?: boolean
   reviewedAt?: boolean
   reviewedBy?: boolean
+  rejectionReason?: boolean
   rating?: boolean
   installCount?: boolean
   createdAt?: boolean
@@ -1661,6 +1702,7 @@ export type SkillSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   reviewNotes?: boolean
   reviewedAt?: boolean
   reviewedBy?: boolean
+  rejectionReason?: boolean
   rating?: boolean
   installCount?: boolean
   createdAt?: boolean
@@ -1693,13 +1735,14 @@ export type SkillSelectScalar = {
   reviewNotes?: boolean
   reviewedAt?: boolean
   reviewedBy?: boolean
+  rejectionReason?: boolean
   rating?: boolean
   installCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type SkillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "version" | "description" | "category" | "status" | "isCore" | "authorId" | "submittedAt" | "tenantId" | "compatibleRoles" | "repositoryUrl" | "mainFile" | "sourceCode" | "capabilities" | "configuration" | "permissions" | "packagePath" | "documentation" | "changelog" | "reviewNotes" | "reviewedAt" | "reviewedBy" | "rating" | "installCount" | "createdAt" | "updatedAt", ExtArgs["result"]["skill"]>
+export type SkillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "version" | "description" | "category" | "status" | "isCore" | "authorId" | "submittedAt" | "tenantId" | "compatibleRoles" | "repositoryUrl" | "mainFile" | "sourceCode" | "capabilities" | "configuration" | "permissions" | "packagePath" | "documentation" | "changelog" | "reviewNotes" | "reviewedAt" | "reviewedBy" | "rejectionReason" | "rating" | "installCount" | "createdAt" | "updatedAt", ExtArgs["result"]["skill"]>
 export type SkillInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   tenant?: boolean | Prisma.Skill$tenantArgs<ExtArgs>
@@ -1746,6 +1789,7 @@ export type $SkillPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     reviewNotes: string | null
     reviewedAt: Date | null
     reviewedBy: string | null
+    rejectionReason: string | null
     rating: number
     installCount: number
     createdAt: Date
@@ -2199,6 +2243,7 @@ export interface SkillFieldRefs {
   readonly reviewNotes: Prisma.FieldRef<"Skill", 'String'>
   readonly reviewedAt: Prisma.FieldRef<"Skill", 'DateTime'>
   readonly reviewedBy: Prisma.FieldRef<"Skill", 'String'>
+  readonly rejectionReason: Prisma.FieldRef<"Skill", 'String'>
   readonly rating: Prisma.FieldRef<"Skill", 'Float'>
   readonly installCount: Prisma.FieldRef<"Skill", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Skill", 'DateTime'>

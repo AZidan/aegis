@@ -135,11 +135,21 @@ export class PrivateSkillsService {
   }
 
   /**
-   * List private skills owned by the current tenant.
+   * List private skills owned by the current tenant with optional status filter.
    */
-  async listOwnPrivateSkills(tenantId: string) {
+  async listOwnPrivateSkills(tenantId: string, statusFilter?: string[]) {
+    const validStatuses = ['pending', 'in_review', 'approved', 'rejected', 'changes_requested'];
+    const where: any = { tenantId };
+
+    if (statusFilter?.length) {
+      const filtered = statusFilter.filter((s) => validStatuses.includes(s));
+      if (filtered.length) {
+        where.status = { in: filtered };
+      }
+    }
+
     const skills = await this.prisma.skill.findMany({
-      where: { tenantId },
+      where,
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
@@ -152,10 +162,54 @@ export class PrivateSkillsService {
         submittedAt: true,
         reviewNotes: true,
         reviewedAt: true,
+        rejectionReason: true,
       },
     });
 
     return { data: skills };
+  }
+
+  /**
+   * Get detail for a single private skill owned by the current tenant.
+   */
+  async getSkillDetail(tenantId: string, skillId: string) {
+    const skill = await this.prisma.skill.findFirst({
+      where: { id: skillId, tenantId },
+      include: {
+        author: { select: { email: true } },
+      },
+    });
+
+    if (!skill) {
+      throw new NotFoundException(`Skill ${skillId} not found in this tenant`);
+    }
+
+    let llmReview = null;
+    if (skill.reviewNotes) {
+      try {
+        llmReview = JSON.parse(skill.reviewNotes);
+      } catch {
+        // Not JSON
+      }
+    }
+
+    return {
+      id: skill.id,
+      name: skill.name,
+      version: skill.version,
+      description: skill.description,
+      category: skill.category,
+      status: skill.status,
+      compatibleRoles: skill.compatibleRoles,
+      author: skill.author?.email ?? skill.authorId,
+      submittedAt: skill.submittedAt.toISOString(),
+      reviewedAt: skill.reviewedAt?.toISOString() ?? null,
+      rejectionReason: skill.rejectionReason ?? null,
+      sourceCode: skill.sourceCode,
+      documentation: skill.documentation,
+      permissions: skill.permissions,
+      llmReview,
+    };
   }
 
   /**

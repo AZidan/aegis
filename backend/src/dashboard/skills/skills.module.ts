@@ -17,6 +17,7 @@ import { SkillReviewService } from './skill-review.service';
 import { SkillReviewProcessor, SKILL_REVIEW_QUEUE } from './skill-review.processor';
 import { SkillDeploymentService, SKILL_DEPLOYMENT_QUEUE } from './skill-deployment.service';
 import { SkillDeploymentProcessor } from './skill-deployment.processor';
+import { GitHubSkillImportModule } from '../../shared/github-skill-import';
 
 /**
  * Skills Module - Tenant: Skills
@@ -29,6 +30,7 @@ import { SkillDeploymentProcessor } from './skill-deployment.processor';
  */
 @Module({
   imports: [
+    GitHubSkillImportModule,
     BullModule.registerQueue(
       { name: ALERT_QUEUE_NAME },
       { name: SKILL_REVIEW_QUEUE },
@@ -55,6 +57,6 @@ import { SkillDeploymentProcessor } from './skill-deployment.processor';
     SkillDeploymentService,
     SkillDeploymentProcessor,
   ],
-  exports: [SkillsService, PermissionService, NetworkPolicyService, SkillDeploymentService, SkillPackageService],
+  exports: [SkillsService, PermissionService, NetworkPolicyService, SkillDeploymentService, SkillPackageService, SkillValidatorService],
 })
 export class SkillsModule {}

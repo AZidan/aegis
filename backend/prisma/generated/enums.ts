@@ -83,7 +83,8 @@ export const SkillStatus = {
   pending: 'pending',
   in_review: 'in_review',
   approved: 'approved',
-  rejected: 'rejected'
+  rejected: 'rejected',
+  changes_requested: 'changes_requested'
 } as const
 
 export type SkillStatus = (typeof SkillStatus)[keyof typeof SkillStatus]

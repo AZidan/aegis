@@ -230,6 +230,7 @@ export const SkillScalarFieldEnum = {
   reviewNotes: 'reviewNotes',
   reviewedAt: 'reviewedAt',
   reviewedBy: 'reviewedBy',
+  rejectionReason: 'rejectionReason',
   rating: 'rating',
   installCount: 'installCount',
   createdAt: 'createdAt',
