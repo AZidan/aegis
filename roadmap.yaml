@@ -5,7 +5,7 @@
 # tenant management, skill marketplace) -- NOT the agents themselves.
 # Agents run on OpenClaw; we build the management/orchestration layer around them.
 #
-# Last Updated: 2026-02-08
+# Last Updated: 2026-02-21
 # Document Owner: Strategy & Product Team
 # =============================================================================
 
@@ -1625,7 +1625,9 @@ sprint_plan:
   team_assumption: "2 backend engineers, 1 frontend engineer, 1 full-stack/DevOps"
   notes: >
     MVP sprint plan (S1-S4) completed 2026-02-08. Phase 2 sprint plan (S5-S8)
-    added based on MVP retrospective and actual velocity analysis.
+    added based on MVP retrospective and actual velocity analysis. S9 (Per-Agent
+    Setup + Deep Channel UI) and S10 (Skill Package System + Skills Lifecycle)
+    completed 2026-02-21.
 
   sprints:
     - id: S1
@@ -1870,42 +1872,147 @@ sprint_plan:
         - "Phase 2 E2E test suite"
       notes: "E9-F5 and E10-F3 are P2 -- deferrable if velocity drops (saves 10pts)"
 
-    - id: S10
-      name: "Sprint 10: Skill Package System — Core Pipeline"
+    - id: S9
+      name: "Sprint 9: Per-Agent Setup + Deep Channel UI"
       duration: "2 weeks"
+      dates: "Weeks 17-18"
+      status: "completed"
+      completed_at: "2026-02-15"
       goal: >
-        Deliver the core skill package pipeline: ZIP upload with per-file-type
-        validation, LLM-based security review, container read-only deployment,
-        and admin review UI. Non-engineer authoring (visual builder) and community
-        import deferred to Sprint 11.
+        Per-agent role template configuration (6 new AgentRoleConfig fields),
+        container config sync pipeline, agent channel binding, Slack OAuth
+        integration in agent wizard, and admin role template CRUD.
       stories:
+        - feature: "S9-A"
+          description: "Schema migration (6 new AgentRoleConfig fields + customTemplates on Agent)"
+          points: 5
+        - feature: "S9-B"
+          description: "ContainerConfigGeneratorService, SyncService, Processor (BullMQ)"
+          points: 8
+        - feature: "S9-C"
+          description: "Agent CRUD integration (customTemplates, config sync on create/update)"
+          points: 5
+        - feature: "S9-D"
+          description: "Admin role template CRUD (4 endpoints)"
+          points: 5
+        - feature: "S9-E"
+          description: "Frontend wizard template editor step"
+          points: 3
+        - feature: "S9-F"
+          description: "52 new backend tests (6 suites) + agent-tool-policy regression fix"
+          points: 5
+        - feature: "S9-G"
+          description: "Agent channel endpoints (3 endpoints)"
+          points: 3
+        - feature: "S9-H"
+          description: "Frontend channel API, hooks, wizard channel binding, Slack OAuth callback"
+          points: 5
+        - feature: "S9-J"
+          description: "Agent detail Channels tab"
+          points: 3
+      total_points: 42
+      deliverables:
+        - "Per-agent role template configuration with 6 tunable fields"
+        - "BullMQ-driven container config sync pipeline"
+        - "Agent wizard template editor and channel binding steps"
+        - "Admin role template CRUD API"
+        - "Agent channel endpoints and Channels tab UI"
+        - "52 new backend tests across 6 suites"
+        - "API contract v1.4.0 (sections 13-15)"
+      notes: >
+        Full Slack round-trip proven: Slack → Socket Mode → ChannelProxy →
+        /v1/responses → Agent → dispatch-to-platform → Slack reply. HTML
+        prototypes (4 screens) delivered in Phase 0.
+
+    - id: S10
+      name: "Sprint 10: Skill Package System + Skills Lifecycle"
+      duration: "2 weeks"
+      dates: "Weeks 19-20"
+      status: "completed"
+      completed_at: "2026-02-21"
+      goal: >
+        Deliver the core skill package pipeline (ZIP upload, LLM review, container
+        deployment, admin review UI) plus the full skills lifecycle: admin tabs
+        for submission history, submitter feedback visibility, tenant submission
+        flow with GitHub import, and shared import modal.
+      stories:
+        # --- Core Pipeline (Epic E18) ---
         - feature: "E18-F1"
-          description: "Skill package parser & validator (ZIP extraction, manifest schema, AST analysis, per-file-type validators)"
+          description: "Skill package parser & validator (ZIP extraction, Zod manifest, per-file validators, 26 tests)"
           points: 13
         - feature: "E18-F2"
-          description: "LLM-based skill review pipeline (risk scoring, auto-approve low-risk, human queue for medium+)"
+          description: "LLM-based skill review pipeline (Anthropic API, BullMQ async, risk scoring, 11 tests)"
           points: 8
         - feature: "E18-F3"
-          description: "Container skill deployment (read-only mount, network policy from manifest, env injection)"
+          description: "Container skill deployment (AgentSkillInstallation model, deploy/undeploy, network policy, 9 tests)"
           points: 8
         - feature: "E18-F4"
           description: "Admin skill review UI (review queue, SKILL.md preview, LLM findings, approve/reject)"
           points: 8
         - feature: "E2-F4"
-          description: "Platform admin dashboard home (stats cards, alerts table, health indicators, recent activity)"
+          description: "Platform admin dashboard home (real Prisma queries, stat cards, alerts, activity feed, 16 tests)"
           points: 5
-      total_points: 42
+        # --- Skills Lifecycle ---
+        - feature: "SL-1"
+          description: "Prisma migration: changes_requested enum + rejectionReason field"
+          points: 2
+        - feature: "SL-2"
+          description: "Admin review service: listSkills with status filter, requestChanges endpoint, rejectionReason on reject"
+          points: 3
+        - feature: "SL-3"
+          description: "Shared GitHub import module (extracted to backend/src/shared/github-skill-import/)"
+          points: 2
+        - feature: "SL-4"
+          description: "Tenant endpoints: private skills status filter, skill detail, GitHub import"
+          points: 3
+        - feature: "SL-5"
+          description: "Frontend types, API functions, hooks for status filter + requestChanges + tenant GitHub import"
+          points: 2
+        - feature: "SL-6"
+          description: "Admin skills page: 3 tabs (Pending/Approved/Rejected) with counts and status-specific columns"
+          points: 3
+        - feature: "SL-7"
+          description: "Admin review detail: read-only mode for approved/rejected/changes_requested skills"
+          points: 2
+        - feature: "SL-8"
+          description: "Tenant private skills page: 3 tabs with rejection feedback display"
+          points: 3
+        - feature: "SL-9"
+          description: "Tenant skill detail page: read-only with status banner, code viewer, LLM review"
+          points: 3
+        - feature: "SL-10"
+          description: "Shared components: CodeViewer, SkillStatusBadge, SkillStatusBanner, unified ImportSkillModal"
+          points: 3
+        - feature: "SL-11"
+          description: "Increase JSON body limit to 5MB for large skill imports"
+          points: 1
+        - feature: "SL-12"
+          description: "API contract v1.9.0 + backend tests (32 tests, up from 13)"
+          points: 2
+      total_points: 71
       deliverables:
         - ".skill ZIP upload endpoint with validation report"
         - "LLM security review with risk scoring"
         - "Container read-only skill mounting with manifest-driven network policy"
         - "Admin review queue UI with SKILL.md preview and LLM findings"
-        - "Sample skill package (ticket-triage) validated end-to-end"
         - "Platform admin dashboard with live stats and alerts"
+        - "Admin skills page with 3 tabs (Pending/Approved/Rejected) and submission history"
+        - "Admin review detail read-only mode for non-pending skills"
+        - "Request changes workflow (changes_requested status + rejectionReason)"
+        - "Tenant private skills with 3 tabs and rejection feedback visibility"
+        - "Tenant skill detail page with code viewer and LLM review"
+        - "Shared GitHub import module (admin + tenant)"
+        - "Unified ImportSkillModal (GitHub-first, 3 tabs, mode=admin|tenant)"
+        - "Shared UI components: CodeViewer, SkillStatusBadge, SkillStatusBanner"
+        - "API contract v1.9.0 (6 new/updated endpoints)"
+        - "32 backend tests for admin skills review service"
       notes: >
-        E18-F5 (Visual Skill Builder) and E18-F6 (Community Import) are P2 —
-        deferred to Sprint 11. E2-F4 (Admin Dashboard) is a gap from MVP phase
-        that was never implemented — both backend and frontend are stubs.
+        Sprint 10 expanded beyond original E18 scope to include full skills
+        lifecycle (admin tabs, submitter feedback, tenant submission). GitHub
+        import extracted to shared module for reuse by both admin and tenant.
+        Tenant import modal (Phase 3D from lifecycle plan) was deferred initially
+        but then delivered as unified shared ImportSkillModal. Migration
+        20260221000001_add_changes_requested_status applied.
 
 # =============================================================================
 # PHASE SUMMARY
