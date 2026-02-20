@@ -373,6 +373,33 @@ interface ApiError {
 
 ---
 
+### Get Recent Activity
+- **Path**: `/api/admin/dashboard/recent-activity`
+- **Method**: `GET`
+- **Description**: Recent platform-wide admin activity from audit logs
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin)
+- **Query Params**:
+  - `limit` (optional): number, default 10, max 50
+
+#### Response
+- **Success (200)**:
+```typescript
+Array<{
+  id: string;
+  action: string;
+  resourceType: string;
+  resourceId: string;
+  userId: string;
+  tenantId: string;
+  timestamp: string;         // ISO 8601
+  details: Record<string, unknown> | null;
+}>
+```
+
+---
+
 ## 3. Platform Admin: Tenants
 
 ### List Tenants
@@ -2595,10 +2622,290 @@ interface AgentChannelRoute {
 
 ---
 
+## 18. Skill Packages (Sprint 10)
+
+### Upload Skill Package
+- **Path**: `/api/dashboard/skills/package/upload`
+- **Method**: `POST`
+- **Description**: Upload and validate a .skill/.zip package, store for later submission
+- **Content-Type**: `multipart/form-data`
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (tenant user)
+- **Body**: `file` — ZIP file (max 5MB compressed)
+
+#### Response
+- **Success (201)**:
+```typescript
+{
+  valid: boolean;
+  packageId: string;             // UUID for referencing stored package
+  manifest: {
+    name: string;
+    version: string;
+    description: string;
+    category: string;
+    author: string;
+    runtime: "markdown" | "javascript" | "typescript";
+    compatibleRoles: string[];
+    permissions: {
+      network?: { allowedDomains: string[] };
+      files?: { readPaths: string[]; writePaths: string[] };
+      env?: { required: string[]; optional: string[] };
+    };
+    config: Array<{
+      key: string;
+      label: string;
+      description: string;
+      type: "string" | "number" | "boolean" | "select";
+      required: boolean;
+      options?: (string | number)[];
+      defaultValue?: string | number | boolean;
+    }>;
+  } | null;
+  skillMd: {
+    title: string;
+    description: string;
+    trigger?: string;
+    steps: string[];
+    rawContent: string;
+  } | null;
+  files: Array<{
+    path: string;
+    size: number;
+    type: "skill-definition" | "manifest" | "javascript" | "handlebars" | "data";
+  }>;
+  issues: Array<{
+    severity: "error" | "warning" | "info";
+    file?: string;
+    message: string;
+  }>;
+  scriptAnalysis?: Array<{
+    valid: boolean;
+    issues: Array<{ severity: string; pattern: string; message: string; line?: number }>;
+  }>;
+}
+```
+
+- **Error (400)**: Invalid package / validation errors
+- **Error (413)**: File too large (>5MB)
+
+---
+
+### Validate Skill Package (No Storage)
+- **Path**: `/api/dashboard/skills/package/validate`
+- **Method**: `POST`
+- **Description**: Validate a .skill/.zip package without storing it
+- **Content-Type**: `multipart/form-data`
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (tenant user)
+- **Body**: `file` — ZIP file (max 5MB compressed)
+
+#### Response
+- **Success (200)**: Same shape as upload response but `packageId` is omitted
+
+---
+
+### Get Stored Package
+- **Path**: `/api/dashboard/skills/package/:packageId`
+- **Method**: `GET`
+- **Description**: Retrieve a previously uploaded package's validation result
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (tenant user)
+
+#### Response
+- **Success (200)**: Same shape as upload response
+- **Error (404)**: Package not found or expired (30min TTL)
+
+---
+
+### Submit Package for Review
+- **Path**: `/api/dashboard/skills/package/:packageId/submit`
+- **Method**: `POST`
+- **Description**: Submit a validated package for admin review. Creates a Skill record and enqueues LLM review.
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (tenant user)
+- **Body**:
+```typescript
+{
+  envConfig?: Record<string, string>;   // Values for required env vars
+}
+```
+
+#### Response
+- **Success (201)**:
+```typescript
+{
+  skillId: string;
+  status: "pending";
+  message: string;
+}
+```
+
+- **Error (400)**: Package has validation errors
+- **Error (404)**: Package not found or expired
+
+---
+
+### Admin: Get Skills Pending Review
+- **Path**: `/api/admin/skills/review`
+- **Method**: `GET`
+- **Description**: List all skills pending admin review with LLM analysis results
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin)
+- **Query Params**:
+  - `status` (optional): `pending` | `in_review` — default: both
+  - `limit` (optional): number, default 20
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  data: Array<{
+    id: string;
+    name: string;
+    version: string;
+    description: string;
+    category: string;
+    author: string;
+    tenantId: string;
+    tenantName: string;
+    status: "pending" | "in_review";
+    submittedAt: string;
+    llmReview?: {
+      riskScore: number;             // 0-100
+      riskLevel: "low" | "medium" | "high" | "critical";
+      findings: Array<{
+        category: string;
+        severity: "low" | "medium" | "high" | "critical";
+        description: string;
+        recommendation: string;
+      }>;
+      summary: string;
+      reviewedAt: string;
+    };
+  }>;
+}
+```
+
+---
+
+### Admin: Get Skill Review Details
+- **Path**: `/api/admin/skills/review/:skillId`
+- **Method**: `GET`
+- **Description**: Get full skill details for review including source code and LLM analysis
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin)
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  id: string;
+  name: string;
+  version: string;
+  description: string;
+  category: string;
+  sourceCode: string;
+  documentation: string;
+  permissions: object;
+  compatibleRoles: string[];
+  llmReview?: { /* same as above */ };
+  tenantId: string;
+  tenantName: string;
+  submittedAt: string;
+}
+```
+
+---
+
+### Admin: Approve/Reject Skill
+- **Path**: `/api/admin/skills/review/:skillId`
+- **Method**: `PUT`
+- **Description**: Approve or reject a skill after admin review
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (role: platform_admin)
+- **Body**:
+```typescript
+{
+  action: "approve" | "reject";
+  reviewNotes?: string;               // Required for rejection
+}
+```
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  id: string;
+  status: "approved" | "rejected";
+  reviewedAt: string;
+  reviewedBy: string;
+  reviewNotes?: string;
+}
+```
+
+---
+
+### Install Skill on Agent
+- **Path**: `/api/dashboard/agents/:agentId/skills/:skillId/install`
+- **Method**: `POST`
+- **Description**: Install an approved skill on an agent, deploying files to container
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (tenant user)
+- **Body**:
+```typescript
+{
+  envConfig?: Record<string, string>;   // Runtime env values
+  configValues?: Record<string, unknown>; // Skill config values
+}
+```
+
+#### Response
+- **Success (201)**:
+```typescript
+{
+  installationId: string;
+  agentId: string;
+  skillName: string;
+  skillVersion: string;
+  status: "deploying";
+}
+```
+
+---
+
+### Uninstall Skill from Agent
+- **Path**: `/api/dashboard/agents/:agentId/skills/:skillId/uninstall`
+- **Method**: `POST`
+- **Description**: Remove a skill from an agent and clean up container files
+
+#### Request
+- **Headers**: `Authorization: Bearer <access_token>` (tenant user)
+
+#### Response
+- **Success (200)**:
+```typescript
+{
+  installationId: string;
+  status: "uninstalled";
+}
+```
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.6.0 | 2026-02-20 | Skill Packages (section 18): upload, validate, submit, admin review, install/uninstall. Admin dashboard recent-activity endpoint (section 2). |
 | 1.5.0 | 2026-02-15 | Billing APIs: overview, usage analytics, overage toggle, quota warnings (section 17) |
 | 1.4.0 | 2026-02-11 | Admin role config template CRUD (section 13), tenant agent template preview (section 14), agent channel routes CRUD (section 15) |
 | 1.3.0 | 2026-02-07 | Dynamic roles (AgentRoleConfig), thinkingMode→fast/standard/extended, allow-only toolPolicy (drop deny), new fields: temperature/avatarColor/personality/errorMessage, dashboard stats: plan/skillsInstalled/teamMembers/messageTrend, new endpoint: GET /api/dashboard/roles, channels deferred |

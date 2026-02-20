@@ -4,10 +4,26 @@ import { api } from '@/lib/api/client';
 // Types
 // ---------------------------------------------------------------------------
 
+/** Normalized permission manifest from backend (v2 format) */
 export interface SkillPermissions {
-  network: string[];
-  files: string[];
-  env: string[];
+  network: { allowedDomains: string[] };
+  files: { readPaths: string[]; writePaths: string[] };
+  env: { required: string[]; optional: string[] };
+}
+
+/** Helper: flatten permissions to string arrays for display */
+export function flattenPermissions(p: SkillPermissions) {
+  return {
+    network: p.network?.allowedDomains ?? [],
+    files: [
+      ...(p.files?.readPaths ?? []).map((f) => `read: ${f}`),
+      ...(p.files?.writePaths ?? []).map((f) => `write: ${f}`),
+    ],
+    env: [
+      ...(p.env?.required ?? []).map((e) => `${e} (required)`),
+      ...(p.env?.optional ?? []).map((e) => `${e} (optional)`),
+    ],
+  };
 }
 
 export interface Skill {
@@ -30,11 +46,16 @@ export interface SkillReview {
   createdAt: string;
 }
 
+export interface InstalledAgent {
+  id: string;
+  name: string;
+}
+
 export interface SkillDetail extends Skill {
   documentation: string;
   changelog: string;
   reviews: SkillReview[];
-  installedAgents?: string[];
+  installedAgents?: InstalledAgent[];
 }
 
 export interface InstalledSkill {
@@ -60,6 +81,7 @@ export interface SkillFilters {
 export interface InstallSkillPayload {
   agentId: string;
   credentials?: Record<string, string>;
+  acceptPermissions?: boolean;
 }
 
 export interface InstallSkillResponse {

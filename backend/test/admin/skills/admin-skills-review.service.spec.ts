@@ -73,7 +73,7 @@ describe('AdminSkillsReviewService', () => {
 
       expect(prisma.skill.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { status: 'pending', tenantId: { not: null } },
+          where: { status: { in: ['pending', 'in_review'] }, tenantId: { not: null } },
         }),
       );
     });

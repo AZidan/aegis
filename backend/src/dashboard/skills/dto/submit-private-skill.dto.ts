@@ -13,6 +13,7 @@ export const submitPrivateSkillSchema = z.object({
     env: z.object({ required: z.array(z.string()), optional: z.array(z.string()) }),
   }),
   documentation: z.string().max(50000).optional(),
+  packageId: z.string().uuid().optional(),
 });
 
 export type SubmitPrivateSkillDto = z.infer<typeof submitPrivateSkillSchema>;

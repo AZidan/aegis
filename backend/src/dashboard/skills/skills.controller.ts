@@ -107,7 +107,8 @@ export class SkillsController {
     @Body(new ZodValidationPipe(installSkillSchema)) dto: InstallSkillDto,
   ) {
     const tenantId = this.getTenantId(req);
-    return this.skillsService.installSkill(tenantId, id, dto);
+    const userId = (req as Request & { user: { id: string } }).user.id;
+    return this.skillsService.installSkill(tenantId, id, dto, userId);
   }
 
   // ==========================================================================
@@ -122,6 +123,7 @@ export class SkillsController {
     @Query('agentId') agentId: string,
   ) {
     const tenantId = this.getTenantId(req);
-    await this.skillsService.uninstallSkill(tenantId, id, agentId);
+    const userId = (req as Request & { user: { id: string } }).user.id;
+    await this.skillsService.uninstallSkill(tenantId, id, agentId, userId);
   }
 }

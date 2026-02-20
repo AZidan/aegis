@@ -82,12 +82,15 @@ services:
       CONTAINER_BASE_PORT: ${CONTAINER_BASE_PORT:-19000}
       CONTAINER_PORT_RANGE: ${CONTAINER_PORT_RANGE:-1000}
       AEGIS_SECRETS_DIR: /tmp/aegis-secrets
+      SKILL_PACKAGE_STORAGE_PATH: /data/skill-packages
     volumes:
       - ./backend:/app
       - /app/node_modules
       - /app/prisma/generated
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/aegis-secrets:/tmp/aegis-secrets
+      - skill-packages:/data/skill-packages
+      - openclaw-workspaces:/home/node/.openclaw
     depends_on:
       postgres:
         condition: service_healthy
@@ -125,6 +128,10 @@ volumes:
     name: aegis-postgres-data
   redis_data:
     name: aegis-redis-data
+  skill-packages:
+    name: aegis-skill-packages
+  openclaw-workspaces:
+    name: aegis-openclaw-workspaces
 
 networks:
   aegis-network:

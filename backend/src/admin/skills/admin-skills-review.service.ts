@@ -12,30 +12,95 @@ export class AdminSkillsReviewService {
   ) {}
 
   /**
-   * List all skills awaiting review (status=pending, tenantId not null).
+   * List all skills awaiting review (status=pending or in_review, tenantId not null).
+   * Includes LLM review results from reviewNotes (JSON) when available.
    */
   async listReviewQueue() {
     const skills = await this.prisma.skill.findMany({
-      where: { status: 'pending', tenantId: { not: null } },
+      where: {
+        status: { in: ['pending', 'in_review'] },
+        tenantId: { not: null },
+      },
       orderBy: { submittedAt: 'asc' },
-      select: {
-        id: true,
-        name: true,
-        version: true,
-        description: true,
-        category: true,
-        status: true,
-        compatibleRoles: true,
-        tenantId: true,
-        authorId: true,
-        submittedAt: true,
-        sourceCode: true,
-        permissions: true,
-        documentation: true,
+      include: {
+        tenant: { select: { companyName: true } },
+        author: { select: { email: true } },
       },
     });
 
-    return { data: skills, total: skills.length };
+    const data = skills.map((skill) => {
+      let llmReview = null;
+      if (skill.reviewNotes) {
+        try {
+          llmReview = JSON.parse(skill.reviewNotes);
+        } catch {
+          // Not JSON (legacy text notes)
+        }
+      }
+      return {
+        id: skill.id,
+        name: skill.name,
+        version: skill.version,
+        description: skill.description,
+        category: skill.category,
+        status: skill.status,
+        compatibleRoles: skill.compatibleRoles,
+        tenantId: skill.tenantId,
+        tenantName: skill.tenant?.companyName ?? 'Unknown',
+        author: skill.author?.email ?? skill.authorId,
+        submittedAt: skill.submittedAt.toISOString(),
+        sourceCode: skill.sourceCode,
+        documentation: skill.documentation,
+        permissions: skill.permissions,
+        llmReview,
+      };
+    });
+
+    return { data, total: data.length };
+  }
+
+  /**
+   * Get detail for a single skill in review.
+   */
+  async getSkillDetail(skillId: string) {
+    const skill = await this.prisma.skill.findUnique({
+      where: { id: skillId },
+      include: {
+        tenant: { select: { companyName: true } },
+        author: { select: { email: true } },
+      },
+    });
+
+    if (!skill || !skill.tenantId) {
+      throw new NotFoundException(`Skill ${skillId} not found`);
+    }
+
+    let llmReview = null;
+    if (skill.reviewNotes) {
+      try {
+        llmReview = JSON.parse(skill.reviewNotes);
+      } catch {
+        // Not JSON (legacy text notes)
+      }
+    }
+
+    return {
+      id: skill.id,
+      name: skill.name,
+      version: skill.version,
+      description: skill.description,
+      category: skill.category,
+      status: skill.status,
+      compatibleRoles: skill.compatibleRoles,
+      tenantId: skill.tenantId,
+      tenantName: skill.tenant?.companyName ?? 'Unknown',
+      author: skill.author?.email ?? skill.authorId,
+      submittedAt: skill.submittedAt.toISOString(),
+      sourceCode: skill.sourceCode,
+      documentation: skill.documentation,
+      permissions: skill.permissions,
+      llmReview,
+    };
   }
 
   /**

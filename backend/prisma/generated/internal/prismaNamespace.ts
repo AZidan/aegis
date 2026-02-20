@@ -398,6 +398,7 @@ export const ModelName = {
   AgentActivity: 'AgentActivity',
   AgentMetrics: 'AgentMetrics',
   SkillInstallation: 'SkillInstallation',
+  AgentSkillInstallation: 'AgentSkillInstallation',
   ContainerHealth: 'ContainerHealth',
   Alert: 'Alert',
   AuditLog: 'AuditLog',
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "tenant" | "tenantConfigHistory" | "agent" | "agentRoleConfig" | "skill" | "refreshToken" | "apiKey" | "teamMember" | "teamInvite" | "agentChannel" | "agentActivity" | "agentMetrics" | "skillInstallation" | "containerHealth" | "alert" | "auditLog" | "agentMessage" | "agentAllowlist" | "channelConnection" | "channelRouting" | "usageRecord" | "providerPricing" | "workflowTemplate" | "workflowInstance"
+    modelProps: "user" | "tenant" | "tenantConfigHistory" | "agent" | "agentRoleConfig" | "skill" | "refreshToken" | "apiKey" | "teamMember" | "teamInvite" | "agentChannel" | "agentActivity" | "agentMetrics" | "skillInstallation" | "agentSkillInstallation" | "containerHealth" | "alert" | "auditLog" | "agentMessage" | "agentAllowlist" | "channelConnection" | "channelRouting" | "usageRecord" | "providerPricing" | "workflowTemplate" | "workflowInstance"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1464,6 +1465,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AgentSkillInstallation: {
+      payload: Prisma.$AgentSkillInstallationPayload<ExtArgs>
+      fields: Prisma.AgentSkillInstallationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgentSkillInstallationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSkillInstallationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgentSkillInstallationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSkillInstallationPayload>
+        }
+        findFirst: {
+          args: Prisma.AgentSkillInstallationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSkillInstallationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgentSkillInstallationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSkillInstallationPayload>
+        }
+        findMany: {
+          args: Prisma.AgentSkillInstallationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSkillInstallationPayload>[]
+        }
+        create: {
+          args: Prisma.AgentSkillInstallationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSkillInstallationPayload>
+        }
+        createMany: {
+          args: Prisma.AgentSkillInstallationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgentSkillInstallationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSkillInstallationPayload>[]
+        }
+        delete: {
+          args: Prisma.AgentSkillInstallationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSkillInstallationPayload>
+        }
+        update: {
+          args: Prisma.AgentSkillInstallationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSkillInstallationPayload>
+        }
+        deleteMany: {
+          args: Prisma.AgentSkillInstallationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgentSkillInstallationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgentSkillInstallationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSkillInstallationPayload>[]
+        }
+        upsert: {
+          args: Prisma.AgentSkillInstallationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSkillInstallationPayload>
+        }
+        aggregate: {
+          args: Prisma.AgentSkillInstallationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgentSkillInstallation>
+        }
+        groupBy: {
+          args: Prisma.AgentSkillInstallationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentSkillInstallationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgentSkillInstallationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentSkillInstallationCountAggregateOutputType> | number
+        }
+      }
+    }
     ContainerHealth: {
       payload: Prisma.$ContainerHealthPayload<ExtArgs>
       fields: Prisma.ContainerHealthFieldRefs
@@ -2446,6 +2521,7 @@ export const SkillScalarFieldEnum = {
   capabilities: 'capabilities',
   configuration: 'configuration',
   permissions: 'permissions',
+  packagePath: 'packagePath',
   documentation: 'documentation',
   changelog: 'changelog',
   reviewNotes: 'reviewNotes',
@@ -2567,6 +2643,23 @@ export const SkillInstallationScalarFieldEnum = {
 } as const
 
 export type SkillInstallationScalarFieldEnum = (typeof SkillInstallationScalarFieldEnum)[keyof typeof SkillInstallationScalarFieldEnum]
+
+
+export const AgentSkillInstallationScalarFieldEnum = {
+  id: 'id',
+  agentId: 'agentId',
+  skillPackageId: 'skillPackageId',
+  skillName: 'skillName',
+  skillVersion: 'skillVersion',
+  tenantId: 'tenantId',
+  envConfig: 'envConfig',
+  deployedAt: 'deployedAt',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgentSkillInstallationScalarFieldEnum = (typeof AgentSkillInstallationScalarFieldEnum)[keyof typeof AgentSkillInstallationScalarFieldEnum]
 
 
 export const ContainerHealthScalarFieldEnum = {
@@ -3047,6 +3140,20 @@ export type ListEnumActivityTypeFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
+ * Reference to a field of type 'SkillDeploymentStatus'
+ */
+export type EnumSkillDeploymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SkillDeploymentStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SkillDeploymentStatus[]'
+ */
+export type ListEnumSkillDeploymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SkillDeploymentStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'HealthStatus'
  */
 export type EnumHealthStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'HealthStatus'>
@@ -3322,6 +3429,7 @@ export type GlobalOmitConfig = {
   agentActivity?: Prisma.AgentActivityOmit
   agentMetrics?: Prisma.AgentMetricsOmit
   skillInstallation?: Prisma.SkillInstallationOmit
+  agentSkillInstallation?: Prisma.AgentSkillInstallationOmit
   containerHealth?: Prisma.ContainerHealthOmit
   alert?: Prisma.AlertOmit
   auditLog?: Prisma.AuditLogOmit

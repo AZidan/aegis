@@ -371,6 +371,9 @@ model Agent {
   // Channel integration (Sprint 6 — E11)
   channelRouting   ChannelRouting[]  @relation("ChannelRouting")
 
+  // Skill package deployments (Sprint 10 — S10-03)
+  skillInstallationsV2 AgentSkillInstallation[] @relation("AgentSkillInstallations")
+
   @@index([tenantId])
   @@index([status])
   @@index([role])
@@ -436,6 +439,9 @@ model Skill {
   capabilities  Json? // Skill capabilities metadata
   configuration Json? // Configuration options
   permissions   Json // { network: string[], files: string[], env: string[] }
+
+  // Package storage (path to ZIP on disk for full deployment)
+  packagePath String?
 
   // Documentation
   documentation String? @db.Text
@@ -668,6 +674,40 @@ model SkillInstallation {
   @@index([agentId])
   @@index([skillId])
   @@map("skill_installations")
+}
+
+// ============================================================================
+// SKILL PACKAGE DEPLOYMENT (Sprint 10 — S10-03)
+// ============================================================================
+
+enum SkillDeploymentStatus {
+  pending
+  deploying
+  deployed
+  failed
+  uninstalled
+
+  @@map("skill_deployment_status")
+}
+
+/// AgentSkillInstallation - Tracks skill package deployments to agent containers
+model AgentSkillInstallation {
+  id              String                @id @default(uuid())
+  agentId         String
+  agent           Agent                 @relation("AgentSkillInstallations", fields: [agentId], references: [id], onDelete: Cascade)
+  skillPackageId  String                // UUID of the source Skill record
+  skillName       String
+  skillVersion    String
+  tenantId        String
+  envConfig       Json?                 // Encrypted env var values for the skill
+  deployedAt      DateTime?
+  status          SkillDeploymentStatus @default(pending)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@unique([agentId, skillName])
+  @@index([tenantId])
+  @@map("agent_skill_installations")
 }
 
 // ============================================================================

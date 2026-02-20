@@ -11,6 +11,7 @@ import { Prisma } from '../../../prisma/generated/client';
 import { BrowseSkillsQueryDto } from './dto/browse-skills-query.dto';
 import { InstallSkillDto } from './dto/install-skill.dto';
 import { PermissionService } from './permission.service';
+import { SkillDeploymentService } from './skill-deployment.service';
 
 /**
  * Skills Service - Tenant: Skills
@@ -33,6 +34,7 @@ export class SkillsService {
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
     private readonly permissionService: PermissionService,
+    private readonly deploymentService: SkillDeploymentService,
   ) {}
 
   // ==========================================================================
@@ -171,11 +173,14 @@ export class SkillsService {
         skillId,
         agentId: { in: tenantAgentIds },
       },
-      select: { agentId: true },
+      select: { agentId: true, agent: { select: { name: true } } },
     });
 
     const installed = installations.length > 0;
-    const installedAgents = installations.map((i) => i.agentId);
+    const installedAgents = installations.map((i) => ({
+      id: i.agentId,
+      name: i.agent.name,
+    }));
 
     return {
       id: skill.id,
@@ -201,7 +206,7 @@ export class SkillsService {
   // Response (201): { skillId, agentId, status: "installing", message }
   // Error (409): Conflict if already installed
   // ==========================================================================
-  async installSkill(tenantId: string, skillId: string, dto: InstallSkillDto) {
+  async installSkill(tenantId: string, skillId: string, dto: InstallSkillDto, userId: string) {
     // Verify skill exists and is approved
     const skill = await this.prisma.skill.findFirst({
       where: { id: skillId, status: 'approved' },
@@ -242,8 +247,26 @@ export class SkillsService {
     const toolPolicy = (agent.toolPolicy as { allow: string[] }) ?? { allow: [] };
     const { compatible, violations } = this.permissionService.checkPolicyCompatibility(manifest, toolPolicy);
     if (!compatible) {
-      throw new ConflictException(
-        `Skill requires permissions denied by agent tool policy: ${violations.join('; ')}`,
+      if (!dto.acceptPermissions) {
+        throw new ConflictException(
+          `Skill requires permissions denied by agent tool policy: ${violations.join('; ')}`,
+        );
+      }
+
+      // User accepted — auto-add required permission categories to agent's toolPolicy
+      const updatedAllow = [...toolPolicy.allow];
+      if (manifest.network.allowedDomains.length > 0 && !updatedAllow.includes('network')) {
+        updatedAllow.push('network');
+      }
+      if ((manifest.files.readPaths.length > 0 || manifest.files.writePaths.length > 0) && !updatedAllow.includes('filesystem')) {
+        updatedAllow.push('filesystem');
+      }
+      await this.prisma.agent.update({
+        where: { id: dto.agentId },
+        data: { toolPolicy: { allow: updatedAllow } },
+      });
+      this.logger.log(
+        `Auto-granted permissions [${updatedAllow.filter((x) => !toolPolicy.allow.includes(x)).join(', ')}] to agent ${dto.agentId} for skill ${skill.name}`,
       );
     }
 
@@ -281,6 +304,22 @@ export class SkillsService {
       `Skill ${skill.name} (${skillId}) installed on agent ${dto.agentId} for tenant ${tenantId}`,
     );
 
+    // Trigger container deployment (enqueues BullMQ job to extract skill files)
+    try {
+      await this.deploymentService.installSkill(
+        dto.agentId,
+        skillId,
+        tenantId,
+        userId,
+        dto.credentials,
+      );
+    } catch (deployErr) {
+      // Don't fail the install if deployment enqueue fails — the DB record exists
+      this.logger.warn(
+        `Deployment enqueue failed for ${skill.name} on agent ${dto.agentId}: ${deployErr}`,
+      );
+    }
+
     return {
       skillId,
       agentId: dto.agentId,
@@ -298,6 +337,7 @@ export class SkillsService {
     tenantId: string,
     skillId: string,
     agentId: string,
+    userId: string,
   ): Promise<void> {
     // Verify agent belongs to tenant
     const agent = await this.prisma.agent.findFirst({
@@ -361,6 +401,15 @@ export class SkillsService {
     this.logger.log(
       `Skill ${skillId} uninstalled from agent ${agentId} for tenant ${tenantId}`,
     );
+
+    // Trigger container undeploy (removes skill files from agent workspace)
+    try {
+      await this.deploymentService.uninstallSkill(agentId, skillId, tenantId, userId);
+    } catch (undeployErr) {
+      this.logger.warn(
+        `Undeploy enqueue failed for skill ${skillId} on agent ${agentId}: ${undeployErr}`,
+      );
+    }
   }
 
   // ==========================================================================

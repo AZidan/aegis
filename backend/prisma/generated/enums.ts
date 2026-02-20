@@ -227,6 +227,17 @@ export const AllowlistDirection = {
 export type AllowlistDirection = (typeof AllowlistDirection)[keyof typeof AllowlistDirection]
 
 
+export const SkillDeploymentStatus = {
+  pending: 'pending',
+  deploying: 'deploying',
+  deployed: 'deployed',
+  failed: 'failed',
+  uninstalled: 'uninstalled'
+} as const
+
+export type SkillDeploymentStatus = (typeof SkillDeploymentStatus)[keyof typeof SkillDeploymentStatus]
+
+
 export const WorkflowStatus = {
   pending: 'pending',
   running: 'running',

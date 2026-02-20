@@ -88,6 +88,11 @@ export type AgentMetrics = Prisma.AgentMetricsModel
  */
 export type SkillInstallation = Prisma.SkillInstallationModel
 /**
+ * Model AgentSkillInstallation
+ * AgentSkillInstallation - Tracks skill package deployments to agent containers
+ */
+export type AgentSkillInstallation = Prisma.AgentSkillInstallationModel
+/**
  * Model ContainerHealth
  * ContainerHealth - Container health metrics
  */

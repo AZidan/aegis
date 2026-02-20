@@ -27,7 +27,9 @@ import {
 import {
   SKILL_CATEGORY_LABELS,
   SKILL_CATEGORY_COLORS,
+  flattenPermissions,
 } from '@/lib/api/skills';
+import type { SkillPermissions, InstalledAgent } from '@/lib/api/skills';
 
 // ---------------------------------------------------------------------------
 // Tab Configuration
@@ -299,10 +301,12 @@ function OverviewTab({
   isUninstalling,
 }: {
   documentation: string;
-  installedAgents?: string[];
+  installedAgents?: InstalledAgent[];
   onUninstall: (agentId: string) => void;
   isUninstalling: boolean;
 }) {
+  const [confirmingId, setConfirmingId] = React.useState<string | null>(null);
+
   return (
     <div className="space-y-6">
       {/* Documentation */}
@@ -322,26 +326,49 @@ function OverviewTab({
             Installed Agents
           </h3>
           <div className="space-y-2">
-            {installedAgents.map((agentId) => (
+            {installedAgents.map((agent) => (
               <div
-                key={agentId}
+                key={agent.id}
                 className="flex items-center justify-between rounded-lg border border-neutral-100 px-4 py-2.5"
               >
-                <span className="text-sm text-neutral-700 font-mono">
-                  {agentId}
+                <span className="text-sm text-neutral-700">
+                  {agent.name}
                 </span>
-                <button
-                  onClick={() => onUninstall(agentId)}
-                  disabled={isUninstalling}
-                  className="inline-flex items-center gap-1.5 text-xs text-red-500 hover:text-red-700 transition-colors disabled:opacity-50"
-                >
-                  {isUninstalling ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
+                {confirmingId === agent.id ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-neutral-500">Uninstall from {agent.name}?</span>
+                    <button
+                      onClick={() => {
+                        onUninstall(agent.id);
+                        setConfirmingId(null);
+                      }}
+                      disabled={isUninstalling}
+                      className="inline-flex items-center gap-1 rounded-md bg-red-500 px-2.5 py-1 text-xs font-medium text-white hover:bg-red-600 transition-colors disabled:opacity-50"
+                    >
+                      {isUninstalling ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        'Confirm'
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setConfirmingId(null)}
+                      disabled={isUninstalling}
+                      className="inline-flex items-center rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-medium text-neutral-600 hover:bg-neutral-50 transition-colors disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmingId(agent.id)}
+                    disabled={isUninstalling}
+                    className="inline-flex items-center gap-1.5 text-xs text-red-500 hover:text-red-700 transition-colors disabled:opacity-50"
+                  >
                     <Trash2 className="h-3.5 w-3.5" />
-                  )}
-                  Uninstall
-                </button>
+                    Uninstall
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -358,12 +385,13 @@ function OverviewTab({
 function PermissionsTab({
   permissions,
 }: {
-  permissions: { network: string[]; files: string[]; env: string[] };
+  permissions: SkillPermissions;
 }) {
+  const flat = flattenPermissions(permissions);
   const hasAny =
-    permissions.network.length > 0 ||
-    permissions.files.length > 0 ||
-    permissions.env.length > 0;
+    flat.network.length > 0 ||
+    flat.files.length > 0 ||
+    flat.env.length > 0;
 
   if (!hasAny) {
     return (
@@ -377,28 +405,28 @@ function PermissionsTab({
 
   return (
     <div className="space-y-4">
-      {permissions.network.length > 0 && (
+      {flat.network.length > 0 && (
         <PermissionGroup
           icon={<Globe className="h-4 w-4 text-blue-500" />}
           title="Network Access"
           description="This skill requires access to the following network resources."
-          items={permissions.network}
+          items={flat.network}
         />
       )}
-      {permissions.files.length > 0 && (
+      {flat.files.length > 0 && (
         <PermissionGroup
           icon={<FolderOpen className="h-4 w-4 text-amber-500" />}
           title="File Access"
           description="This skill requires access to the following file paths."
-          items={permissions.files}
+          items={flat.files}
         />
       )}
-      {permissions.env.length > 0 && (
+      {flat.env.length > 0 && (
         <PermissionGroup
           icon={<Key className="h-4 w-4 text-purple-500" />}
           title="Environment Variables"
           description="This skill requires the following environment variables."
-          items={permissions.env}
+          items={flat.env}
         />
       )}
     </div>

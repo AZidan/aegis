@@ -201,4 +201,38 @@ export class NetworkPolicyService {
 
     return false;
   }
+
+  /**
+   * Add allowed domains for a skill deployment.
+   * Stores them in a Redis set keyed by tenant+skill for later aggregation.
+   */
+  async addDomainsForSkill(
+    tenantId: string,
+    skillName: string,
+    domains: string[],
+  ): Promise<void> {
+    const cacheKey = `skill-domains:${tenantId}:${skillName}`;
+    await this.cache.set(cacheKey, JSON.stringify(domains), 0); // No expiry
+    // Invalidate the tenant policy cache so it's regenerated
+    await this.cache.del(`network-policy:${tenantId}`);
+    this.logger.log(
+      `Added ${domains.length} domains for skill ${skillName} in tenant ${tenantId}`,
+    );
+  }
+
+  /**
+   * Remove allowed domains for an uninstalled skill.
+   */
+  async removeDomainsForSkill(
+    tenantId: string,
+    skillName: string,
+  ): Promise<void> {
+    const cacheKey = `skill-domains:${tenantId}:${skillName}`;
+    await this.cache.del(cacheKey);
+    // Invalidate the tenant policy cache
+    await this.cache.del(`network-policy:${tenantId}`);
+    this.logger.log(
+      `Removed domains for skill ${skillName} in tenant ${tenantId}`,
+    );
+  }
 }

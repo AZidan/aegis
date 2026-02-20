@@ -1,9 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConflictException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { getQueueToken } from '@nestjs/bullmq';
 import { PrivateSkillsService } from '../../../src/dashboard/skills/private-skills.service';
 import { PrismaService } from '../../../src/prisma/prisma.service';
 import { AuditService } from '../../../src/audit/audit.service';
 import { SkillValidatorService } from '../../../src/dashboard/skills/skill-validator.service';
+import { SkillPackageService } from '../../../src/dashboard/skills/skill-package.service';
+import { SKILL_REVIEW_QUEUE } from '../../../src/dashboard/skills/skill-review.processor';
 
 const TENANT_ID = 'tenant-uuid-1';
 const USER_ID = 'user-uuid-1';
@@ -66,6 +69,14 @@ describe('PrivateSkillsService', () => {
               .mockResolvedValue({ valid: true, issues: [] }),
           },
         },
+        {
+          provide: SkillPackageService,
+          useValue: {
+            getPackagePath: jest.fn().mockReturnValue('/data/skill-packages/tenant-1/my-custom-skill/1.0.0/package.zip'),
+            getStoredPackage: jest.fn().mockResolvedValue(null),
+          },
+        },
+        { provide: getQueueToken(SKILL_REVIEW_QUEUE), useValue: { add: jest.fn().mockResolvedValue({}) } },
       ],
     }).compile();
 

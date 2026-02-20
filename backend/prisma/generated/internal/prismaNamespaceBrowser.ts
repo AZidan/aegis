@@ -65,6 +65,7 @@ export const ModelName = {
   AgentActivity: 'AgentActivity',
   AgentMetrics: 'AgentMetrics',
   SkillInstallation: 'SkillInstallation',
+  AgentSkillInstallation: 'AgentSkillInstallation',
   ContainerHealth: 'ContainerHealth',
   Alert: 'Alert',
   AuditLog: 'AuditLog',
@@ -223,6 +224,7 @@ export const SkillScalarFieldEnum = {
   capabilities: 'capabilities',
   configuration: 'configuration',
   permissions: 'permissions',
+  packagePath: 'packagePath',
   documentation: 'documentation',
   changelog: 'changelog',
   reviewNotes: 'reviewNotes',
@@ -344,6 +346,23 @@ export const SkillInstallationScalarFieldEnum = {
 } as const
 
 export type SkillInstallationScalarFieldEnum = (typeof SkillInstallationScalarFieldEnum)[keyof typeof SkillInstallationScalarFieldEnum]
+
+
+export const AgentSkillInstallationScalarFieldEnum = {
+  id: 'id',
+  agentId: 'agentId',
+  skillPackageId: 'skillPackageId',
+  skillName: 'skillName',
+  skillVersion: 'skillVersion',
+  tenantId: 'tenantId',
+  envConfig: 'envConfig',
+  deployedAt: 'deployedAt',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgentSkillInstallationScalarFieldEnum = (typeof AgentSkillInstallationScalarFieldEnum)[keyof typeof AgentSkillInstallationScalarFieldEnum]
 
 
 export const ContainerHealthScalarFieldEnum = {

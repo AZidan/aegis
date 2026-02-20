@@ -55,6 +55,20 @@ export class AdminSkillsReviewController {
   }
 
   // ==========================================================================
+  // GET /api/admin/skills/review/:id - Get skill detail
+  // Requires: platform_admin role
+  // ==========================================================================
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  async getSkillDetail(
+    @Param('id') id: string,
+    @CurrentUser() user: { role: string },
+  ) {
+    this.assertPlatformAdmin(user);
+    return this.reviewService.getSkillDetail(id);
+  }
+
+  // ==========================================================================
   // PUT /api/admin/skills/review/:id/approve - Approve skill
   // Requires: platform_admin role
   // ==========================================================================

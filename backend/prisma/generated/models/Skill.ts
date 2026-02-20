@@ -50,6 +50,7 @@ export type SkillMinAggregateOutputType = {
   repositoryUrl: string | null
   mainFile: string | null
   sourceCode: string | null
+  packagePath: string | null
   documentation: string | null
   changelog: string | null
   reviewNotes: string | null
@@ -75,6 +76,7 @@ export type SkillMaxAggregateOutputType = {
   repositoryUrl: string | null
   mainFile: string | null
   sourceCode: string | null
+  packagePath: string | null
   documentation: string | null
   changelog: string | null
   reviewNotes: string | null
@@ -104,6 +106,7 @@ export type SkillCountAggregateOutputType = {
   capabilities: number
   configuration: number
   permissions: number
+  packagePath: number
   documentation: number
   changelog: number
   reviewNotes: number
@@ -141,6 +144,7 @@ export type SkillMinAggregateInputType = {
   repositoryUrl?: true
   mainFile?: true
   sourceCode?: true
+  packagePath?: true
   documentation?: true
   changelog?: true
   reviewNotes?: true
@@ -166,6 +170,7 @@ export type SkillMaxAggregateInputType = {
   repositoryUrl?: true
   mainFile?: true
   sourceCode?: true
+  packagePath?: true
   documentation?: true
   changelog?: true
   reviewNotes?: true
@@ -195,6 +200,7 @@ export type SkillCountAggregateInputType = {
   capabilities?: true
   configuration?: true
   permissions?: true
+  packagePath?: true
   documentation?: true
   changelog?: true
   reviewNotes?: true
@@ -311,6 +317,7 @@ export type SkillGroupByOutputType = {
   capabilities: runtime.JsonValue | null
   configuration: runtime.JsonValue | null
   permissions: runtime.JsonValue
+  packagePath: string | null
   documentation: string | null
   changelog: string | null
   reviewNotes: string | null
@@ -363,6 +370,7 @@ export type SkillWhereInput = {
   capabilities?: Prisma.JsonNullableFilter<"Skill">
   configuration?: Prisma.JsonNullableFilter<"Skill">
   permissions?: Prisma.JsonFilter<"Skill">
+  packagePath?: Prisma.StringNullableFilter<"Skill"> | string | null
   documentation?: Prisma.StringNullableFilter<"Skill"> | string | null
   changelog?: Prisma.StringNullableFilter<"Skill"> | string | null
   reviewNotes?: Prisma.StringNullableFilter<"Skill"> | string | null
@@ -395,6 +403,7 @@ export type SkillOrderByWithRelationInput = {
   capabilities?: Prisma.SortOrderInput | Prisma.SortOrder
   configuration?: Prisma.SortOrderInput | Prisma.SortOrder
   permissions?: Prisma.SortOrder
+  packagePath?: Prisma.SortOrderInput | Prisma.SortOrder
   documentation?: Prisma.SortOrderInput | Prisma.SortOrder
   changelog?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewNotes?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -431,6 +440,7 @@ export type SkillWhereUniqueInput = Prisma.AtLeast<{
   capabilities?: Prisma.JsonNullableFilter<"Skill">
   configuration?: Prisma.JsonNullableFilter<"Skill">
   permissions?: Prisma.JsonFilter<"Skill">
+  packagePath?: Prisma.StringNullableFilter<"Skill"> | string | null
   documentation?: Prisma.StringNullableFilter<"Skill"> | string | null
   changelog?: Prisma.StringNullableFilter<"Skill"> | string | null
   reviewNotes?: Prisma.StringNullableFilter<"Skill"> | string | null
@@ -463,6 +473,7 @@ export type SkillOrderByWithAggregationInput = {
   capabilities?: Prisma.SortOrderInput | Prisma.SortOrder
   configuration?: Prisma.SortOrderInput | Prisma.SortOrder
   permissions?: Prisma.SortOrder
+  packagePath?: Prisma.SortOrderInput | Prisma.SortOrder
   documentation?: Prisma.SortOrderInput | Prisma.SortOrder
   changelog?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewNotes?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -500,6 +511,7 @@ export type SkillScalarWhereWithAggregatesInput = {
   capabilities?: Prisma.JsonNullableWithAggregatesFilter<"Skill">
   configuration?: Prisma.JsonNullableWithAggregatesFilter<"Skill">
   permissions?: Prisma.JsonWithAggregatesFilter<"Skill">
+  packagePath?: Prisma.StringNullableWithAggregatesFilter<"Skill"> | string | null
   documentation?: Prisma.StringNullableWithAggregatesFilter<"Skill"> | string | null
   changelog?: Prisma.StringNullableWithAggregatesFilter<"Skill"> | string | null
   reviewNotes?: Prisma.StringNullableWithAggregatesFilter<"Skill"> | string | null
@@ -527,6 +539,7 @@ export type SkillCreateInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: string | null
   documentation?: string | null
   changelog?: string | null
   reviewNotes?: string | null
@@ -559,6 +572,7 @@ export type SkillUncheckedCreateInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: string | null
   documentation?: string | null
   changelog?: string | null
   reviewNotes?: string | null
@@ -587,6 +601,7 @@ export type SkillUpdateInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -619,6 +634,7 @@ export type SkillUncheckedUpdateInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -649,6 +665,7 @@ export type SkillCreateManyInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: string | null
   documentation?: string | null
   changelog?: string | null
   reviewNotes?: string | null
@@ -676,6 +693,7 @@ export type SkillUpdateManyMutationInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -705,6 +723,7 @@ export type SkillUncheckedUpdateManyInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -750,6 +769,7 @@ export type SkillCountOrderByAggregateInput = {
   capabilities?: Prisma.SortOrder
   configuration?: Prisma.SortOrder
   permissions?: Prisma.SortOrder
+  packagePath?: Prisma.SortOrder
   documentation?: Prisma.SortOrder
   changelog?: Prisma.SortOrder
   reviewNotes?: Prisma.SortOrder
@@ -780,6 +800,7 @@ export type SkillMaxOrderByAggregateInput = {
   repositoryUrl?: Prisma.SortOrder
   mainFile?: Prisma.SortOrder
   sourceCode?: Prisma.SortOrder
+  packagePath?: Prisma.SortOrder
   documentation?: Prisma.SortOrder
   changelog?: Prisma.SortOrder
   reviewNotes?: Prisma.SortOrder
@@ -805,6 +826,7 @@ export type SkillMinOrderByAggregateInput = {
   repositoryUrl?: Prisma.SortOrder
   mainFile?: Prisma.SortOrder
   sourceCode?: Prisma.SortOrder
+  packagePath?: Prisma.SortOrder
   documentation?: Prisma.SortOrder
   changelog?: Prisma.SortOrder
   reviewNotes?: Prisma.SortOrder
@@ -957,6 +979,7 @@ export type SkillCreateWithoutAuthorInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: string | null
   documentation?: string | null
   changelog?: string | null
   reviewNotes?: string | null
@@ -987,6 +1010,7 @@ export type SkillUncheckedCreateWithoutAuthorInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: string | null
   documentation?: string | null
   changelog?: string | null
   reviewNotes?: string | null
@@ -1046,6 +1070,7 @@ export type SkillScalarWhereInput = {
   capabilities?: Prisma.JsonNullableFilter<"Skill">
   configuration?: Prisma.JsonNullableFilter<"Skill">
   permissions?: Prisma.JsonFilter<"Skill">
+  packagePath?: Prisma.StringNullableFilter<"Skill"> | string | null
   documentation?: Prisma.StringNullableFilter<"Skill"> | string | null
   changelog?: Prisma.StringNullableFilter<"Skill"> | string | null
   reviewNotes?: Prisma.StringNullableFilter<"Skill"> | string | null
@@ -1073,6 +1098,7 @@ export type SkillCreateWithoutTenantInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: string | null
   documentation?: string | null
   changelog?: string | null
   reviewNotes?: string | null
@@ -1103,6 +1129,7 @@ export type SkillUncheckedCreateWithoutTenantInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: string | null
   documentation?: string | null
   changelog?: string | null
   reviewNotes?: string | null
@@ -1157,6 +1184,7 @@ export type SkillCreateWithoutInstallationsInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: string | null
   documentation?: string | null
   changelog?: string | null
   reviewNotes?: string | null
@@ -1188,6 +1216,7 @@ export type SkillUncheckedCreateWithoutInstallationsInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: string | null
   documentation?: string | null
   changelog?: string | null
   reviewNotes?: string | null
@@ -1231,6 +1260,7 @@ export type SkillUpdateWithoutInstallationsInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1262,6 +1292,7 @@ export type SkillUncheckedUpdateWithoutInstallationsInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1290,6 +1321,7 @@ export type SkillCreateManyAuthorInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: string | null
   documentation?: string | null
   changelog?: string | null
   reviewNotes?: string | null
@@ -1317,6 +1349,7 @@ export type SkillUpdateWithoutAuthorInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1347,6 +1380,7 @@ export type SkillUncheckedUpdateWithoutAuthorInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1376,6 +1410,7 @@ export type SkillUncheckedUpdateManyWithoutAuthorInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1404,6 +1439,7 @@ export type SkillCreateManyTenantInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: string | null
   documentation?: string | null
   changelog?: string | null
   reviewNotes?: string | null
@@ -1431,6 +1467,7 @@ export type SkillUpdateWithoutTenantInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1461,6 +1498,7 @@ export type SkillUncheckedUpdateWithoutTenantInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1490,6 +1528,7 @@ export type SkillUncheckedUpdateManyWithoutTenantInput = {
   capabilities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   configuration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  packagePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documentation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changelog?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1550,6 +1589,7 @@ export type SkillSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   capabilities?: boolean
   configuration?: boolean
   permissions?: boolean
+  packagePath?: boolean
   documentation?: boolean
   changelog?: boolean
   reviewNotes?: boolean
@@ -1583,6 +1623,7 @@ export type SkillSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   capabilities?: boolean
   configuration?: boolean
   permissions?: boolean
+  packagePath?: boolean
   documentation?: boolean
   changelog?: boolean
   reviewNotes?: boolean
@@ -1614,6 +1655,7 @@ export type SkillSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   capabilities?: boolean
   configuration?: boolean
   permissions?: boolean
+  packagePath?: boolean
   documentation?: boolean
   changelog?: boolean
   reviewNotes?: boolean
@@ -1645,6 +1687,7 @@ export type SkillSelectScalar = {
   capabilities?: boolean
   configuration?: boolean
   permissions?: boolean
+  packagePath?: boolean
   documentation?: boolean
   changelog?: boolean
   reviewNotes?: boolean
@@ -1656,7 +1699,7 @@ export type SkillSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SkillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "version" | "description" | "category" | "status" | "isCore" | "authorId" | "submittedAt" | "tenantId" | "compatibleRoles" | "repositoryUrl" | "mainFile" | "sourceCode" | "capabilities" | "configuration" | "permissions" | "documentation" | "changelog" | "reviewNotes" | "reviewedAt" | "reviewedBy" | "rating" | "installCount" | "createdAt" | "updatedAt", ExtArgs["result"]["skill"]>
+export type SkillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "version" | "description" | "category" | "status" | "isCore" | "authorId" | "submittedAt" | "tenantId" | "compatibleRoles" | "repositoryUrl" | "mainFile" | "sourceCode" | "capabilities" | "configuration" | "permissions" | "packagePath" | "documentation" | "changelog" | "reviewNotes" | "reviewedAt" | "reviewedBy" | "rating" | "installCount" | "createdAt" | "updatedAt", ExtArgs["result"]["skill"]>
 export type SkillInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   tenant?: boolean | Prisma.Skill$tenantArgs<ExtArgs>
@@ -1697,6 +1740,7 @@ export type $SkillPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     capabilities: runtime.JsonValue | null
     configuration: runtime.JsonValue | null
     permissions: runtime.JsonValue
+    packagePath: string | null
     documentation: string | null
     changelog: string | null
     reviewNotes: string | null
@@ -2149,6 +2193,7 @@ export interface SkillFieldRefs {
   readonly capabilities: Prisma.FieldRef<"Skill", 'Json'>
   readonly configuration: Prisma.FieldRef<"Skill", 'Json'>
   readonly permissions: Prisma.FieldRef<"Skill", 'Json'>
+  readonly packagePath: Prisma.FieldRef<"Skill", 'String'>
   readonly documentation: Prisma.FieldRef<"Skill", 'String'>
   readonly changelog: Prisma.FieldRef<"Skill", 'String'>
   readonly reviewNotes: Prisma.FieldRef<"Skill", 'String'>

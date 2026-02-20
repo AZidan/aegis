@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { Loader2, Shield, Globe, FolderOpen, Key, AlertCircle } from 'lucide-react';
-import { cn } from '@/lib/utils/cn';
 import {
   Dialog,
   DialogContent,
@@ -15,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { useAgents } from '@/lib/hooks/use-agents';
 import { useInstallSkill } from '@/lib/hooks/use-skills';
 import type { SkillDetail } from '@/lib/api/skills';
+import { flattenPermissions } from '@/lib/api/skills';
 
 // ---------------------------------------------------------------------------
 // Props
@@ -40,9 +40,16 @@ export function InstallSkillModal({
   const [selectedAgentId, setSelectedAgentId] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState(false);
+  const [permissionsAccepted, setPermissionsAccepted] = React.useState(false);
 
   const { data: agents = [], isLoading: agentsLoading } = useAgents();
   const installMutation = useInstallSkill();
+
+  const flat = flattenPermissions(skill.permissions);
+  const hasPermissions =
+    flat.network.length > 0 ||
+    flat.files.length > 0 ||
+    flat.env.length > 0;
 
   // Reset state when modal opens/closes
   React.useEffect(() => {
@@ -50,6 +57,7 @@ export function InstallSkillModal({
       setSelectedAgentId('');
       setError(null);
       setSuccess(false);
+      setPermissionsAccepted(false);
     }
   }, [open]);
 
@@ -63,30 +71,33 @@ export function InstallSkillModal({
     installMutation.mutate(
       {
         skillId: skill.id,
-        payload: { agentId: selectedAgentId },
+        payload: {
+          agentId: selectedAgentId,
+          acceptPermissions: hasPermissions ? permissionsAccepted : undefined,
+        },
       },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           setSuccess(true);
-          // Auto-close after a short delay
           setTimeout(() => {
             onInstalled();
             onClose();
           }, 1500);
         },
         onError: (err: unknown) => {
-          const message =
-            err instanceof Error ? err.message : 'Failed to install skill.';
-          setError(message);
+          const axiosMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+          const errMsg = axiosMsg || (err instanceof Error ? err.message : 'Failed to install skill.');
+          setError(errMsg);
         },
       }
     );
   };
 
-  const hasPermissions =
-    skill.permissions.network.length > 0 ||
-    skill.permissions.files.length > 0 ||
-    skill.permissions.env.length > 0;
+  const canInstall =
+    !!selectedAgentId &&
+    !installMutation.isPending &&
+    !success &&
+    (!hasPermissions || permissionsAccepted);
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -128,18 +139,18 @@ export function InstallSkillModal({
             )}
           </div>
 
-          {/* Permissions review */}
+          {/* Permissions review + acceptance */}
           {hasPermissions && (
-            <div className="rounded-lg border border-neutral-200 p-4">
+            <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Shield className="h-4 w-4 text-neutral-500" />
-                <span className="text-sm font-medium text-neutral-700">
+                <Shield className="h-4 w-4 text-amber-600" />
+                <span className="text-sm font-medium text-amber-800">
                   Permissions Required
                 </span>
               </div>
 
-              <div className="space-y-2.5">
-                {skill.permissions.network.length > 0 && (
+              <div className="space-y-2.5 mb-4">
+                {flat.network.length > 0 && (
                   <div className="flex items-start gap-2">
                     <Globe className="h-3.5 w-3.5 text-blue-500 mt-0.5 shrink-0" />
                     <div>
@@ -147,12 +158,12 @@ export function InstallSkillModal({
                         Network Access
                       </p>
                       <p className="text-[11px] text-neutral-400">
-                        {skill.permissions.network.join(', ')}
+                        {flat.network.join(', ')}
                       </p>
                     </div>
                   </div>
                 )}
-                {skill.permissions.files.length > 0 && (
+                {flat.files.length > 0 && (
                   <div className="flex items-start gap-2">
                     <FolderOpen className="h-3.5 w-3.5 text-amber-500 mt-0.5 shrink-0" />
                     <div>
@@ -160,12 +171,12 @@ export function InstallSkillModal({
                         File Access
                       </p>
                       <p className="text-[11px] text-neutral-400">
-                        {skill.permissions.files.join(', ')}
+                        {flat.files.join(', ')}
                       </p>
                     </div>
                   </div>
                 )}
-                {skill.permissions.env.length > 0 && (
+                {flat.env.length > 0 && (
                   <div className="flex items-start gap-2">
                     <Key className="h-3.5 w-3.5 text-purple-500 mt-0.5 shrink-0" />
                     <div>
@@ -173,12 +184,26 @@ export function InstallSkillModal({
                         Environment Variables
                       </p>
                       <p className="text-[11px] text-neutral-400">
-                        {skill.permissions.env.join(', ')}
+                        {flat.env.join(', ')}
                       </p>
                     </div>
                   </div>
                 )}
               </div>
+
+              {/* Acceptance checkbox */}
+              <label className="flex items-start gap-2.5 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={permissionsAccepted}
+                  onChange={(e) => setPermissionsAccepted(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+                />
+                <span className="text-xs text-neutral-600 group-hover:text-neutral-800 leading-relaxed">
+                  I understand and accept that this skill will be granted the
+                  above permissions on the selected agent.
+                </span>
+              </label>
             </div>
           )}
 
@@ -207,9 +232,7 @@ export function InstallSkillModal({
           </Button>
           <Button
             onClick={handleInstall}
-            disabled={
-              !selectedAgentId || installMutation.isPending || success
-            }
+            disabled={!canInstall}
           >
             {installMutation.isPending ? (
               <>

@@ -1,10 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { Plus, Package, Loader2 } from 'lucide-react';
+import { Upload, Package, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePrivateSkills } from '@/lib/hooks/use-private-skills';
-import { SubmitSkillModal } from '@/components/dashboard/skills/submit-skill-modal';
+import { UploadSkillModal } from '@/components/dashboard/skills/upload-skill-modal';
 import type { PrivateSkill } from '@/lib/api/private-skills';
 
 // ---------------------------------------------------------------------------
@@ -55,8 +55,8 @@ export default function PrivateSkillsPage() {
           </p>
         </div>
         <Button onClick={() => setModalOpen(true)}>
-          <Plus className="h-4 w-4" />
-          Submit Skill
+          <Upload className="h-4 w-4" />
+          Upload Skill
         </Button>
       </div>
 
@@ -93,15 +93,15 @@ export default function PrivateSkillsPage() {
             No private skills yet
           </p>
           <p className="mt-1 text-xs text-neutral-400">
-            Submit your first custom skill to get started.
+            Upload your first custom skill package to get started.
           </p>
           <Button
             className="mt-4"
             variant="outline"
             onClick={() => setModalOpen(true)}
           >
-            <Plus className="h-4 w-4" />
-            Submit Skill
+            <Upload className="h-4 w-4" />
+            Upload Skill
           </Button>
         </div>
       )}
@@ -147,10 +147,9 @@ export default function PrivateSkillsPage() {
       )}
 
       {/* Submit Modal */}
-      <SubmitSkillModal
+      <UploadSkillModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSubmitted={() => refetch()}
       />
     </div>
   );

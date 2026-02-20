@@ -10,6 +10,7 @@ import { z } from 'zod';
 export const installSkillSchema = z.object({
   agentId: z.string().uuid('agentId must be a valid UUID'),
   credentials: z.record(z.string(), z.string()).optional(),
+  acceptPermissions: z.boolean().optional(),
 });
 
 export type InstallSkillDto = z.infer<typeof installSkillSchema>;
