@@ -1,0 +1,46 @@
+# E18-F8 AC-1: GET /admin/skills/review accepts ?status= query param (comma-separated filter)
+#
+# Verification strategy: Each tab triggers a different API call with a status filter.
+# Pending tab => ?status=pending,in_review,changes_requested (comma-separated)
+# Approved tab => ?status=approved
+# Rejected tab => ?status=rejected
+# We verify that each tab loads and renders (even if empty) without error,
+# confirming the API accepted each filter.
+
+url: http://localhost:3001/admin/login
+---
+- runFlow: helpers/admin-login.yaml
+- openLink: http://localhost:3001/admin/skills
+- extendedWaitUntil:
+    visible: "Skill Management"
+    timeout: 15000
+
+# Pending tab is default - API called with comma-separated filter
+- assertVisible: "Pending"
+- waitForAnimationToEnd
+- takeScreenshot: "e18-f8-ac-1-pending-tab-loaded"
+
+# Switch to Approved tab - API called with ?status=approved
+- tapOn: "Approved"
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "Approved"
+    timeout: 10000
+# No error state should appear - empty state OR data, not "Failed to load skills"
+- assertNotVisible: "Failed to load skills"
+- takeScreenshot: "e18-f8-ac-1-approved-tab-loaded"
+
+# Switch to Rejected tab - API called with ?status=rejected
+- tapOn: "Rejected"
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "Rejected"
+    timeout: 10000
+- assertNotVisible: "Failed to load skills"
+- takeScreenshot: "e18-f8-ac-1-rejected-tab-loaded"
+
+# Switch back to Pending - confirms comma-separated filter round-trips
+- tapOn: "Pending"
+- waitForAnimationToEnd
+- assertNotVisible: "Failed to load skills"
+- takeScreenshot: "e18-f8-ac-1-pending-tab-reloaded"

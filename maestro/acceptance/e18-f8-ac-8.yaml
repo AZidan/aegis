@@ -1,0 +1,35 @@
+# E18-F8 AC-8: Status banner at top of detail page: green/red/amber per status
+#
+# SkillStatusBanner renders for non-pending, non-in_review statuses:
+# - approved => green banner: "Approved on <date>"
+# - rejected => red banner: "Rejected on <date>"
+# - changes_requested => amber banner: "Changes Requested on <date>"
+#
+# Test 1: approved skill (id: 94d025ea-0ac7-4308-9ea0-518aaa787bf1 "Task Automator") => "Approved on" text
+# Test 2: rejected skill (id: 05925355-ec17-419d-9357-9a1b26994259 "web-design-guidelines") => "Rejected on" text
+
+url: http://localhost:3001/admin/login
+---
+- runFlow: helpers/admin-login.yaml
+
+# Test 1: Approved skill => green banner with "Approved on" text
+- openLink: http://localhost:3001/admin/skills/review/94d025ea-0ac7-4308-9ea0-518aaa787bf1
+- extendedWaitUntil:
+    visible: "Task Automator"
+    timeout: 15000
+- waitForAnimationToEnd
+
+# Green status banner must show "Approved on" text
+- assertVisible: "Approved on"
+- takeScreenshot: "e18-f8-ac-8-approved-banner-green"
+
+# Test 2: Rejected skill => red banner with "Rejected on" text
+- openLink: http://localhost:3001/admin/skills/review/05925355-ec17-419d-9357-9a1b26994259
+- extendedWaitUntil:
+    visible: "web-design-guidelines"
+    timeout: 15000
+- waitForAnimationToEnd
+
+# Red status banner must show "Rejected on" text
+- assertVisible: "Rejected on"
+- takeScreenshot: "e18-f8-ac-8-rejected-banner-red"

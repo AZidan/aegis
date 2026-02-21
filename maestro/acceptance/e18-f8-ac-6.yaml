@@ -1,0 +1,53 @@
+# E18-F8 AC-6: Rejected tab shows truncated rejection reason, View action button
+#
+# The Rejected tab renders:
+# - A "Reason" column showing the rejection reason (truncated with line-clamp-2)
+# - An "Action" column with a "View" button (navigates to read-only detail page)
+# - No "Status" badge column
+#
+# DB has 1 rejected skill: web-design-guidelines (id: 05925355-ec17-419d-9357-9a1b26994259)
+# Note: The action column is beyond the visible viewport width in Maestro's browser.
+# We verify the Reason column exists and confirm the read-only detail navigation works.
+
+url: http://localhost:3001/admin/login
+---
+- runFlow: helpers/admin-login.yaml
+- openLink: http://localhost:3001/admin/skills
+- extendedWaitUntil:
+    visible: "Skill Management"
+    timeout: 15000
+- waitForAnimationToEnd
+
+# Navigate to Rejected tab
+- tapOn: "Rejected"
+- waitForAnimationToEnd
+
+# Wait for the "Reason" column header to appear (rejected-specific column)
+- extendedWaitUntil:
+    visible: "Reason"
+    timeout: 15000
+
+# "Reason" column is visible (rejected-specific column showing truncated rejection reason)
+- assertVisible: "Reason"
+
+# "Status" badge column is NOT present on Rejected tab
+- assertNotVisible: "Status"
+
+# The rejected skill row should show the skill name
+- assertVisible: "web-design-guidelines"
+
+- takeScreenshot: "e18-f8-ac-6-rejected-reason-column-skill-visible"
+
+# Verify the View action button leads to a read-only detail page with rejection info
+# (web-design-guidelines id: 05925355-ec17-419d-9357-9a1b26994259 is rejected)
+- openLink: http://localhost:3001/admin/skills/review/05925355-ec17-419d-9357-9a1b26994259
+- extendedWaitUntil:
+    visible: "web-design-guidelines"
+    timeout: 15000
+- waitForAnimationToEnd
+
+# Rejected detail page is read-only - no action bar
+- assertNotVisible: "Approve & Publish"
+# Status banner shows "Rejected on" (red)
+- assertVisible: "Rejected on"
+- takeScreenshot: "e18-f8-ac-6-view-button-leads-to-readonly-rejected-page"

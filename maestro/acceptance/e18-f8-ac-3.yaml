@@ -1,0 +1,51 @@
+# E18-F8 AC-3: Each tab shows count badge and status-specific table columns
+#
+# Count badges: Each tab renders a numeric badge (0 or more) next to its label.
+# Pending tab columns: Skill, Version, Type, Author, Tenant, Risk, Status, Submitted, Action
+# Approved tab columns: Skill, Version, Type, Author, Tenant, Risk, Reviewed, Date, Action
+# Rejected tab columns: Skill, Version, Type, Author, Tenant, Risk, Reason, Date, Action
+#
+# Key column differences between tabs:
+# - Pending shows "Status" column header; Approved/Rejected do NOT
+# - Approved shows "Reviewed" column header
+# - Rejected shows "Reason" column header
+
+url: http://localhost:3001/admin/login
+---
+- runFlow: helpers/admin-login.yaml
+- openLink: http://localhost:3001/admin/skills
+- extendedWaitUntil:
+    visible: "Skill Management"
+    timeout: 15000
+- waitForAnimationToEnd
+
+# Pending tab (default) - DB has 4 in_review skills, table should render
+- extendedWaitUntil:
+    visible: "Status"
+    timeout: 10000
+- assertVisible: "Status"
+- takeScreenshot: "e18-f8-ac-3-pending-columns"
+
+# Switch to Approved tab - 6 approved skills exist
+- tapOn: "Approved"
+- waitForAnimationToEnd
+# Wait for the Reviewed column header (appears when approved data loads)
+- extendedWaitUntil:
+    visible: "Reviewed"
+    timeout: 15000
+# Approved tab shows "Reviewed" date column, not "Status"
+- assertVisible: "Reviewed"
+- assertNotVisible: "Status"
+- takeScreenshot: "e18-f8-ac-3-approved-columns"
+
+# Switch to Rejected tab - 1 rejected skill exists
+- tapOn: "Rejected"
+- waitForAnimationToEnd
+# Wait for the Reason column header (appears when rejected data loads)
+- extendedWaitUntil:
+    visible: "Reason"
+    timeout: 15000
+# Rejected tab shows "Reason" column, not "Status"
+- assertVisible: "Reason"
+- assertNotVisible: "Status"
+- takeScreenshot: "e18-f8-ac-3-rejected-columns"

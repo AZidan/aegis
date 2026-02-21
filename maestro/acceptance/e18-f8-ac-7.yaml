@@ -1,0 +1,32 @@
+# E18-F8 AC-7: Review detail page renders read-only for non-pending skills (no action bar)
+#
+# A skill with status "approved" (id: 94d025ea-0ac7-4308-9ea0-518aaa787bf1, "Task Automator")
+# is non-pending so isReadOnly = true in the component.
+# In read-only mode:
+# - The sticky bottom action bar (Reject / Request Changes / Approve & Publish) is NOT rendered
+# - The Security Review Checklist right column is hidden
+# - The SkillStatusBanner IS shown at the top
+#
+# We navigate directly to the detail page for an approved skill and assert
+# the action bar buttons are absent.
+
+url: http://localhost:3001/admin/login
+---
+- runFlow: helpers/admin-login.yaml
+- openLink: http://localhost:3001/admin/skills/review/94d025ea-0ac7-4308-9ea0-518aaa787bf1
+- extendedWaitUntil:
+    visible: "Task Automator"
+    timeout: 15000
+- waitForAnimationToEnd
+- takeScreenshot: "e18-f8-ac-7-approved-skill-detail"
+
+# In read-only mode, action bar buttons must NOT be present
+- assertNotVisible: "Approve & Publish"
+- assertNotVisible: "Reject"
+- assertNotVisible: "Request Changes"
+- assertNotVisible: "Security Review Checklist"
+- takeScreenshot: "e18-f8-ac-7-no-action-bar-confirmed"
+
+# Verify the page still shows the skill name and breadcrumb navigation
+- assertVisible: "Task Automator"
+- assertVisible: "Review Queue"

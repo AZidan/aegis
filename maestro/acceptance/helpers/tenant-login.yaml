@@ -1,0 +1,17 @@
+# Tenant admin login flow (no MFA)
+url: http://localhost:3001/login
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Sign in"
+    timeout: 5000
+- tapOn:
+    id: "email"
+- inputText: "tenant@acme.com"
+- tapOn:
+    id: "password"
+- inputText: "Tenant12345!@"
+- tapOn: "Sign in"
+- extendedWaitUntil:
+    visible: "Dashboard"
+    timeout: 10000

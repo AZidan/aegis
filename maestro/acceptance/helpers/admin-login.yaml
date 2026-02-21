@@ -1,0 +1,32 @@
+# Admin login flow with MFA via OTP
+# OTP auto-focuses first input and auto-advances on each digit
+# TOTP generated at runtime via pure JS (no env vars needed)
+url: http://localhost:3001/admin/login
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Sign in"
+    timeout: 5000
+- tapOn:
+    id: "email"
+- inputText: "admin@aegis.ai"
+- tapOn:
+    id: "password"
+- inputText: "Admin12345!@"
+- tapOn: "Sign in"
+- extendedWaitUntil:
+    visible: "Two-Factor Authentication"
+    timeout: 5000
+# Generate TOTP right before entry (avoids 30-second expiry)
+- runScript: generate-totp.js
+# Type one digit at a time; auto-advance moves focus to next box
+- inputText: "${output.d1}"
+- inputText: "${output.d2}"
+- inputText: "${output.d3}"
+- inputText: "${output.d4}"
+- inputText: "${output.d5}"
+- inputText: "${output.d6}"
+# Auto-submit triggers after all 6 digits filled
+- extendedWaitUntil:
+    visible: "Platform Dashboard"
+    timeout: 15000

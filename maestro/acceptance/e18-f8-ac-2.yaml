@@ -1,0 +1,23 @@
+# E18-F8 AC-2: Admin skills page has 3 tabs: Pending (default), Approved, Rejected
+#
+# Verifies all 3 tab labels are visible and Pending is the default active tab
+# (page loads on Pending without any user action).
+
+url: http://localhost:3001/admin/login
+---
+- runFlow: helpers/admin-login.yaml
+- openLink: http://localhost:3001/admin/skills
+- extendedWaitUntil:
+    visible: "Skill Management"
+    timeout: 15000
+- waitForAnimationToEnd
+
+# All 3 tabs must be visible in the tab bar
+- assertVisible: "Pending"
+- assertVisible: "Approved"
+- assertVisible: "Rejected"
+
+# Pending is the default active tab - page content is visible without clicking Pending
+# Both empty state and table are valid renders of the Pending tab
+- assertNotVisible: "Failed to load skills"
+- takeScreenshot: "e18-f8-ac-2-three-tabs-pending-default"

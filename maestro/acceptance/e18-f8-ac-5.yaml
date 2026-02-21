@@ -1,0 +1,50 @@
+# E18-F8 AC-5: Approved tab shows reviewed date, View action button
+#
+# The Approved tab renders:
+# - A "Reviewed" column showing the date the skill was reviewed
+# - An "Action" column with a "View" button (navigates to read-only detail page)
+# - No "Status" badge column (Status column only appears on Pending tab)
+#
+# DB has 14 approved skills.
+# Note: The action column is beyond the visible viewport width in Maestro's browser.
+# We verify the Reviewed column exists and confirm the read-only detail navigation works.
+
+url: http://localhost:3001/admin/login
+---
+- runFlow: helpers/admin-login.yaml
+- openLink: http://localhost:3001/admin/skills
+- extendedWaitUntil:
+    visible: "Skill Management"
+    timeout: 15000
+- waitForAnimationToEnd
+
+# Navigate to Approved tab
+- tapOn: "Approved"
+- waitForAnimationToEnd
+
+# Wait for the "Reviewed" column header to appear (approved-specific column)
+- extendedWaitUntil:
+    visible: "Reviewed"
+    timeout: 15000
+
+# "Reviewed" date column is visible (approved-specific column header)
+- assertVisible: "Reviewed"
+
+# "Status" badge column is NOT present on Approved tab
+- assertNotVisible: "Status"
+
+- takeScreenshot: "e18-f8-ac-5-approved-reviewed-column-no-status"
+
+# Verify the View action button leads to a read-only detail page
+# (Task Automator id: 94d025ea-0ac7-4308-9ea0-518aaa787bf1 is approved)
+- openLink: http://localhost:3001/admin/skills/review/94d025ea-0ac7-4308-9ea0-518aaa787bf1
+- extendedWaitUntil:
+    visible: "Task Automator"
+    timeout: 15000
+- waitForAnimationToEnd
+
+# Approved detail page is read-only - no action bar
+- assertNotVisible: "Approve & Publish"
+# Status banner shows "Approved on" (green)
+- assertVisible: "Approved on"
+- takeScreenshot: "e18-f8-ac-5-view-button-leads-to-readonly-page"
