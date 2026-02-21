@@ -1564,7 +1564,7 @@ epics:
           containers as read-only mounts so that agents can use skills without
           any ability to modify them, ensuring security isolation.
         acceptance_criteria:
-          - "Approved skills mounted read-only at /home/node/.aegis/skills/{skill-name}/"
+          - "Approved skills mounted read-only at ~/.openclaw/workspace-{agentId}/skills/{skill-name}/ (per-agent isolation via OpenClaw workspace)"
           - "SKILL.md + scripts/ + templates/ + references/ + assets/ pushed to container"
           - "manifest.json NEVER pushed to container — stays on Aegis server"
           - "manifest.json configures container network policy (allowedDomains → iptables rules)"
@@ -1615,6 +1615,97 @@ epics:
           - "Prompt user to create manifest.json (permissions, allowed domains)"
           - "Imported skills go through same review pipeline as custom skills"
           - "Version tracking: link to upstream source for update notifications"
+
+      - id: E18-F7
+        title: "Changes Requested Workflow"
+        priority: "P1"
+        user_story: >
+          As a platform admin, I want to request changes on a submitted skill
+          (instead of outright rejecting it) so that the submitter can revise
+          and resubmit without starting over.
+        acceptance_criteria:
+          - "New SkillStatus enum value: changes_requested"
+          - "PUT /admin/skills/review/:id/request-changes endpoint with reason body"
+          - "rejectionReason field on Skill model (separate from reviewNotes to preserve LLM data)"
+          - "Status distinguishes reject vs changes_requested (same field, different enum)"
+          - "Prisma migration adds enum value + field non-destructively"
+
+      - id: E18-F8
+        title: "Admin Skills Review History"
+        priority: "P1"
+        user_story: >
+          As a platform admin, I want to view previously approved, rejected,
+          and changes-requested skills so that I can audit review decisions
+          and track submission history across tenants.
+        acceptance_criteria:
+          - "GET /admin/skills/review accepts ?status= query param (comma-separated filter)"
+          - "Admin skills page has 3 tabs: Pending (default), Approved, Rejected"
+          - "Each tab shows count badge and status-specific table columns"
+          - "Pending tab: shows status badge, risk score, Review action button"
+          - "Approved tab: shows reviewed date, View action button"
+          - "Rejected tab: shows truncated rejection reason, View action button"
+          - "Review detail page renders read-only for non-pending skills (no action bar)"
+          - "Status banner at top of detail page: green/red/amber per status"
+
+      - id: E18-F9
+        title: "Submitter Feedback Visibility"
+        priority: "P1"
+        user_story: >
+          As a tenant admin who submitted a skill, I want to see why my skill
+          was rejected or what changes were requested so that I can address
+          the feedback and submit a corrected version.
+        acceptance_criteria:
+          - "GET /dashboard/skills/private accepts ?status= query param (comma-separated filter)"
+          - "Tenant private skills page has 3 tabs: Pending, Approved, Rejected"
+          - "Rejected/changes_requested skills display rejectionReason inline in table"
+          - "Tenant skill detail page shows status banner + feedback card with reason"
+          - "Code viewer and LLM review visible in read-only mode"
+          - "Resubmission requires new version (not in-place edit of rejected skill)"
+
+      - id: E18-F10
+        title: "Unified Import Skill Modal"
+        priority: "P1"
+        user_story: >
+          As both a platform admin and tenant admin, I want a consistent skill
+          import experience with GitHub URL, ZIP upload, and manual entry tabs
+          so that I can submit skills from any source using a single interface.
+        acceptance_criteria:
+          - "Single shared ImportSkillModal component with mode prop (admin | tenant)"
+          - "3 tabs: GitHub URL (default), ZIP Upload, Manual Entry"
+          - "Admin mode: imports to marketplace (null tenantId, auto-approved)"
+          - "Tenant mode: submits for review (JWT tenantId, status=pending)"
+          - "GitHub tab: URL input → fetch skills list → select → import"
+          - "ZIP tab: drag-and-drop upload → validation → submit"
+          - "Manual tab: form with name, version, description, category, source code, permissions"
+          - "Replaces separate admin and tenant upload modals"
+
+      - id: E18-F11
+        title: "Tenant GitHub Skill Import"
+        priority: "P1"
+        user_story: >
+          As a tenant admin, I want to import skills from GitHub repositories
+          (e.g., anthropics/skills) so that I can use community skills without
+          manually copying source code.
+        acceptance_criteria:
+          - "POST /dashboard/skills/import/github endpoint (JWT + TenantGuard)"
+          - "Shared GitHubSkillImportModule extracted from admin-only service"
+          - "Tenant imports always set tenantId from JWT and status=pending"
+          - "Same request/response shape as admin GitHub import endpoint"
+          - "Large skill payloads supported (5MB JSON body limit)"
+
+      - id: E18-F12
+        title: "Shared Skill UI Components"
+        priority: "P2"
+        user_story: >
+          As a developer, I want reusable skill UI components (code viewer,
+          status badges, status banners) so that admin and tenant skill pages
+          maintain visual consistency without code duplication.
+        acceptance_criteria:
+          - "CodeViewer component: syntax-highlighted source display with file tabs"
+          - "SkillStatusBadge: color-coded badge for all 5 skill statuses"
+          - "SkillStatusBanner: full-width banner with icon, status text, and date"
+          - "All components exported from frontend/src/components/shared/skills/"
+          - "Used by both /admin/skills/* and /dashboard/skills/* pages"
 
 # =============================================================================
 # SPRINT PLAN -- MVP Phase (Weeks 1-8)

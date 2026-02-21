@@ -340,6 +340,7 @@ export function LoginForm({ variant }: LoginFormProps) {
                   ref={(el) => {
                     mfaInputRefs.current[index] = el;
                   }}
+                  id={`otp-${index}`}
                   type="text"
                   inputMode="numeric"
                   maxLength={1}
